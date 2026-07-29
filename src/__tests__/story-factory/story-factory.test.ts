@@ -29,6 +29,7 @@ import {
   materializeWindowReview,
   nextRunAfterNonChapterStage,
   PlannerRollingPlanResponseSchema,
+  REVISION_SYSTEM_PROMPT,
   WindowReviewSchema,
   WindowReviewWireSchema,
   appendAcceptedOutcome,
@@ -2235,6 +2236,8 @@ describe('canonical Story Factory', () => {
       draftAttempts: 2,
       firstPass: false,
     });
+    expect(REVISION_SYSTEM_PROMPT).toContain('thời lượng cảnh, thời gian di chuyển');
+    expect(REVISION_SYSTEM_PROMPT).toContain('không được tạo mâu thuẫn mới');
   });
 
   test('revision keeps the current chapter number and title evidence is grounded', async () => {

@@ -1,4 +1,4 @@
-export const FACTORY_PROMPT_VERSION = 'story-factory-2026-07-29.18-explicit-time-budget';
+export const FACTORY_PROMPT_VERSION = 'story-factory-2026-07-29.19-revision-preserves-mechanics';
 
 export const WRITER_SYSTEM_PROMPT = `Bạn là tiểu thuyết gia web-serial tiếng Việt.
 Hãy tiếp nối tự nhiên đoạn cuối chương trước, thực hiện đầy đủ chapter brief và giữ đúng canon, ký ức liên quan, tài nguyên, tri thức, quan hệ cùng vị trí nhân vật.
@@ -30,6 +30,7 @@ Nếu cần sửa, chỉ nêu tối đa ba lỗi quan trọng nhất và chỉ d
 export const REVISION_SYSTEM_PROMPT = `Bạn là tác giả sửa lại toàn bộ chương truyện.
 Viết lại từ đầu bằng chapter brief, đoạn nối chương trước và các lỗi biên tập có bằng chứng. Bản cũ cố ý không được đưa vào context để tránh vá câu hoặc nhân bản cấu trúc hỏng.
 Giữ nguyên canon và required changes, nhưng tự dựng lại cảnh, đối thoại, nhịp và câu chữ thành một chương hoàn chỉnh.
+Mọi constraint cơ học trong brief vẫn bất biến khi sửa: thời lượng cảnh, thời gian di chuyển, vị trí, tài nguyên, tri thức, quan hệ và trạng thái đầu-cuối. Sửa lỗi được nêu nhưng không được tạo mâu thuẫn mới với bất kỳ constraint nào khác.
 Tôn trọng POV được giao cho từng cảnh; không kể trực tiếp suy nghĩ riêng của nhân vật khác. Những trao đổi quyết định kết quả phải được diễn thành hành động hoặc đối thoại, không tóm tắt bằng lời người kể.
 Không giải thích quá trình sửa, không nhắc đến prompt, brief, delta, schema hay model.`;
 
