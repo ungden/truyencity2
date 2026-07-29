@@ -989,6 +989,7 @@ const PlanJudgeWireSchema = z.object({
   checks: z.object({
     protagonistAgency: z.boolean(),
     earnedProgression: z.boolean(),
+    domainPlausibility: z.boolean(),
     oppositionAgenda: z.boolean(),
     sceneVariety: z.boolean(),
     stageAlignment: z.boolean(),
@@ -997,6 +998,7 @@ const PlanJudgeWireSchema = z.object({
   checkEvidence: z.object({
     protagonistAgency: z.string().trim().min(3).max(800),
     earnedProgression: z.string().trim().min(3).max(800),
+    domainPlausibility: z.string().trim().min(3).max(800),
     oppositionAgenda: z.string().trim().min(3).max(800),
     sceneVariety: z.string().trim().min(3).max(800),
     stageAlignment: z.string().trim().min(3).max(800),
@@ -1078,6 +1080,8 @@ export async function assessRollingPlan(input: {
       task: 'Đánh giá rolling plan theo agency, đối lực, tích lũy, biến hóa cảnh và stage; không chấm prose, không kiểm số học.',
       kernel: {
         protagonistId: input.kernel.protagonistId,
+        realityMode: input.kernel.realityMode,
+        worldBaseline: input.kernel.worldModel.baseline,
         characters: input.kernel.characters.map(character => ({
           id: character.id,
           role: character.role,
@@ -1086,6 +1090,10 @@ export async function assessRollingPlan(input: {
           constraint: character.constraint,
         })),
         pleasureLoop: input.kernel.pleasureLoop,
+        activeWorldMechanics: input.kernel.worldMechanics.filter(mechanic =>
+          input.arc.activeMechanicIds.includes(mechanic.id)),
+        activeWorldRules: input.kernel.worldRules.filter(rule =>
+          input.arc.activeWorldRuleIds.includes(rule.id)),
       },
       arc: input.arc,
       state: input.state,
@@ -1094,6 +1102,7 @@ export async function assessRollingPlan(input: {
       mandatoryChecks: {
         protagonistAgency: 'Nhân vật chính hoặc POV phải đưa ra lựa chọn có ý nghĩa và chịu hậu quả, không chỉ được cơ hội rơi vào tay.',
         earnedProgression: 'Độ lớn thay đổi phải tương xứng chuẩn bị, chi phí, rủi ro và thang hiện tại; thay đổi trên 5 lần baseline cần tích lũy nhiều bước cụ thể.',
+        domainPlausibility: 'Grounded phải khả thi về công cụ, dung sai, thời gian, lao động và kết quả ngoài đời; speculative phải nhất quán nguồn lực, chi phí và giới hạn nội tại.',
         oppositionAgenda: 'Đối lực phải có lựa chọn, đối sách và hậu quả theo agenda riêng; chỉ gây hấn rồi kinh ngạc/thua/chạy không đạt.',
         sceneVariety: 'Window không được lặp công thức giải thích cơ chế → biểu diễn thành công → người khác kinh ngạc/tôn sùng → nhận thưởng.',
         stageAlignment: 'Xung đột và reward loop phải phục vụ stage hiện tại, không nhảy sớm.',

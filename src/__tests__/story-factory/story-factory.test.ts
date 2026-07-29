@@ -105,6 +105,7 @@ const kernel: StoryKernel = {
   title: 'Trọng Sinh Về Làng Biển, Tôi Đưa Cả Nhà Ăn No',
   description: 'Một người đàn ông trở lại làng biển và dùng kinh nghiệm nghề nghiệp để gây dựng sinh kế bền vững cho gia đình.',
   genreLane: 'do-thi-nien-dai',
+  realityMode: 'grounded',
   readerFantasy: 'Chủ động thay đổi cuộc sống bằng năng lực thật và nhìn thấy gia đình khá lên từng bước.',
   uniqueMechanism: 'Dùng hiểu biết về mùa cá, bảo quản và chênh lệch đầu ra nhưng luôn chịu giới hạn vốn và thời tiết.',
   mechanismFingerprint: 'tri-thuc-mua-ca-va-bao-quan',
@@ -1862,7 +1863,6 @@ describe('canonical Story Factory', () => {
       location: 'Bãi ngang',
       participants: ['Hải', 'Bà Lành'],
       immediateObjective: 'Mở cuộc thương lượng mới ở bãi ngang.',
-      unwrittenGapMinutes: 0,
       plannedTravelMinutes: 20,
       mustRemainAvailableAt: [],
     });
@@ -3188,12 +3188,13 @@ describe('canonical Story Factory', () => {
     const provider = new QueueProvider([plannerWire(), {
       status: 'pass',
       checks: {
-        protagonistAgency: true, earnedProgression: true, oppositionAgenda: true,
+        protagonistAgency: true, earnedProgression: true, domainPlausibility: true, oppositionAgenda: true,
         sceneVariety: true, stageAlignment: true, outcomeWeight: true,
       },
       checkEvidence: {
         protagonistAgency: 'chapter 1 scene_1 delta_1',
         earnedProgression: 'chapter 1 scene_1 delta_1',
+        domainPlausibility: 'chapter 1 scene_1 delta_1',
         oppositionAgenda: 'chapter 1 scene_1 delta_1',
         sceneVariety: 'chapter 1 scene_1 delta_1',
         stageAlignment: 'chapter 1 scene_1 delta_1',
@@ -3332,12 +3333,13 @@ describe('canonical Story Factory', () => {
     const provider = new QueueProvider([plannerWire(), {
       status: 'pass',
       checks: {
-        protagonistAgency: true, earnedProgression: true, oppositionAgenda: true,
+        protagonistAgency: true, earnedProgression: true, domainPlausibility: true, oppositionAgenda: true,
         sceneVariety: true, stageAlignment: true, outcomeWeight: true,
       },
       checkEvidence: {
         protagonistAgency: 'chapter 1 scene_1 delta_1',
         earnedProgression: 'chapter 1 scene_1 delta_1',
+        domainPlausibility: 'chapter 1 scene_1 delta_1',
         oppositionAgenda: 'chapter 1 scene_1 delta_1',
         sceneVariety: 'chapter 1 scene_1 delta_1',
         stageAlignment: 'chapter 1 scene_1 delta_1',
@@ -3379,12 +3381,13 @@ describe('canonical Story Factory', () => {
     const revise = {
       status: 'revise' as const,
       checks: {
-        protagonistAgency: true, earnedProgression: false, oppositionAgenda: true,
+        protagonistAgency: true, earnedProgression: false, domainPlausibility: true, oppositionAgenda: true,
         sceneVariety: true, stageAlignment: true, outcomeWeight: true,
       },
       checkEvidence: {
         protagonistAgency: 'chapter 1 scene_1 delta_1',
         earnedProgression: 'chapter 1 scene_1 delta_1',
+        domainPlausibility: 'chapter 1 scene_1 delta_1',
         oppositionAgenda: 'chapter 1 scene_1 delta_1',
         sceneVariety: 'chapter 1 scene_1 delta_1',
         stageAlignment: 'chapter 1 scene_1 delta_1',
@@ -3402,12 +3405,13 @@ describe('canonical Story Factory', () => {
     const provider = new QueueProvider([plannerWire(), revise, plannerWire(), {
       status: 'pass',
       checks: {
-        protagonistAgency: true, earnedProgression: true, oppositionAgenda: true,
+        protagonistAgency: true, earnedProgression: true, domainPlausibility: true, oppositionAgenda: true,
         sceneVariety: true, stageAlignment: true, outcomeWeight: true,
       },
       checkEvidence: {
         protagonistAgency: 'chapter 1 scene_1 delta_1',
         earnedProgression: 'chapter 1 scene_1 delta_1',
+        domainPlausibility: 'chapter 1 scene_1 delta_1',
         oppositionAgenda: 'chapter 1 scene_1 delta_1',
         sceneVariety: 'chapter 1 scene_1 delta_1',
         stageAlignment: 'chapter 1 scene_1 delta_1',
@@ -3438,6 +3442,7 @@ describe('canonical Story Factory', () => {
       checks: {
         protagonistAgency: true,
         earnedProgression: true,
+        domainPlausibility: true,
         oppositionAgenda: false,
         sceneVariety: true,
         stageAlignment: true,
@@ -3446,6 +3451,7 @@ describe('canonical Story Factory', () => {
       checkEvidence: {
         protagonistAgency: 'chapter 1 scene_1 delta_1',
         earnedProgression: 'chapter 1 scene_1 delta_1',
+        domainPlausibility: 'chapter 1 scene_1 delta_1',
         oppositionAgenda: 'chapter 1 scene_1 lacks an opposing choice',
         sceneVariety: 'chapter 1 scene_1 has a distinct action',
         stageAlignment: 'chapter 1 scene_1 serves stage_1',
@@ -3465,6 +3471,7 @@ describe('canonical Story Factory', () => {
       checks: {
         protagonistAgency: true,
         earnedProgression: true,
+        domainPlausibility: true,
         oppositionAgenda: true,
         sceneVariety: true,
         stageAlignment: true,
@@ -3473,6 +3480,7 @@ describe('canonical Story Factory', () => {
       checkEvidence: {
         protagonistAgency: 'chapter 1 scene_1 delta_1',
         earnedProgression: 'chapter 1 scene_1 delta_1',
+        domainPlausibility: 'chapter 1 scene_1 delta_1',
         oppositionAgenda: 'chapter 1 scene_1 now has a counter-move',
         sceneVariety: 'chapter 1 scene_1 has a distinct action',
         stageAlignment: 'chapter 1 scene_1 serves stage_1',
@@ -3582,12 +3590,13 @@ describe('canonical Story Factory', () => {
     const revise = {
       status: 'revise' as const,
       checks: {
-        protagonistAgency: true, earnedProgression: true, oppositionAgenda: false,
+        protagonistAgency: true, earnedProgression: true, domainPlausibility: true, oppositionAgenda: false,
         sceneVariety: true, stageAlignment: true, outcomeWeight: true,
       },
       checkEvidence: {
         protagonistAgency: 'chapter 1 scene_1 delta_1',
         earnedProgression: 'chapter 1 scene_1 delta_1',
+        domainPlausibility: 'chapter 1 scene_1 delta_1',
         oppositionAgenda: 'chapter 1 scene_1 delta_1',
         sceneVariety: 'chapter 1 scene_1 delta_1',
         stageAlignment: 'chapter 1 scene_1 delta_1',
@@ -3790,6 +3799,7 @@ describe('canonical Story Factory', () => {
     const {
       worldModel, worldMechanics, worldRules, locations, travelRules, resources,
       progressionTracks, seriesSpine, longPromises, promises, endingDirection,
+      realityMode: _realityMode,
       ...identityKernel
     } = pack.kernel;
     const characterIdMap: Record<string, string> = {

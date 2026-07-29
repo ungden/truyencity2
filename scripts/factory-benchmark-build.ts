@@ -27,6 +27,7 @@ import {
   runConceptLab,
   writeStoryChapter,
   type ModelRoutes,
+  type ChapterAttemptTelemetry,
   type PlanAssessment,
   type PlanQualifiedWriterBrief,
   type PortfolioSignature,
@@ -115,7 +116,9 @@ type Progress = {
     id: string;
     lane: string;
     chapterNumber: number;
-    telemetry: Awaited<ReturnType<typeof writeStoryChapter>>['attemptTelemetry'];
+    outcome: 'published' | 'failed';
+    errorCode: string | null;
+    telemetry: ChapterAttemptTelemetry;
   }>;
   setupCheckpoints: Record<string, SetupCheckpoint>;
   plannedWindows: Record<string, { rollingPlan: RollingPlan; assessment: PlanAssessment }>;
@@ -204,6 +207,13 @@ function failedUsageCost(evidence: unknown): number {
     total += failedUsageCost(record[key]);
   }
   return total;
+}
+
+function failedChapterTelemetry(error: unknown): ChapterAttemptTelemetry | null {
+  if (!(error instanceof StoryFactoryError) || !error.evidence || typeof error.evidence !== 'object') return null;
+  const telemetry = (error.evidence as { pipelineTelemetry?: unknown }).pipelineTelemetry;
+  if (!telemetry || typeof telemetry !== 'object' || !Array.isArray((telemetry as { usages?: unknown }).usages)) return null;
+  return telemetry as ChapterAttemptTelemetry;
 }
 
 async function main() {
@@ -462,6 +472,18 @@ async function main() {
             });
           } catch (error) {
             progress.generationFailures += 1;
+            const telemetry = failedChapterTelemetry(error);
+            if (telemetry) {
+              progress.chapterAttempts.push({
+                id: `${entry.commission.slotKey.toLowerCase()}-ch${plan.chapterNumber}`,
+                lane,
+                chapterNumber: plan.chapterNumber,
+                outcome: 'failed',
+                errorCode: error instanceof StoryFactoryError ? error.code : null,
+                telemetry,
+              });
+              persist();
+            }
             throw error;
           }
           const generationCost = usageCost(candidate.usages);
@@ -470,6 +492,8 @@ async function main() {
             id: `${entry.commission.slotKey.toLowerCase()}-ch${plan.chapterNumber}`,
             lane,
             chapterNumber: plan.chapterNumber,
+            outcome: 'published',
+            errorCode: null,
             telemetry: candidate.attemptTelemetry,
           });
           persist();

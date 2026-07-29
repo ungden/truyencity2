@@ -16,7 +16,7 @@ import {
 } from './provider';
 
 export const STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL = 'story-factory-writer-bakeoff-v11-idempotent-exact-resume';
-export const STORY_FACTORY_SEQUENTIAL_PROTOCOL = 'story-factory-sequential-survival-v4-next-opening-handoff';
+export const STORY_FACTORY_SEQUENTIAL_PROTOCOL = 'story-factory-sequential-survival-v5-natural-handoff-complete-attempts';
 export const STORY_FACTORY_BENCHMARK_PROTOCOL = 'story-factory-validation-v11-idempotent-exact-resume';
 export const STORY_FACTORY_BENCHMARK_SAMPLE_COUNT = 20;
 export const STORY_FACTORY_WRITER_SAMPLE_COUNT = 4;

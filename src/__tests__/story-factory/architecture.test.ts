@@ -56,6 +56,7 @@ describe('Story Factory architecture boundary', () => {
     expect(writerBriefBody).not.toContain('durationMinutes: scene.durationMinutes');
     expect(writerBriefBody).not.toContain('travelMinutesFromPrevious: scene.travelMinutesFromPrevious');
     expect(writerBriefBody).not.toContain('genreLane: input.kernel.genreLane');
+    expect(writerBriefBody).not.toContain('unwrittenGapMinutes');
     expect(writerBriefBody).not.toContain('aliases: character.aliases');
     expect(context).not.toContain('WRITER_BRIEF_MAX_CHARS');
     const migration = readFileSync('supabase/migrations/20260722072832_canonical_story_outcomes.sql', 'utf8');
@@ -176,6 +177,8 @@ describe('Story Factory architecture boundary', () => {
     expect(planner).toContain('message: mechanicalError?.message');
     expect(planner).toContain('evidence: mechanicalError?.evidence ?? null');
     expect(prompts).toContain('Thời gian cuối chương là mốc tuyệt đối');
+    expect(prompts).toContain('kernel.realityMode');
+    expect(planner).toContain('domainPlausibility');
   });
 
   test('Planner contract changes participate in the engine release identity', () => {
@@ -254,6 +257,8 @@ describe('Story Factory architecture boundary', () => {
     expect(sequential).toContain('estimated_cost_usd: progress.buildCostUsd');
     expect(sequential).not.toContain('unbookedSetupCost');
     expect(sequential).toContain('telemetry: candidate.attemptTelemetry');
+    expect(sequential).toContain("outcome: 'failed'");
+    expect(sequential).toContain('failedChapterTelemetry(error)');
     expect(sequential).toContain('chapterAttempts: progress.chapterAttempts');
   });
 

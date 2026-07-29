@@ -183,6 +183,7 @@ const LaunchIdentitySchema = z.object({
   selectedConceptId: z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/),
   coverPrompt: z.string().trim().min(20).max(2_000),
   kernel: LaunchIdentityKernelSchema.extend({
+    realityMode: StoryKernelObjectSchema.shape.realityMode,
     protagonistId: StoryKernelObjectSchema.shape.protagonistId,
     characters: StoryKernelObjectSchema.shape.characters,
   }),
@@ -602,6 +603,7 @@ Chỉ được chọn concept có domainFeasibility=pass và longRunFeasibility=
         coverPrompt: launchIdentityWire.value.coverPrompt,
         kernel: {
           ...launchIdentityWire.value.kernel,
+          realityMode: commission.realityMode,
           protagonistId: characters.protagonist.id,
           characters: [
             characters.protagonist,
