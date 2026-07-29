@@ -2881,6 +2881,54 @@ describe('canonical Story Factory', () => {
     });
   });
 
+  test('Editor can resolve an allow-listed continuity ID stored inside an ID array', async () => {
+    const draft = {
+      title: 'Góc Hom Mới',
+      content: 'Hải đổi góc nghiêng của miệng hom thành 45 độ rồi buộc lại từng nút dây.',
+    };
+    const issue = {
+      v: 3 as const,
+      findings: [{
+        category: 'canon' as const,
+        severity: 'major' as const,
+        scope: 'prose' as const,
+        evidence: 'đổi góc nghiêng của miệng hom thành 45 độ',
+        referenceId: 'fact_design_ready',
+        instruction: 'Giữ góc nghiêng 15 độ đã được thử và commit ở chương trước.',
+      }],
+      deltaChecks: [{ deltaId: 'delta_1', realized: true, evidence: 'buộc lại từng nút dây' }],
+      outcome: null,
+    };
+    const assessed = await assessStoryDraft({
+      provider: new QueueProvider([issue]),
+      model: routes.editor,
+      kernel,
+      state: {
+        ...initialState,
+        continuityPacket: {
+          relevantHistory: [{
+            eventId: 'event_design_ready',
+            chapterNumber: 1,
+            eventType: 'chapter_outcome',
+            factIds: ['fact_design_ready'],
+            before: 'Chưa có thiết kế miệng hom được kiểm chứng.',
+            after: 'Miệng hom nghiêng 15 độ đã được thử và chốt.',
+          }],
+        },
+      },
+      plan: plan(1),
+      draft,
+    });
+    expect(assessed.assessment).toMatchObject({
+      status: 'revise',
+      continuityIssues: [{
+        referenceId: 'fact_design_ready',
+        currentEvidence: 'đổi góc nghiêng của miệng hom thành 45 độ',
+        conflictingEvidence: expect.stringContaining('15 độ'),
+      }],
+    });
+  });
+
   test('accepted outcome evidence must exist verbatim in prose', () => {
     const transitioned = applyChapterPlan({ kernel, state: initialState, plan: plan(1) }).state;
     expect(() => appendAcceptedOutcome({

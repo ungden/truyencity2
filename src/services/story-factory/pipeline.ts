@@ -338,7 +338,7 @@ function mergePreflight(assessment: EditorAssessment, deterministic: PreflightIs
 function collectStableIds(value: unknown): Set<string> {
   const ids = new Set<string>();
   const visit = (item: unknown, key?: string) => {
-    if (typeof item === 'string' && (key === 'id' || key?.endsWith('Id') || key?.endsWith('Ids'))) {
+    if (typeof item === 'string' && isStableIdKey(key)) {
       ids.add(item);
       return;
     }
@@ -354,28 +354,48 @@ function collectStableIds(value: unknown): Set<string> {
   return ids;
 }
 
-function artifactByStableId(value: unknown, id: string): unknown | null {
+function isStableIdKey(key?: string): boolean {
+  return key === 'id' || key?.endsWith('Id') === true || key?.endsWith('Ids') === true;
+}
+
+function entryContainsStableId(key: string, value: unknown, id: string): boolean {
+  if (!isStableIdKey(key)) return false;
+  if (typeof value === 'string') return value === id;
+  return key.endsWith('Ids')
+    && Array.isArray(value)
+    && value.some(item => typeof item === 'string' && item === id);
+}
+
+function findArtifactByStableId(value: unknown, id: string, canonicalOwnerOnly: boolean): unknown | null {
   if (Array.isArray(value)) {
     for (const item of value) {
-      const found = artifactByStableId(item, id);
+      const found = findArtifactByStableId(item, id, canonicalOwnerOnly);
       if (found !== null) return found;
     }
     return null;
   }
   if (!value || typeof value !== 'object') return null;
   const entries = Object.entries(value);
-  if (entries.some(([key, item]) => (
-    typeof item === 'string'
-    && item === id
-    && (key === 'id' || key.endsWith('Id') || key.endsWith('Ids'))
-  ))) {
+  const matches = canonicalOwnerOnly
+    ? entries.some(([key, item]) => key === 'id' && item === id)
+    : entries.some(([key, item]) => entryContainsStableId(key, item, id));
+  if (matches) {
     return value;
   }
   for (const [, item] of entries) {
-    const found = artifactByStableId(item, id);
+    const found = findArtifactByStableId(item, id, canonicalOwnerOnly);
     if (found !== null) return found;
   }
   return null;
+}
+
+function artifactByStableId(value: unknown, id: string): unknown | null {
+  // Prefer the canonical object whose own `id` matches. Only when history has
+  // no standalone artifact (for example `factIds` on an old outcome event),
+  // fall back to the enclosing reference-bearing event. This keeps delta
+  // evidence precise without making exact-ID history unresolvable.
+  return findArtifactByStableId(value, id, true)
+    ?? findArtifactByStableId(value, id, false);
 }
 
 function canonicalArtifactEvidence(input: {
