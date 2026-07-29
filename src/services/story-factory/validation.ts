@@ -10,7 +10,7 @@ import {
   StoryFactoryError,
 } from './contracts';
 
-export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-23-reported-future-transfers';
+export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-24-lexical-direction-guards';
 
 export interface StateEvent {
   chapterNumber: number;
