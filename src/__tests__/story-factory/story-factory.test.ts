@@ -1221,7 +1221,7 @@ describe('canonical Story Factory', () => {
 
   test('owned resource direction accepts a real owner payment', () => {
     const chapter = plan(1);
-    chapter.scenes[0].action = 'Hải trả 50 đồng tiền công cho người cung cấp manh mối.';
+    chapter.scenes[0].action = 'Hải trả 50 đồng tiền công; người cung cấp manh mối nhận tiền rồi rời đi.';
     chapter.requiredDeltas = [{
       id: 'pay_clue',
       kind: 'resource_numeric',

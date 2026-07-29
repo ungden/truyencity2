@@ -10,7 +10,7 @@ import {
   StoryFactoryError,
 } from './contracts';
 
-export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-26-explicit-settlement-only';
+export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-27-structured-direction-only';
 
 export interface StateEvent {
   chapterNumber: number;
@@ -435,13 +435,6 @@ function semanticSlug(value: string): string {
     .trim();
 }
 
-function isCurrencyResource(resource: Extract<StoryKernel['resources'][number], { kind: 'numeric' }>): boolean {
-  const unit = semanticSlug(resource.unit);
-  const name = semanticSlug(resource.name);
-  return /^(?:vnd|usd|dong|nghin dong|trieu dong)$/u.test(unit)
-    || /(?:^| )(?:tien|ngan sach|so du|von)(?: |$)/u.test(name);
-}
-
 function tokenSequenceStartsAt(tokens: string[], sequence: string[], start: number): boolean {
   return sequence.every((token, offset) => tokens[start + offset] === token);
 }
@@ -535,23 +528,14 @@ function validateScenes(kernel: StoryKernel, state: StoryState, plan: ChapterPla
       const sink = semanticSlug(delta.sink ?? '');
       const paymentVerbs = [['tra'], ['chi'], ['dua'], ['thanh', 'toan']];
       const receiptVerbs = [['nhan'], ['thu'], ['kiem']];
-      // Free-form scene action can mention several transactions or a generic
-      // "chi phí". Only use it as directional evidence when it contains an
-      // explicit amount; structured provenance remains the primary signal.
-      // Action prose is only reliable directional evidence for currency. For
-      // physical resources, phrases such as "thủ công ... 2 kg" can tokenize
-      // into "thu" + "cong" + an amount and look like a receipt. Their
-      // direction is instead enforced by the exact mechanic source/sink.
-      const useActionDirection = isCurrencyResource(definition);
-      const ownerPaysInAction = useActionDirection
-        && ownerPerformsTransfer(normalizedAction, labels, paymentVerbs, true, true);
-      const ownerReceivesInAction = useActionDirection
-        && ownerPerformsTransfer(normalizedAction, labels, receiptVerbs, true, true);
+      // Action prose can contain several subjects ("Phan pays; Trương
+      // receives") and is not a safe ownership ledger. Direction comes only
+      // from exact structured source/sink provenance and mechanic ownership.
       const ownerPaysInProvenance = ownerPerformsTransfer(source, labels, paymentVerbs, false)
         || ownerPerformsTransfer(sink, labels, paymentVerbs, false);
       const ownerReceivesInProvenance = ownerPerformsTransfer(source, labels, receiptVerbs, false)
         || ownerPerformsTransfer(sink, labels, receiptVerbs, false);
-      if (delta.delta > 0 && (ownerPaysInAction || ownerPaysInProvenance)) {
+      if (delta.delta > 0 && ownerPaysInProvenance) {
         fail(`Resource ${delta.resourceId} increases even though its owner pays it out.`, {
           ownerEntityId: definition.ownerEntityId,
           action: scene.action,
@@ -559,7 +543,7 @@ function validateScenes(kernel: StoryKernel, state: StoryState, plan: ChapterPla
           delta: delta.delta,
         });
       }
-      if (delta.delta < 0 && (ownerReceivesInAction || ownerReceivesInProvenance)) {
+      if (delta.delta < 0 && ownerReceivesInProvenance) {
         fail(`Resource ${delta.resourceId} decreases even though its owner receives it.`, {
           ownerEntityId: definition.ownerEntityId,
           action: scene.action,
