@@ -415,6 +415,18 @@ export const StoryStateSchema = z.object({
   recentOutcomes: z.array(ChapterOutcomeSchema).max(12),
 }).strict();
 
+/**
+ * Opening simulations are selection evidence, never published canon. A launch
+ * pack therefore starts before chapter one with no accepted outcomes or
+ * consumed expansion seeds.
+ */
+export const InitialStoryStateSchema = StoryStateSchema.extend({
+  chapterNumber: z.literal(0),
+  storyTimeMinutes: z.literal(0),
+  usedExpansionSeedIds: z.array(stableId).length(0),
+  recentOutcomes: z.array(ChapterOutcomeSchema).length(0),
+}).strict();
+
 const arcPlanShape = {
   schemaVersion: z.literal(2),
   arcNumber: z.number().int().min(1),
@@ -713,7 +725,7 @@ export const LaunchPackSchema = z.object({
   selectedConceptId: stableId,
   kernel: StoryKernelSchema,
   arc: InitialArcPlanSchema,
-  initialState: StoryStateSchema,
+  initialState: InitialStoryStateSchema,
   coverPrompt: z.string().trim().min(20).max(2_000),
 }).strict();
 

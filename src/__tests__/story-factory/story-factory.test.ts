@@ -11,6 +11,8 @@ import {
   EditorAssessmentSchema,
   LaunchPackSchema,
   InitialArcPlanSchema,
+  InitialStoryStateSchema,
+  LaunchStateSchema,
   PlanAssessmentSchema,
   type ArcPlan,
   type ChapterPlan,
@@ -3697,6 +3699,33 @@ describe('canonical Story Factory', () => {
     });
   });
 
+  test('launch state cannot promote an opening simulation into phantom canon', () => {
+    const phantomOutcome = {
+      chapterNumber: 1,
+      title: 'Mẫu mở đầu chưa xuất bản',
+      event: 'Một cuộc thương lượng chỉ tồn tại trong opening simulation.',
+      result: 'Đối thủ đồng ý một giao kèo chưa từng được runtime viết.',
+      method: 'Mẫu dùng để chọn concept.',
+      endingSituation: 'State giả như chương một đã xảy ra.',
+      evidenceSpans: ['cuộc thương lượng chỉ tồn tại'],
+    };
+    expect(InitialStoryStateSchema.safeParse({
+      ...initialState,
+      recentOutcomes: [phantomOutcome],
+    }).success).toBe(false);
+    expect(LaunchStateSchema.safeParse({
+      arc,
+      initialState: {
+        ...initialState,
+        recentOutcomes: [phantomOutcome],
+      },
+    }).success).toBe(false);
+    expect(() => validateKernelState(kernel, {
+      ...initialState,
+      recentOutcomes: [phantomOutcome],
+    })).toThrow('ahead of StoryState chapter 0');
+  });
+
   test('Concept Lab grounds all concepts before blind ranking and validates the launch pack', async () => {
     const candidate = (id: string) => ({
       id, workingTitle: `Tên truyện trực diện ${id}`, premise: 'Một premise đủ dài để kiểm tra khả năng triển khai truyện nối tiếp.',
@@ -3715,7 +3744,7 @@ describe('canonical Story Factory', () => {
     const pack: LaunchPack = {
       schemaVersion: 2, selectedConceptId: 'concept_a_01',
       kernel: { ...kernel, mechanismFingerprint: selected.mechanismFingerprint, rewardLoopFingerprint: selected.rewardLoopFingerprint, conflictEconomyFingerprint: selected.conflictEconomyFingerprint },
-      arc: { ...arc, startChapter: 1 }, initialState,
+      arc: { ...arc, startChapter: 1 }, initialState: InitialStoryStateSchema.parse(initialState),
       coverPrompt: 'Một làng biển Việt Nam cuối thập niên tám mươi lúc bình minh, thuyền gỗ và sân phơi cá, không chữ.',
     };
     const openingSample = Array.from({ length: 650 }, (_, index) => (
@@ -3818,5 +3847,9 @@ describe('canonical Story Factory', () => {
       'character_opposition_01',
       'character_supporting_01',
     ]);
+    const launchStatePrompt = provider.prompts.at(-1);
+    expect(launchStatePrompt).toBeDefined();
+    expect(launchStatePrompt).not.toContain('openingSample');
+    expect(launchStatePrompt).not.toContain('selectedSimulation');
   });
 });

@@ -3,11 +3,11 @@ import { z } from 'zod';
 import {
   ArcPlanSchema,
   InitialArcPlanSchema,
+  InitialStoryStateSchema,
   LaunchPackSchema,
   StoryCharacterSchema,
   StoryFactoryError,
   StoryKernelSchema,
-  StoryStateSchema,
   WorldMechanicSchema,
   type LaunchPack,
   type ModelRoutes,
@@ -120,7 +120,7 @@ interface SetupStageArtifact {
   usage: ProviderUsage;
 }
 
-export const SETUP_CHECKPOINT_VERSION = 'story-factory-setup-checkpoint-1-input-bound';
+export const SETUP_CHECKPOINT_VERSION = 'story-factory-setup-checkpoint-2-no-simulated-canon';
 
 export interface SetupCheckpointProvenance {
   version: typeof SETUP_CHECKPOINT_VERSION;
@@ -254,9 +254,9 @@ const LaunchSeriesSchema = z.object({
     endingDirection: true,
   }),
 }).strict();
-const LaunchStateSchema = z.object({
+export const LaunchStateSchema = z.object({
   arc: InitialArcPlanSchema,
-  initialState: StoryStateSchema,
+  initialState: InitialStoryStateSchema,
 }).strict();
 
 async function setupStage<T>(label: string, call: Promise<T>): Promise<T> {
@@ -708,7 +708,6 @@ State có đúng một entry cho mọi character, resource và promise trong Ker
     prompt: JSON.stringify({
       task: 'Xuất Arc đầu và State chương 0.',
       selectedConcept,
-      selectedSimulation,
       kernel,
     }),
     schema: LaunchStateSchema,
@@ -729,8 +728,12 @@ State có đúng một entry cho mọi character, resource và promise trong Ker
   });
   assertLaunchSemantics(launch, commission);
   assertPortfolioDiversity(selectedConcept, input.existingSignatures ?? []);
-  if (launch.initialState.chapterNumber !== 0 || launch.arc.startChapter !== 1) {
-    throw new StoryFactoryError('setup_blocked', 'Launch pack must start from chapter zero and arc one.');
+  if (launch.initialState.chapterNumber !== 0
+    || launch.initialState.storyTimeMinutes !== 0
+    || launch.initialState.recentOutcomes.length
+    || launch.initialState.usedExpansionSeedIds.length
+    || launch.arc.startChapter !== 1) {
+    throw new StoryFactoryError('setup_blocked', 'Launch pack must start before chapter one with no simulated canon or consumed expansion seeds.');
   }
   try {
     validateKernelState(launch.kernel, launch.initialState);

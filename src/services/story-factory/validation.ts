@@ -89,6 +89,17 @@ export function validateKernelState(kernel: StoryKernel, state: StoryState): voi
   unique(state.promises.map(item => item.promiseId), 'State promises');
   unique(state.usedExpansionSeedIds, 'Consumed expansion seeds');
   unique(state.facts.map(item => item.id), 'State facts');
+  unique(state.recentOutcomes.map(item => String(item.chapterNumber)), 'Recent outcome chapters');
+  let previousOutcomeChapter = -1;
+  for (const outcome of state.recentOutcomes) {
+    if (outcome.chapterNumber > state.chapterNumber) {
+      fail(`Recent outcome chapter ${outcome.chapterNumber} is ahead of StoryState chapter ${state.chapterNumber}.`);
+    }
+    if (outcome.chapterNumber <= previousOutcomeChapter) {
+      fail('Recent outcomes must be strictly ordered by committed chapter number.');
+    }
+    previousOutcomeChapter = outcome.chapterNumber;
+  }
 
   const characterIds = new Set(kernel.characters.map(item => item.id));
   const resourceIds = new Set(kernel.resources.map(item => item.id));
