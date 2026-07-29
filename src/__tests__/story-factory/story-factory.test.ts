@@ -581,6 +581,16 @@ describe('canonical Story Factory', () => {
     expect(() => assertVoiceSemantics(cast)).toThrow('canned gesture');
   });
 
+  test('voice traits allow useful neutral detail without inheriting short-label limits', () => {
+    const cast = structuredClone(kernel.characters);
+    cast[0].voice.addressRules = 'Xưng tôi với người ngang vai, gọi người lớn tuổi bằng vai vế gia đình, chuyển sang anh hoặc chị trong giao dịch, tránh dùng danh xưng quyền lực khi chưa có quan hệ rõ ràng; cách xưng hô thay đổi theo mức độ thân thiết đã commit.';
+    expect(cast[0].voice.addressRules.length).toBeGreaterThan(160);
+    expect(() => assertVoiceSemantics(StoryKernelSchema.parse({
+      ...kernel,
+      characters: cast,
+    }).characters)).not.toThrow();
+  });
+
   test('rejects a resource transition that is not owned by a validated mechanic', () => {
     const chapter = plan(1);
     chapter.requiredDeltas = [{

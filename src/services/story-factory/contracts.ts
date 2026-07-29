@@ -2,16 +2,17 @@ import { z } from 'zod';
 
 const stableId = z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/);
 const shortText = z.string().trim().min(2).max(160);
+const voiceTrait = z.string().trim().min(2).max(300);
 const prose = z.string().trim().min(8).max(2_000);
 const mechanicalText = z.string().trim().min(2).max(1_000);
 
 export const VoiceContractSchema = z.object({
-  register: shortText,
-  sentenceRhythm: shortText,
+  register: voiceTrait,
+  sentenceRhythm: voiceTrait,
   directness: z.enum(['reserved', 'balanced', 'direct']),
-  addressRules: shortText,
-  vocabulary: shortText,
-  reasoningStyle: shortText,
+  addressRules: voiceTrait,
+  vocabulary: voiceTrait,
+  reasoningStyle: voiceTrait,
   emotionDisplay: z.enum(['restrained', 'open', 'deflecting', 'volatile']),
   humorStyle: z.enum(['none', 'dry', 'self_deprecating', 'situational', 'teasing']),
 }).strict();
