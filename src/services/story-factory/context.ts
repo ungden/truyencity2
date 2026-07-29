@@ -31,6 +31,7 @@ export interface WriterBrief {
     participants: string[];
     immediateObjective: string;
     unwrittenGapMinutes: number;
+    plannedTravelMinutes: number;
     mustRemainAvailableAt: Array<{ character: string; location: string }>;
   };
 }
@@ -180,6 +181,7 @@ export function buildWriterBrief(input: {
             0,
           ),
       ),
+      plannedTravelMinutes: nextScene.travelMinutesFromPrevious,
       mustRemainAvailableAt: (input.stateAfter?.characters ?? [])
         .filter(character => (
           nextScene.participantIds.includes(character.characterId)

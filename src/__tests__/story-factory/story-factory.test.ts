@@ -1761,7 +1761,9 @@ describe('canonical Story Factory', () => {
   test('Writer and Editor receive a mechanical next-chapter handoff without prose from the next plan', () => {
     const current = plan(1);
     const next = plan(2, 'ngay_1');
-    next.scenes[0].objective = 'Mở cuộc thương lượng mới ở căn nhà.';
+    next.scenes[0].locationId = 'beach';
+    next.scenes[0].travelMinutesFromPrevious = 20;
+    next.scenes[0].objective = 'Mở cuộc thương lượng mới ở bãi ngang.';
     next.scenes[0].action = 'Người mua nói một câu dẫn truyện mà Writer không được nhìn thấy.';
     const stateAfter = applyChapterPlan({ kernel, state: initialState, plan: current }).state;
     const contexts = buildChapterContexts({
@@ -1773,14 +1775,12 @@ describe('canonical Story Factory', () => {
     });
     expect(contexts.brief.nextOpening).toEqual({
       chapterNumber: 2,
-      location: 'Nhà Hải',
+      location: 'Bãi ngang',
       participants: ['Hải', 'Bà Lành'],
-      immediateObjective: 'Mở cuộc thương lượng mới ở căn nhà.',
+      immediateObjective: 'Mở cuộc thương lượng mới ở bãi ngang.',
       unwrittenGapMinutes: 0,
-      mustRemainAvailableAt: [
-        { character: 'Hải', location: 'Nhà Hải' },
-        { character: 'Bà Lành', location: 'Nhà Hải' },
-      ],
+      plannedTravelMinutes: 20,
+      mustRemainAvailableAt: [],
     });
     expect(JSON.stringify(contexts.brief)).not.toContain(next.scenes[0].action);
     expect(JSON.stringify(contexts.brief)).toContain(next.scenes[0].objective);
@@ -1788,7 +1788,8 @@ describe('canonical Story Factory', () => {
       plannedEndState: { chapterNumber: 1 },
       nextOpening: {
         chapterNumber: 2,
-        location: 'Nhà Hải',
+        location: 'Bãi ngang',
+        plannedTravelMinutes: 20,
       },
     });
   });
