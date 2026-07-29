@@ -1148,6 +1148,29 @@ describe('canonical Story Factory', () => {
     expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).not.toThrow();
   });
 
+  test('profit sharing requires a numeric ledger delta even when hidden in relationship provenance', () => {
+    const chapter = plan(1);
+    chapter.scenes[0].action = 'Hải gặp Tấn để củng cố thỏa thuận hợp tác.';
+    chapter.requiredDeltas = [{
+      id: 'relationship_profit_share',
+      kind: 'relationship',
+      characterId: 'buyer',
+      counterpartId: 'main',
+      before: null,
+      after: 'cooperative',
+      source: 'Hải chia một phần lợi nhuận cho Tấn',
+    }];
+    chapter.scenes[0].requiredDeltaIds = ['relationship_profit_share'];
+    expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter }))
+      .toThrow('transaction without a numeric resource delta');
+  });
+
+  test('a future profit-share promise does not create a fake current transaction', () => {
+    const chapter = plan(1);
+    chapter.scenes[0].action = 'Hải hứa sẽ chia một phần lợi nhuận cho Tấn ở mẻ hàng sau.';
+    expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).not.toThrow();
+  });
+
   test('owned resource direction cannot increase when its owner pays out', () => {
     const chapter = plan(1);
     chapter.scenes[0].action = 'Hải trả 50 đồng tiền công cho người cung cấp manh mối.';

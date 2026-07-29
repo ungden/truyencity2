@@ -10,7 +10,7 @@ import {
   StoryFactoryError,
 } from './contracts';
 
-export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-21-actionable-transaction-repair';
+export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-22-profit-share-ledger';
 
 export interface StateEvent {
   chapterNumber: number;
@@ -387,7 +387,7 @@ function travelMinimum(kernel: StoryKernel, from: string, to: string): number | 
 function stripFutureIntent(action: string): string {
   const intent = String.raw`(?:cần|sẽ|định|dự\s+định|tính|muốn|chưa|không|đi|hứa(?:\s+sẽ)?|dự\s+kiến|sắp|quyết\s+định|trước\s+khi|phân\s+tích\s+việc|xem\s+xét\s+việc|lên\s+kế\s+hoạch(?:\s+để)?|đồng\s+ý|chấp\s+nhận|thống\s+nhất|thỏa\s+thuận|thoả\s+thuận)`;
   const filler = String.raw`(?:[\p{L}\p{N}_-]+\s+){0,12}`;
-  const verbs = String.raw`(?:mua|bán|thu\s+mua|trả\s+tiền|chi\s+tiền|thu\s+tiền|nhận\s+tiền|kiếm\s+tiền|chế\s+tạo|đóng\s+thành|xây\s+dựng|lắp\s+ráp|thu\s+gom|nhận\s+được)`;
+  const verbs = String.raw`(?:mua|bán|thu\s+mua|trả\s+tiền|chi\s+tiền|thu\s+tiền|nhận\s+tiền|kiếm\s+tiền|chia\s+(?:một\s+)?phần\s+lợi\s+nhuận|chia\s+tiền\s+lãi|trích\s+phần\s+trăm|trả\s+công|chế\s+tạo|đóng\s+thành|xây\s+dựng|lắp\s+ráp|thu\s+gom|nhận\s+được)`;
   const left = String.raw`(?<![\p{L}\p{N}_-])`;
   const right = String.raw`(?=$|[^\p{L}\p{N}_-])`;
   return action.replace(new RegExp(String.raw`${left}${intent}\s+${filler}${verbs}${right}`, 'giu'), '');
@@ -549,12 +549,23 @@ function validateScenes(kernel: StoryKernel, state: StoryState, plan: ChapterPla
     // is physically holding it. "Nhận tiền" by itself can therefore be an
     // internal hand-off with no balance change. External acquisition/payment
     // remains covered by the unambiguous transaction verbs below.
-    if (hasVietnameseTerm(realizedAction, String.raw`mua|bán|thu mua|trả tiền|chi tiền|thu tiền|kiếm tiền`)
+    const transactionEvidence = [
+      realizedAction,
+      ...sceneDeltas.flatMap(delta => (
+        delta.kind !== 'resource_numeric' && 'source' in delta && typeof delta.source === 'string'
+          ? [stripFutureIntent(delta.source)]
+          : []
+      )),
+    ].join(' ');
+    if (hasVietnameseTerm(transactionEvidence, String.raw`mua|bán|thu mua|trả tiền|chi tiền|thu tiền|kiếm tiền|chia (?:một )?phần lợi nhuận|chia tiền lãi|trích phần trăm|trả công`)
       && !sceneDeltas.some(delta => delta.kind === 'resource_numeric')) {
       fail(`Scene ${scene.id} describes a transaction without a numeric resource delta.`, {
         chapterNumber: plan.chapterNumber,
         sceneId: scene.id,
         action: scene.action,
+        deltaSources: sceneDeltas.flatMap(delta => (
+          'source' in delta && typeof delta.source === 'string' ? [delta.source] : []
+        )),
         repairRule: 'Choose exactly one: (1) if money or goods actually move in this scene, add the exact numeric resource delta and bind it to one compatible existing effect mechanic; or (2) rewrite the action as a report, negotiation, or future obligation with no present transfer. Do not keep a present-tense purchase, sale, payment, or profit share without ledger movement.',
       });
     }
