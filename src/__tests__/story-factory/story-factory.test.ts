@@ -1263,6 +1263,111 @@ describe('canonical Story Factory', () => {
     })).not.toThrow();
   });
 
+  test('does not treat gathering loose materials as creating a durable asset', () => {
+    const chapter = plan(1);
+    chapter.scenes[0].action = 'Phan và Mai thu gom cọc tre, dây leo và lưới đánh cá cũ để chuẩn bị dựng hàng rào.';
+    expect(() => applyChapterPlan({
+      kernel,
+      state: initialState,
+      plan: chapter,
+    })).not.toThrow();
+  });
+
+  test('does not read thủ công plus a physical quantity as an owner receipt', () => {
+    const physicalKernel: StoryKernel = {
+      ...kernel,
+      resources: [
+        ...kernel.resources,
+        {
+          id: 'res_seaweed_harvested',
+          name: 'Rong câu tươi đã vớt',
+          kind: 'numeric',
+          unit: 'kg',
+          ownerEntityId: 'char_main',
+          minimum: 0,
+          maximum: 500,
+        },
+        {
+          id: 'res_agar',
+          name: 'Thạch sợi',
+          kind: 'numeric',
+          unit: 'kg',
+          ownerEntityId: 'main',
+          minimum: 0,
+          maximum: 500,
+        },
+      ],
+      worldMechanics: [
+        ...kernel.worldMechanics,
+        {
+          id: 'conv_cook_agar',
+          kind: 'conversion',
+          name: 'Nấu thạch',
+          description: 'Hai mươi cân rong tươi được nấu và ép thành hai cân thạch sợi.',
+          inputsPerBatch: [{ resourceId: 'res_seaweed_harvested', amount: 20 }],
+          outputsPerBatch: [{ resourceId: 'res_agar', amount: 2 }],
+          maximumBatchesPerUse: 1,
+        },
+      ],
+    };
+    const physicalState: StoryState = {
+      ...initialState,
+      resources: [
+        ...initialState.resources,
+        {
+          resourceId: 'res_seaweed_harvested',
+          kind: 'numeric',
+          value: 20,
+        },
+        {
+          resourceId: 'res_agar',
+          kind: 'numeric',
+          value: 0,
+        },
+      ],
+    };
+    const chapter = plan(1);
+    chapter.scenes[0].action = 'Hải dùng kích gỗ thủ công ép dịch qua màng lọc và phơi thành 2 kg thạch sợi.';
+    chapter.requiredDeltas = [
+      {
+        id: 'consume_seaweed',
+        kind: 'resource_numeric',
+        resourceId: 'res_seaweed_harvested',
+        before: 20,
+        delta: -20,
+        after: 0,
+        source: 'res_seaweed_harvested',
+        sink: 'conv_cook_agar',
+      },
+      {
+        id: 'produce_agar',
+        kind: 'resource_numeric',
+        resourceId: 'res_agar',
+        before: 0,
+        delta: 2,
+        after: 2,
+        source: 'conv_cook_agar',
+        sink: 'res_agar',
+      },
+    ];
+    chapter.scenes[0].requiredDeltaIds = ['consume_seaweed', 'produce_agar'];
+    chapter.mechanicUses = [{
+      id: 'use_cook_agar',
+      sceneId: chapter.scenes[0].id,
+      mechanicId: 'conv_cook_agar',
+      role: 'effect',
+      actorId: 'main',
+      preconditionFactIds: [],
+      deltaIds: ['consume_seaweed', 'produce_agar'],
+      quantity: 1,
+    }];
+    expect(() => applyChapterPlan({
+      kernel: physicalKernel,
+      state: physicalState,
+      plan: chapter,
+    })).not.toThrow();
+  });
+
   test('does not treat a policy prohibiting sales as a completed transaction', () => {
     const chapter = plan(1);
     chapter.scenes[0].action = 'Thẩm Uyên ký lệnh nghiêm cấm việc bán quặng thô cho xưởng rèn không phép.';

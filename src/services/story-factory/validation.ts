@@ -435,6 +435,13 @@ function semanticSlug(value: string): string {
     .trim();
 }
 
+function isCurrencyResource(resource: Extract<StoryKernel['resources'][number], { kind: 'numeric' }>): boolean {
+  const unit = semanticSlug(resource.unit);
+  const name = semanticSlug(resource.name);
+  return /^(?:vnd|usd|dong|nghin dong|trieu dong)$/u.test(unit)
+    || /(?:^| )(?:tien|ngan sach|so du|von)(?: |$)/u.test(name);
+}
+
 function tokenSequenceStartsAt(tokens: string[], sequence: string[], start: number): boolean {
   return sequence.every((token, offset) => tokens[start + offset] === token);
 }
@@ -520,7 +527,7 @@ function validateScenes(kernel: StoryKernel, state: StoryState, plan: ChapterPla
     for (const delta of sceneDeltas) {
       if (delta.kind !== 'resource_numeric') continue;
       const definition = resourceDefinitions.get(delta.resourceId);
-      if (!definition?.ownerEntityId) continue;
+      if (!definition || definition.kind !== 'numeric' || !definition.ownerEntityId) continue;
       const labels = (ownerLabels.get(definition.ownerEntityId) ?? [definition.ownerEntityId])
         .map(semanticSlug)
         .filter(Boolean);
@@ -531,8 +538,15 @@ function validateScenes(kernel: StoryKernel, state: StoryState, plan: ChapterPla
       // Free-form scene action can mention several transactions or a generic
       // "chi phí". Only use it as directional evidence when it contains an
       // explicit amount; structured provenance remains the primary signal.
-      const ownerPaysInAction = ownerPerformsTransfer(normalizedAction, labels, paymentVerbs, true, true);
-      const ownerReceivesInAction = ownerPerformsTransfer(normalizedAction, labels, receiptVerbs, true, true);
+      // Action prose is only reliable directional evidence for currency. For
+      // physical resources, phrases such as "thủ công ... 2 kg" can tokenize
+      // into "thu" + "cong" + an amount and look like a receipt. Their
+      // direction is instead enforced by the exact mechanic source/sink.
+      const useActionDirection = isCurrencyResource(definition);
+      const ownerPaysInAction = useActionDirection
+        && ownerPerformsTransfer(normalizedAction, labels, paymentVerbs, true, true);
+      const ownerReceivesInAction = useActionDirection
+        && ownerPerformsTransfer(normalizedAction, labels, receiptVerbs, true, true);
       const ownerPaysInProvenance = ownerPerformsTransfer(source, labels, paymentVerbs, false)
         || ownerPerformsTransfer(sink, labels, paymentVerbs, false);
       const ownerReceivesInProvenance = ownerPerformsTransfer(source, labels, receiptVerbs, false)
@@ -578,7 +592,7 @@ function validateScenes(kernel: StoryKernel, state: StoryState, plan: ChapterPla
         repairRule: 'Choose exactly one: (1) if money or goods actually move in this scene, add the exact numeric resource delta and bind it to one compatible existing effect mechanic; or (2) rewrite the action as a report, negotiation, or future obligation with no present transfer. Do not keep a present-tense purchase, sale, payment, or profit share without ledger movement.',
       });
     }
-    if (hasVietnameseTerm(realizedAction, String.raw`chế tạo|đóng thành|xây dựng|lắp ráp|thu gom`)
+    if (hasVietnameseTerm(realizedAction, String.raw`chế tạo|đóng thành|xây dựng|lắp ráp`)
       && !sceneDeltas.some(delta => delta.kind === 'resource_numeric' || delta.kind === 'resource_state' || delta.kind === 'fact')) {
       fail(`Scene ${scene.id} creates or acquires a durable asset without a state delta.`, scene.action);
     }
