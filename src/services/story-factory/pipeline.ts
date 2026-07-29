@@ -495,6 +495,7 @@ export async function writeStoryChapter(input: {
   kernel: StoryKernel;
   state: StoryState;
   plan: ChapterPlan;
+  nextPlan?: ChapterPlan;
   previousChapter?: string;
   continuityPacket?: ContinuityPacket;
   routes: ModelRoutes;
@@ -503,7 +504,7 @@ export async function writeStoryChapter(input: {
   const provider = input.provider ?? geminiProvider;
   // Validate and materialize the exact state transition before spending a model call.
   const transition = applyChapterPlan({ kernel: input.kernel, state: input.state, plan: input.plan });
-  const contexts = buildChapterContexts(input);
+  const contexts = buildChapterContexts({ ...input, stateAfter: transition.state });
   const usages: ProviderUsage[] = [];
   let initialDraft: ChapterDraft | null = null;
   let initialAssessment: EditorAssessment | null = null;

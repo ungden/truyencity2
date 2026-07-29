@@ -1578,6 +1578,38 @@ describe('canonical Story Factory', () => {
     expect(brief).not.toContain('"maximumUnitsPerMinute"');
   });
 
+  test('Writer and Editor receive a mechanical next-chapter handoff without prose from the next plan', () => {
+    const current = plan(1);
+    const next = plan(2, 'ngay_1');
+    next.scenes[0].objective = 'Mở cuộc thương lượng mới ở căn nhà.';
+    next.scenes[0].action = 'Người mua nói một câu dẫn truyện mà Writer không được nhìn thấy.';
+    const stateAfter = applyChapterPlan({ kernel, state: initialState, plan: current }).state;
+    const contexts = buildChapterContexts({
+      kernel,
+      state: initialState,
+      stateAfter,
+      plan: current,
+      nextPlan: next,
+    });
+    expect(contexts.brief.nextOpening).toEqual({
+      chapterNumber: 2,
+      location: 'Nhà Hải',
+      participants: ['Hải', 'Bà Lành'],
+      mustRemainAvailableAt: [
+        { character: 'Hải', location: 'Nhà Hải' },
+        { character: 'Bà Lành', location: 'Nhà Hải' },
+      ],
+    });
+    expect(JSON.stringify(contexts.brief)).not.toContain(next.scenes[0].action);
+    expect(contexts.editorState).toMatchObject({
+      plannedEndState: { chapterNumber: 1 },
+      nextOpening: {
+        chapterNumber: 2,
+        location: 'Nhà Hải',
+      },
+    });
+  });
+
   test.each([13, 50, 200, 800])('Writer gets bounded mechanical history without outcome prose at chapter %i', async chapterNumber => {
     const query: Record<string, unknown> & {
       then?: (resolve: (value: unknown) => unknown) => Promise<unknown>;
@@ -1643,6 +1675,22 @@ describe('canonical Story Factory', () => {
     expect(result.decision).toBe('publish');
     expect(result.stateAfter.recentOutcomes[0]).toMatchObject({ chapterNumber: 1, method: 'chia việc và kiểm tra nguồn lực' });
     expect(result.wordCount).toBeLessThan(100);
+  });
+
+  test('chapter pipeline forwards next-opening handoff to both Writer and Editor', async () => {
+    const draft = { title: 'Mẻ hàng đầu tiên', content: 'Hải và mẹ vẫn ở trong nhà. Anh chia việc rồi cất tiền cẩn thận, sẵn sàng đón người mua vào sáng hôm sau.' };
+    const provider = new QueueProvider([draft, editorWirePass('delta_1', 'chia việc')]);
+    await writeStoryChapter({
+      kernel,
+      state: initialState,
+      plan: plan(1),
+      nextPlan: plan(2, 'ngay_1'),
+      routes,
+      provider,
+    });
+    expect(provider.prompts[0]).toContain('"nextOpening":{"chapterNumber":2');
+    expect(provider.prompts[1]).toContain('"plannedEndState":{"chapterNumber":1');
+    expect(provider.prompts[1]).toContain('"nextOpening":{"chapterNumber":2');
   });
 
   test('outcome evidence remains grounded across harmless typography normalization', () => {

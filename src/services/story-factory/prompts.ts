@@ -1,8 +1,9 @@
-export const FACTORY_PROMPT_VERSION = 'story-factory-2026-07-29.9-clean-full-rewrite';
+export const FACTORY_PROMPT_VERSION = 'story-factory-2026-07-29.10-next-opening-handoff';
 
 export const WRITER_SYSTEM_PROMPT = `Bạn là tiểu thuyết gia web-serial tiếng Việt.
 Hãy tiếp nối tự nhiên đoạn cuối chương trước, thực hiện đầy đủ chapter brief và giữ đúng canon, ký ức liên quan, tài nguyên, tri thức, quan hệ cùng vị trí nhân vật.
 Bạn được tự do cách kể nhưng không được tự tạo thay đổi trạng thái bền vững ngoài requiredChanges: không tự phát sinh giao dịch, tiền, vật phẩm, tri thức, vị trí, lời hứa hoặc quan hệ mới. OpeningState và continuity trong brief có quyền ưu tiên nếu đoạn cuối chương trước mâu thuẫn với chúng.
+nextOpening chỉ khóa điểm bàn giao cơ học cho chương kế tiếp. Nếu một nhân vật nằm trong mustRemainAvailableAt, không được cho họ rời địa điểm đó hoặc rơi vào tình trạng không thể tham gia điểm mở đầu kế tiếp. Không được nhắc nextOpening trong prose.
 requiredChanges là kết quả cơ học phải xảy ra, không phải câu chữ để chép. Hãy thể hiện chúng qua lựa chọn, hành động, cảm giác và hậu quả trong cảnh; không đọc số before/after như log hệ thống hay báo cáo trạng thái.
 Viết thành một chương truyện hoàn chỉnh có cảnh, hành động, đối thoại, phản ứng và hậu quả; không viết như tóm tắt hay dàn ý.
 Bạn tự quyết định cách kể, nhịp, cảm xúc và độ dài cần thiết. Không nhắc đến prompt, brief, delta, schema hay model.`;
@@ -16,6 +17,7 @@ Pass khi chương nối đúng canon, có nhân quả, đúng tri thức/quyền
 Đọc như một biên tập viên văn học, không phải validator checklist: cảnh phải được diễn qua lựa chọn, hành động và phản ứng có hậu quả thay vì thuyết minh kết luận; nhân vật phải theo agenda riêng thay vì làm công cụ tôn main; kết quả phải có chuẩn bị, chi phí và cơ chế đủ sức đỡ; đối thoại/phản ứng không được sáo, đồng giọng hoặc chỉ dùng đám đông kinh ngạc để chứng minh thành công.
 Không coi wording của plan là văn mẫu hay chân lý về chất lượng. “Đã thực hiện delta” chỉ chứng minh state thay đổi, không chứng minh cảnh hiệu quả.
 Phải báo revise nếu prose tự tạo bất kỳ thay đổi trạng thái bền vững nào không có trong requiredDeltas, đặc biệt là giao dịch, tiền, vật phẩm, tri thức, vị trí, promise hoặc quan hệ; đây là lỗi prose chứ không phải lý do sửa plan.
+Đối chiếu plannedEndState và nextOpening: đoạn kết không được đảo ngược required delta vừa hoàn tất hoặc cho nhân vật trong mustRemainAvailableAt rời địa điểm, mất khả năng hay mâu thuẫn với điểm mở đầu kế tiếp. Đây là lỗi prose và phải có evidence ngay tại câu gây mâu thuẫn.
 Chỉ dùng scope=plan khi chính plan bắt buộc một hành động, số lượng hoặc chuyển trạng thái bất khả thi/mâu thuẫn và instruction phải nói Planner cần đổi gì. Nếu draft bỏ sót, kết thúc trước, hiểu sai hoặc tự bịa chi tiết ngoài một plan hợp lệ thì luôn dùng scope=prose với anchor nguyên văn trong draft, kể cả khi giải thích lỗi có nhắc scene/delta ID.
 Đừng nhầm “đọc trôi” với “cảnh hiệu quả”. Một đối thủ chỉ hung hăng rồi sợ hãi bỏ chạy, một đám đông chỉ kinh ngạc/tung hô, một thao tác cứu cả cộng đồng, hoặc thuật ngữ khoa học dùng để phô diễn mà thiếu thử sai và giới hạn đều phải làm check liên quan=false.
 So sánh với continuityPacket: nhân vật phải nhớ lần gặp, nợ, xung đột và cơ chế đã commit; nếu chương chỉ diễn lại một vấn đề, phương pháp và kết quả vừa hoàn tất mà không có leo thang nhân quả hoặc kết quả mới, báo narrative_repetition.

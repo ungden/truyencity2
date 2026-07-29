@@ -75,6 +75,7 @@ describe('Story Factory architecture boundary', () => {
     expect(pipeline).not.toContain('planJudge');
     expect(benchmark).toContain('Current Planner and Plan Judge must pass exactly chapters 1-5');
     expect(benchmark).toContain('writeStoryChapter({');
+    expect(benchmark).toContain('nextPlan: planned.rollingPlan.plans[planIndex + 1]');
     expect(benchmark).toContain('assessSequentialContinuity({');
     expect(benchmark).toContain('--frozen-discovery-progress');
     expect(benchmark).toContain('planned = frozenProgress.plannedWindows[lane]');

@@ -25,6 +25,12 @@ export interface WriterBrief {
   scenes: unknown[];
   operationalConstraints: string[];
   continuity: unknown[];
+  nextOpening: null | {
+    chapterNumber: number;
+    location: string;
+    participants: string[];
+    mustRemainAvailableAt: Array<{ character: string; location: string }>;
+  };
 }
 
 function relevantIds(plan: ChapterPlan) {
@@ -115,6 +121,8 @@ export function buildWriterBrief(input: {
   kernel: StoryKernel;
   state: StoryState;
   plan: ChapterPlan;
+  stateAfter?: StoryState;
+  nextPlan?: ChapterPlan;
   continuityPacket?: ContinuityPacket;
 }): WriterBrief {
   const ids = relevantIds(input.plan);
@@ -148,6 +156,25 @@ export function buildWriterBrief(input: {
       }));
     return [...operations, ...standalone];
   };
+  const nextScene = input.nextPlan?.chapterNumber === input.plan.chapterNumber + 1
+    ? input.nextPlan.scenes[0]
+    : null;
+  const nextOpening = nextScene
+    ? {
+      chapterNumber: input.nextPlan!.chapterNumber,
+      location: name(nextScene.locationId),
+      participants: nextScene.participantIds.map(name),
+      mustRemainAvailableAt: (input.stateAfter?.characters ?? [])
+        .filter(character => (
+          nextScene.participantIds.includes(character.characterId)
+          && character.locationId === nextScene.locationId
+        ))
+        .map(character => ({
+          character: name(character.characterId),
+          location: name(character.locationId),
+        })),
+    }
+    : null;
   return {
     story: { title: input.kernel.title },
     cast: input.kernel.characters.filter(character => ids.characters.has(character.id)).map(character => ({
@@ -196,6 +223,7 @@ export function buildWriterBrief(input: {
     })),
     operationalConstraints: operationalConstraints(input.kernel, input.plan, name),
     continuity,
+    nextOpening,
   };
 }
 
@@ -220,6 +248,8 @@ export function buildChapterContexts(input: {
   kernel: StoryKernel;
   state: StoryState;
   plan: ChapterPlan;
+  stateAfter?: StoryState;
+  nextPlan?: ChapterPlan;
   previousChapter?: string;
   continuityPacket?: ContinuityPacket;
 }) {
@@ -244,6 +274,15 @@ export function buildChapterContexts(input: {
     promises: input.state.promises.filter(promise => ids.promises.has(promise.promiseId)),
     recentOutcomes: input.state.recentOutcomes,
     continuityPacket: input.continuityPacket ?? null,
+    plannedEndState: input.stateAfter ? {
+      chapterNumber: input.stateAfter.chapterNumber,
+      storyTimeMinutes: input.stateAfter.storyTimeMinutes,
+      facts: input.stateAfter.facts.filter(fact => ids.facts.has(fact.id)),
+      characters: input.stateAfter.characters.filter(character => ids.characters.has(character.characterId)),
+      resources: input.stateAfter.resources.filter(resource => ids.resources.has(resource.resourceId)),
+      promises: input.stateAfter.promises.filter(promise => ids.promises.has(promise.promiseId)),
+    } : null,
+    nextOpening: brief.nextOpening,
   };
   return {
     brief,

@@ -404,6 +404,7 @@ async function runChapter(db: SupabaseClient, job: FactoryJobRow, project: Facto
   const routes = routesResult.data;
   const rolling = rollingResult.data;
   const plan = rolling.plans.find(item => item.chapterNumber === nextChapter)!;
+  const nextPlan = rolling.plans.find(item => item.chapterNumber === nextChapter + 1);
   if (plan.arcNumber !== arc.arcNumber) return blockRun(db, job, null, new StoryFactoryError('plan_blocked', 'Rolling plan belongs to a different arc.'));
   const runId = await createRun(db, job, 'chapter', plan.chapterNumber);
   try {
@@ -424,6 +425,7 @@ async function runChapter(db: SupabaseClient, job: FactoryJobRow, project: Facto
       kernel,
       state,
       plan,
+      nextPlan,
       previousChapter,
       continuityPacket,
       routes,

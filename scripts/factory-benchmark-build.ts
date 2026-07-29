@@ -421,7 +421,7 @@ async function main() {
         let previous = '';
         const laneSamples: SequentialBenchmarkCorpus['samples'] = [];
         const chapters: Array<{ chapterNumber: number; title: string; content: string }> = [];
-        for (const plan of planned.rollingPlan.plans) {
+        for (const [planIndex, plan] of planned.rollingPlan.plans.entries()) {
           const stateBefore = state;
           const previousTail = previous ? tailWords(previous) : null;
           const planDigest = digestArtifact(plan);
@@ -454,6 +454,7 @@ async function main() {
               kernel: setup.launchPack.kernel,
               state: stateBefore,
               plan,
+              nextPlan: planned.rollingPlan.plans[planIndex + 1],
               previousChapter: previous || undefined,
               routes: candidateRoutes,
             });
