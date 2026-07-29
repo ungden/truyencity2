@@ -130,6 +130,9 @@ describe('Story Factory architecture boundary', () => {
     expect(setup.indexOf("setupStage('Grounded Domain Research'"))
       .toBeLessThan(setup.indexOf("setupStage('Blind Concept Judge'"));
     expect(setup).toContain('Grounded Domain Research là ràng buộc');
+    expect(setup).toContain("realityMode: z.enum(['grounded', 'speculative'])");
+    expect(setup).toContain('không bác nó chỉ vì trái vật lý Trái Đất');
+    expect(setup).toContain('Phải áp dụng realityPolicy');
     expect(setup).toContain('concepts: candidates');
   });
 

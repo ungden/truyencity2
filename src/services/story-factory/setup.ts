@@ -34,6 +34,7 @@ export const ResearchSnapshotSchema = z.object({
 export const StoryCommissionSchema = z.object({
   slotKey: z.string().trim().min(2).max(80),
   genreLane: z.string().trim().min(2).max(80),
+  realityMode: z.enum(['grounded', 'speculative']),
   audience: z.string().trim().min(8).max(800),
   tone: z.string().trim().min(8).max(800),
   settingBoundary: z.string().trim().min(8).max(800),
@@ -423,6 +424,9 @@ export async function runConceptLab(input: {
   const commission = StoryCommissionSchema.parse(input.commission);
   const research = ResearchSnapshotSchema.parse(input.research);
   if (commission.genreLane !== research.lane) throw new StoryFactoryError('setup_blocked', 'Research lane does not match the commission.');
+  const groundedRealityPolicy = commission.realityMode === 'grounded'
+    ? 'Đây là bối cảnh grounded: claim vật lý, kỹ thuật, nghề nghiệp, tiền, thời gian, an toàn và hạ tầng phải khả thi ngoài đời; không được dùng phép màu để lấp lỗ nhân quả.'
+    : 'Đây là bối cảnh speculative: chấp nhận tiên đề siêu nhiên riêng của truyện, không bác nó chỉ vì trái vật lý Trái Đất. Hãy kiểm tính nhất quán nội tại, nguồn năng lượng/vật tư, actor có quyền, chi phí, giới hạn, thời gian và hậu quả xã hội; kiến thức thực chỉ dùng để kiểm phần tương tự đời thật.';
   const provider = input.provider ?? geminiProvider;
   const usages: ProviderUsage[] = [];
   const provenance = buildSetupCheckpointProvenance({
@@ -488,7 +492,12 @@ export async function runConceptLab(input: {
       model: input.routes.openingSimulator,
       system: `Bạn là technical researcher cho story setup. Dùng Google Search kiểm tra các claim kỹ thuật cốt lõi của mười hai concept trước khi Judge chọn.
 Ưu tiên cơ quan nhà nước, tiêu chuẩn, tài liệu học thuật hoặc tổ chức chuyên ngành. Nhóm các concept cùng cơ chế để báo cáo cô đọng; nêu rõ claim sai, hạ tầng, thời gian, năng lượng, vệ sinh/an toàn, nguồn lực và điều kiện tối thiểu. Không viết truyện, không chọn concept.`,
-      prompt: JSON.stringify({ commission, researchSignals: research.signals, concepts: candidates }),
+      prompt: JSON.stringify({
+        realityPolicy: groundedRealityPolicy,
+        commission,
+        researchSignals: research.signals,
+        concepts: candidates,
+      }),
       temperature: 0.2,
       grounding: 'google_search',
     }));
@@ -501,9 +510,10 @@ export async function runConceptLab(input: {
     : await setupStage('Blind Concept Judge', provider.json({
     model: input.routes.setupJudge,
     system: `Bạn là Blind Concept Judge. Chọn theo sức hút, nhân quả thế giới và khả năng serial; không biết model nào tạo concept.
-Grounded Domain Research là ràng buộc: không chọn concept dựa trên claim bị research bác hoặc đòi hạ tầng, vốn, thời gian, năng lượng hay mức an toàn trái commission.`,
+Grounded Domain Research là ràng buộc theo realityPolicy. Áp dụng realityPolicy trước khi đọc research. Với grounded, không chọn claim bị research bác hoặc đòi hạ tầng, vốn, thời gian, năng lượng hay mức an toàn trái commission. Với speculative, tiền đề siêu nhiên được phép; chỉ loại khi concept không khóa được logic nội tại, nguồn lực, chi phí, giới hạn, actor hoặc hậu quả.`,
     prompt: JSON.stringify({
       task: 'Chọn đúng hai concept mạnh nhất và khả thi về domain.',
+      realityPolicy: groundedRealityPolicy,
       commission,
       groundedDomainResearch: domainResearch.value,
       candidates,
@@ -528,9 +538,11 @@ Grounded Domain Research là ràng buộc: không chọn concept dựa trên cla
 Với mỗi concept, viết actual opening sample tiếng Việt đủ dài để đánh giá như một cảnh mở đầu hoàn chỉnh: có nhân vật hành động, đối thoại tự nhiên, đối lực có agenda riêng và một thay đổi cụ thể. Không kéo dài để đạt số từ. Đây là mẫu để chọn concept, không phải canon và không được đưa vào Kernel.
 Sau sample, mô tả ngắn hướng chương 2 và 3, chemistry nhân vật, agency của xung đột và audit seriality/nhân quả.
 Đánh domainFeasibility=reject nếu ba chương đầu đòi hạ tầng, vốn, thời gian, năng lượng, kỹ năng hoặc mức an toàn không thực tế. Không được coi kiến thức tương lai là vật tư hay thời gian miễn phí.
+Phải áp dụng realityPolicy: grounded dùng chuẩn thực tế ngoài đời; speculative chấp nhận tiên đề siêu nhiên nhưng vẫn reject nếu thiếu nguồn năng lượng/vật tư, actor có quyền, chi phí, giới hạn, thời gian hoặc hậu quả nhất quán trong chính thế giới đó.
 Đánh longRunFeasibility=reject nếu concept có thể kết thúc ở arc đầu, chỉ lặp một vòng kiếm tiền/sức mạnh, hoặc không có đủ arena, xung đột và progression cho 800-1.200 chương.`,
     prompt: JSON.stringify({
       task: 'Viết opening sample thật cho cả hai concept, sau đó audit hướng chương 2-3 và tính khả thi dài hạn.',
+      realityPolicy: groundedRealityPolicy,
       commission,
       researchSignals: research.signals,
       groundedDomainResearch: domainResearch.value,
