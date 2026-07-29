@@ -2315,10 +2315,10 @@ describe('canonical Story Factory', () => {
     });
     expect(resumed.failure).toBeNull();
     expect(resumed.providerFailures).toBe(1);
-    expect(resumed.setupSuccesses).toBe(1);
-    expect(resumed.planSuccesses).toBe(1);
-    expect(resumed.launchPackDigests).toEqual(progress.launchPackDigests);
-    expect(resumed.writerBriefs).toEqual(progress.writerBriefs);
+    expect(resumed.setupSuccesses).toBe(0);
+    expect(resumed.planSuccesses).toBe(0);
+    expect(resumed.launchPackDigests).toEqual([]);
+    expect(resumed.writerBriefs).toEqual([]);
     expect(resumed.plannedWindows).toEqual(progress.plannedWindows);
     expect(resumed.setupCheckpoints.era_coastal).toBe(progress.setupCheckpoints.era_coastal);
     expect(resumed.buildCostUsd).toBeCloseTo(0.4);

@@ -112,8 +112,11 @@ export function prepareDiscoveryResume<T extends ResumableDiscoveryProgress>(inp
     engineRelease: input.engineRelease,
     route: input.route,
     continuityJudgeModel: input.continuityJudgeModel,
-    setupSuccesses: preserveCurrentReleaseEvidence ? progress.setupSuccesses : 0,
-    planSuccesses: preserveCurrentReleaseEvidence ? progress.planSuccesses : 0,
+    // The discovery loop deterministically replays every lane from its
+    // checkpoint and rebuilds these derived counters/collections. Preserve the
+    // expensive plan artifacts, not their already-counted projections.
+    setupSuccesses: 0,
+    planSuccesses: 0,
     providerFailures: preserveCurrentReleaseEvidence ? progress.providerFailures : 0,
     generationFailures: preserveCurrentReleaseEvidence ? progress.generationFailures : 0,
     continuityFailures: preserveCurrentReleaseEvidence ? progress.continuityFailures : 0,
@@ -121,9 +124,9 @@ export function prepareDiscoveryResume<T extends ResumableDiscoveryProgress>(inp
     buildCostUsd: input.compatibleSetupOnly
       ? checkpointTotal
       : Math.max(progress.buildCostUsd, checkpointTotal),
-    launchPackDigests: preserveCurrentReleaseEvidence ? progress.launchPackDigests : [],
+    launchPackDigests: [],
     samples: [],
-    writerBriefs: preserveCurrentReleaseEvidence ? progress.writerBriefs : [],
+    writerBriefs: [],
     chapterAttempts: [],
     plannedWindows: preserveCurrentReleaseEvidence ? progress.plannedWindows : {},
     windowReviews: [],
