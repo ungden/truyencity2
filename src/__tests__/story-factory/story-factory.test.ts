@@ -3381,7 +3381,7 @@ describe('canonical Story Factory', () => {
         effectResources: [],
         effectFactIds: ['fact_day'],
         capacityUnit: 'hồ sơ',
-        maximumUnitsPerMinute: 1,
+        maximumUnitsPerMinute: 0.02,
       },
     );
     const dependencyState: StoryState = structuredClone(initialState);
@@ -3416,6 +3416,12 @@ describe('canonical Story Factory', () => {
         minimumForOneUse: null,
         producerMechanicIds: ['process_dossier'],
       }],
+      capacity: {
+        unit: 'hồ sơ',
+        maximumUnitsPerMinute: 0.02,
+        minimumAvailableMinutesForOneUnit: 50,
+        rule: 'availableMinutes phải >= ceil(qty / maximumUnitsPerMinute); effect dùng scene.dur, support dùng scene.dur + scene.travel.',
+      },
       unlocksFactIds: ['fact_day'],
       unlocksResourceIds: [],
     });

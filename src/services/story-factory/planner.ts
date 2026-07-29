@@ -158,6 +158,12 @@ type PlannerMechanicGuide = {
       minimumForOneUse: number | null;
       producerMechanicIds: string[];
     }>;
+    capacity: null | {
+      unit: string | null;
+      maximumUnitsPerMinute: number;
+      minimumAvailableMinutesForOneUnit: number;
+      rule: string;
+    };
     unlocksFactIds: string[];
     unlocksResourceIds: string[];
   }>;
@@ -272,6 +278,14 @@ export function buildPlannerMechanicGuide(input: {
         availableAtWindowStart: blockedByFacts.length === 0 && blockedByResources.length === 0,
         blockedByFacts,
         blockedByResources,
+        capacity: mechanic.kind === 'capability' && mechanic.maximumUnitsPerMinute !== null
+          ? {
+            unit: mechanic.capacityUnit,
+            maximumUnitsPerMinute: mechanic.maximumUnitsPerMinute,
+            minimumAvailableMinutesForOneUnit: Math.ceil(1 / mechanic.maximumUnitsPerMinute),
+            rule: 'availableMinutes phải >= ceil(qty / maximumUnitsPerMinute); effect dùng scene.dur, support dùng scene.dur + scene.travel.',
+          }
+          : null,
         unlocksFactIds,
         unlocksResourceIds,
       };
