@@ -5,6 +5,7 @@ import {
   EditorContinuityIssueSchema,
   ReadingIssueSchema,
   StoryFactoryError,
+  narrativelyObservableDeltaIds,
   type ChapterPlan,
   type EditorAssessment,
   type ModelRoutes,
@@ -248,7 +249,7 @@ function preflight(draft: ChapterDraft, chapterNumber: number): PreflightIssue[]
 }
 
 function editorPrompt(input: {
-  kernel: unknown;
+  kernel: Pick<StoryKernel, 'protagonistId' | 'resources'>;
   state: unknown;
   plan: ChapterPlan;
   draft: ChapterDraft;
@@ -268,7 +269,12 @@ function editorPrompt(input: {
         state: input.state,
         plan: input.plan,
       })].sort(),
-      deltaChecks: 'Mỗi required delta đúng một check và evidence nguyên văn nếu realized=true.',
+      observableDeltaIds: [...narrativelyObservableDeltaIds(input.kernel, input.plan)],
+      hiddenMechanicalDeltaIds: input.plan.requiredDeltas
+        .map(delta => delta.id)
+        .filter(deltaId => !narrativelyObservableDeltaIds(input.kernel, input.plan).has(deltaId)),
+      deltaChecks: 'Chỉ mỗi observableDeltaId có đúng một check và evidence nguyên văn nếu realized=true. Hidden mechanical delta vẫn được code kiểm và commit, nhưng không được bắt prose nêu số dư/trữ lượng ẩn.',
+      historicalMoney: 'Phân biệt tổng giá trị với mệnh giá: “cọc/xấp tiền trị giá năm trăm ngàn” không có nghĩa là một tờ tiền mệnh giá 500.000. Chỉ báo lỗi mệnh giá khi prose nói rõ một tờ hoặc đồng tiền có mệnh giá lịch sử không tồn tại.',
       clean: 'findings=[] chỉ khi mọi delta realized=true; khi đó outcome bắt buộc.',
       issues: 'Có finding hoặc delta chưa realized thì outcome=null.',
     },
@@ -276,8 +282,12 @@ function editorPrompt(input: {
   });
 }
 
-function assertDeltaCoverage(plan: ChapterPlan, assessment: EditorAssessment): void {
-  const expected = new Set(plan.requiredDeltas.map(delta => delta.id));
+function assertDeltaCoverage(
+  kernel: Pick<StoryKernel, 'protagonistId' | 'resources'>,
+  plan: ChapterPlan,
+  assessment: EditorAssessment,
+): void {
+  const expected = narrativelyObservableDeltaIds(kernel, plan);
   const actual = assessment.deltaChecks.map(check => check.deltaId);
   if (new Set(actual).size !== actual.length || actual.some(id => !expected.has(id)) || actual.length !== expected.size) {
     throw new StoryFactoryError('infra_blocked', 'Editor returned an invalid delta-check set.', { expected: [...expected], actual });
@@ -446,7 +456,7 @@ function groundIssueEvidence(input: {
 export async function assessStoryDraft(input: {
   provider: StoryModelProvider;
   model: string;
-  kernel: unknown;
+  kernel: Pick<StoryKernel, 'protagonistId' | 'resources'>;
   state: unknown;
   plan: ChapterPlan;
   draft: ChapterDraft;
@@ -457,7 +467,7 @@ export async function assessStoryDraft(input: {
     state: input.state,
     plan: input.plan,
   })];
-  const deltaIds = input.plan.requiredDeltas.map(delta => delta.id);
+  const deltaIds = [...narrativelyObservableDeltaIds(input.kernel, input.plan)];
   const responseSchema = buildEditorWireAssessmentSchema({ referenceIds, deltaIds });
   const response = await input.provider.json({
     model: input.model,
@@ -499,7 +509,7 @@ export async function assessStoryDraft(input: {
       state: input.state,
     });
   }
-  assertDeltaCoverage(input.plan, assessment);
+  assertDeltaCoverage(input.kernel, input.plan, assessment);
   return { assessment: mergePreflight(assessment, deterministicIssues), usage: response.usage };
 }
 

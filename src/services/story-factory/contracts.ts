@@ -746,6 +746,28 @@ export type PlanAssessment = z.infer<typeof PlanAssessmentSchema>;
 export type ModelRoutes = z.infer<typeof ModelRoutesSchema>;
 export type LaunchPack = z.infer<typeof LaunchPackSchema>;
 
+/**
+ * Exact world ledgers are broader than what a viewpoint character can observe.
+ * World-owned stocks and another character's remaining balance still commit
+ * transactionally, but forcing their exact after-values into prose makes the
+ * Writer narrate database state. Only a POV-owned resource balance is a
+ * required narrative realization; causal validation still owns every delta.
+ */
+export function narrativelyObservableDeltaIds(
+  kernel: Pick<StoryKernel, 'protagonistId' | 'resources'>,
+  plan: ChapterPlan,
+): Set<string> {
+  const povCharacterIds = new Set(plan.scenes.map(scene => scene.povCharacterId));
+  const resourceOwners = new Map(kernel.resources.map(resource => [resource.id, resource.ownerEntityId]));
+  return new Set(plan.requiredDeltas.flatMap(delta => {
+    if (delta.kind !== 'resource_numeric' && delta.kind !== 'resource_state') return [delta.id];
+    const ownerId = resourceOwners.get(delta.resourceId);
+    return ownerId && (ownerId === kernel.protagonistId || povCharacterIds.has(ownerId))
+      ? [delta.id]
+      : [];
+  }));
+}
+
 export type FactoryBlockCode = 'setup_blocked' | 'plan_blocked' | 'quality_blocked' | 'infra_blocked';
 
 export class StoryFactoryError extends Error {

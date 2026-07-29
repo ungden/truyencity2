@@ -1,4 +1,5 @@
 import {
+  narrativelyObservableDeltaIds,
   type ArcPlan,
   type CanonExtension,
   type ChapterOutcome,
@@ -10,7 +11,7 @@ import {
   StoryFactoryError,
 } from './contracts';
 
-export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-28-owner-authorized-outflow';
+export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-29-observable-story-delta';
 
 export interface StateEvent {
   chapterNumber: number;
@@ -997,6 +998,9 @@ export function applyChapterPlan(input: {
   checkPreconditions(state, plan);
   validateScenes(kernel, state, plan);
   validateCausalMechanics({ kernel, state, plan });
+  if (narrativelyObservableDeltaIds(kernel, plan).size === 0) {
+    fail(`Chapter ${plan.chapterNumber} changes only hidden world ledger state and has no reader-visible story delta.`);
+  }
 
   const events: StateEvent[] = [];
   for (const delta of plan.requiredDeltas) {

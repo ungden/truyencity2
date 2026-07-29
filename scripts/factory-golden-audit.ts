@@ -101,7 +101,7 @@ async function main() {
     const assessed = await assessStoryDraft({
       provider: geminiProvider,
       model: editorModel,
-      kernel: launchPack.kernel,
+      kernel: launchPack.kernel as never,
       state: previousState,
       plan: plan as never,
       draft: { title: chapter.title, content: chapter.content },

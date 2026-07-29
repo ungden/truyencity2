@@ -1,4 +1,5 @@
 import {
+  narrativelyObservableDeltaIds,
   type ChapterPlan,
   type EditorAssessment,
   type StateDelta,
@@ -135,12 +136,22 @@ export function buildWriterBrief(input: {
   const ids = relevantIds(input.plan);
   ids.characters.add(input.kernel.protagonistId);
   const name = labels(input.kernel);
-  const deltas = new Map(input.plan.requiredDeltas.map(delta => [delta.id, delta]));
+  const observableDeltaIds = narrativelyObservableDeltaIds(input.kernel, input.plan);
+  const hiddenResourceIds = new Set(input.plan.requiredDeltas.flatMap(delta => (
+    (delta.kind === 'resource_numeric' || delta.kind === 'resource_state')
+    && !observableDeltaIds.has(delta.id)
+      ? [delta.resourceId]
+      : []
+  )));
+  hiddenResourceIds.forEach(resourceId => ids.resources.delete(resourceId));
+  const deltas = new Map(input.plan.requiredDeltas
+    .filter(delta => observableDeltaIds.has(delta.id))
+    .map(delta => [delta.id, delta]));
   const continuity = input.continuityPacket
     ? flattenContinuityPacket(input.continuityPacket).slice(0, 12).map(event => readableTransition(event, name))
     : [];
   const sceneChanges = (sceneId: string, deltaIds: string[]) => {
-    const available = new Set(deltaIds);
+    const available = new Set(deltaIds.filter(deltaId => deltas.has(deltaId)));
     const claimed = new Set<string>();
     const operations = input.plan.mechanicUses
       .filter(use => use.sceneId === sceneId && use.role === 'effect')
@@ -155,7 +166,7 @@ export function buildWriterBrief(input: {
         }];
       });
     const standalone = deltaIds
-      .filter(id => !claimed.has(id))
+      .filter(id => deltas.has(id) && !claimed.has(id))
       .map(id => ({
         operation: null,
         actor: null,

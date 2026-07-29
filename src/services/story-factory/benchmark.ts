@@ -17,8 +17,8 @@ import {
 import { WindowPassSchema } from './planner';
 
 export const STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL = 'story-factory-writer-bakeoff-v11-idempotent-exact-resume';
-export const STORY_FACTORY_SEQUENTIAL_PROTOCOL = 'story-factory-sequential-survival-v6-evidenced-window-review';
-export const STORY_FACTORY_BENCHMARK_PROTOCOL = 'story-factory-validation-v12-evidenced-window-review';
+export const STORY_FACTORY_SEQUENTIAL_PROTOCOL = 'story-factory-sequential-survival-v7-hidden-ledger-boundary';
+export const STORY_FACTORY_BENCHMARK_PROTOCOL = 'story-factory-validation-v13-hidden-ledger-boundary';
 export const STORY_FACTORY_BENCHMARK_SAMPLE_COUNT = 20;
 export const STORY_FACTORY_WRITER_SAMPLE_COUNT = 4;
 

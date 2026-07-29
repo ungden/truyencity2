@@ -32,6 +32,7 @@ import {
   appendAcceptedOutcome,
   applyCanonExtension,
   applyChapterPlan,
+  assessStoryDraft,
   assertVoiceSemantics,
   assertComparableSequentialCorpora,
   buildBlindReaderComparison,
@@ -51,6 +52,7 @@ import {
   loadRelevantStoryTransitions,
   memoryEntityIdsForArc,
   memoryEntityIdsForPlan,
+  narrativelyObservableDeltaIds,
   runConceptLab,
   planArcLifecycle,
   planRollingWindow,
@@ -1858,6 +1860,146 @@ describe('canonical Story Factory', () => {
     expect(brief).not.toContain('avoidances');
     const contexts = buildChapterContexts({ kernel, state, plan: plan(1) });
     expect(JSON.stringify(contexts.editorState)).toContain('lót trấu và xơ dừa');
+  });
+
+  test('hidden world stock and another character balance stay out of Writer prose obligations', async () => {
+    const hiddenKernel: StoryKernel = {
+      ...structuredClone(kernel),
+      resources: [
+        ...kernel.resources,
+        {
+          id: 'wild_stock',
+          name: 'Trữ lượng ghẹ ẩn dưới rạn',
+          kind: 'numeric',
+          unit: 'kg',
+          ownerEntityId: null,
+          minimum: 0,
+        },
+        {
+          id: 'buyer_cash',
+          name: 'Số dư kín của người mua',
+          kind: 'numeric',
+          unit: 'VND',
+          ownerEntityId: 'buyer',
+          minimum: 0,
+        },
+      ],
+    };
+    const chapter = plan(1);
+    chapter.requiredDeltas.push(
+      {
+        id: 'hidden_wild_stock',
+        kind: 'resource_numeric',
+        resourceId: 'wild_stock',
+        before: 98765,
+        delta: -10,
+        after: 98755,
+        source: null,
+        sink: 'ghẹ được đánh bắt',
+      },
+      {
+        id: 'hidden_buyer_balance',
+        kind: 'resource_numeric',
+        resourceId: 'buyer_cash',
+        before: 765432,
+        delta: -100,
+        after: 765332,
+        source: null,
+        sink: 'người mua trả cho Hải',
+      },
+    );
+    chapter.scenes[0].requiredDeltaIds.push('hidden_wild_stock', 'hidden_buyer_balance');
+    const observable = narrativelyObservableDeltaIds(hiddenKernel, chapter);
+    expect([...observable]).toEqual(['delta_1']);
+    const brief = JSON.stringify(buildWriterBrief({
+      kernel: hiddenKernel,
+      state: {
+        ...structuredClone(initialState),
+        resources: [
+          ...initialState.resources,
+          { resourceId: 'wild_stock', kind: 'numeric', value: 98765 },
+          { resourceId: 'buyer_cash', kind: 'numeric', value: 765432 },
+        ],
+      },
+      plan: chapter,
+    }));
+    expect(brief).not.toContain('Trữ lượng ghẹ ẩn dưới rạn');
+    expect(brief).not.toContain('Số dư kín của người mua');
+    expect(brief).not.toContain('98765');
+    expect(brief).not.toContain('765432');
+
+    const provider = new QueueProvider([editorWirePass('delta_1', 'Hải chia việc và bắt tay thực hiện')]);
+    const assessed = await assessStoryDraft({
+      provider,
+      model: routes.editor,
+      kernel: hiddenKernel,
+      state: initialState,
+      plan: chapter,
+      draft: {
+        title: 'Chương 1: Bắt Tay Làm',
+        content: 'Hải chia việc và bắt tay thực hiện công việc đã thống nhất với gia đình.',
+      },
+    });
+    expect(assessed.assessment.deltaChecks).toEqual([
+      expect.objectContaining({ deltaId: 'delta_1', realized: true }),
+    ]);
+    expect(provider.prompts[0]).toContain('hiddenMechanicalDeltaIds');
+    expect(provider.prompts[0]).toContain('tổng giá trị với mệnh giá');
+
+    const hiddenOnlyKernel: StoryKernel = {
+      ...hiddenKernel,
+      worldMechanics: [
+        ...hiddenKernel.worldMechanics,
+        {
+          id: 'mechanic_hidden_harvest',
+          name: 'Đánh bắt ghẹ từ trữ lượng tự nhiên',
+          kind: 'capability',
+          description: 'Duy dùng rập lấy ghẹ khỏi trữ lượng tự nhiên có giới hạn.',
+          allowedActorIds: ['main'],
+          requiredFacts: [],
+          requiredResourceIds: ['wild_stock'],
+          effectResources: [{ resourceId: 'wild_stock', direction: 'decrease' }],
+          effectFactIds: [],
+          capacityUnit: 'kg',
+          maximumUnitsPerMinute: 1,
+        },
+      ],
+    };
+    const hiddenOnlyPlan = plan(1);
+    hiddenOnlyPlan.requiredDeltas = [{
+      id: 'hidden_wild_stock',
+      kind: 'resource_numeric',
+      resourceId: 'wild_stock',
+      before: 98765,
+      delta: -1,
+      after: 98764,
+      source: null,
+      sink: 'Duy đánh bắt một kg ghẹ',
+    }];
+    hiddenOnlyPlan.scenes[0].requiredDeltaIds = ['hidden_wild_stock'];
+    hiddenOnlyPlan.scenes[0].action = 'Duy dùng rập đánh bắt một kg ghẹ từ rạn.';
+    hiddenOnlyPlan.mechanicUses = [{
+      id: 'use_hidden_harvest',
+      sceneId: hiddenOnlyPlan.scenes[0].id,
+      mechanicId: 'mechanic_hidden_harvest',
+      role: 'effect',
+      actorId: 'main',
+      quantity: 1,
+      preconditionFactIds: [],
+      deltaIds: ['hidden_wild_stock'],
+    }];
+    expect(() => applyChapterPlan({
+      kernel: hiddenOnlyKernel,
+      state: {
+        ...structuredClone(initialState),
+        resources: [
+          ...initialState.resources,
+          { resourceId: 'wild_stock', kind: 'numeric', value: 98765 },
+          { resourceId: 'buyer_cash', kind: 'numeric', value: 765432 },
+        ],
+      },
+      plan: hiddenOnlyPlan,
+    })).toThrow('no reader-visible story delta');
   });
 
   test('Writer sees causal operation groups without duplicated capacity telemetry', () => {
