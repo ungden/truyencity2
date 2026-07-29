@@ -10,7 +10,7 @@ import {
   StoryFactoryError,
 } from './contracts';
 
-export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-19-owned-resource-direction';
+export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-20-structured-asset-phrases';
 
 export interface StateEvent {
   chapterNumber: number;
@@ -402,6 +402,16 @@ function stripProhibitedTransactions(action: string): string {
   return action.replace(new RegExp(String.raw`${left}${prohibition}\s+${filler}${verbs}${right}`, 'giu'), '');
 }
 
+function stripNonActionAssetPhrases(action: string): string {
+  // These phrases name a field of knowledge rather than the act of creating a
+  // durable asset. Free-form scene text is only a defensive signal; it must
+  // not override the structured delta/mechanic contract on a lexical match.
+  return action.replace(
+    /(?<![\p{L}\p{N}_-])(?:kiến\s+thức|kinh\s+nghiệm|kỹ\s+năng|kỹ\s+thuật|chuyên\s+môn|ngành|lĩnh\s+vực|thuật\s+ngữ)\s+(?:về\s+)?xây\s+dựng(?=$|[^\p{L}\p{N}_-])/giu,
+    '',
+  );
+}
+
 function hasVietnameseTerm(action: string, terms: string): boolean {
   return new RegExp(String.raw`(?<![\p{L}\p{N}_-])(?:${terms})(?=$|[^\p{L}\p{N}_-])`, 'iu').test(action);
 }
@@ -494,7 +504,9 @@ function validateScenes(kernel: StoryKernel, state: StoryState, plan: ChapterPla
       referenced.add(deltaId);
     }
     const sceneDeltas = scene.requiredDeltaIds.map(deltaId => plan.requiredDeltas.find(delta => delta.id === deltaId)!);
-    const realizedAction = stripProhibitedTransactions(stripFutureIntent(scene.action));
+    const realizedAction = stripNonActionAssetPhrases(
+      stripProhibitedTransactions(stripFutureIntent(scene.action)),
+    );
     const normalizedAction = semanticSlug(realizedAction);
     for (const delta of sceneDeltas) {
       if (delta.kind !== 'resource_numeric') continue;
@@ -541,7 +553,7 @@ function validateScenes(kernel: StoryKernel, state: StoryState, plan: ChapterPla
       && !sceneDeltas.some(delta => delta.kind === 'resource_numeric')) {
       fail(`Scene ${scene.id} describes a transaction without a numeric resource delta.`, scene.action);
     }
-    if (hasVietnameseTerm(realizedAction, String.raw`chế tạo|đóng thành|xây dựng|lắp ráp|thu gom|nhận được`)
+    if (hasVietnameseTerm(realizedAction, String.raw`chế tạo|đóng thành|xây dựng|lắp ráp|thu gom`)
       && !sceneDeltas.some(delta => delta.kind === 'resource_numeric' || delta.kind === 'resource_state' || delta.kind === 'fact')) {
       fail(`Scene ${scene.id} creates or acquires a durable asset without a state delta.`, scene.action);
     }

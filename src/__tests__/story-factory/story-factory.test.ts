@@ -33,6 +33,7 @@ import {
   buildBlindReaderComparison,
   buildBlindReaderInput,
   buildChapterContexts,
+  buildPlannerMechanicGuide,
   buildWriterBrief,
   buildSetupCheckpointProvenance,
   bookSetupCheckpointCost,
@@ -1199,6 +1200,16 @@ describe('canonical Story Factory', () => {
     const chapter = plan(1);
     chapter.scenes[0].action = 'Thím Tư dùng quyền lực bến bãi để ép một ngư dân khai ra việc Phong dùng thùng xốp giữ lạnh mang cá đi bán.';
     expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).not.toThrow();
+  });
+
+  test('does not treat construction knowledge as creation of a durable asset', () => {
+    const chapter = plan(1);
+    chapter.scenes[0].action = 'Thẩm Nhược Thủy chất vấn Trần Hữu, nhưng anh dùng kiến thức xây dựng giải thích rằng vách đá tự nhiên bị nứt do áp lực.';
+    expect(() => applyChapterPlan({
+      kernel,
+      state: initialState,
+      plan: chapter,
+    })).not.toThrow();
   });
 
   test('does not treat a policy prohibiting sales as a completed transaction', () => {
@@ -2712,6 +2723,107 @@ describe('canonical Story Factory', () => {
       state: dependencyState,
       plan: rolling.plans[0],
     })).not.toThrow();
+  });
+
+  test('Planner mechanic guide exposes the exact producer needed before a blocked capability', () => {
+    const dependencyKernel: StoryKernel = structuredClone(kernel);
+    dependencyKernel.resources.push({
+      id: 'processed_dossiers',
+      name: 'Hồ sơ đã thẩm định',
+      kind: 'numeric',
+      unit: 'hồ sơ',
+      ownerEntityId: 'main',
+      minimum: 0,
+    });
+    dependencyKernel.worldMechanics.push(
+      {
+        id: 'process_dossier',
+        name: 'Thẩm định hồ sơ',
+        kind: 'conversion',
+        description: 'Dùng tiền để hoàn tất một hồ sơ.',
+        inputsPerBatch: [{ resourceId: 'money', amount: 10 }],
+        outputsPerBatch: [{ resourceId: 'processed_dossiers', amount: 1 }],
+        maximumBatchesPerUse: 5,
+      },
+      {
+        id: 'approve_loan',
+        name: 'Phê duyệt khoản vay',
+        kind: 'capability',
+        description: 'Chỉ phê duyệt khi đã có hồ sơ thẩm định.',
+        allowedActorIds: ['main'],
+        requiredFacts: [],
+        requiredResourceIds: ['processed_dossiers'],
+        effectResources: [],
+        effectFactIds: ['fact_day'],
+        capacityUnit: 'hồ sơ',
+        maximumUnitsPerMinute: 1,
+      },
+    );
+    const dependencyState: StoryState = structuredClone(initialState);
+    dependencyState.resources.push({
+      resourceId: 'processed_dossiers',
+      kind: 'numeric',
+      value: 0,
+    });
+    const dependencyArc: ArcPlan = {
+      ...structuredClone(arc),
+      activeMechanicIds: [
+        ...arc.activeMechanicIds,
+        'process_dossier',
+        'approve_loan',
+      ],
+    };
+
+    const guide = buildPlannerMechanicGuide({
+      kernel: dependencyKernel,
+      arc: dependencyArc,
+      state: dependencyState,
+    });
+
+    expect(guide.mechanics.find(item => item.mechanicId === 'approve_loan')).toEqual({
+      mechanicId: 'approve_loan',
+      kind: 'capability',
+      availableAtWindowStart: false,
+      blockedByFacts: [],
+      blockedByResources: [{
+        resourceId: 'processed_dossiers',
+        current: 0,
+        minimumForOneUse: null,
+        producerMechanicIds: ['process_dossier'],
+      }],
+      unlocksFactIds: ['fact_day'],
+      unlocksResourceIds: [],
+    });
+  });
+
+  test('Planner prompt receives the state-aware mechanic dependency guide', async () => {
+    const provider = new QueueProvider([plannerWire(), {
+      status: 'pass',
+      checks: {
+        protagonistAgency: true, earnedProgression: true, oppositionAgenda: true,
+        sceneVariety: true, stageAlignment: true, outcomeWeight: true,
+      },
+      checkEvidence: {
+        protagonistAgency: 'chapter 1 scene_1 delta_1',
+        earnedProgression: 'chapter 1 scene_1 delta_1',
+        oppositionAgenda: 'chapter 1 scene_1 delta_1',
+        sceneVariety: 'chapter 1 scene_1 delta_1',
+        stageAlignment: 'chapter 1 scene_1 delta_1',
+        outcomeWeight: 'chapter 1 scene_1 delta_1',
+      },
+      issues: [],
+    }]);
+
+    await planRollingWindow({ kernel, arc, state: initialState, routes, provider });
+    const prompt = JSON.parse(provider.prompts[0]) as {
+      mechanicDependencyGuide: {
+        planningRule: string;
+        mechanics: Array<{ mechanicId: string }>;
+      };
+    };
+    expect(prompt.mechanicDependencyGuide.planningRule).toContain('producerMechanicId');
+    expect(prompt.mechanicDependencyGuide.mechanics.map(item => item.mechanicId))
+      .toEqual(expect.arrayContaining(arc.activeMechanicIds));
   });
 
   test('fact before values are derived sequentially from State across a rolling window', () => {

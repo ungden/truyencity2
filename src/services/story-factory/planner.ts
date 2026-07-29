@@ -113,6 +113,7 @@ const PLANNER_COMPACT_CONTRACT = {
     'Mọi field compact đều bắt buộc; dùng null đúng chỗ, không bỏ field. counterpart chỉ khác null với relationship.',
     'resource_numeric phải ghi nguồn/đích theo dấu của change: change dương có source cụ thể và sink=null; change âm có sink cụ thể và source=null; không tạo delta change=0.',
     'pre.k chỉ được fact|resource|location|promise; resource_numeric và resource_state chỉ dùng cho deltas.k.',
+    'Mỗi pre.value là giá trị equality chính xác tại đầu chương, tuyệt đối không dùng như minimum/maximum hay ngưỡng. Ví dụ State có 100 thì pre resource phải là 100, không phải 20 với ý nghĩa “ít nhất 20”.',
     'time, dur và travel là số nguyên phút; mỗi scene.dur bắt buộc trong khoảng 1-10000, scene.travel trong khoảng 0-100000; tuyệt đối không dùng dur=0; travel không được là mảng hay mô tả tuyến đường.',
     'time là storyTime tuyệt đối ở cuối chương, không phải số phút của riêng chương. Với chương đầu: time >= State.storyTimeMinutes + tổng mọi scene.dur + scene.travel. Với chương sau: time >= time chương trước + tổng dur + travel của chương đó.',
     'Tính time tuần tự cho cả window sau khi đã chốt scenes; tuyệt đối không để time bằng thời điểm đầu chương khi chương có diễn biến.',
@@ -138,6 +139,145 @@ const PLANNER_COMPACT_CONTRACT = {
     'Không tạo location delta. Chỉ khai báo đúng scene.people, scene.loc và scene.travel; compiler là nguồn duy nhất tự sinh location delta từ vị trí đầu chương tới scene cuối của từng nhân vật.',
   ],
 } as const;
+
+type PlannerMechanicGuide = {
+  planningRule: string;
+  mechanics: Array<{
+    mechanicId: string;
+    kind: StoryKernel['worldMechanics'][number]['kind'];
+    availableAtWindowStart: boolean;
+    blockedByFacts: Array<{
+      factId: string;
+      expected: string | number;
+      current: string | number | null;
+      producerMechanicIds: string[];
+    }>;
+    blockedByResources: Array<{
+      resourceId: string;
+      current: string | number | null;
+      minimumForOneUse: number | null;
+      producerMechanicIds: string[];
+    }>;
+    unlocksFactIds: string[];
+    unlocksResourceIds: string[];
+  }>;
+};
+
+/**
+ * Compile the causal dependency graph into a small, state-aware projection.
+ *
+ * The Planner already receives the exact mechanics contract, but asking a
+ * model to rediscover producer -> prerequisite edges inside a large Kernel is
+ * both wasteful and unreliable. This guide contains no story prose and makes
+ * no creative choice: it only states which active mechanics are legal now and
+ * which active mechanics can unlock their missing inputs.
+ */
+export function buildPlannerMechanicGuide(input: {
+  kernel: StoryKernel;
+  arc: ArcPlan;
+  state: StoryState;
+}): PlannerMechanicGuide {
+  const facts = new Map(input.state.facts.map(fact => [fact.id, fact.value]));
+  const resources = new Map(input.state.resources.map(resource => [
+    resource.resourceId,
+    resource.value,
+  ]));
+  const activeIds = new Set(input.arc.activeMechanicIds);
+  const activeMechanics = input.kernel.worldMechanics.filter(mechanic => activeIds.has(mechanic.id));
+
+  const factProducers = new Map<string, string[]>();
+  const resourceProducers = new Map<string, string[]>();
+  const addProducer = (index: Map<string, string[]>, targetId: string, mechanicId: string) => {
+    index.set(targetId, [...new Set([...(index.get(targetId) ?? []), mechanicId])].sort());
+  };
+  for (const mechanic of activeMechanics) {
+    if (mechanic.kind === 'conversion') {
+      mechanic.outputsPerBatch.forEach(output =>
+        addProducer(resourceProducers, output.resourceId, mechanic.id));
+    } else if (mechanic.kind === 'capability') {
+      mechanic.effectFactIds.forEach(factId =>
+        addProducer(factProducers, factId, mechanic.id));
+      mechanic.effectResources
+        .filter(effect => effect.direction === 'increase' || effect.direction === 'state_change')
+        .forEach(effect => addProducer(resourceProducers, effect.resourceId, mechanic.id));
+    }
+  }
+
+  const isUsableResource = (value: string | number | undefined): boolean => (
+    typeof value === 'number' ? value > 0 : typeof value === 'string' && value.trim().length > 0
+  );
+  const conditionMatches = (
+    current: string | number | undefined,
+    expected: string | number,
+  ): boolean => (
+    current === expected
+    || (typeof expected === 'number'
+      && typeof current === 'string'
+      && current.trim() !== ''
+      && Number(current) === expected)
+  );
+
+  return {
+    planningRule: 'Nếu availableAtWindowStart=false, phải dùng một producerMechanicId hợp lệ ở scene/chương trước rồi mới dùng mechanic bị khóa. Nếu producerMechanicIds rỗng thì không được dùng mechanic đó trong window.',
+    mechanics: activeMechanics.map(mechanic => {
+      const requiredFacts = mechanic.kind === 'conversion' ? [] : mechanic.requiredFacts;
+      const requiredResources = mechanic.kind === 'conversion'
+        ? mechanic.inputsPerBatch.map(inputResource => ({
+          resourceId: inputResource.resourceId,
+          minimumForOneUse: inputResource.amount,
+        }))
+        : mechanic.kind === 'capability'
+          ? mechanic.requiredResourceIds.map(resourceId => ({
+            resourceId,
+            minimumForOneUse: null,
+          }))
+          : [];
+      const blockedByFacts = requiredFacts
+        .filter(condition => !conditionMatches(facts.get(condition.factId), condition.expected))
+        .map(condition => ({
+          factId: condition.factId,
+          expected: condition.expected,
+          current: facts.get(condition.factId) ?? null,
+          producerMechanicIds: factProducers.get(condition.factId) ?? [],
+        }));
+      const blockedByResources = [...new Map(
+        requiredResources.map(requirement => [requirement.resourceId, requirement]),
+      ).values()]
+        .filter(requirement => {
+          const current = resources.get(requirement.resourceId);
+          return requirement.minimumForOneUse === null
+            ? !isUsableResource(current)
+            : typeof current !== 'number' || current < requirement.minimumForOneUse;
+        })
+        .map(requirement => ({
+          resourceId: requirement.resourceId,
+          current: resources.get(requirement.resourceId) ?? null,
+          minimumForOneUse: requirement.minimumForOneUse,
+          producerMechanicIds: resourceProducers.get(requirement.resourceId) ?? [],
+        }));
+      const unlocksFactIds = mechanic.kind === 'capability'
+        ? [...mechanic.effectFactIds].sort()
+        : [];
+      const unlocksResourceIds = mechanic.kind === 'conversion'
+        ? [...new Set(mechanic.outputsPerBatch.map(output => output.resourceId))].sort()
+        : mechanic.kind === 'capability'
+          ? [...new Set(mechanic.effectResources
+            .filter(effect => effect.direction === 'increase' || effect.direction === 'state_change')
+            .map(effect => effect.resourceId))].sort()
+          : [];
+
+      return {
+        mechanicId: mechanic.id,
+        kind: mechanic.kind,
+        availableAtWindowStart: blockedByFacts.length === 0 && blockedByResources.length === 0,
+        blockedByFacts,
+        blockedByResources,
+        unlocksFactIds,
+        unlocksResourceIds,
+      };
+    }),
+  };
+}
 
 function signedConversionVector(
   mechanic: Extract<StoryKernel['worldMechanics'][number], { kind: 'conversion' }>,
@@ -1058,6 +1198,11 @@ export async function planRollingWindow(input: {
             )),
           },
         ])),
+        mechanicDependencyGuide: buildPlannerMechanicGuide({
+          kernel: input.kernel,
+          arc: input.arc,
+          state: input.state,
+        }),
         travelConstraints: {
           initialLocationsByCharacter: Object.fromEntries(
             input.state.characters.map(item => [item.characterId, item.locationId]),
