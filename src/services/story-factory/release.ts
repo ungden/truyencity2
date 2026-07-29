@@ -10,7 +10,7 @@ export const FACTORY_SETUP_VERSION = 'story-factory-setup-47-kernel-reality-mode
 export const FACTORY_PLANNER_VERSION = 'story-factory-planner-57-reader-visible-delta';
 export const FACTORY_CONTEXT_VERSION = 'story-factory-context-19-explicit-time-budget';
 export const FACTORY_MEMORY_POLICY_VERSION = 'story-factory-memory-4-exact-id-bounded-no-rag';
-export const FACTORY_WINDOW_REVIEW_VERSION = 'story-factory-window-review-2-grounded-pattern-map';
+export const FACTORY_WINDOW_REVIEW_VERSION = 'story-factory-window-review-3-compact-evidence-wire';
 const FACTORY_ENGINE_SETUP_COMPATIBILITY = FACTORY_SETUP_VERSION;
 
 const identity = {

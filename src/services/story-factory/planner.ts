@@ -1028,6 +1028,133 @@ export const WindowReviewSchema = z.discriminatedUnion('status', [
   WindowBlockSchema,
 ]);
 
+/**
+ * Gemini constrained decoding rejects the canonical review schema because it
+ * nests five evidence arrays inside a discriminated union. Keep the durable
+ * contract expressive, but ask the provider for one compact flat wire shape
+ * and materialize it in application code.
+ */
+export const WindowReviewWireSchema = z.object({
+  v: z.literal(1),
+  status: z.enum(['pass', 'block']),
+  checks: z.object({
+    s: z.boolean(),
+    r: z.boolean(),
+    v: z.boolean(),
+    e: z.boolean(),
+    l: z.boolean(),
+  }).strict(),
+  evidence: z.array(z.object({
+    k: z.enum(['s', 'r', 'v', 'e', 'l']),
+    c: z.number().int(),
+    q: z.string(),
+  }).strict()).max(25),
+  patterns: z.array(z.object({
+    c: z.number().int(),
+    s: z.enum(['xd', 'ii', 'nt', 'ta', 'cs', 'ra', 'ed', 'mo']),
+    v: z.enum(['mc', 'sa', 'es', 'cs', 'or', 'im', 'rc', 'un']),
+    e: z.enum(['h', 's', 'r', 'f']),
+    k: z.enum(['p', 's', 'r', 'a']),
+    q: z.string(),
+  }).strict()).length(5),
+  issues: z.array(z.object({
+    k: z.enum(['cd', 'vd', 'rp', 'rl', 'pg', 'rd', 'ad', 'pp', 'oa', 'ep', 'pc']),
+    c: z.number().int(),
+    q: z.string(),
+    fix: z.string(),
+  }).strict()).max(3),
+}).strict();
+
+export function materializeWindowReview(value: unknown): WindowReview {
+  const wire = WindowReviewWireSchema.parse(value);
+  const checkNames = {
+    s: 'structureVariety',
+    r: 'reactionVariety',
+    v: 'voiceSeparation',
+    e: 'earnedProgression',
+    l: 'causalLearning',
+  } as const;
+  const checkEvidence = Object.fromEntries(Object.entries(checkNames).map(([key, name]) => [
+    name,
+    wire.evidence
+      .filter(item => item.k === key)
+      .map(item => ({ chapterNumber: item.c, quote: item.q })),
+  ]));
+  const structures = {
+    xd: 'explain_then_demonstrate',
+    ii: 'investigate_then_infer',
+    nt: 'negotiate_then_trade',
+    ta: 'attempt_fail_adapt',
+    cs: 'confront_then_shift',
+    ra: 'relationship_action',
+    ed: 'explore_then_discover',
+    mo: 'mixed_other',
+  } as const;
+  const validationSources = {
+    mc: 'material_consequence',
+    sa: 'self_assertion',
+    es: 'expert_surprise',
+    cs: 'crowd_surprise',
+    or: 'opponent_reaction',
+    im: 'independent_measurement',
+    rc: 'relationship_change',
+    un: 'unresolved',
+  } as const;
+  const evidenceStages = {
+    h: 'hypothesis',
+    s: 'single_observation',
+    r: 'repeated_observation',
+    f: 'established_fact',
+  } as const;
+  const claimStrengths = {
+    p: 'provisional',
+    s: 'single_trial',
+    r: 'repeatable',
+    a: 'absolute',
+  } as const;
+  const issueCategories = {
+    cd: 'continuity_drift',
+    vd: 'voice_drift',
+    rp: 'repetition',
+    rl: 'reward_loop',
+    pg: 'progression',
+    rd: 'resource_drift',
+    ad: 'artifact_drift',
+    pp: 'prose_pattern',
+    oa: 'opposition_agency',
+    ep: 'earned_progression',
+    pc: 'premature_certainty',
+  } as const;
+  const checks = {
+    structureVariety: wire.checks.s,
+    reactionVariety: wire.checks.r,
+    voiceSeparation: wire.checks.v,
+    earnedProgression: wire.checks.e,
+    causalLearning: wire.checks.l,
+  };
+  if (wire.status === 'block' && Object.values(checks).every(Boolean)) {
+    throw new StoryFactoryError('infra_blocked', 'Window Review block must identify at least one failed check.');
+  }
+  return WindowReviewSchema.parse({
+    status: wire.status,
+    checks,
+    checkEvidence,
+    chapterPatterns: wire.patterns.map(pattern => ({
+      chapterNumber: pattern.c,
+      dominantStructure: structures[pattern.s],
+      validationSource: validationSources[pattern.v],
+      evidenceStage: evidenceStages[pattern.e],
+      claimStrength: claimStrengths[pattern.k],
+      evidence: [{ chapterNumber: pattern.c, quote: pattern.q }],
+    })),
+    issues: wire.issues.map(issue => ({
+      category: issueCategories[issue.k],
+      evidence: [{ chapterNumber: issue.c, quote: issue.q }],
+      instruction: issue.fix,
+    })),
+  });
+}
+
 const ArcLifecycleSchema = z.discriminatedUnion('status', [
   z.object({ status: z.literal('continue'), nextArc: ArcPlanSchema, canonExtension: CanonExtensionSchema }).strict(),
   z.object({ status: z.literal('finale'), nextArc: ArcPlanSchema, canonExtension: CanonExtensionSchema }).strict(),
@@ -1558,11 +1685,56 @@ export async function reviewFiveChapterWindow(input: {
 Block nếu nhân vật phản ứng như quên sự kiện vừa trải qua, cơ chế vật phẩm/công nghệ đổi cách hoạt động, số tiền/khối lượng/giá trong prose lệch với ledger, hoặc năm chương lặp cùng cấu trúc mà không tạo tiến triển.
 Phải đọc trải nghiệm của cả cửa sổ: bắt lặp chức năng “giải thích cơ chế → biểu diễn → quần chúng kinh ngạc”, stock reaction tương đương dù khác từ, main và đối thủ nói cùng giọng, đối thủ liên tục làm công cụ, hoặc progression tăng mạnh thiếu tích lũy/chi phí.
 Không mặc định một thiết kế là tối ưu hoặc một kết quả là tuyệt đối chỉ vì nhân vật giải thích tự tin hay thử thành công một lần. Với realityMode=grounded, kết luận phải tương xứng số lần quan sát và sai số thực tế.
-Lập chapterPatterns cho đủ đúng năm chương trước khi kết luận. Mỗi quote trong checkEvidence, chapterPatterns và issues phải được sao chép nguyên văn từ content của đúng chapterNumber; mỗi check phải so sánh ít nhất hai chương khác nhau.
+Lập patterns cho đủ đúng năm chương trước khi kết luận. Mỗi quote trong evidence, patterns và issues phải được sao chép nguyên văn từ content của đúng chapterNumber; mỗi check phải so sánh ít nhất hai chương khác nhau.
 Trạng thái pass cũng phải có bằng chứng cụ thể. Chỉ báo tối đa ba lỗi drift hoặc pattern quan trọng.`,
     prompt: JSON.stringify({
       task: 'Đọc năm chương như một độc giả liên tục, lập pattern map, rồi kiểm tra continuity và trải nghiệm đọc.',
       realityMode: input.kernel.realityMode,
+      wireLegend: {
+        checks: {
+          s: 'structureVariety',
+          r: 'reactionVariety',
+          v: 'voiceSeparation',
+          e: 'earnedProgression',
+          l: 'causalLearning',
+        },
+        patternStructure: {
+          xd: 'explain_then_demonstrate',
+          ii: 'investigate_then_infer',
+          nt: 'negotiate_then_trade',
+          ta: 'attempt_fail_adapt',
+          cs: 'confront_then_shift',
+          ra: 'relationship_action',
+          ed: 'explore_then_discover',
+          mo: 'mixed_other',
+        },
+        validationSource: {
+          mc: 'material_consequence',
+          sa: 'self_assertion',
+          es: 'expert_surprise',
+          cs: 'crowd_surprise',
+          or: 'opponent_reaction',
+          im: 'independent_measurement',
+          rc: 'relationship_change',
+          un: 'unresolved',
+        },
+        evidenceStage: { h: 'hypothesis', s: 'single_observation', r: 'repeated_observation', f: 'established_fact' },
+        claimStrength: { p: 'provisional', s: 'single_trial', r: 'repeatable', a: 'absolute' },
+        issueCategory: {
+          cd: 'continuity_drift',
+          vd: 'voice_drift',
+          rp: 'repetition',
+          rl: 'reward_loop',
+          pg: 'progression',
+          rd: 'resource_drift',
+          ad: 'artifact_drift',
+          pp: 'prose_pattern',
+          oa: 'opposition_agency',
+          ep: 'earned_progression',
+          pc: 'premature_certainty',
+        },
+        evidenceRule: 'evidence là mảng phẳng; mỗi check key s/r/v/e/l cần ít nhất hai quote thuộc hai chapter khác nhau.',
+      },
       auditChecklist: [
         'nhân vật có nhớ và phản ứng theo các lần gặp/sự kiện trong recentOutcomes không',
         'artifact và world-rule quan trọng có giữ cùng cơ chế hoạt động không',
@@ -1582,12 +1754,13 @@ Trạng thái pass cũng phải có bằng chứng cụ thể. Chỉ báo tối 
       currentState: input.state,
       chapters: input.chapters,
     }),
-    schema: WindowReviewSchema,
+    schema: WindowReviewWireSchema,
     temperature: 0.4,
   });
   try {
-    validateWindowEvidence(result.value, input.chapters);
-    const review = applyDeterministicWindowPolicy(result.value, input.kernel.realityMode);
+    const materialized = materializeWindowReview(result.value);
+    validateWindowEvidence(materialized, input.chapters);
+    const review = applyDeterministicWindowPolicy(materialized, input.kernel.realityMode);
     return { review, usage: result.usage };
   } catch (error) {
     if (error instanceof StoryFactoryError) {

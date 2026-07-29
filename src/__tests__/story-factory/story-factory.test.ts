@@ -26,9 +26,11 @@ import {
   FIRST_30_PORTFOLIO,
   materializePlannerRollingPlan,
   materializeEditorAssessment,
+  materializeWindowReview,
   nextRunAfterNonChapterStage,
   PlannerRollingPlanResponseSchema,
   WindowReviewSchema,
+  WindowReviewWireSchema,
   appendAcceptedOutcome,
   applyCanonExtension,
   applyChapterPlan,
@@ -353,6 +355,29 @@ function windowReviewPass(chapterOffset = 0): Extract<WindowReview, { status: 'p
       }],
     })),
     issues: [] as [],
+  };
+}
+
+function windowReviewWirePass(chapterOffset = 0): z.input<typeof WindowReviewWireSchema> {
+  const checkKeys = ['s', 'r', 'v', 'e', 'l'] as const;
+  return {
+    v: 1 as const,
+    status: 'pass' as const,
+    checks: { s: true, r: true, v: true, e: true, l: true },
+    evidence: checkKeys.flatMap(k => [1, 2].map(chapter => ({
+      k,
+      c: chapterOffset + chapter,
+      q: `Bằng chứng nguyên văn chương ${chapterOffset + chapter}.`,
+    }))),
+    patterns: Array.from({ length: 5 }, (_, index) => ({
+      c: chapterOffset + index + 1,
+      s: 'mo' as const,
+      v: 'mc' as const,
+      e: 'r' as const,
+      k: 'r' as const,
+      q: `Bằng chứng nguyên văn chương ${chapterOffset + index + 1}.`,
+    })),
+    issues: [],
   };
 }
 
@@ -3904,17 +3929,25 @@ describe('canonical Story Factory', () => {
     }).status).toBe('block');
   });
 
+  test('window review uses a compact provider wire and materializes durable evidence', () => {
+    const wire = windowReviewWirePass();
+    const providerSchema = JSON.stringify(toGeminiResponseSchema(WindowReviewWireSchema));
+    expect(providerSchema.length).toBeLessThan(10_000);
+    expect(providerSchema).not.toContain('anyOf');
+    expect(materializeWindowReview(wire)).toEqual(windowReviewPass());
+  });
+
   test('window review cannot rubber-stamp a repeated explanation-demonstration-surprise formula', async () => {
     const chapters = Array.from({ length: 5 }, (_, index) => ({
       chapterNumber: index + 1,
       title: `Chương ${index + 1}`,
       content: `Bằng chứng nguyên văn chương ${index + 1}. Nhân vật thực hiện diễn biến của chương.`,
     }));
-    const review = windowReviewPass();
-    review.chapterPatterns = review.chapterPatterns.map((pattern, index) => index < 3 ? {
+    const review = windowReviewWirePass();
+    review.patterns = review.patterns.map((pattern, index) => index < 3 ? {
       ...pattern,
-      dominantStructure: 'explain_then_demonstrate' as const,
-      validationSource: 'expert_surprise' as const,
+      s: 'xd' as const,
+      v: 'es' as const,
     } : pattern);
     const provider = new QueueProvider([review]);
     const result = await reviewFiveChapterWindow({ kernel, arc, state: initialState, chapters, routes, provider });
@@ -3931,8 +3964,8 @@ describe('canonical Story Factory', () => {
       title: `Chương ${index + 1}`,
       content: `Bằng chứng nguyên văn chương ${index + 1}.`,
     }));
-    const review = windowReviewPass();
-    review.checkEvidence.structureVariety[0].quote = 'Câu này không tồn tại trong chương.';
+    const review = windowReviewWirePass();
+    review.evidence[0].q = 'Câu này không tồn tại trong chương.';
     const provider = new QueueProvider([review]);
     await expect(reviewFiveChapterWindow({ kernel, arc, state: initialState, chapters, routes, provider }))
       .rejects.toMatchObject({
