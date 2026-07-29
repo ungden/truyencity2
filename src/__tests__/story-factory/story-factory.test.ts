@@ -11,6 +11,7 @@ import {
   EditorAssessmentSchema,
   LaunchPackSchema,
   InitialArcPlanSchema,
+  PlanAssessmentSchema,
   type ArcPlan,
   type ChapterPlan,
   type LaunchPack,
@@ -3203,6 +3204,23 @@ describe('canonical Story Factory', () => {
         responseDigest: expect.stringMatching(/^[a-f0-9]{64}$/),
       }),
     ]);
+  });
+
+  test('Plan Judge contract can reject an impossible cross-scene knowledge flow', () => {
+    expect(PlanAssessmentSchema.parse({
+      status: 'revise',
+      issues: [{
+        category: 'knowledge_flow',
+        chapterNumber: 5,
+        sceneId: 'scene_report_sale',
+        deltaId: null,
+        evidence: 'Phan reports a sale completed by Mai in another location before they meet.',
+        instruction: 'Add a communication scene and knowledge delta, let Phan witness the sale, or remove the report.',
+      }],
+    })).toMatchObject({
+      status: 'revise',
+      issues: [{ category: 'knowledge_flow' }],
+    });
   });
 
   test('Plan Judge permits exactly one full-window replan then passes', async () => {

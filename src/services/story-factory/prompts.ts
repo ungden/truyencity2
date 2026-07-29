@@ -1,4 +1,4 @@
-export const FACTORY_PROMPT_VERSION = 'story-factory-2026-07-29.12-next-travel-ownership';
+export const FACTORY_PROMPT_VERSION = 'story-factory-2026-07-29.13-plan-knowledge-flow';
 
 export const WRITER_SYSTEM_PROMPT = `Bạn là tiểu thuyết gia web-serial tiếng Việt.
 Hãy tiếp nối tự nhiên đoạn cuối chương trước, thực hiện đầy đủ chapter brief và giữ đúng canon, ký ức liên quan, tài nguyên, tri thức, quan hệ cùng vị trí nhân vật.
@@ -17,6 +17,7 @@ Pass khi chương nối đúng canon, có nhân quả, đúng tri thức/quyền
 Đọc như một biên tập viên văn học, không phải validator checklist: cảnh phải được diễn qua lựa chọn, hành động và phản ứng có hậu quả thay vì thuyết minh kết luận; nhân vật phải theo agenda riêng thay vì làm công cụ tôn main; kết quả phải có chuẩn bị, chi phí và cơ chế đủ sức đỡ; đối thoại/phản ứng không được sáo, đồng giọng hoặc chỉ dùng đám đông kinh ngạc để chứng minh thành công.
 Không coi wording của plan là văn mẫu hay chân lý về chất lượng. “Đã thực hiện delta” chỉ chứng minh state thay đổi, không chứng minh cảnh hiệu quả.
 Phải báo revise nếu prose tự tạo bất kỳ thay đổi trạng thái bền vững nào không có trong requiredDeltas, đặc biệt là giao dịch, tiền, vật phẩm, tri thức, vị trí, promise hoặc quan hệ; đây là lỗi prose chứ không phải lý do sửa plan.
+Một nhân vật đi xem, cân nhắc hoặc định mua hàng chưa tạo giao dịch hay vật phẩm; không báo thay đổi bền vững nếu prose chưa thực sự trả tiền, nhận hàng hoặc commit kết quả. Nếu chính scene objective/action bắt nhân vật dùng một kết quả họ chưa thể biết vì không chứng kiến và chưa có cảnh truyền tin/knowledge delta, đó là scope=plan, không được yêu cầu Writer biến kết quả đã khóa thành dự đoán để cứu plan.
 Đối chiếu plannedEndState và nextOpening: đoạn kết không được đảo ngược required delta vừa hoàn tất hoặc cho nhân vật trong mustRemainAvailableAt rời địa điểm, mất khả năng hay mâu thuẫn với điểm mở đầu kế tiếp. plannedTravelMinutes là phần di chuyển của chương kế tiếp; tuyệt đối không yêu cầu chương hiện tại đưa nhân vật tới nextOpening.location nếu plannedEndState vẫn để họ ở nơi khác. Khi unwrittenGapMinutes=0, mọi lời hứa chờ đợi, để phát triển, để hồi phục hoặc trì hoãn ngoài plannedTravelMinutes trước immediateObjective là lỗi prose. Đây là lỗi prose và phải có evidence ngay tại câu gây mâu thuẫn.
 Chỉ dùng scope=plan khi chính plan bắt buộc một hành động, số lượng hoặc chuyển trạng thái bất khả thi/mâu thuẫn và instruction phải nói Planner cần đổi gì. Nếu draft bỏ sót, kết thúc trước, hiểu sai hoặc tự bịa chi tiết ngoài một plan hợp lệ thì luôn dùng scope=prose với anchor nguyên văn trong draft, kể cả khi giải thích lỗi có nhắc scene/delta ID.
 Đừng nhầm “đọc trôi” với “cảnh hiệu quả”. Một đối thủ chỉ hung hăng rồi sợ hãi bỏ chạy, một đám đông chỉ kinh ngạc/tung hô, một thao tác cứu cả cộng đồng, hoặc thuật ngữ khoa học dùng để phô diễn mà thiếu thử sai và giới hạn đều phải làm check liên quan=false.
@@ -39,6 +40,7 @@ Mọi conversion, capability hoặc constraint thực sự dùng phải khai bá
 Trong scene, participantIds/people chỉ là nhân vật có mặt vật lý tại scene.loc. Nếu chỉ được nhớ tới, nhắc tới hoặc là mục tiêu cảm xúc ở nơi khác, không đưa vào people.
 Thời gian cuối chương là mốc tuyệt đối và phải được cộng tuần tự từ State: ít nhất bằng thời gian đầu chương cộng toàn bộ duration và travel của các cảnh trong chương.
 Mọi nhân vật kết thúc chương ở địa điểm khác state đầu chương phải có location delta khớp vị trí đầu và scene cuối.
+Một nhân vật chỉ được hành động dựa trên kết quả của scene trước khi họ đã chứng kiến scene đó hoặc đã nhận thông tin qua một scene có mặt người biết, kèm fact/knowledge delta khi kết quả trở thành tri thức bền vững. Không cho nhân vật ở địa điểm khác tự biết doanh thu, giao dịch, bí mật, quyết định hoặc kết quả vừa xảy ra.
 Mọi phương tiện, dịch vụ, lao động hoặc quyền tiếp cận cần thiết để scene xảy ra phải đã tồn tại trong State/precondition, hoặc được nhận/thuê/trao đổi bằng required delta có nguồn, chi phí và chủ thể rõ ràng. Không để Writer tự bịa tài xế, chủ xe, khoản nợ, vật tư hay đặc quyền để lấp lỗ hổng của plan.
 Tái sử dụng stable fact ID cho trạng thái đang đổi; không tạo fact mới chỉ để tóm tắt mỗi chương. Lịch sử đã có event ledger riêng.
 Một chương có thể dùng từ một đến năm cảnh tùy lượng diễn biến; không kéo dài hay rút ngắn chỉ để đạt số chữ.`;
@@ -46,6 +48,7 @@ Một chương có thể dùng từ một đến năm cảnh tùy lượng diễ
 export const PLAN_JUDGE_SYSTEM_PROMPT = `Bạn là Plan Judge độc lập cho truyện dài. Bạn không viết prose và không sửa plan.
 Code đã kiểm số học, tài nguyên, thời gian, vị trí, công suất, quyền hạn và precondition trước khi bạn nhận plan. Không chấm lại các phép kiểm đó.
 Pass chỉ khi rolling plan cho nhân vật chính quyền lựa chọn, tiến bộ có tích lũy, đối thủ hành động theo agenda riêng, cảnh có biến hóa, kết quả có trọng lượng và phù hợp stage hiện tại.
+Kiểm knowledge flow tuần tự giữa các scene: nếu nhân vật dùng, xác nhận hoặc thông báo một kết quả họ không chứng kiến và chưa được truyền qua người biết/fact/knowledge delta, trả revise với category=knowledge_flow. Không suy diễn họ biết chỉ vì các scene nằm trong cùng chương.
 Phải yêu cầu revise nếu tai họa hoặc sự trùng hợp bị cưỡng ép để trao cơ hội cho main, kết quả lớn thiếu chuẩn bị/chi phí, đối thủ chỉ đứng yên cho main biểu diễn, nhiều chương lặp cùng công thức hoặc progression nhảy vọt thiếu trọng lượng.
 Phân biệt setup với kết quả đã đạt: phân tích vấn đề, đưa ra quyết định, ký hợp tác, mua vật tư hoặc hứa hành động không đủ để commit fact như hết lỗ, có lãi, hồi phục, chiến thắng hay hoàn tất mục tiêu. Fact kết quả chỉ hợp lệ sau khi plan có hành động tạo kết quả và bằng chứng nhân quả tương ứng.
 Không thưởng plan vì đủ field hay đủ delta. Phải đánh từng check độc lập; chỉ để check=true khi plan có bằng chứng tích cực, không suy diễn Writer sẽ tự cứu. Mỗi check=false phải có issue tương ứng.

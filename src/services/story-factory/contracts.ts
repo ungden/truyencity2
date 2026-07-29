@@ -623,6 +623,7 @@ export const PlanIssueSchema = z.object({
     'causal_mechanism',
     'earned_progression',
     'opposition_agenda',
+    'knowledge_flow',
     'scene_variety',
     'stage_alignment',
     'state_transition',
