@@ -235,6 +235,8 @@ export function buildWriterBrief(input: {
       pov: name(scene.povCharacterId),
       participants: scene.participantIds.map(name),
       location: name(scene.locationId),
+      timeBudgetMinutes: scene.durationMinutes,
+      travelFromPreviousMinutes: scene.travelMinutesFromPrevious,
       objective: scene.objective,
       obstacle: scene.obstacle,
       // Group exact ledger transitions into causal operations. Writer still sees

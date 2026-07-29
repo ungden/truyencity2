@@ -275,6 +275,7 @@ function editorPrompt(input: {
         .filter(deltaId => !narrativelyObservableDeltaIds(input.kernel, input.plan).has(deltaId)),
       deltaChecks: 'Chỉ mỗi observableDeltaId có đúng một check và evidence nguyên văn nếu realized=true. Hidden mechanical delta vẫn được code kiểm và commit, nhưng không được bắt prose nêu số dư/trữ lượng ẩn.',
       historicalMoney: 'Phân biệt tổng giá trị với mệnh giá: “cọc/xấp tiền trị giá năm trăm ngàn” không có nghĩa là một tờ tiền mệnh giá 500.000. Chỉ báo lỗi mệnh giá khi prose nói rõ một tờ hoặc đồng tiền có mệnh giá lịch sử không tồn tại.',
+      temporalArithmetic: 'Đối chiếu mọi cụm thời lượng trong prose với durationMinutes, travelMinutesFromPrevious và storyTimeAfterMinutes. Cộng thời gian diễn ra trong từng cảnh; báo timeline/travel nếu prose vượt ngân sách hoặc di chuyển nhanh hơn plan.',
       clean: 'findings=[] chỉ khi mọi delta realized=true; khi đó outcome bắt buộc.',
       issues: 'Có finding hoặc delta chưa realized thì outcome=null.',
     },

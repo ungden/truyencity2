@@ -2017,6 +2017,8 @@ describe('canonical Story Factory', () => {
     const brief = JSON.stringify(buildWriterBrief({ kernel, state: initialState, plan: chapter }));
     expect(brief).toContain('"operation":"Quyền giao dịch của Hải"');
     expect(brief).toContain('"actor":"Hải"');
+    expect(brief).toContain('"timeBudgetMinutes":60');
+    expect(brief).toContain('"travelFromPreviousMinutes":0');
     expect(brief).toContain('"transitions":[{"entity":"fact day"');
     expect(brief).toContain('Hải thực hiện Quyền giao dịch của Hải');
     expect(brief).toContain(kernel.worldMechanics.find(item => item.id === 'mechanic_trade')!.description);
