@@ -109,6 +109,8 @@ export function prepareDiscoveryResume<T extends ResumableDiscoveryProgress>(inp
     ...progress,
     protocolVersion: input.protocolVersion,
     engineRelease: input.engineRelease,
+    route: input.route,
+    continuityJudgeModel: input.continuityJudgeModel,
     setupSuccesses: 0,
     planSuccesses: 0,
     providerFailures: 0,

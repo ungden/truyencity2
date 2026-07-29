@@ -2256,6 +2256,8 @@ describe('canonical Story Factory', () => {
       compatibleSetupOnly: true,
     });
     expect(compatible.engineRelease).toBe('release_new');
+    expect(compatible.route).toMatchObject({ planner: 'planner-bakeoff-candidate' });
+    expect(compatible.continuityJudgeModel).toBe('continuity');
     expect(compatible.resumeLineage.at(-1)).toMatchObject({
       priorEngineRelease: 'release_old',
       priorFailure: { stage: 'setup', code: 'setup_blocked' },
