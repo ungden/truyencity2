@@ -2278,16 +2278,16 @@ describe('canonical Story Factory', () => {
       },
       continuityJudgeModel: 'continuity',
       startedAt: '2026-07-26T00:00:00.000Z',
-      setupSuccesses: 0,
-      planSuccesses: 0,
+      setupSuccesses: 1,
+      planSuccesses: 1,
       providerFailures: 1,
       generationFailures: 0,
       continuityFailures: 0,
       windowReviewFailures: 0,
       buildCostUsd: 0.1,
-      launchPackDigests: [],
+      launchPackDigests: ['a'.repeat(64)],
       samples: [],
-      writerBriefs: [],
+      writerBriefs: [{ id: 'era-brief' }],
       chapterAttempts: [],
       setupCheckpoints: {
         era_coastal: {
@@ -2295,10 +2295,10 @@ describe('canonical Story Factory', () => {
           generatorB: { usage: { costUsd: 0.2 } },
         },
       },
-      plannedWindows: {},
+      plannedWindows: { era_coastal: { id: 'era-plan' } },
       windowReviews: [],
       failure: {
-        lane: 'era_coastal',
+        lane: 'xuanhuan_rules',
         stage: 'setup',
         message: 'fetch failed',
         code: 'infra_blocked',
@@ -2314,7 +2314,12 @@ describe('canonical Story Factory', () => {
       resumedAt: '2026-07-26T01:00:00.000Z',
     });
     expect(resumed.failure).toBeNull();
-    expect(resumed.providerFailures).toBe(0);
+    expect(resumed.providerFailures).toBe(1);
+    expect(resumed.setupSuccesses).toBe(1);
+    expect(resumed.planSuccesses).toBe(1);
+    expect(resumed.launchPackDigests).toEqual(progress.launchPackDigests);
+    expect(resumed.writerBriefs).toEqual(progress.writerBriefs);
+    expect(resumed.plannedWindows).toEqual(progress.plannedWindows);
     expect(resumed.setupCheckpoints.era_coastal).toBe(progress.setupCheckpoints.era_coastal);
     expect(resumed.buildCostUsd).toBeCloseTo(0.4);
     expect(resumed.resumeLineage).toMatchObject([{

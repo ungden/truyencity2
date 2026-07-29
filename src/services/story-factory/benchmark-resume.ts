@@ -93,6 +93,7 @@ export function prepareDiscoveryResume<T extends ResumableDiscoveryProgress>(inp
     Object.entries(progress.setupCheckpoints).map(([lane, checkpoint]) => [lane, checkpointCost(checkpoint)]),
   );
   const checkpointTotal = Object.values(bookedSetupCostUsdByLane).reduce((sum, value) => sum + value, 0);
+  const preserveCurrentReleaseEvidence = !input.compatibleSetupOnly;
   const resumeLineage = [
     ...(progress.resumeLineage ?? []),
     {
@@ -111,20 +112,20 @@ export function prepareDiscoveryResume<T extends ResumableDiscoveryProgress>(inp
     engineRelease: input.engineRelease,
     route: input.route,
     continuityJudgeModel: input.continuityJudgeModel,
-    setupSuccesses: 0,
-    planSuccesses: 0,
-    providerFailures: 0,
-    generationFailures: 0,
-    continuityFailures: 0,
-    windowReviewFailures: 0,
+    setupSuccesses: preserveCurrentReleaseEvidence ? progress.setupSuccesses : 0,
+    planSuccesses: preserveCurrentReleaseEvidence ? progress.planSuccesses : 0,
+    providerFailures: preserveCurrentReleaseEvidence ? progress.providerFailures : 0,
+    generationFailures: preserveCurrentReleaseEvidence ? progress.generationFailures : 0,
+    continuityFailures: preserveCurrentReleaseEvidence ? progress.continuityFailures : 0,
+    windowReviewFailures: preserveCurrentReleaseEvidence ? progress.windowReviewFailures : 0,
     buildCostUsd: input.compatibleSetupOnly
       ? checkpointTotal
       : Math.max(progress.buildCostUsd, checkpointTotal),
-    launchPackDigests: [],
+    launchPackDigests: preserveCurrentReleaseEvidence ? progress.launchPackDigests : [],
     samples: [],
-    writerBriefs: [],
+    writerBriefs: preserveCurrentReleaseEvidence ? progress.writerBriefs : [],
     chapterAttempts: [],
-    plannedWindows: {},
+    plannedWindows: preserveCurrentReleaseEvidence ? progress.plannedWindows : {},
     windowReviews: [],
     failure: null,
     bookedSetupCostUsdByLane,
