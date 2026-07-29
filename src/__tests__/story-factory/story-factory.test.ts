@@ -1177,6 +1177,22 @@ describe('canonical Story Factory', () => {
     expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).not.toThrow();
   });
 
+  test('a detailed past-sale report and deferred profit share are not a current transfer', () => {
+    const chapter = plan(1);
+    chapter.scenes[0].action = 'Hải gặp Tấn để thông báo việc mẻ hàng đầu tiên đã được chợ huyện bán hết và tái khẳng định cam kết trích lợi nhuận khi có đợt thu hoạch lớn tiếp theo.';
+    chapter.requiredDeltas = [{
+      id: 'relationship_future_share',
+      kind: 'relationship',
+      characterId: 'buyer',
+      counterpartId: 'main',
+      before: null,
+      after: 'Chờ đợt thu hoạch lớn để thực hiện chia lợi nhuận.',
+      source: 'Nghe tin mẻ hàng đầu tiên bán thành công và chờ đợi chia lợi nhuận',
+    }];
+    chapter.scenes[0].requiredDeltaIds = ['relationship_future_share'];
+    expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).not.toThrow();
+  });
+
   test('a real profit share after reporting a past sale still requires a ledger delta', () => {
     const chapter = plan(1);
     chapter.scenes[0].action = 'Hải thông báo kết quả bán hàng thành công, rồi chia tiền lãi ngay cho Tấn.';
