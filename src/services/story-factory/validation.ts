@@ -10,7 +10,7 @@ import {
   StoryFactoryError,
 } from './contracts';
 
-export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-20-structured-asset-phrases';
+export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-21-actionable-transaction-repair';
 
 export interface StateEvent {
   chapterNumber: number;
@@ -551,7 +551,12 @@ function validateScenes(kernel: StoryKernel, state: StoryState, plan: ChapterPla
     // remains covered by the unambiguous transaction verbs below.
     if (hasVietnameseTerm(realizedAction, String.raw`mua|bán|thu mua|trả tiền|chi tiền|thu tiền|kiếm tiền`)
       && !sceneDeltas.some(delta => delta.kind === 'resource_numeric')) {
-      fail(`Scene ${scene.id} describes a transaction without a numeric resource delta.`, scene.action);
+      fail(`Scene ${scene.id} describes a transaction without a numeric resource delta.`, {
+        chapterNumber: plan.chapterNumber,
+        sceneId: scene.id,
+        action: scene.action,
+        repairRule: 'Choose exactly one: (1) if money or goods actually move in this scene, add the exact numeric resource delta and bind it to one compatible existing effect mechanic; or (2) rewrite the action as a report, negotiation, or future obligation with no present transfer. Do not keep a present-tense purchase, sale, payment, or profit share without ledger movement.',
+      });
     }
     if (hasVietnameseTerm(realizedAction, String.raw`chế tạo|đóng thành|xây dựng|lắp ráp|thu gom`)
       && !sceneDeltas.some(delta => delta.kind === 'resource_numeric' || delta.kind === 'resource_state' || delta.kind === 'fact')) {

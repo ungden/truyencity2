@@ -1112,7 +1112,22 @@ describe('canonical Story Factory', () => {
     chapter.scenes[0].travelMinutesFromPrevious = 20;
     chapter.storyTimeAfterMinutes = 80;
     chapter.scenes[0].requiredDeltaIds = ['move'];
-    expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).toThrow('transaction without a numeric resource delta');
+    try {
+      applyChapterPlan({ kernel, state: initialState, plan: chapter });
+      throw new Error('Expected missing-ledger transaction to fail.');
+    } catch (error) {
+      expect(error).toMatchObject({
+        code: 'plan_blocked',
+        evidence: {
+          chapterNumber: 1,
+          sceneId: 'scene_1',
+          action: chapter.scenes[0].action,
+        },
+      });
+      expect((error as StoryFactoryError).evidence).toMatchObject({
+        repairRule: expect.stringContaining('Do not keep a present-tense purchase'),
+      });
+    }
   });
 
   test('does not book a transaction when a scene only analyzes a future purchase', () => {
