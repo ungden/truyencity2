@@ -38,6 +38,7 @@ import {
   assessStoryDraft,
   assertVoiceSemantics,
   assertComparableSequentialCorpora,
+  assertGroundedMechanicSemantics,
   buildBlindReaderComparison,
   buildBlindReaderInput,
   buildChapterContexts,
@@ -627,6 +628,36 @@ describe('canonical Story Factory', () => {
         allowedActorIds: ['inst_market'],
       }],
     }).success).toBe(false);
+  });
+
+  test('grounded setup cannot let a protagonist directly manufacture an external platform metric', () => {
+    const metricKernel = structuredClone(kernel);
+    metricKernel.resources.push({
+      id: 'platform_traffic',
+      name: 'Lưu lượng hiển thị trên ứng dụng',
+      kind: 'numeric',
+      unit: 'lượt xem',
+      ownerEntityId: 'platform',
+      minimum: 0,
+    });
+    metricKernel.worldMechanics.push({
+      id: 'optimize_metadata',
+      name: 'Tối ưu metadata',
+      kind: 'capability',
+      description: 'Nhân vật sửa menu và từ khóa.',
+      allowedActorIds: ['main'],
+      requiredFacts: [],
+      requiredResourceIds: [],
+      effectResources: [{ resourceId: 'platform_traffic', direction: 'increase' }],
+      effectFactIds: [],
+      capacityUnit: 'lượt xem',
+      maximumUnitsPerMinute: 100,
+    });
+    expect(() => assertGroundedMechanicSemantics(metricKernel))
+      .toThrow('cannot directly manufacture an externally owned demand or ranking metric');
+
+    metricKernel.realityMode = 'speculative';
+    expect(() => assertGroundedMechanicSemantics(metricKernel)).not.toThrow();
   });
 
   test('voice validation allows quoted address terms but rejects canned gestures', () => {

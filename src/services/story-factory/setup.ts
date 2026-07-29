@@ -307,6 +307,38 @@ export function assertPortfolioDiversity(candidate: z.infer<typeof ConceptCandid
   }
 }
 
+const GROUNDED_EXTERNAL_METRIC = /(?:lượt\s*(?:xem|hiển\s*thị|tiếp\s*cận)|traffic|impressions?|reach|xếp\s*hạng|thứ\s*hạng|ranking)/iu;
+
+export function assertGroundedMechanicSemantics(
+  kernel: Pick<LaunchPack['kernel'], 'realityMode' | 'resources' | 'worldMechanics'>,
+): void {
+  if (kernel.realityMode !== 'grounded') return;
+  const resources = new Map(kernel.resources.map(resource => [resource.id, resource]));
+  for (const mechanic of kernel.worldMechanics) {
+    if (mechanic.kind !== 'capability') continue;
+    for (const effect of mechanic.effectResources) {
+      const resource = resources.get(effect.resourceId);
+      if (!resource || resource.kind !== 'numeric' || effect.direction !== 'increase') continue;
+      const metricLabel = `${resource.name} ${resource.unit}`;
+      if (resource.ownerEntityId !== null
+        && !mechanic.allowedActorIds.includes(resource.ownerEntityId)
+        && GROUNDED_EXTERNAL_METRIC.test(metricLabel)) {
+        throw new StoryFactoryError(
+          'setup_blocked',
+          'Grounded capability cannot directly manufacture an externally owned demand or ranking metric.',
+          {
+            mechanicId: mechanic.id,
+            resourceId: resource.id,
+            ownerEntityId: resource.ownerEntityId,
+            allowedActorIds: mechanic.allowedActorIds,
+            instruction: 'Track the actor-controlled action as a fact/resource. Model any later platform or audience response with its own causal actor, delay and prerequisites, or leave the external metric out of the numeric ledger.',
+          },
+        );
+      }
+    }
+  }
+}
+
 function assertLaunchSemantics(
   launch: LaunchPack,
   commission: z.infer<typeof StoryCommissionSchema>,
@@ -318,6 +350,7 @@ function assertLaunchSemantics(
 
   assertVoiceSemantics(kernel.characters);
   assertIdentityOpposition(kernel);
+  assertGroundedMechanicSemantics(kernel);
 
   const stages = kernel.seriesSpine.stages;
   for (let index = 1; index < stages.length; index += 1) {
@@ -651,6 +684,7 @@ Trả mechanics trong đúng ba mảng conversions, capabilities và constraints
 Constraint chỉ là guard cho một hành động: requiredFacts phải đang đúng và forbiddenFacts không được bằng expected thì hành động mới được phép. Constraint không bao giờ tự tạo fact/resource/state effect. Nếu một trigger tự động gây phản phệ, hư hỏng, thưởng/phạt hoặc thay đổi trạng thái cần theo dõi, phải mô hình hóa hậu quả đó bằng capability/conversion có actor và effect tương ứng; không được khai báo chính trigger fact là forbidden rồi dùng constraint để tạo hậu quả. Không giấu số học hoặc quyền hạn trong prose worldRules.
 Capability.allowedActorIds chỉ được dùng character ID có trong identity/cast đã khóa; organization, institution, location và resource không phải actor vật lý của scene. Năng lực của tổ chức phải được thực hiện qua một nhân vật đại diện có trong cast và authority/fact phù hợp.
 Mọi vật tư đầu vào của cơ chế arc đầu phải có đường đạt được: hoặc có sẵn hợp lý ở State ban đầu, hoặc là output của chuỗi conversion bắt đầu từ tài nguyên có sẵn. Mua/thu mua là conversion từ tiền hoặc vật trao đổi sang hàng; khai thác/sản xuất cũng phải có conversion riêng của truyện. Không cho tài nguyên xuất hiện chỉ nhờ source/sink prose.
+Trong bối cảnh grounded, hành động do nhân vật kiểm soát như phân tích dữ liệu, sửa metadata/menu, đăng nội dung hay đề xuất chiến thuật không được trực tiếp tăng ledger bên ngoài như lượt xem, traffic, reach hoặc thứ hạng. Chỉ commit hành động/fact mà nhân vật thực sự kiểm soát; phản ứng của nền tảng/khán giả phải là cơ chế riêng có actor, độ trễ và prerequisite hợp lý, hoặc không đưa metric đó vào numeric resource.
 World rules, resource và tổ chức phải phản ánh requiredInfrastructure, minimumPlausibleTimeline và criticalAssumptions đã được mô phỏng.`,
       prompt: JSON.stringify({
         task: 'Xuất phần world canon cho identity đã khóa.',
