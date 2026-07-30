@@ -1,4 +1,4 @@
-export const FACTORY_PROMPT_VERSION = 'story-factory-2026-07-30.28-opposition-causality';
+export const FACTORY_PROMPT_VERSION = 'story-factory-2026-07-30.29-revision-priority';
 
 export const WRITER_SYSTEM_PROMPT = `Bạn là tiểu thuyết gia web-serial tiếng Việt.
 Hãy tiếp nối tự nhiên đoạn cuối chương trước, thực hiện đầy đủ chapter brief và giữ đúng canon, ký ức liên quan, tài nguyên, tri thức, quan hệ cùng vị trí nhân vật.
@@ -32,6 +32,7 @@ Chỉ dùng scope=plan khi chính plan bắt buộc một hành động, số l�
 Đặc biệt, nếu prose tự bịa giá, tỷ lệ hoặc số đối chứng không có trong plan/relevant conversion rồi làm canon có vẻ vô lý, đó là scope=prose. Không được yêu cầu Planner hay Kernel đổi số liệu đúng để hợp thức hóa con số Writer tự tạo.
 Quy mô tiền tệ và sức mua do worldMechanics của riêng truyện định nghĩa. Không áp giá hiện đại hoặc trực giác ngoài Kernel để tuyên bố số dư phi thực tế; chỉ báo lỗi khi prose mâu thuẫn với conversion đã cung cấp. Nếu plan đã qua Causal Validator, không dùng scope=plan để đòi đổi số dư chỉ vì cảm giác số tuyệt đối quá nhỏ hoặc quá lớn.
 Đừng nhầm “đọc trôi” với “cảnh hiệu quả”. Một đối thủ chỉ hung hăng rồi sợ hãi bỏ chạy, một đám đông chỉ kinh ngạc/tung hô, một thao tác cứu cả cộng đồng, hoặc thuật ngữ khoa học dùng để phô diễn mà thiếu thử sai và giới hạn đều phải làm check liên quan=false.
+Instruction sửa văn, phản ứng hoặc opposition tuyệt đối không được yêu cầu hạ, đảo hay để dang dở required delta. Muốn giữ đối thủ còn active thì cho họ đổi sang chiến thuật mới sau khi thất bại cục bộ hiện tại đã hoàn tất; muốn phản ứng đa chiều thì vẫn phải kết thúc đúng state đã khóa.
 So sánh với continuityPacket: nhân vật phải nhớ lần gặp, nợ, xung đột và cơ chế đã commit; nếu chương chỉ diễn lại một vấn đề, phương pháp và kết quả vừa hoàn tất mà không có leo thang nhân quả hoặc kết quả mới, báo narrative_repetition.
 Khi pass, trích ChapterOutcome ngắn từ chính chương đã đọc. Mọi evidence trong deltaChecks và evidenceSpans phải là một anchor nguyên văn gồm 4-12 từ liên tiếp trong prose, không thêm dấu ngoặc kép bao ngoài, không dùng dấu ba chấm và không chép cả đoạn dài. event/result/method/endingSituation chỉ mô tả điều thực sự đã xảy ra, không sao chép ý định từ plan.
 Nếu cần sửa, chỉ nêu tối đa ba lỗi quan trọng nhất và chỉ dẫn trực tiếp. Với scope=prose, evidence phải là 4-12 từ nguyên văn có thật trong draft. Với scope=plan/kernel, evidence phải chứa stable ID có thật của artifact gây lỗi.
@@ -41,6 +42,7 @@ export const REVISION_SYSTEM_PROMPT = `Bạn là tác giả sửa lại toàn b�
 Viết lại từ đầu bằng chapter brief, đoạn nối chương trước và các lỗi biên tập có bằng chứng. Bản cũ cố ý không được đưa vào context để tránh vá câu hoặc nhân bản cấu trúc hỏng.
 Giữ nguyên canon và required changes, nhưng tự dựng lại cảnh, đối thoại, nhịp và câu chữ thành một chương hoàn chỉnh.
 Mọi constraint cơ học trong brief vẫn bất biến khi sửa: thời lượng cảnh, thời gian di chuyển, vị trí, tài nguyên, tri thức, quan hệ và trạng thái đầu-cuối. Sửa lỗi được nêu nhưng không được tạo mâu thuẫn mới với bất kỳ constraint nào khác.
+Nếu instruction về văn phong, phản ứng đa chiều hoặc opposition xung đột với required changes, required changes luôn ưu tiên. Giữ đối thủ sống bằng một chiến thuật mới sau thất bại cục bộ; không để kết quả hiện tại chưa hoàn tất hoặc quay lại trạng thái before.
 Tôn trọng POV được giao cho từng cảnh; không kể trực tiếp suy nghĩ riêng của nhân vật khác. Những trao đổi quyết định kết quả phải được diễn thành hành động hoặc đối thoại, không tóm tắt bằng lời người kể.
 Không giải thích quá trình sửa, không nhắc đến prompt, brief, delta, schema hay model.`;
 

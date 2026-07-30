@@ -52,6 +52,8 @@ describe('Story Factory architecture boundary', () => {
     expect(prompts).toContain('canonicalUnits là từ điển đơn vị hợp lệ');
     expect(prompts).toContain('không được ngẫu nhiên cung cấp đúng lực, góc, công cụ');
     expect(prompts).toContain('họ phải can thiệp trước hoặc trong hành động quyết định');
+    expect(prompts).toContain('required changes luôn ưu tiên');
+    expect(prompts).toContain('không được yêu cầu hạ, đảo hay để dang dở required delta');
   });
 
   test('narrative outcomes stay out of Writer context and each rolling window is reviewed', () => {
