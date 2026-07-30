@@ -5,6 +5,7 @@ import {
   type StateDelta,
   type StoryKernel,
   type StoryState,
+  type WorldMechanic,
 } from './contracts';
 import {
   flattenContinuityPacket,
@@ -26,6 +27,7 @@ export interface WriterBrief {
   openingState: unknown[];
   scenes: unknown[];
   operationalConstraints: string[];
+  relevantConversionRates: unknown[];
   continuity: unknown[];
   nextOpening: null | {
     chapterNumber: number;
@@ -35,6 +37,48 @@ export interface WriterBrief {
     plannedTravelMinutes: number;
     mustRemainAvailableAt: Array<{ character: string; location: string }>;
   };
+}
+
+type ConversionMechanic = Extract<WorldMechanic, { kind: 'conversion' }>;
+
+function isConversionMechanic(mechanic: WorldMechanic): mechanic is ConversionMechanic {
+  return mechanic.kind === 'conversion';
+}
+
+function relevantConversionMechanics(kernel: StoryKernel, plan: ChapterPlan): ConversionMechanic[] {
+  const conversions = kernel.worldMechanics.filter(isConversionMechanic);
+  const invoked = conversions.filter(mechanic =>
+    plan.mechanicUses.some(use => use.mechanicId === mechanic.id));
+  const invokedIds = new Set(invoked.map(mechanic => mechanic.id));
+  const comparedOutputIds = new Set(invoked.flatMap(mechanic => mechanic.outputsPerBatch.map(output => output.resourceId)));
+  if (!comparedOutputIds.size) return [];
+  return conversions
+    .filter(mechanic => {
+      if (invokedIds.has(mechanic.id)) return true;
+      const outputIds = new Set(mechanic.outputsPerBatch.map(output => output.resourceId));
+      const isCircularExchange = mechanic.inputsPerBatch.some(input => outputIds.has(input.resourceId));
+      return !isCircularExchange
+        && mechanic.outputsPerBatch.some(output => comparedOutputIds.has(output.resourceId));
+    })
+    .slice(0, 8);
+}
+
+function relevantConversionRates(
+  kernel: StoryKernel,
+  plan: ChapterPlan,
+  name: (id: string) => string,
+) {
+  return relevantConversionMechanics(kernel, plan).map(mechanic => ({
+    conversion: mechanic.name,
+    inputsPerBatch: mechanic.inputsPerBatch.map(input => ({
+      resource: name(input.resourceId),
+      amount: input.amount,
+    })),
+    outputsPerBatch: mechanic.outputsPerBatch.map(output => ({
+      resource: name(output.resourceId),
+      amount: output.amount,
+    })),
+  }));
 }
 
 function relevantIds(plan: ChapterPlan) {
@@ -248,6 +292,7 @@ export function buildWriterBrief(input: {
       requiredChanges: sceneChanges(scene.id, scene.requiredDeltaIds),
     })),
     operationalConstraints: operationalConstraints(input.kernel, input.plan, name),
+    relevantConversionRates: relevantConversionRates(input.kernel, input.plan, name),
     continuity,
     nextOpening,
   };
@@ -282,13 +327,21 @@ export function buildChapterContexts(input: {
   const brief = buildWriterBrief(input);
   const previousTail = input.previousChapter ? selectPreviousTail(input.previousChapter) : '';
   const ids = relevantIds(input.plan);
+  const comparisonMechanics = relevantConversionMechanics(input.kernel, input.plan);
+  const comparisonMechanicIds = new Set(comparisonMechanics.map(mechanic => mechanic.id));
+  const comparisonResourceIds = new Set(comparisonMechanics.flatMap(mechanic => [
+    ...mechanic.inputsPerBatch.map(inputResource => inputResource.resourceId),
+    ...mechanic.outputsPerBatch.map(outputResource => outputResource.resourceId),
+  ]));
   const editorKernel = {
     title: input.kernel.title,
     protagonistId: input.kernel.protagonistId,
     characters: input.kernel.characters.filter(character => ids.characters.has(character.id) || character.id === input.kernel.protagonistId),
     worldMechanics: input.kernel.worldMechanics.filter(mechanic =>
-      input.plan.mechanicUses.some(use => use.mechanicId === mechanic.id)),
-    resources: input.kernel.resources.filter(resource => ids.resources.has(resource.id)),
+      input.plan.mechanicUses.some(use => use.mechanicId === mechanic.id)
+      || comparisonMechanicIds.has(mechanic.id)),
+    resources: input.kernel.resources.filter(resource =>
+      ids.resources.has(resource.id) || comparisonResourceIds.has(resource.id)),
     promises: input.kernel.promises.filter(promise => ids.promises.has(promise.id)),
   };
   const editorState = {

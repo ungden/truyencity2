@@ -1952,6 +1952,92 @@ describe('canonical Story Factory', () => {
     expect(JSON.stringify(contexts.editorState)).toContain('lót trấu và xơ dừa');
   });
 
+  test('Writer and Editor receive grounded comparison rates for related conversions', () => {
+    const comparisonKernel = structuredClone(kernel);
+    comparisonKernel.resources.push(
+      { id: 'raw_fish', name: 'Cá tươi loại thường', kind: 'numeric', unit: 'kg', ownerEntityId: 'main', minimum: 0 },
+      { id: 'premium_fish', name: 'Cá đã tuyển loại', kind: 'numeric', unit: 'kg', ownerEntityId: 'main', minimum: 0 },
+    );
+    comparisonKernel.worldMechanics.push(
+      {
+        id: 'raw_fish_sale',
+        name: 'Bán cá tươi loại thường',
+        kind: 'conversion',
+        description: 'Mười ký cá tươi loại thường bán được một trăm hai mươi đồng.',
+        inputsPerBatch: [{ resourceId: 'raw_fish', amount: 10 }],
+        outputsPerBatch: [{ resourceId: 'money', amount: 120 }],
+        maximumBatchesPerUse: 10,
+      },
+      {
+        id: 'premium_fish_sale',
+        name: 'Bán cá đã tuyển loại',
+        kind: 'conversion',
+        description: 'Mười ký cá đã tuyển loại bán được một trăm tám mươi đồng.',
+        inputsPerBatch: [{ resourceId: 'premium_fish', amount: 10 }],
+        outputsPerBatch: [{ resourceId: 'money', amount: 180 }],
+        maximumBatchesPerUse: 10,
+      },
+    );
+    const chapter = plan(1);
+    chapter.requiredDeltas.push(
+      {
+        id: 'premium_fish_used',
+        kind: 'resource_numeric',
+        resourceId: 'premium_fish',
+        before: 20,
+        delta: -10,
+        after: 10,
+        source: null,
+        sink: 'premium_fish_sale',
+      },
+      {
+        id: 'premium_sale_income',
+        kind: 'resource_numeric',
+        resourceId: 'money',
+        before: 100,
+        delta: 180,
+        after: 280,
+        source: 'premium_fish_sale',
+        sink: null,
+      },
+    );
+    chapter.scenes[0].requiredDeltaIds.push('premium_fish_used', 'premium_sale_income');
+    chapter.mechanicUses = [{
+      id: 'use_premium_fish_sale',
+      sceneId: chapter.scenes[0].id,
+      mechanicId: 'premium_fish_sale',
+      role: 'effect',
+      actorId: 'main',
+      quantity: 1,
+      preconditionFactIds: [],
+      deltaIds: ['premium_fish_used', 'premium_sale_income'],
+    }];
+    const comparisonState = structuredClone(initialState);
+    comparisonState.resources.push(
+      { resourceId: 'raw_fish', kind: 'numeric', value: 0 },
+      { resourceId: 'premium_fish', kind: 'numeric', value: 20 },
+    );
+
+    const contexts = buildChapterContexts({
+      kernel: comparisonKernel,
+      state: comparisonState,
+      plan: chapter,
+    });
+    const brief = JSON.stringify(contexts.brief);
+    expect(brief).toContain('Bán cá tươi loại thường');
+    expect(brief).toContain('"resource":"Cá tươi loại thường","amount":10');
+    expect(brief).toContain('"resource":"Tiền mặt","amount":120');
+    expect(brief).toContain('Bán cá đã tuyển loại');
+    expect(brief).toContain('"resource":"Tiền mặt","amount":180');
+    expect(brief).not.toContain('Đổi vốn lấy hàng');
+    expect(contexts.editorKernel.worldMechanics.map(mechanic => mechanic.id)).toEqual(
+      expect.arrayContaining(['raw_fish_sale', 'premium_fish_sale']),
+    );
+    expect(contexts.editorKernel.resources.map(resource => resource.id)).toEqual(
+      expect.arrayContaining(['raw_fish', 'premium_fish', 'money']),
+    );
+  });
+
   test('hidden world stock and another character balance stay out of Writer prose obligations', async () => {
     const hiddenKernel: StoryKernel = {
       ...structuredClone(kernel),
