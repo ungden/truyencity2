@@ -1478,6 +1478,28 @@ describe('canonical Story Factory', () => {
     })).not.toThrow();
   });
 
+  test('does not treat agreeing to begin fabrication as a completed durable asset', () => {
+    const chapter = plan(1);
+    chapter.scenes[0].action = 'Khương Lục trình bày số liệu và thuyết phục Đường Thiết bắt tay vào chế tạo.';
+    expect(() => applyChapterPlan({
+      kernel,
+      state: initialState,
+      plan: chapter,
+    })).not.toThrow();
+  });
+
+  test('still requires state when a durable asset is explicitly completed', () => {
+    const chapter = plan(1);
+    chapter.scenes[0].action = 'Khương Lục và Đường Thiết hoàn tất việc chế tạo guồng nước.';
+    chapter.scenes[0].requiredDeltaIds = [];
+    chapter.requiredDeltas = [];
+    expect(() => applyChapterPlan({
+      kernel,
+      state: initialState,
+      plan: chapter,
+    })).toThrow('creates or acquires a durable asset without a state delta');
+  });
+
   test('does not read thủ công plus a physical quantity as an owner receipt', () => {
     const physicalKernel: StoryKernel = {
       ...kernel,

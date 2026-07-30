@@ -11,7 +11,7 @@ import {
   StoryFactoryError,
 } from './contracts';
 
-export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-31-route-efficiency';
+export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-32-completed-assets';
 
 export interface StateEvent {
   chapterNumber: number;
@@ -447,6 +447,13 @@ function stripNonActionAssetPhrases(action: string): string {
   );
 }
 
+function describesCompletedDurableAsset(action: string): boolean {
+  const completionBeforeVerb = String.raw`(?:hoàn\s+tất|hoàn\s+thành)\s+(?:việc\s+)?(?:chế\s+tạo|đóng|xây\s+dựng|lắp\s+ráp|dựng)`;
+  const completionAfterVerb = String.raw`(?:chế\s+tạo|xây\s+dựng|lắp\s+ráp|dựng)\s+(?:xong|hoàn\s+chỉnh)`;
+  const resultativeBuild = String.raw`đóng\s+thành`;
+  return hasVietnameseTerm(action, `${completionBeforeVerb}|${completionAfterVerb}|${resultativeBuild}`);
+}
+
 function hasVietnameseTerm(action: string, terms: string): boolean {
   return new RegExp(String.raw`(?<![\p{L}\p{N}_-])(?:${terms})(?=$|[^\p{L}\p{N}_-])`, 'iu').test(action);
 }
@@ -671,7 +678,7 @@ function validateScenes(kernel: StoryKernel, state: StoryState, plan: ChapterPla
         repairRule: 'Choose exactly one: (1) if money or goods actually move in this scene, add the exact numeric resource delta and bind it to one compatible existing effect mechanic; or (2) rewrite the action as a report, negotiation, or future obligation with no present transfer. Do not keep a present-tense purchase, sale, payment, or profit share without ledger movement.',
       });
     }
-    if (hasVietnameseTerm(realizedAction, String.raw`chế tạo|đóng thành|xây dựng|lắp ráp`)
+    if (describesCompletedDurableAsset(realizedAction)
       && !sceneDeltas.some(delta => delta.kind === 'resource_numeric' || delta.kind === 'resource_state' || delta.kind === 'fact')) {
       fail(`Scene ${scene.id} creates or acquires a durable asset without a state delta.`, scene.action);
     }
