@@ -2002,16 +2002,7 @@ describe('canonical Story Factory', () => {
       },
     );
     chapter.scenes[0].requiredDeltaIds.push('premium_fish_used', 'premium_sale_income');
-    chapter.mechanicUses = [{
-      id: 'use_premium_fish_sale',
-      sceneId: chapter.scenes[0].id,
-      mechanicId: 'premium_fish_sale',
-      role: 'effect',
-      actorId: 'main',
-      quantity: 1,
-      preconditionFactIds: [],
-      deltaIds: ['premium_fish_used', 'premium_sale_income'],
-    }];
+    chapter.mechanicUses = [];
     const comparisonState = structuredClone(initialState);
     comparisonState.resources.push(
       { resourceId: 'raw_fish', kind: 'numeric', value: 0 },

@@ -46,6 +46,8 @@ describe('Story Factory architecture boundary', () => {
     expect(prompts).toContain('payoff đánh bại họ thuộc long promise ở stage sau');
     expect(prompts).toContain('relevantConversionRates khóa các mức quy đổi/giá');
     expect(prompts).toContain('Không được yêu cầu Planner hay Kernel đổi số liệu đúng');
+    expect(prompts).toContain('Không áp giá hiện đại hoặc trực giác ngoài Kernel');
+    expect(prompts).toContain('không dùng scope=plan để đòi đổi số dư');
   });
 
   test('narrative outcomes stay out of Writer context and each rolling window is reviewed', () => {

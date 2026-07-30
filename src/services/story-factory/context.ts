@@ -50,15 +50,22 @@ function relevantConversionMechanics(kernel: StoryKernel, plan: ChapterPlan): Co
   const invoked = conversions.filter(mechanic =>
     plan.mechanicUses.some(use => use.mechanicId === mechanic.id));
   const invokedIds = new Set(invoked.map(mechanic => mechanic.id));
-  const comparedOutputIds = new Set(invoked.flatMap(mechanic => mechanic.outputsPerBatch.map(output => output.resourceId)));
-  if (!comparedOutputIds.size) return [];
+  const relevantResourceIds = relevantIds(plan).resources;
+  invoked.forEach(mechanic => {
+    mechanic.inputsPerBatch.forEach(input => relevantResourceIds.add(input.resourceId));
+    mechanic.outputsPerBatch.forEach(output => relevantResourceIds.add(output.resourceId));
+  });
+  if (!relevantResourceIds.size) return [];
   return conversions
     .filter(mechanic => {
       if (invokedIds.has(mechanic.id)) return true;
       const outputIds = new Set(mechanic.outputsPerBatch.map(output => output.resourceId));
       const isCircularExchange = mechanic.inputsPerBatch.some(input => outputIds.has(input.resourceId));
       return !isCircularExchange
-        && mechanic.outputsPerBatch.some(output => comparedOutputIds.has(output.resourceId));
+        && (
+          mechanic.inputsPerBatch.some(input => relevantResourceIds.has(input.resourceId))
+          || mechanic.outputsPerBatch.some(output => relevantResourceIds.has(output.resourceId))
+        );
     })
     .slice(0, 8);
 }
