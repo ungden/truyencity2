@@ -11,12 +11,12 @@ import {
   StoryFactoryError,
 } from './contracts';
 
-export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-29-observable-story-delta';
+export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-30-exact-first-encounter';
 
 export interface StateEvent {
   chapterNumber: number;
   deltaId: string;
-  kind: StateDelta['kind'] | 'chapter_outcome' | 'mechanic_use';
+  kind: StateDelta['kind'] | 'chapter_outcome' | 'mechanic_use' | 'encounter';
   entityId: string;
   before: unknown;
   after: unknown;
@@ -137,8 +137,21 @@ export function validateKernelState(kernel: StoryKernel, state: StoryState): voi
   for (const character of state.characters) {
     if (!characterIds.has(character.characterId)) fail(`State references unknown character ${character.characterId}.`);
     if (!locationIds.has(character.locationId)) fail(`State references unknown location ${character.locationId}.`);
+    unique(character.encounteredCharacterIds, `Encounter snapshot for ${character.characterId}`);
+    for (const counterpartId of character.encounteredCharacterIds) {
+      if (counterpartId === character.characterId) fail(`Character ${character.characterId} cannot encounter itself.`);
+      if (!characterIds.has(counterpartId)) fail(`Encounter snapshot references unknown character ${counterpartId}.`);
+      const counterpart = state.characters.find(item => item.characterId === counterpartId);
+      if (!counterpart?.encounteredCharacterIds.includes(character.characterId)) {
+        fail(`Encounter snapshot must be reciprocal for ${character.characterId}:${counterpartId}.`);
+      }
+    }
     for (const counterpartId of Object.keys(character.relationshipState)) {
       if (!characterIds.has(counterpartId)) fail(`Relationship state references unknown character ${counterpartId}.`);
+      const value = character.relationshipState[counterpartId];
+      if (/(?:\b(?:chưa|không|mới|đã)\s+(?:từng\s+)?(?:biết|gặp|quen)\b|sự tồn tại|lần đầu(?: tiên)?\s+(?:gặp|biết))/iu.test(value)) {
+        fail(`Relationship state ${character.characterId}:${counterpartId} encodes encounter history in prose; use encounteredCharacterIds as the exact source of truth.`);
+      }
     }
   }
   for (const resource of state.resources) {
@@ -301,6 +314,7 @@ export function applyCanonExtension(input: {
       characterId: item.definition.id,
       locationId: item.initialState.locationId,
       knownFactIds: item.initialState.knownFactIds,
+      encounteredCharacterIds: item.initialState.encounteredCharacterIds,
       relationshipState: item.initialState.relationshipState,
     });
     characterIds.add(item.definition.id);
@@ -1003,6 +1017,37 @@ export function applyChapterPlan(input: {
   }
 
   const events: StateEvent[] = [];
+  const encounterPairs = new Set<string>();
+  for (const scene of plan.scenes) {
+    const participants = [...new Set(scene.participantIds)].sort();
+    for (let leftIndex = 0; leftIndex < participants.length; leftIndex += 1) {
+      for (let rightIndex = leftIndex + 1; rightIndex < participants.length; rightIndex += 1) {
+        encounterPairs.add(`${participants[leftIndex]}\u0000${participants[rightIndex]}`);
+      }
+    }
+  }
+  for (const pair of encounterPairs) {
+    const [leftId, rightId] = pair.split('\u0000');
+    const left = state.characters.find(character => character.characterId === leftId);
+    const right = state.characters.find(character => character.characterId === rightId);
+    if (!left || !right) fail(`Encounter references an unknown character pair ${leftId}:${rightId}.`);
+    const alreadyEncountered = left.encounteredCharacterIds.includes(rightId)
+      && right.encounteredCharacterIds.includes(leftId);
+    if (alreadyEncountered) continue;
+    if (!left.encounteredCharacterIds.includes(rightId)) left.encounteredCharacterIds.push(rightId);
+    if (!right.encounteredCharacterIds.includes(leftId)) right.encounteredCharacterIds.push(leftId);
+    events.push({
+      chapterNumber: plan.chapterNumber,
+      deltaId: `encounter_${plan.chapterNumber}_${leftId}_${rightId}`,
+      kind: 'encounter',
+      entityId: `${leftId}:${rightId}`,
+      before: false,
+      after: true,
+      source: plan.scenes.find(scene =>
+        scene.participantIds.includes(leftId) && scene.participantIds.includes(rightId))?.id ?? null,
+      relatedEntityIds: [leftId, rightId],
+    });
+  }
   for (const delta of plan.requiredDeltas) {
     let before: unknown;
     let after: unknown;

@@ -1517,6 +1517,12 @@ export async function planRollingWindow(input: {
               value,
             }))
           )),
+          encounters: input.state.characters.flatMap(character => (
+            character.encounteredCharacterIds.map(counterpartId => ({
+              characterId: character.characterId,
+              counterpartId,
+            }))
+          )),
           promises: Object.fromEntries(input.state.promises.map(item => [item.promiseId, item.status])),
         },
         factContracts: Object.fromEntries(input.state.facts.map(fact => [

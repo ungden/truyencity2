@@ -215,6 +215,9 @@ export function buildWriterBrief(input: {
         entity: name(character.characterId),
         location: name(character.locationId),
         knownRelevantFacts: character.knownFactIds.filter(id => ids.facts.has(id)).map(name),
+        encounteredRelevantCharacters: character.encounteredCharacterIds
+          .filter(counterpartId => ids.characters.has(counterpartId))
+          .map(name),
         relevantRelationships: Object.entries(character.relationshipState)
           .filter(([counterpartId]) => ids.characters.has(counterpartId))
           .map(([counterpartId, value]) => ({ with: name(counterpartId), state: value })),

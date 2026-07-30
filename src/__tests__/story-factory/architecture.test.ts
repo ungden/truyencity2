@@ -39,6 +39,8 @@ describe('Story Factory architecture boundary', () => {
     expect(prompts).toContain('prose tự tạo bất kỳ thay đổi trạng thái bền vững nào không có trong requiredDeltas');
     expect(prompts).toContain('draft bỏ sót, kết thúc trước, hiểu sai hoặc tự bịa chi tiết');
     expect(prompts).toContain('luôn dùng scope=prose');
+    expect(prompts).toContain('encounteredRelevantCharacters là nguồn sự thật exact-ID');
+    expect(prompts).toContain('ledgerSnapshot.encounters là nguồn sự thật exact-ID');
   });
 
   test('narrative outcomes stay out of Writer context and each rolling window is reviewed', () => {

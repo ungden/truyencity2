@@ -753,6 +753,7 @@ Arc gắn stage đầu; mọi active ID phải có trong Kernel. State không gh
 Arc.activeMechanicIds chỉ chứa mechanic dùng trong arc đầu. Mọi requiredFacts của capability/constraint đang active phải có fact và expected value tương ứng trong initialState.
 Mọi đầu vào và resource điều kiện của activeMechanicIds phải có đường nhân quả từ initialState: số dư dương có nguồn gốc hợp lý hoặc output của active conversion bắt đầu từ tài nguyên đang có. activeResourceIds có thể chứa tài nguyên chỉ để theo dõi về sau, nhưng Planner không được thay đổi nó trước khi có mechanic hợp lệ. Nếu cần mua vật tư để dùng ngay, phải kích hoạt conversion thu mua tương ứng; không đặt vật tư bằng 0 rồi trông chờ Planner tự bịa nguồn.
 initialState.schemaVersion=2, chapterNumber=0, recentOutcomes=[] và usedExpansionSeedIds=[].
+encounteredCharacterIds là nguồn sự thật exact-ID duy nhất về việc hai nhân vật đã từng gặp trực tiếp trước chương 1; phải đối xứng hai chiều. relationshipState chỉ mô tả thái độ hiện tại như tin tưởng, dè chừng, mang ơn hoặc thù địch, không dùng câu "chưa biết/chưa gặp/lần đầu" để mã hóa lịch sử gặp mặt.
 State có đúng một entry cho mọi character, resource và promise trong Kernel; không thiếu, không thêm ID lạ.`,
     prompt: JSON.stringify({
       task: 'Xuất Arc đầu và State chương 0.',

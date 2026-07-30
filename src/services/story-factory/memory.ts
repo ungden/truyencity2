@@ -156,8 +156,8 @@ export async function loadContinuityPacket(input: {
   };
   const [outcomes, relationshipsFirst, relationshipsLast, entityLatest, promiseFirst, promiseLast, mechanicUses] = await Promise.all([
     queryEvents({ ...common, kinds: ['chapter_outcome'], ascending: false, limit: 8 }),
-    queryEvents({ ...common, kinds: ['relationship'], ascending: true, limit: 24 }),
-    queryEvents({ ...common, kinds: ['relationship'], ascending: false, limit: 24 }),
+    queryEvents({ ...common, kinds: ['relationship', 'encounter'], ascending: true, limit: 24 }),
+    queryEvents({ ...common, kinds: ['relationship', 'encounter'], ascending: false, limit: 24 }),
     queryEvents({ ...common, kinds: ['resource_numeric', 'resource_state', 'location', 'knowledge'], ascending: false, limit: 24 }),
     queryEvents({ ...common, kinds: ['promise'], ascending: true, limit: 24 }),
     queryEvents({ ...common, kinds: ['promise'], ascending: false, limit: 24 }),

@@ -403,6 +403,7 @@ export const StoryStateSchema = z.object({
     characterId: stableId,
     locationId: stableId,
     knownFactIds: z.array(stableId).max(500),
+    encounteredCharacterIds: z.array(stableId).max(80).default([]),
     relationshipState: z.record(z.string().max(500)).default({}),
   }).strict()).max(80),
   resources: z.array(z.discriminatedUnion('kind', [
@@ -689,6 +690,7 @@ export const CanonExtensionSchema = z.object({
     initialState: z.object({
       locationId: stableId,
       knownFactIds: z.array(stableId).max(100),
+      encounteredCharacterIds: z.array(stableId).max(80).default([]),
       relationshipState: z.record(z.string().max(500)).default({}),
     }).strict(),
   }).strict()).max(8),

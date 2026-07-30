@@ -225,9 +225,9 @@ const initialState: StoryState = {
   storyTimeMinutes: 0,
   facts: [{ id: 'fact_day', value: 'ngay_0' }],
   characters: [
-    { characterId: 'main', locationId: 'home', knownFactIds: ['fact_day'], relationshipState: {} },
-    { characterId: 'mother', locationId: 'home', knownFactIds: [], relationshipState: {} },
-    { characterId: 'buyer', locationId: 'beach', knownFactIds: [], relationshipState: {} },
+    { characterId: 'main', locationId: 'home', knownFactIds: ['fact_day'], encounteredCharacterIds: [], relationshipState: {} },
+    { characterId: 'mother', locationId: 'home', knownFactIds: [], encounteredCharacterIds: [], relationshipState: {} },
+    { characterId: 'buyer', locationId: 'beach', knownFactIds: [], encounteredCharacterIds: [], relationshipState: {} },
   ],
   resources: [{ resourceId: 'money', kind: 'numeric', value: 100 }],
   promises: [
@@ -1694,7 +1694,40 @@ describe('canonical Story Factory', () => {
     const result = applyChapterPlan({ kernel, state: initialState, plan: relationshipPlan });
     expect(result.state.characters.find(character => character.characterId === 'main')?.relationshipState.buyer)
       .toBe('tin_tuong_1_no_200');
-    expect(result.events[0].relatedEntityIds).toEqual(expect.arrayContaining(['main', 'buyer']));
+    expect(result.events.find(event => event.kind === 'relationship')?.relatedEntityIds)
+      .toEqual(expect.arrayContaining(['main', 'buyer']));
+  });
+
+  test('physical co-presence commits an exact reciprocal first-encounter once', () => {
+    const meetingState = structuredClone(initialState);
+    meetingState.characters.find(character => character.characterId === 'buyer')!.locationId = 'home';
+    const firstMeeting = plan(1);
+    firstMeeting.scenes[0].participantIds = ['main', 'buyer'];
+    const first = applyChapterPlan({ kernel, state: meetingState, plan: firstMeeting });
+    expect(first.state.characters.find(character => character.characterId === 'main')?.encounteredCharacterIds)
+      .toContain('buyer');
+    expect(first.state.characters.find(character => character.characterId === 'buyer')?.encounteredCharacterIds)
+      .toContain('main');
+    expect(first.events).toContainEqual(expect.objectContaining({
+      kind: 'encounter',
+      entityId: 'buyer:main',
+      before: false,
+      after: true,
+      relatedEntityIds: ['buyer', 'main'],
+    }));
+
+    const secondMeeting = plan(2, 'ngay_1');
+    secondMeeting.scenes[0].participantIds = ['main', 'buyer'];
+    const second = applyChapterPlan({ kernel, state: first.state, plan: secondMeeting });
+    expect(second.events.filter(event => event.kind === 'encounter')).toHaveLength(0);
+  });
+
+  test('relationship prose cannot replace exact encounter history', () => {
+    const invalid = structuredClone(initialState);
+    invalid.characters.find(character => character.characterId === 'buyer')!
+      .relationshipState.main = 'Chưa biết đến sự tồn tại của Hải.';
+    expect(() => validateKernelState(kernel, invalid))
+      .toThrow('encodes encounter history in prose');
   });
 
   test('canon extension only adds stage-authorized IDs and cannot overwrite canon', () => {
