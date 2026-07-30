@@ -365,7 +365,6 @@ function windowReviewWirePass(chapterOffset = 0): z.input<typeof WindowReviewWir
   const checkKeys = ['s', 'r', 'v', 'e', 'l'] as const;
   return {
     v: 1 as const,
-    status: 'pass' as const,
     checks: { s: true, r: true, v: true, e: true, l: true },
     evidence: checkKeys.flatMap(k => [1, 2].map(chapter => ({
       k,
@@ -4377,6 +4376,27 @@ describe('canonical Story Factory', () => {
     expect(providerSchema.length).toBeLessThan(10_000);
     expect(providerSchema).not.toContain('anyOf');
     expect(materializeWindowReview(wire)).toEqual(windowReviewPass());
+  });
+
+  test('window review decision is code-derived when the model reports an issue with true checks', () => {
+    const wire = windowReviewWirePass();
+    wire.issues = [{
+      k: 'rp',
+      c: 3,
+      q: 'Bằng chứng nguyên văn chương 3.',
+      fix: 'Đổi cấu trúc cảnh thay vì lặp lại cùng một vòng diễn biến.',
+    }];
+    expect(materializeWindowReview(wire)).toMatchObject({
+      status: 'block',
+      checks: { structureVariety: false },
+      issues: [{ category: 'repetition' }],
+    });
+  });
+
+  test('window review cannot fail a check without an evidence issue', () => {
+    const wire = windowReviewWirePass();
+    wire.checks.s = false;
+    expect(() => materializeWindowReview(wire)).toThrow('cannot fail a check without an evidence issue');
   });
 
   test('window review cannot rubber-stamp a repeated explanation-demonstration-surprise formula', async () => {

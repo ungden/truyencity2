@@ -1091,11 +1091,11 @@ export const WindowReviewSchema = z.discriminatedUnion('status', [
  * Gemini constrained decoding rejects the canonical review schema because it
  * nests five evidence arrays inside a discriminated union. Keep the durable
  * contract expressive, but ask the provider for one compact flat wire shape
- * and materialize it in application code.
+ * and derive pass/block in application code. The model cannot self-declare a
+ * pass while also reporting an issue.
  */
 export const WindowReviewWireSchema = z.object({
   v: z.literal(1),
-  status: z.enum(['pass', 'block']),
   checks: z.object({
     s: z.boolean(),
     r: z.boolean(),
@@ -1184,18 +1184,32 @@ export function materializeWindowReview(value: unknown): WindowReview {
     ep: 'earned_progression',
     pc: 'premature_certainty',
   } as const;
-  const checks = {
+  const checks: z.infer<typeof WindowBlockSchema>['checks'] = {
     structureVariety: wire.checks.s,
     reactionVariety: wire.checks.r,
     voiceSeparation: wire.checks.v,
     earnedProgression: wire.checks.e,
     causalLearning: wire.checks.l,
   };
-  if (wire.status === 'block' && Object.values(checks).every(Boolean)) {
-    throw new StoryFactoryError('infra_blocked', 'Window Review block must identify at least one failed check.');
+  const issues = wire.issues.map(issue => ({
+    category: issueCategories[issue.k],
+    evidence: [{ chapterNumber: issue.c, quote: issue.q }],
+    instruction: issue.fix,
+  }));
+  if (!issues.length && !Object.values(checks).every(Boolean)) {
+    throw new StoryFactoryError('infra_blocked', 'Window Review cannot fail a check without an evidence issue.');
+  }
+  for (const issue of issues) {
+    if (issue.category === 'voice_drift') checks.voiceSeparation = false;
+    else if (issue.category === 'repetition' || issue.category === 'prose_pattern') checks.structureVariety = false;
+    else if (issue.category === 'opposition_agency') checks.reactionVariety = false;
+    else if (issue.category === 'reward_loop'
+      || issue.category === 'progression'
+      || issue.category === 'earned_progression') checks.earnedProgression = false;
+    else checks.causalLearning = false;
   }
   return WindowReviewSchema.parse({
-    status: wire.status,
+    status: issues.length ? 'block' : 'pass',
     checks,
     checkEvidence,
     chapterPatterns: wire.patterns.map(pattern => ({
@@ -1206,11 +1220,7 @@ export function materializeWindowReview(value: unknown): WindowReview {
       claimStrength: claimStrengths[pattern.k],
       evidence: [{ chapterNumber: pattern.c, quote: pattern.q }],
     })),
-    issues: wire.issues.map(issue => ({
-      category: issueCategories[issue.k],
-      evidence: [{ chapterNumber: issue.c, quote: issue.q }],
-      instruction: issue.fix,
-    })),
+    issues,
   });
 }
 
