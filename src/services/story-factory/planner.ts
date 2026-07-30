@@ -99,7 +99,7 @@ const PLANNER_COMPACT_CONTRACT = {
     resource_state: 'target=resourceId; before=null vì code lấy tuần tự từ State; after là trạng thái mới; source giải thích nguồn thay đổi; change/sink=null',
     knowledge: 'target=characterId; after=factId; source là nguồn học biết; before/change/sink=null',
     promise: 'target=promiseId; before=null vì code lấy tuần tự từ State; after thuộc open|progressed|resolved|abandoned; change/source/sink=null',
-    relationship: 'target=characterId; counterpart=counterpartId; before=null vì code lấy tuần tự từ State; after là trạng thái mới; source giải thích sự kiện; change/sink=null',
+    relationship: 'target=characterId là chủ thể có thái độ/quan hệ nội tâm thay đổi; counterpart=counterpartId là người mà thái độ đó hướng tới; before=null vì code lấy tuần tự từ State; after chỉ mô tả trạng thái mới của target đối với counterpart; source giải thích sự kiện; change/sink=null. Nếu cả hai phía thay đổi thì cần hai delta riêng.',
   },
   chapterJson: {
     serialization: 'Trả chapters là mảng object theo schema; không stringify JSON bên trong string và không markdown.',
@@ -136,6 +136,7 @@ const PLANNER_COMPACT_CONTRACT = {
     'knowledge.after phải là fact ID đã tồn tại trong State. Nếu nhân vật học một fact mới, tạo fact delta khai báo fact đó trước knowledge delta trong cùng chương và gắn cả hai vào scene học biết.',
     'Fact được mechanic khác dùng làm requiredFact là precondition có kiểu và giá trị khóa. Nếu một capability tạo/cập nhật fact đó để mechanic sau sử dụng, fact delta.after phải đúng required expected trong factContracts; không thay marker precondition bằng tên bản vẽ, lời mô tả hoặc kết quả prose.',
     'Với fact, resource_state, promise và relationship, luôn gửi before=null; compiler tự lấy before thật và cập nhật tuần tự qua cả window. Không chép lại ledger bằng model.',
+    'Relationship delta có hướng: target là chính nhân vật đổi thái độ, counterpart là người được hướng tới. Không ghi thành tích “đã thuyết phục được người khác” vào relationship của target; nếu người bị thuyết phục đổi niềm tin thì chính người đó phải là target. Nếu prose cần cả hai người đổi thái độ, tạo hai delta riêng.',
     'Không tạo location delta. Chỉ khai báo đúng scene.people, scene.loc và scene.travel; compiler là nguồn duy nhất tự sinh location delta từ vị trí đầu chương tới scene cuối của từng nhân vật.',
   ],
 } as const;
@@ -1447,6 +1448,7 @@ export async function assessRollingPlan(input: {
         sceneVariety: 'Window không được lặp công thức giải thích cơ chế → biểu diễn thành công → người khác kinh ngạc/tôn sùng → nhận thưởng.',
         stageAlignment: 'Xung đột và reward loop phải phục vụ stage hiện tại, không nhảy sớm.',
         outcomeWeight: 'Kết quả phải có trọng lượng tương xứng chuẩn bị và phản lực. Quyết định, phân tích, ký hợp tác hoặc mua đầu vào chỉ là setup; không được commit fact tuyên bố đã hết lỗ, có lãi, thành công hay giải quyết xung đột trước khi hành động tạo kết quả thực sự xảy ra.',
+        stateTransitionOwnership: 'Mỗi relationship delta phải cập nhật đúng người thực sự đổi thái độ: characterId/target là chủ thể của thái độ, counterpartId là người thái độ hướng tới. “A thuyết phục được B” không phải trạng thái quan hệ của A; nếu B chuyển từ nghi ngờ sang tin thì B phải là target. Hai phía cùng đổi cần hai delta.',
       },
       repairVerification: input.repairIssues
         ? {
@@ -1681,6 +1683,7 @@ export async function planRollingWindow(input: {
   const judgeRepair = await requestPlan({
     task: `Tạo lại toàn bộ rolling window đúng một lần theo evidence của Plan Judge; giữ contract cơ học hợp lệ và không vá cục bộ.
 Mọi issue là yêu cầu bắt buộc, không phải gợi ý. opposition_agenda phải trở thành một đối sách/hành động có hậu quả trong plan, không chỉ là ý định hoặc cảm xúc. state_transition/earned_progression phải có bước chuyển tương xứng chuẩn bị và không dùng trạng thái tuyệt đối thiếu căn cứ.
+Với relationship state_transition, target phải là chính nhân vật đổi thái độ và after chỉ mô tả thái độ của target đối với counterpart; không dùng relationship delta của người hành động để ghi rằng họ đã thuyết phục người khác.
 Đối thủ phải cản trở trước hoặc trong hành động quyết định; tuyệt đối không biến cú đánh, tai họa hay sai lầm của họ thành lực/công cụ/thời điểm vừa khít giúp main hoàn tất cơ chế.
 Nếu validation báo required fact sai, delta tạo fact phải dùng chính xác expected trong factContracts trước mechanic sử dụng; không dùng mô tả thay marker precondition.
 Sau khi lập lại, tự đối chiếu từng issue với scene và delta mới trước khi trả kết quả.`,

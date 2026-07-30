@@ -205,6 +205,8 @@ describe('Story Factory architecture boundary', () => {
     expect(prompts).toContain('Thời gian cuối chương là mốc tuyệt đối');
     expect(prompts).toContain('kernel.realityMode');
     expect(planner).toContain('domainPlausibility');
+    expect(planner).toContain('target là chính nhân vật đổi thái độ');
+    expect(planner).toContain('stateTransitionOwnership');
   });
 
   test('Planner contract changes participate in the engine release identity', () => {
