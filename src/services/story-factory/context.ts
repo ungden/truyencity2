@@ -75,15 +75,19 @@ function relevantConversionRates(
   plan: ChapterPlan,
   name: (id: string) => string,
 ) {
+  const units = new Map(kernel.resources.flatMap(resource =>
+    resource.kind === 'numeric' ? [[resource.id, resource.unit] as const] : []));
   return relevantConversionMechanics(kernel, plan).map(mechanic => ({
     conversion: mechanic.name,
     inputsPerBatch: mechanic.inputsPerBatch.map(input => ({
       resource: name(input.resourceId),
       amount: input.amount,
+      unit: units.get(input.resourceId) ?? null,
     })),
     outputsPerBatch: mechanic.outputsPerBatch.map(output => ({
       resource: name(output.resourceId),
       amount: output.amount,
+      unit: units.get(output.resourceId) ?? null,
     })),
   }));
 }

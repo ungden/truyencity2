@@ -2016,10 +2016,10 @@ describe('canonical Story Factory', () => {
     });
     const brief = JSON.stringify(contexts.brief);
     expect(brief).toContain('Bán cá tươi loại thường');
-    expect(brief).toContain('"resource":"Cá tươi loại thường","amount":10');
-    expect(brief).toContain('"resource":"Tiền mặt","amount":120');
+    expect(brief).toContain('"resource":"Cá tươi loại thường","amount":10,"unit":"kg"');
+    expect(brief).toContain('"resource":"Tiền mặt","amount":120,"unit":"VND"');
     expect(brief).toContain('Bán cá đã tuyển loại');
-    expect(brief).toContain('"resource":"Tiền mặt","amount":180');
+    expect(brief).toContain('"resource":"Tiền mặt","amount":180,"unit":"VND"');
     expect(brief).not.toContain('Đổi vốn lấy hàng');
     expect(contexts.editorKernel.worldMechanics.map(mechanic => mechanic.id)).toEqual(
       expect.arrayContaining(['raw_fish_sale', 'premium_fish_sale']),
@@ -2437,6 +2437,61 @@ describe('canonical Story Factory', () => {
       status: 'revise',
       continuityIssues: [expect.objectContaining({ category: 'canon' })],
     });
+  });
+
+  test('deterministic preflight blocks a thousand-fold currency scale drift missed by Editor', async () => {
+    const currencyPlan = plan(1);
+    currencyPlan.requiredDeltas = [{
+      id: 'spend_money',
+      kind: 'resource_numeric',
+      resourceId: 'money',
+      before: 100,
+      delta: -20,
+      after: 80,
+      source: null,
+      sink: 'mua vật tư',
+    }];
+    currencyPlan.scenes[0].requiredDeltaIds = ['spend_money'];
+    currencyPlan.mechanicUses = [{
+      id: 'use_trade',
+      sceneId: currencyPlan.scenes[0].id,
+      mechanicId: 'mechanic_trade',
+      role: 'effect',
+      actorId: 'main',
+      quantity: 1,
+      preconditionFactIds: ['fact_day'],
+      deltaIds: ['spend_money'],
+    }];
+    const first = {
+      title: 'Chương 1: Mua Vật Tư',
+      content: 'Hải mang một trăm ngàn đồng đi mua vật tư. Trả xong, anh còn đúng tám mươi ngàn đồng trong túi.',
+    };
+    const revised = {
+      title: 'Chương 1: Mua Vật Tư',
+      content: 'Hải mang một trăm đồng đi mua vật tư. Trả xong, anh còn đúng tám mươi đồng trong túi.',
+    };
+    const provider = new QueueProvider([
+      first,
+      editorWirePass('spend_money', 'còn đúng tám mươi ngàn đồng'),
+      revised,
+      editorWirePass('spend_money', 'còn đúng tám mươi đồng trong túi'),
+    ]);
+    const result = await writeStoryChapter({
+      kernel,
+      state: initialState,
+      plan: currencyPlan,
+      routes,
+      provider,
+    });
+    expect(result.revisionCount).toBe(1);
+    expect(result.attemptTelemetry.initialAssessment).toMatchObject({
+      status: 'revise',
+      continuityIssues: [expect.objectContaining({
+        category: 'resource',
+        referenceId: 'money',
+      })],
+    });
+    expect(result.draft).toEqual(revised);
   });
 
   test('failed rewrite preserves both drafts, both assessments and usage lineage', async () => {

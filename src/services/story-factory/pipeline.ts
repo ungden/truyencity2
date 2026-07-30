@@ -180,9 +180,10 @@ function injectDeterministicMissingDeltaFinding(
 
 interface PreflightIssue {
   kind: 'continuity' | 'reading';
-  category: 'canon' | 'prompt_leak' | 'unnatural_dialogue';
+  category: 'canon' | 'prompt_leak' | 'resource' | 'unnatural_dialogue';
   evidence: string;
   conflictingEvidence?: string;
+  referenceId?: string;
   instruction: string;
 }
 
@@ -214,16 +215,20 @@ function wordCount(content: string): number {
   return content.trim().split(/\s+/u).filter(Boolean).length;
 }
 
-function preflight(draft: ChapterDraft, chapterNumber: number): PreflightIssue[] {
+function preflight(
+  draft: ChapterDraft,
+  plan: ChapterPlan,
+  kernel: Pick<StoryKernel, 'resources'>,
+): PreflightIssue[] {
   const issues: PreflightIssue[] = [];
   const declaredChapter = draft.title.match(/^\s*chương\s+(\d+)\b/iu);
-  if (declaredChapter && Number(declaredChapter[1]) !== chapterNumber) {
+  if (declaredChapter && Number(declaredChapter[1]) !== plan.chapterNumber) {
     issues.push({
       kind: 'continuity',
       category: 'canon',
       evidence: draft.title,
-      conflictingEvidence: `Đây là chương ${chapterNumber}.`,
-      instruction: `Đặt lại title cho đúng chương ${chapterNumber}; không được ghi số chương khác.`,
+      conflictingEvidence: `Đây là chương ${plan.chapterNumber}.`,
+      instruction: `Đặt lại title cho đúng chương ${plan.chapterNumber}; không được ghi số chương khác.`,
     });
   }
   const leaks = [
@@ -246,6 +251,39 @@ function preflight(draft: ChapterDraft, chapterNumber: number): PreflightIssue[]
     evidence: foreign[0],
     instruction: 'Thay ký tự Hán bằng tiếng Việt tự nhiên phù hợp bối cảnh.',
   });
+  const literalCurrencyResources = kernel.resources.filter(
+    (resource): resource is Extract<StoryKernel['resources'][number], { kind: 'numeric' }> =>
+      resource.kind === 'numeric' && /^(?:vnd|đồng)$/iu.test(resource.unit.trim()),
+  );
+  for (const resource of literalCurrencyResources) {
+    const plannedValues = plan.requiredDeltas.flatMap(delta =>
+      delta.kind === 'resource_numeric' && delta.resourceId === resource.id
+        ? [delta.before, delta.delta, delta.after].map(Math.abs)
+        : []);
+    plan.preconditions.forEach(condition => {
+      if (condition.kind === 'resource' && condition.entityId === resource.id) {
+        const numericExpected = typeof condition.expected === 'number'
+          ? condition.expected
+          : Number(condition.expected);
+        if (Number.isFinite(numericExpected)) plannedValues.push(Math.abs(numericExpected));
+      }
+    });
+    const maximumLiteralValue = Math.max(0, ...plannedValues);
+    if (!plannedValues.length || maximumLiteralValue >= 1_000) continue;
+    const scaled = draft.content.match(
+      /(?:\d+(?:[.,]\d+)?|[\p{L}]+(?:\s+[\p{L}]+){0,3})\s+(?:nghìn|ngàn|triệu|tỷ)\s+đồng/iu,
+    );
+    if (!scaled) continue;
+    issues.push({
+      kind: 'continuity',
+      category: 'resource',
+      evidence: scaled[0],
+      conflictingEvidence: `${resource.name} dùng ${resource.unit} literal; các giá trị khóa trong chương: ${[...new Set(plannedValues)].join(', ')}.`,
+      referenceId: resource.id,
+      instruction: `Giữ nguyên thang ${resource.unit}: không thêm nghìn/ngàn/triệu/tỷ vào số tiền ledger đã khóa.`,
+    });
+    break;
+  }
   return issues.slice(0, 3);
 }
 
@@ -305,12 +343,12 @@ function mergePreflight(assessment: EditorAssessment, deterministic: PreflightIs
   const existingReading = assessment.status === 'revise' ? assessment.readingIssues : [];
   const continuityIssues = [
     ...deterministic.filter(issue => issue.kind === 'continuity').map(issue => ({
-      category: issue.category === 'canon' ? 'canon' as const : 'prompt_leak' as const,
+      category: issue.category,
       severity: 'major' as const,
       scope: 'prose' as const,
       currentEvidence: issue.evidence,
       conflictingEvidence: issue.conflictingEvidence ?? 'Nội dung chương không được chứa thuật ngữ vận hành.',
-      referenceId: null,
+      referenceId: issue.referenceId ?? null,
       instruction: issue.instruction,
     })),
     ...existingContinuity,
@@ -483,7 +521,7 @@ export async function assessStoryDraft(input: {
   plan: ChapterPlan;
   draft: ChapterDraft;
 }): Promise<{ assessment: EditorAssessment; usage: ProviderUsage }> {
-  const deterministicIssues = preflight(input.draft, input.plan.chapterNumber);
+  const deterministicIssues = preflight(input.draft, input.plan, input.kernel);
   const deltaIds = [...narrativelyObservableDeltaIds(input.kernel, input.plan)];
   const responseSchema = buildEditorWireAssessmentSchema({ deltaIds });
   const response = await input.provider.json({
