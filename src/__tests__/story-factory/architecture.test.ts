@@ -41,6 +41,9 @@ describe('Story Factory architecture boundary', () => {
     expect(prompts).toContain('luôn dùng scope=prose');
     expect(prompts).toContain('encounteredRelevantCharacters là nguồn sự thật exact-ID');
     expect(prompts).toContain('ledgerSnapshot.encounters là nguồn sự thật exact-ID');
+    expect(prompts).toContain('Không khuếch đại thất bại cục bộ thành sụp đổ toàn diện');
+    expect(prompts).toContain('Không dừng ở lỗi tiêu đề/canon dễ thấy');
+    expect(prompts).toContain('payoff đánh bại họ thuộc long promise ở stage sau');
   });
 
   test('narrative outcomes stay out of Writer context and each rolling window is reviewed', () => {
