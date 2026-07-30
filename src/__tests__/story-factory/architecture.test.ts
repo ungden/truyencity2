@@ -35,6 +35,7 @@ describe('Story Factory architecture boundary', () => {
 
   test('Writer freedom cannot create state outside required deltas', () => {
     const prompts = readFileSync('src/services/story-factory/prompts.ts', 'utf8');
+    const pipeline = readFileSync('src/services/story-factory/pipeline.ts', 'utf8');
     expect(prompts).toContain('không được tự tạo thay đổi trạng thái bền vững ngoài requiredChanges');
     expect(prompts).toContain('prose tự tạo bất kỳ thay đổi trạng thái bền vững nào không có trong requiredDeltas');
     expect(prompts).toContain('draft bỏ sót, kết thúc trước, hiểu sai hoặc tự bịa chi tiết');
@@ -54,6 +55,8 @@ describe('Story Factory architecture boundary', () => {
     expect(prompts).toContain('họ phải can thiệp trước hoặc trong hành động quyết định');
     expect(prompts).toContain('required changes luôn ưu tiên');
     expect(prompts).toContain('không được yêu cầu hạ, đảo hay để dang dở required delta');
+    expect(prompts).toContain('before/after là tổng số dư còn delta là lượng của một giao dịch');
+    expect(pipeline).toContain('before/after là tổng số dư còn delta là lượng giao dịch');
   });
 
   test('narrative outcomes stay out of Writer context and each rolling window is reviewed', () => {

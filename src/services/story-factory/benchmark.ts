@@ -17,9 +17,9 @@ import {
 } from './provider';
 import { WindowPassSchema } from './planner';
 
-export const STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL = 'story-factory-writer-bakeoff-v18-revision-priority';
-export const STORY_FACTORY_SEQUENTIAL_PROTOCOL = 'story-factory-sequential-survival-v21-revision-priority';
-export const STORY_FACTORY_BENCHMARK_PROTOCOL = 'story-factory-validation-v27-revision-priority';
+export const STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL = 'story-factory-writer-bakeoff-v19-resource-semantics';
+export const STORY_FACTORY_SEQUENTIAL_PROTOCOL = 'story-factory-sequential-survival-v22-resource-semantics';
+export const STORY_FACTORY_BENCHMARK_PROTOCOL = 'story-factory-validation-v28-resource-semantics';
 export const STORY_FACTORY_BENCHMARK_SAMPLE_COUNT = 20;
 export const STORY_FACTORY_WRITER_SAMPLE_COUNT = 4;
 

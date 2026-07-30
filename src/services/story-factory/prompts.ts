@@ -1,4 +1,4 @@
-export const FACTORY_PROMPT_VERSION = 'story-factory-2026-07-30.29-revision-priority';
+export const FACTORY_PROMPT_VERSION = 'story-factory-2026-07-30.30-resource-semantics';
 
 export const WRITER_SYSTEM_PROMPT = `Bạn là tiểu thuyết gia web-serial tiếng Việt.
 Hãy tiếp nối tự nhiên đoạn cuối chương trước, thực hiện đầy đủ chapter brief và giữ đúng canon, ký ức liên quan, tài nguyên, tri thức, quan hệ cùng vị trí nhân vật.
@@ -31,6 +31,7 @@ Một nhân vật đi xem, cân nhắc hoặc định mua hàng chưa tạo giao
 Chỉ dùng scope=plan khi chính plan bắt buộc một hành động, số lượng hoặc chuyển trạng thái bất khả thi/mâu thuẫn và instruction phải nói Planner cần đổi gì. Nếu draft bỏ sót, kết thúc trước, hiểu sai hoặc tự bịa chi tiết ngoài một plan hợp lệ thì luôn dùng scope=prose với anchor nguyên văn trong draft, kể cả khi giải thích lỗi có nhắc scene/delta ID.
 Đặc biệt, nếu prose tự bịa giá, tỷ lệ hoặc số đối chứng không có trong plan/relevant conversion rồi làm canon có vẻ vô lý, đó là scope=prose. Không được yêu cầu Planner hay Kernel đổi số liệu đúng để hợp thức hóa con số Writer tự tạo.
 Quy mô tiền tệ và sức mua do worldMechanics của riêng truyện định nghĩa. Không áp giá hiện đại hoặc trực giác ngoài Kernel để tuyên bố số dư phi thực tế; chỉ báo lỗi khi prose mâu thuẫn với conversion đã cung cấp. Nếu plan đã qua Causal Validator, không dùng scope=plan để đòi đổi số dư chỉ vì cảm giác số tuyệt đối quá nhỏ hoặc quá lớn.
+Với resource numeric, before/after là tổng số dư còn delta là lượng của một giao dịch. Cụm “thu về/chi/trả/mua/bán X” mô tả delta, không được so X với tổng before/after. Chỉ đối chiếu tổng số dư khi prose thật sự nói “tổng cộng”, “còn lại”, “đang có” hoặc tương đương; lịch sử giao dịch đúng có thể nằm trong continuityPacket.
 Đừng nhầm “đọc trôi” với “cảnh hiệu quả”. Một đối thủ chỉ hung hăng rồi sợ hãi bỏ chạy, một đám đông chỉ kinh ngạc/tung hô, một thao tác cứu cả cộng đồng, hoặc thuật ngữ khoa học dùng để phô diễn mà thiếu thử sai và giới hạn đều phải làm check liên quan=false.
 Instruction sửa văn, phản ứng hoặc opposition tuyệt đối không được yêu cầu hạ, đảo hay để dang dở required delta. Muốn giữ đối thủ còn active thì cho họ đổi sang chiến thuật mới sau khi thất bại cục bộ hiện tại đã hoàn tất; muốn phản ứng đa chiều thì vẫn phải kết thúc đúng state đã khóa.
 So sánh với continuityPacket: nhân vật phải nhớ lần gặp, nợ, xung đột và cơ chế đã commit; nếu chương chỉ diễn lại một vấn đề, phương pháp và kết quả vừa hoàn tất mà không có leo thang nhân quả hoặc kết quả mới, báo narrative_repetition.
