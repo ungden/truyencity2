@@ -91,14 +91,15 @@ function exactStringSchema(values: string[]) {
 }
 
 function buildEditorWireAssessmentSchema(input: {
-  referenceIds: string[];
   deltaIds: string[];
 }) {
   return z.object({
     v: z.literal(3),
-    findings: z.array(EditorWireFindingSchema.extend({
-      referenceId: exactStringSchema(input.referenceIds),
-    })).max(3),
+    // Gemini can reject a large dynamic reference-ID enum with "too many
+    // states for serving". Keep the compact stable-ID lexical contract here;
+    // groundIssueEvidence validates exact membership against Kernel/Plan/State
+    // immediately after decoding, before any verdict can pass.
+    findings: z.array(EditorWireFindingSchema).max(3),
     deltaChecks: z.array(EditorWireDeltaCheckSchema.extend({
       deltaId: exactStringSchema(input.deltaIds),
     })).length(input.deltaIds.length),
@@ -483,13 +484,8 @@ export async function assessStoryDraft(input: {
   draft: ChapterDraft;
 }): Promise<{ assessment: EditorAssessment; usage: ProviderUsage }> {
   const deterministicIssues = preflight(input.draft, input.plan.chapterNumber);
-  const referenceIds = [...collectStableIds({
-    kernel: input.kernel,
-    state: input.state,
-    plan: input.plan,
-  })];
   const deltaIds = [...narrativelyObservableDeltaIds(input.kernel, input.plan)];
-  const responseSchema = buildEditorWireAssessmentSchema({ referenceIds, deltaIds });
+  const responseSchema = buildEditorWireAssessmentSchema({ deltaIds });
   const response = await input.provider.json({
     model: input.model,
     system: EDITOR_SYSTEM_PROMPT,

@@ -228,6 +228,14 @@ describe('Story Factory architecture boundary', () => {
     expect(provider.match(/usage: response\.usage/g)?.length).toBeGreaterThanOrEqual(2);
   });
 
+  test('Editor provider schema stays bounded while application validation remains exact-ID', () => {
+    const pipeline = readFileSync('src/services/story-factory/pipeline.ts', 'utf8');
+    expect(pipeline).not.toContain('referenceId: exactStringSchema(input.referenceIds)');
+    expect(pipeline).toContain('groundIssueEvidence validates exact membership');
+    expect(pipeline).toContain('!validIds.has(issue.referenceId)');
+    expect(pipeline).toContain('deltaId: exactStringSchema(input.deltaIds)');
+  });
+
   test('Writer discovery selects two routes but promotion requires frozen sequential evidence', () => {
     const bakeoff = readFileSync('scripts/factory-model-bakeoff.ts', 'utf8');
     const validation = readFileSync('scripts/factory-benchmark.ts', 'utf8');
