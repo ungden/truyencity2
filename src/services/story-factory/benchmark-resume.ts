@@ -33,6 +33,7 @@ export type ResumableDiscoveryProgress = {
   launchPackDigests: string[];
   samples: unknown[];
   writerBriefs: unknown[];
+  stateEventsByLane?: Record<string, unknown[]>;
   chapterAttempts: unknown[];
   setupCheckpoints: Record<string, object>;
   plannedWindows: Record<string, unknown>;
@@ -127,6 +128,7 @@ export function prepareDiscoveryResume<T extends ResumableDiscoveryProgress>(inp
     launchPackDigests: [],
     samples: [],
     writerBriefs: [],
+    stateEventsByLane: {},
     chapterAttempts: [],
     plannedWindows: preserveCurrentReleaseEvidence ? progress.plannedWindows : {},
     windowReviews: [],

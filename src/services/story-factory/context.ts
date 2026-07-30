@@ -171,12 +171,17 @@ function operationalConstraints(kernel: StoryKernel, plan: ChapterPlan, name: (i
 }
 
 function readableTransition(event: RelevantStoryTransition, name: (id: string) => string) {
+  const change = typeof event.before === 'number' && typeof event.after === 'number'
+    ? event.after - event.before
+    : null;
   return {
     chapter: event.chapterNumber,
     type: event.kind,
     entity: name(event.entityId),
     before: event.before,
+    change,
     after: event.after,
+    provenance: event.source,
   };
 }
 

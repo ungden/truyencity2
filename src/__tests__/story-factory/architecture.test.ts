@@ -92,6 +92,11 @@ describe('Story Factory architecture boundary', () => {
     expect(benchmark).toContain('nextPlan: window.rollingPlan.plans[planIndex + 1]');
     expect(benchmark).toContain('nextPlan: planned.rollingPlan.plans[1]');
     expect(benchmark).toContain('assessSequentialContinuity({');
+    expect(benchmark).toContain('buildContinuityPacketFromEvents({');
+    expect(benchmark).toContain('memoryEntityIdsForPlan(setup.launchPack.kernel, plan)');
+    expect(benchmark).toContain('continuityPacket,');
+    expect(benchmark).toContain('eventLedger.push(...candidate.stateEvents)');
+    expect(benchmark).toContain('stateEventsByLane');
     expect(benchmark).toContain('--frozen-discovery-progress');
     expect(benchmark).toContain('planned = frozenProgress.plannedWindows[lane]');
     expect(benchmark).toContain('prepareDiscoveryResume({');

@@ -18,9 +18,13 @@ import {
   StoryFactoryError,
   WriterBakeoffCorpusSchema,
   assessSequentialContinuity,
+  buildContinuityPacketFromEvents,
   bookSetupCheckpointCost,
   checkpointCost,
   digestArtifact,
+  flattenContinuityPacket,
+  memoryEntityIdsForArc,
+  memoryEntityIdsForPlan,
   planRollingWindow,
   prepareDiscoveryResume,
   reviewFiveChapterWindow,
@@ -37,6 +41,7 @@ import {
   type RollingPlan,
   type DiscoveryResumeLineage,
   type StoryState,
+  type StateEvent,
   type WindowReview,
 } from '../src/services/story-factory';
 
@@ -113,6 +118,7 @@ type Progress = {
   launchPackDigests: string[];
   samples: SequentialBenchmarkCorpus['samples'];
   writerBriefs: PlanQualifiedWriterBrief[];
+  stateEventsByLane: Record<string, StateEvent[]>;
   chapterAttempts: Array<{
     id: string;
     lane: string;
@@ -260,6 +266,7 @@ async function main() {
     launchPackDigests: [],
     samples: [],
     writerBriefs: [],
+    stateEventsByLane: {},
     chapterAttempts: [],
     setupCheckpoints: {},
     plannedWindows: {},
@@ -288,6 +295,7 @@ async function main() {
     })
     : freshProgress;
   progress.followupPlannedWindows ??= {};
+  progress.stateEventsByLane ??= {};
   const persist = () => writeFileSync(progressPath, `${JSON.stringify(progress, null, 2)}\n`);
   persist();
   const signatures: PortfolioSignature[] = [];
@@ -434,6 +442,7 @@ async function main() {
             plan: firstPlan,
             nextPlan: planned.rollingPlan.plans[1],
             previousTail: null,
+            continuityEvidence: null,
             planAssessment: acceptedInitialWindow.assessment,
             causalValidation: {
               validatorVersion: CAUSAL_VALIDATOR_VERSION,
@@ -452,6 +461,8 @@ async function main() {
         stage = 'chapters';
         let state: StoryState = setup.launchPack.initialState;
         let previous = '';
+        const eventLedger = progress.stateEventsByLane[lane] ?? [];
+        progress.stateEventsByLane[lane] = eventLedger;
         const laneSamples: SequentialBenchmarkCorpus['samples'] = [];
         const chapters: Array<{ chapterNumber: number; title: string; content: string }> = [];
         const writePlannedWindow = async (
@@ -461,6 +472,12 @@ async function main() {
           for (const [planIndex, plan] of window.rollingPlan.plans.entries()) {
             const stateBefore = state;
             const previousTail = previous ? tailWords(previous) : null;
+            const continuityPacket = buildContinuityPacketFromEvents({
+              state: stateBefore,
+              entityIds: memoryEntityIdsForPlan(setup.launchPack.kernel, plan),
+              events: eventLedger,
+            });
+            const flattenedContinuity = flattenContinuityPacket(continuityPacket);
             const planDigest = digestArtifact(plan);
             const causalValidation = {
               validatorVersion: CAUSAL_VALIDATOR_VERSION,
@@ -481,6 +498,11 @@ async function main() {
               plan,
               nextPlan: window.rollingPlan.plans[planIndex + 1] ?? null,
               previousTail,
+              continuityEvidence: {
+                digest: digestArtifact(continuityPacket),
+                transitionCount: flattenedContinuity.length,
+                recentOutcomeCount: continuityPacket.recentOutcomes.length,
+              },
               planAssessment: window.assessment,
               causalValidation,
             });
@@ -494,6 +516,7 @@ async function main() {
                 plan,
                 nextPlan: window.rollingPlan.plans[planIndex + 1],
                 previousChapter: previous || undefined,
+                continuityPacket,
                 routes: candidateRoutes,
               });
             } catch (error) {
@@ -531,6 +554,7 @@ async function main() {
               stateBefore,
               stateAfter: candidate.stateAfter,
               previousTail,
+              continuityPacket,
               content: candidate.draft.content,
               model: continuityJudgeModel,
             });
@@ -566,6 +590,7 @@ async function main() {
             laneSamples.push(sample);
             progress.samples.push(sample);
             state = candidate.stateAfter;
+            eventLedger.push(...candidate.stateEvents);
             previous = candidate.draft.content;
             chapters.push({
               chapterNumber: plan.chapterNumber,
@@ -585,6 +610,11 @@ async function main() {
           kernel: setup.launchPack.kernel,
           arc: setup.launchPack.arc,
           state,
+          continuityPacket: buildContinuityPacketFromEvents({
+            state,
+            entityIds: memoryEntityIdsForArc(setup.launchPack.kernel, setup.launchPack.arc, state),
+            events: eventLedger,
+          }),
           routes: candidateRoutes,
           requiredWindowSize: 2,
         });

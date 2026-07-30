@@ -9,6 +9,7 @@ import {
   type StoryKernel,
   type StoryState,
 } from './contracts';
+import type { ContinuityPacket } from './memory';
 import {
   geminiProvider,
   type ProviderUsage,
@@ -16,9 +17,9 @@ import {
 } from './provider';
 import { WindowPassSchema } from './planner';
 
-export const STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL = 'story-factory-writer-bakeoff-v13-scoped-opposition-outcomes';
-export const STORY_FACTORY_SEQUENTIAL_PROTOCOL = 'story-factory-sequential-survival-v16-scoped-opposition-outcomes';
-export const STORY_FACTORY_BENCHMARK_PROTOCOL = 'story-factory-validation-v22-scoped-opposition-outcomes';
+export const STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL = 'story-factory-writer-bakeoff-v14-exact-event-memory';
+export const STORY_FACTORY_SEQUENTIAL_PROTOCOL = 'story-factory-sequential-survival-v17-exact-event-memory';
+export const STORY_FACTORY_BENCHMARK_PROTOCOL = 'story-factory-validation-v23-exact-event-memory';
 export const STORY_FACTORY_BENCHMARK_SAMPLE_COUNT = 20;
 export const STORY_FACTORY_WRITER_SAMPLE_COUNT = 4;
 
@@ -48,6 +49,11 @@ export const PlanQualifiedWriterBriefSchema = z.object({
   plan: ChapterPlanSchema,
   nextPlan: ChapterPlanSchema.nullable(),
   previousTail: z.string().max(8_000).nullable(),
+  continuityEvidence: z.object({
+    digest: z.string().length(64),
+    transitionCount: z.number().int().nonnegative().max(48),
+    recentOutcomeCount: z.number().int().nonnegative().max(8),
+  }).strict().nullable(),
   planAssessment: PlanPassSchema,
   causalValidation: z.object({
     validatorVersion: z.string().trim().min(3),
@@ -393,6 +399,7 @@ export async function assessSequentialContinuity(input: {
   stateBefore: StoryState;
   stateAfter: StoryState;
   previousTail: string | null;
+  continuityPacket?: ContinuityPacket;
   content: string;
   model: string;
   provider?: StoryModelProvider;
@@ -404,7 +411,8 @@ export async function assessSequentialContinuity(input: {
 Chỉ kiểm tra chương hiện tại có thực sự nối từ đoạn kết và trạng thái đã commit hay không.
 Không chấm văn hay, không thưởng việc bám checklist, không sửa plan và không quyết định xuất bản.
 Fail khi nhân vật quên sự kiện/quan hệ, tài nguyên-thời gian-vị trí sai, cảm xúc hoặc agenda bị reset, hay quy tắc thế giới đổi cơ chế.
-Mọi issue phải đưa evidence từ prose hiện tại và evidence đối chiếu từ previous tail hoặc state.`,
+continuityPacket là lịch sử exact-ID đã commit; với số lượng, before + change = after và chỉ change là lượng phát sinh ở chương đó.
+Mọi issue phải đưa evidence từ prose hiện tại và evidence đối chiếu từ previous tail, state hoặc continuityPacket.`,
     prompt: JSON.stringify({
       task: 'Kiểm định continuity của một transition chương.',
       kernel: {
@@ -415,6 +423,7 @@ Mọi issue phải đưa evidence từ prose hiện tại và evidence đối ch
       plan: input.plan,
       stateBefore: input.stateBefore,
       stateAfter: input.stateAfter,
+      continuityPacket: input.continuityPacket ?? null,
       previousTail: input.previousTail,
       currentProse: input.content,
     }),

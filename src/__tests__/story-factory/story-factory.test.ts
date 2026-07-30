@@ -42,6 +42,7 @@ import {
   buildBlindReaderComparison,
   buildBlindReaderInput,
   buildChapterContexts,
+  buildContinuityPacketFromEvents,
   buildPlannerMechanicGuide,
   buildWriterBrief,
   buildSetupCheckpointProvenance,
@@ -1935,6 +1936,7 @@ describe('canonical Story Factory', () => {
         entity_id: 'story',
         before_value: null,
         after_value: chapterOneOutcome,
+        source: 'independent_editor',
         related_entity_ids: ['main', 'buyer'],
       }],
       error: null,
@@ -2031,6 +2033,7 @@ describe('canonical Story Factory', () => {
           entityId: 'prior_decision',
           before: null,
           after: 'buyer_agreed',
+          source: 'direct negotiation',
           relatedEntityIds: ['main', 'buyer', 'prior_decision'],
         }],
         promiseOriginsAndProgress: [],
@@ -2057,6 +2060,35 @@ describe('canonical Story Factory', () => {
     expect(brief).not.toContain('avoidances');
     const contexts = buildChapterContexts({ kernel, state, plan: plan(1) });
     expect(JSON.stringify(contexts.editorState)).toContain('lót trấu và xơ dừa');
+  });
+
+  test('in-memory sequential memory preserves numeric delta provenance instead of relabeling the total', () => {
+    const state = { ...initialState, chapterNumber: 5 };
+    const continuityPacket = buildContinuityPacketFromEvents({
+      state,
+      entityIds: ['money'],
+      events: [{
+        chapterNumber: 4,
+        deltaId: 'delta_buy_ice',
+        kind: 'resource_numeric',
+        entityId: 'money',
+        before: 4,
+        after: 24,
+        source: 'Nhà máy đá giao thêm',
+        relatedEntityIds: ['money'],
+      }],
+    });
+    const brief = JSON.stringify(buildWriterBrief({
+      kernel,
+      state,
+      plan: plan(1),
+      continuityPacket,
+    }));
+    expect(brief).toContain('"before":4');
+    expect(brief).toContain('"change":20');
+    expect(brief).toContain('"after":24');
+    expect(brief).toContain('"provenance":"Nhà máy đá giao thêm"');
+    expect(continuityPacket.recentOutcomes).toEqual([]);
   });
 
   test('Writer and Editor receive grounded comparison rates for related conversions', () => {
@@ -2350,6 +2382,7 @@ describe('canonical Story Factory', () => {
         entity_id: 'main',
         before_value: null,
         after_value: 'debt_open',
+        source: 'scene_first_meeting',
         related_entity_ids: ['main', 'buyer'],
       }],
       error: null,
@@ -2998,6 +3031,7 @@ describe('canonical Story Factory', () => {
         plan: plan(1),
         nextPlan: plan(2, 'ngay_1'),
         previousTail: null,
+        continuityEvidence: null,
         planAssessment: { status: 'pass' as const, issues: [] },
         causalValidation: {
           validatorVersion: 'causal-validator-test',

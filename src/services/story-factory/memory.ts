@@ -20,6 +20,7 @@ export interface RelevantStoryTransition {
   entityId: string;
   before: unknown;
   after: unknown;
+  source: string | null;
   relatedEntityIds: string[];
 }
 
@@ -38,8 +39,20 @@ type EventRow = {
   entity_id: string;
   before_value: unknown;
   after_value: unknown;
+  source: string | null;
   related_entity_ids: unknown;
 };
+
+export interface ContinuityEvent {
+  chapterNumber: number;
+  deltaId: string;
+  kind: string;
+  entityId: string;
+  before: unknown;
+  after: unknown;
+  source: string | null;
+  relatedEntityIds: string[];
+}
 
 function unique(values: string[]): string[] {
   return [...new Set(values.filter(Boolean))];
@@ -53,6 +66,7 @@ function transition(row: EventRow): RelevantStoryTransition {
     entityId: row.entity_id,
     before: row.before_value,
     after: row.after_value,
+    source: row.source ?? null,
     relatedEntityIds: Array.isArray(row.related_entity_ids)
       ? row.related_entity_ids.filter((id: unknown): id is string => typeof id === 'string')
       : [],
@@ -70,6 +84,95 @@ function dedupe(events: RelevantStoryTransition[]): RelevantStoryTransition[] {
     if (seen.has(key)) return false;
     seen.add(key);
     return true;
+  });
+}
+
+function emptyPacket(): ContinuityPacket {
+  return {
+    recentOutcomes: [],
+    firstAndLastRelationships: [],
+    latestEntityTransitions: [],
+    promiseOriginsAndProgress: [],
+    recentMechanicUses: [],
+  };
+}
+
+function firstByEntity(events: RelevantStoryTransition[]) {
+  const seen = new Set<string>();
+  return events.filter(event => {
+    const key = `${event.kind}:${event.entityId}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function lastByEntity(events: RelevantStoryTransition[], count = 1) {
+  const counts = new Map<string, number>();
+  return events.filter(event => {
+    const key = `${event.kind}:${event.entityId}`;
+    const current = counts.get(key) ?? 0;
+    if (current >= count) return false;
+    counts.set(key, current + 1);
+    return true;
+  });
+}
+
+function assembleContinuityPacket(input: {
+  throughChapter: number;
+  entityIds: string[];
+  events: RelevantStoryTransition[];
+}): ContinuityPacket {
+  const ids = new Set(unique(input.entityIds));
+  if (!ids.size || input.throughChapter === 0) return emptyPacket();
+  const relevant = dedupe(input.events)
+    .filter(event => (
+      event.chapterNumber <= input.throughChapter
+      && event.relatedEntityIds.some(id => ids.has(id))
+    ));
+  const ascending = (events: RelevantStoryTransition[]) => [...events]
+    .sort((left, right) => left.chapterNumber - right.chapterNumber);
+  const descending = (events: RelevantStoryTransition[]) => [...events]
+    .sort((left, right) => right.chapterNumber - left.chapterNumber);
+  const byKind = (...kinds: string[]) => relevant.filter(event => kinds.includes(event.kind));
+  const outcomes = descending(byKind('chapter_outcome'));
+  const relationships = byKind('relationship', 'encounter');
+  const promises = byKind('promise');
+
+  return {
+    recentOutcomes: outcomes.flatMap(event => {
+      const parsed = ChapterOutcomeSchema.safeParse(event.after);
+      return parsed.success ? [{ outcome: parsed.data, relatedEntityIds: event.relatedEntityIds }] : [];
+    }).slice(0, 8),
+    firstAndLastRelationships: dedupe([
+      ...firstByEntity(ascending(relationships)),
+      ...lastByEntity(descending(relationships)),
+    ]).slice(0, 24),
+    latestEntityTransitions: lastByEntity(descending(
+      byKind('resource_numeric', 'resource_state', 'location', 'knowledge'),
+    )).slice(0, 12),
+    promiseOriginsAndProgress: dedupe([
+      ...firstByEntity(ascending(promises)),
+      ...lastByEntity(descending(promises)),
+    ]).slice(0, 24),
+    recentMechanicUses: lastByEntity(descending(byKind('mechanic_use')), 2).slice(0, 24),
+  };
+}
+
+/**
+ * Build the exact same bounded packet from an in-memory immutable event ledger.
+ * Offline sequential benchmarks use this instead of inventing a state snapshot
+ * that production never sees.
+ */
+export function buildContinuityPacketFromEvents(input: {
+  state: StoryState;
+  entityIds: string[];
+  events: ContinuityEvent[];
+}): ContinuityPacket {
+  return assembleContinuityPacket({
+    throughChapter: input.state.chapterNumber,
+    entityIds: input.entityIds,
+    events: input.events.map(event => ({ ...event })),
   });
 }
 
@@ -117,7 +220,7 @@ async function queryEvents(input: {
   if (!input.entityIds.length || input.throughChapter <= 0) return [];
   const { data, error } = await input.db
     .from('story_state_events')
-    .select('chapter_number,delta_id,kind,entity_id,before_value,after_value,related_entity_ids')
+    .select('chapter_number,delta_id,kind,entity_id,before_value,after_value,source,related_entity_ids')
     .eq('project_id', input.projectId)
     .in('kind', input.kinds)
     .lte('chapter_number', input.throughChapter)
@@ -140,13 +243,7 @@ export async function loadContinuityPacket(input: {
 }): Promise<ContinuityPacket> {
   const ids = unique(input.entityIds);
   if (!ids.length || input.state.chapterNumber === 0) {
-    return {
-      recentOutcomes: [],
-      firstAndLastRelationships: [],
-      latestEntityTransitions: [],
-      promiseOriginsAndProgress: [],
-      recentMechanicUses: [],
-    };
+    return emptyPacket();
   }
   const common = {
     db: input.db,
@@ -164,42 +261,19 @@ export async function loadContinuityPacket(input: {
     queryEvents({ ...common, kinds: ['mechanic_use'], ascending: false, limit: 24 }),
   ]);
 
-  const firstByEntity = (events: RelevantStoryTransition[]) => {
-    const seen = new Set<string>();
-    return events.filter(event => {
-      const key = `${event.kind}:${event.entityId}`;
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    });
-  };
-  const lastByEntity = (events: RelevantStoryTransition[], count = 1) => {
-    const counts = new Map<string, number>();
-    return events.filter(event => {
-      const key = `${event.kind}:${event.entityId}`;
-      const current = counts.get(key) ?? 0;
-      if (current >= count) return false;
-      counts.set(key, current + 1);
-      return true;
-    });
-  };
-
-  return {
-    recentOutcomes: outcomes.flatMap(event => {
-      const parsed = ChapterOutcomeSchema.safeParse(event.after);
-      return parsed.success ? [{ outcome: parsed.data, relatedEntityIds: event.relatedEntityIds }] : [];
-    }).slice(0, 8),
-    firstAndLastRelationships: dedupe([
-      ...firstByEntity(relationshipsFirst),
-      ...lastByEntity(relationshipsLast),
-    ]).slice(0, 24),
-    latestEntityTransitions: lastByEntity(entityLatest).slice(0, 12),
-    promiseOriginsAndProgress: dedupe([
-      ...firstByEntity(promiseFirst),
-      ...lastByEntity(promiseLast),
-    ]).slice(0, 24),
-    recentMechanicUses: lastByEntity(mechanicUses, 2).slice(0, 24),
-  };
+  return assembleContinuityPacket({
+    throughChapter: input.state.chapterNumber,
+    entityIds: ids,
+    events: [
+      ...outcomes,
+      ...relationshipsFirst,
+      ...relationshipsLast,
+      ...entityLatest,
+      ...promiseFirst,
+      ...promiseLast,
+      ...mechanicUses,
+    ],
+  });
 }
 
 export function flattenContinuityPacket(packet: ContinuityPacket): RelevantStoryTransition[] {
