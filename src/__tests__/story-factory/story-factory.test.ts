@@ -2045,6 +2045,8 @@ describe('canonical Story Factory', () => {
     expect(brief).not.toContain('rubric');
     expect(brief).not.toContain('promisesToResolve');
     expect(brief).toContain('"unit":"VND"');
+    expect(brief).toContain('"canonicalUnits"');
+    expect(brief).toContain('"canonicalUnits":["VND"');
     expect(StoryKernelSchema.safeParse({
       ...kernel,
       resources: [{ id: 'money', name: 'Tiền mặt', kind: 'numeric', minimum: 0 }],

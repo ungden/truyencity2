@@ -24,6 +24,7 @@ export interface WriterBrief {
   story: { title: string };
   chapterNumber: number;
   cast: unknown[];
+  canonicalUnits: string[];
   openingState: unknown[];
   scenes: unknown[];
   operationalConstraints: string[];
@@ -258,6 +259,8 @@ export function buildWriterBrief(input: {
   return {
     story: { title: input.kernel.title },
     chapterNumber: input.plan.chapterNumber,
+    canonicalUnits: [...new Set(input.kernel.resources.flatMap(resource =>
+      resource.kind === 'numeric' ? [resource.unit] : []))],
     cast: input.kernel.characters.filter(character => ids.characters.has(character.id)).map(character => ({
       name: character.name,
       agenda: character.agenda,
