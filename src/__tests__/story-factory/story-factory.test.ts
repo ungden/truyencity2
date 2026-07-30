@@ -1663,6 +1663,113 @@ describe('canonical Story Factory', () => {
     })).toThrow('faster than the world permits');
   });
 
+  test('blocks a redundant acquisition round trip without an intervening causal precondition', () => {
+    const routeKernel = structuredClone(kernel);
+    routeKernel.resources.push({
+      id: 'ice',
+      name: 'Đá cây',
+      kind: 'numeric',
+      unit: 'kg',
+      ownerEntityId: 'main',
+      minimum: 0,
+    });
+    routeKernel.worldMechanics.push({
+      id: 'buy_ice',
+      name: 'Mua đá cây',
+      kind: 'conversion',
+      description: 'Mười đồng mua được một ký đá cây.',
+      inputsPerBatch: [{ resourceId: 'money', amount: 10 }],
+      outputsPerBatch: [{ resourceId: 'ice', amount: 1 }],
+      maximumBatchesPerUse: 10,
+    });
+    const routeState = structuredClone(initialState);
+    routeState.resources.push({ resourceId: 'ice', kind: 'numeric', value: 0 });
+    const routePlan = plan(1);
+    routePlan.storyTimeAfterMinutes = 100;
+    routePlan.scenes = [
+      {
+        id: 'depart_home',
+        povCharacterId: 'main',
+        participantIds: ['main'],
+        locationId: 'beach',
+        durationMinutes: 10,
+        travelMinutesFromPrevious: 20,
+        objective: 'Ra bãi kiểm tra ghe.',
+        obstacle: 'Đường xa.',
+        action: 'Hải ra bãi kiểm tra ghe.',
+        requiredDeltaIds: [],
+      },
+      {
+        id: 'return_to_buy',
+        povCharacterId: 'main',
+        participantIds: ['main'],
+        locationId: 'home',
+        durationMinutes: 10,
+        travelMinutesFromPrevious: 20,
+        objective: 'Quay về mua đá.',
+        obstacle: 'Phải đi lại.',
+        action: 'Hải quay về mua một ký đá.',
+        requiredDeltaIds: ['spend_money', 'gain_ice'],
+      },
+      {
+        id: 'depart_again',
+        povCharacterId: 'main',
+        participantIds: ['main'],
+        locationId: 'beach',
+        durationMinutes: 10,
+        travelMinutesFromPrevious: 20,
+        objective: 'Mang đá ra ghe.',
+        obstacle: 'Đá dễ tan.',
+        action: 'Hải lại mang đá ra bãi.',
+        requiredDeltaIds: ['finish_at_beach'],
+      },
+    ];
+    routePlan.requiredDeltas = [
+      {
+        id: 'spend_money',
+        kind: 'resource_numeric',
+        resourceId: 'money',
+        before: 100,
+        delta: -10,
+        after: 90,
+        source: null,
+        sink: 'buy_ice',
+      },
+      {
+        id: 'gain_ice',
+        kind: 'resource_numeric',
+        resourceId: 'ice',
+        before: 0,
+        delta: 1,
+        after: 1,
+        source: 'buy_ice',
+        sink: null,
+      },
+      {
+        id: 'finish_at_beach',
+        kind: 'location',
+        characterId: 'main',
+        beforeLocationId: 'home',
+        afterLocationId: 'beach',
+      },
+    ];
+    routePlan.mechanicUses = [{
+      id: 'buy_after_return',
+      sceneId: 'return_to_buy',
+      mechanicId: 'buy_ice',
+      role: 'effect',
+      actorId: 'main',
+      quantity: 1,
+      preconditionFactIds: [],
+      deltaIds: ['spend_money', 'gain_ice'],
+    }];
+    expect(() => applyChapterPlan({
+      kernel: routeKernel,
+      state: routeState,
+      plan: routePlan,
+    })).toThrow('redundant acquisition round trip');
+  });
+
   test('rejects a kernel whose protagonist can leave a location but cannot return', () => {
     const oneWayKernel = structuredClone(kernel);
     oneWayKernel.travelRules = oneWayKernel.travelRules.filter(rule => rule.fromLocationId === 'home');

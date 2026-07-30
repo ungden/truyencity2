@@ -11,7 +11,7 @@ import {
   StoryFactoryError,
 } from './contracts';
 
-export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-30-exact-first-encounter';
+export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-31-route-efficiency';
 
 export interface StateEvent {
   chapterNumber: number;
@@ -495,6 +495,70 @@ function ownerPerformsTransfer(
   return false;
 }
 
+function validateRouteEfficiency(kernel: StoryKernel, state: StoryState, plan: ChapterPlan): void {
+  for (const character of state.characters) {
+    let currentLocation = character.locationId;
+    const transitions: Array<{
+      from: string;
+      to: string;
+      sceneId: string;
+      sceneIndex: number;
+    }> = [];
+    plan.scenes.forEach((scene, sceneIndex) => {
+      if (!scene.participantIds.includes(character.characterId)) return;
+      if (currentLocation !== scene.locationId) {
+        transitions.push({
+          from: currentLocation,
+          to: scene.locationId,
+          sceneId: scene.id,
+          sceneIndex,
+        });
+        currentLocation = scene.locationId;
+      }
+    });
+    for (let firstIndex = 0; firstIndex < transitions.length - 2; firstIndex += 1) {
+      const first = transitions[firstIndex];
+      const reverseIndex = transitions.findIndex((transition, index) =>
+        index > firstIndex
+        && transition.from === first.to
+        && transition.to === first.from);
+      if (reverseIndex < 0) continue;
+      const repeatedIndex = transitions.findIndex((transition, index) =>
+        index > reverseIndex
+        && transition.from === first.from
+        && transition.to === first.to);
+      if (repeatedIndex < 0) continue;
+      const reverse = transitions[reverseIndex];
+      const acquisitionUses = plan.mechanicUses.filter(use => {
+        if (use.sceneId !== reverse.sceneId || use.actorId !== character.characterId || use.role !== 'effect') return false;
+        return kernel.worldMechanics.find(mechanic => mechanic.id === use.mechanicId)?.kind === 'conversion';
+      });
+      if (!acquisitionUses.length) continue;
+      const interveningFactIds = new Set(plan.scenes
+        .slice(first.sceneIndex, reverse.sceneIndex)
+        .flatMap(scene => scene.requiredDeltaIds)
+        .flatMap(deltaId => {
+          const delta = plan.requiredDeltas.find(item => item.id === deltaId);
+          return delta?.kind === 'fact' ? [delta.factId] : [];
+        }));
+      const acquisitionDependsOnInterveningFact = acquisitionUses.some(use =>
+        use.preconditionFactIds.some(factId => interveningFactIds.has(factId)));
+      if (acquisitionDependsOnInterveningFact) continue;
+      fail(
+        `Chapter ${plan.chapterNumber} sends ${character.characterId} through a redundant acquisition round trip.`,
+        {
+          repeatedRoute: `${first.from} -> ${first.to} -> ${reverse.to} -> ${transitions[repeatedIndex].to}`,
+          firstDepartureSceneId: first.sceneId,
+          acquisitionSceneId: reverse.sceneId,
+          repeatedDepartureSceneId: transitions[repeatedIndex].sceneId,
+          acquisitionMechanicUseIds: acquisitionUses.map(use => use.id),
+          instruction: 'Move the acquisition before the first departure, or encode the intervening fact that causally makes the later acquisition necessary and cite it as a mechanic precondition.',
+        },
+      );
+    }
+  }
+}
+
 function validateScenes(kernel: StoryKernel, state: StoryState, plan: ChapterPlan): void {
   const characterIds = new Set(kernel.characters.map(item => item.id));
   const locationIds = new Set(kernel.locations.map(item => item.id));
@@ -612,6 +676,7 @@ function validateScenes(kernel: StoryKernel, state: StoryState, plan: ChapterPla
       fail(`Scene ${scene.id} creates or acquires a durable asset without a state delta.`, scene.action);
     }
   }
+  validateRouteEfficiency(kernel, state, plan);
   const orphaned = [...deltaIds].filter(id => !referenced.has(id));
   if (orphaned.length) fail(`Chapter ${plan.chapterNumber} has deltas not assigned to a scene.`, orphaned);
   for (const [characterId, afterLocationId] of locations) {
