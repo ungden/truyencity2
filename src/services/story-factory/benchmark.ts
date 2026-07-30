@@ -17,9 +17,9 @@ import {
 } from './provider';
 import { WindowPassSchema } from './planner';
 
-export const STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL = 'story-factory-writer-bakeoff-v20-relationship-direction';
-export const STORY_FACTORY_SEQUENTIAL_PROTOCOL = 'story-factory-sequential-survival-v23-relationship-direction';
-export const STORY_FACTORY_BENCHMARK_PROTOCOL = 'story-factory-validation-v29-relationship-direction';
+export const STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL = 'story-factory-writer-bakeoff-v21-replan-mechanical-repair';
+export const STORY_FACTORY_SEQUENTIAL_PROTOCOL = 'story-factory-sequential-survival-v24-replan-mechanical-repair';
+export const STORY_FACTORY_BENCHMARK_PROTOCOL = 'story-factory-validation-v30-replan-mechanical-repair';
 export const STORY_FACTORY_BENCHMARK_SAMPLE_COUNT = 20;
 export const STORY_FACTORY_WRITER_SAMPLE_COUNT = 4;
 

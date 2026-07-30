@@ -4185,6 +4185,80 @@ describe('canonical Story Factory', () => {
     ]);
   });
 
+  test('a Plan Judge replan gets one bounded mechanical repair before re-review', async () => {
+    const invalidReplan = plannerWire();
+    invalidReplan.chapters[0].mechanics = [{
+      id: 'invalid_support_after_judge',
+      scene: 'scene_1',
+      mechanic: 'mechanic_daylight',
+      role: 'support',
+      actor: 'main',
+      qty: 1,
+      facts: ['fact_day'],
+      primaryDeltaId: 'missing_delta',
+      additionalDeltaIds: [],
+    }];
+    const revise = {
+      status: 'revise' as const,
+      checks: {
+        protagonistAgency: true, earnedProgression: false, domainPlausibility: true, oppositionAgenda: true,
+        sceneVariety: true, stageAlignment: true, outcomeWeight: true,
+      },
+      checkEvidence: {
+        protagonistAgency: 'chapter 1 scene_1 delta_1',
+        earnedProgression: 'chapter 1 scene_1 delta_1',
+        domainPlausibility: 'chapter 1 scene_1 delta_1',
+        oppositionAgenda: 'chapter 1 scene_1 delta_1',
+        sceneVariety: 'chapter 1 scene_1 delta_1',
+        stageAlignment: 'chapter 1 scene_1 delta_1',
+        outcomeWeight: 'chapter 1 scene_1 delta_1',
+      },
+      issues: [{
+        category: 'earned_progression' as const,
+        chapterNumber: 1,
+        sceneId: 'scene_1',
+        deltaId: 'delta_1',
+        evidence: 'delta_1 tăng kết quả quá nhanh',
+        instruction: 'Tạo tích lũy và chi phí đủ sức đỡ delta_1.',
+      }],
+    };
+    const pass = {
+      status: 'pass' as const,
+      checks: {
+        protagonistAgency: true, earnedProgression: true, domainPlausibility: true, oppositionAgenda: true,
+        sceneVariety: true, stageAlignment: true, outcomeWeight: true,
+      },
+      checkEvidence: {
+        protagonistAgency: 'chapter 1 scene_1 delta_1',
+        earnedProgression: 'chapter 1 scene_1 delta_1',
+        domainPlausibility: 'chapter 1 scene_1 delta_1',
+        oppositionAgenda: 'chapter 1 scene_1 delta_1',
+        sceneVariety: 'chapter 1 scene_1 delta_1',
+        stageAlignment: 'chapter 1 scene_1 delta_1',
+        outcomeWeight: 'chapter 1 scene_1 delta_1',
+      },
+      issues: [],
+    };
+    const provider = new QueueProvider([
+      plannerWire(),
+      revise,
+      invalidReplan,
+      plannerWire(),
+      pass,
+    ]);
+    const result = await planRollingWindow({ kernel, arc, state: initialState, routes, provider });
+    expect(result.assessment.status).toBe('pass');
+    expect(provider.calls).toEqual(['planner', 'plan-judge', 'planner', 'planner', 'plan-judge']);
+    expect(result.attempts.map(attempt => ({
+      attempt: attempt.attempt,
+      status: attempt.status,
+    }))).toEqual([
+      { attempt: 'initial', status: 'validated' },
+      { attempt: 'judge_replan', status: 'invalid' },
+      { attempt: 'judge_replan_mechanical_repair', status: 'validated' },
+    ]);
+  });
+
   test('a benchmark-required three-chapter window is repaired before Plan Judge', async () => {
     const provider = new QueueProvider([plannerWire(), plannerWire()]);
     await expect(planRollingWindow({

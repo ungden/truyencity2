@@ -27,7 +27,7 @@ import {
 type PlanRevisionIssues = Extract<PlanAssessment, { status: 'revise' }>['issues'];
 
 export type PlannerAttemptTelemetry = {
-  attempt: 'initial' | 'mechanical_repair' | 'judge_replan';
+  attempt: 'initial' | 'mechanical_repair' | 'judge_replan' | 'judge_replan_mechanical_repair';
   responseDigest: string;
   status: 'validated' | 'invalid';
   validationMessage: string | null;
@@ -1715,12 +1715,46 @@ Sau khi lập lại, tự đối chiếu từng issue với scene và delta mớ
       validationEvidence: normalized.evidence ?? null,
       usage: judgeRepair.usage,
     });
-    throw new StoryFactoryError('plan_blocked', normalized.message, {
-      validation: normalized.evidence ?? null,
-      judgeIssues: judged.assessment.issues,
-      usages,
-      attempts,
+    const mechanicalRepair = await requestPlan({
+      task: 'Tạo lại toàn bộ rolling window sau Plan Judge và sửa đúng validation issue cơ học; không thay mục tiêu sửa nội dung của Plan Judge, không vá cục bộ.',
+      previousResponse: judgeRepair.value,
+      validationIssues: {
+        message: normalized.message,
+        evidence: normalized.evidence ?? null,
+        judgeIssues: judged.assessment.issues,
+      },
+      temperature: 0.1,
     });
+    try {
+      repairedPlan = materializeAndValidate(mechanicalRepair.value);
+      attempts.push({
+        attempt: 'judge_replan_mechanical_repair',
+        responseDigest: digestRollingPlan(repairedPlan),
+        status: 'validated',
+        validationMessage: null,
+        validationEvidence: null,
+        usage: mechanicalRepair.usage,
+      });
+    } catch (repairError) {
+      if (repairError instanceof StoryFactoryError && repairError.code === 'infra_blocked') throw repairError;
+      const repairFailure = normalizePlanError(repairError);
+      attempts.push({
+        attempt: 'judge_replan_mechanical_repair',
+        responseDigest: createHash('sha256')
+          .update(JSON.stringify(mechanicalRepair.value))
+          .digest('hex'),
+        status: 'invalid',
+        validationMessage: repairFailure.message,
+        validationEvidence: repairFailure.evidence ?? null,
+        usage: mechanicalRepair.usage,
+      });
+      throw new StoryFactoryError('plan_blocked', repairFailure.message, {
+        validation: repairFailure.evidence ?? null,
+        judgeIssues: judged.assessment.issues,
+        usages,
+        attempts,
+      });
+    }
   }
   const rejudged = await assessRollingPlan({
     provider,

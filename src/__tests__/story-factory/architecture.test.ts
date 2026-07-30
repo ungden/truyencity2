@@ -207,6 +207,7 @@ describe('Story Factory architecture boundary', () => {
     expect(planner).toContain('domainPlausibility');
     expect(planner).toContain('target là chính nhân vật đổi thái độ');
     expect(planner).toContain('stateTransitionOwnership');
+    expect(planner).toContain('judge_replan_mechanical_repair');
   });
 
   test('Planner contract changes participate in the engine release identity', () => {
