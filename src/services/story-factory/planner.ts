@@ -1681,6 +1681,7 @@ export async function planRollingWindow(input: {
   const judgeRepair = await requestPlan({
     task: `Tạo lại toàn bộ rolling window đúng một lần theo evidence của Plan Judge; giữ contract cơ học hợp lệ và không vá cục bộ.
 Mọi issue là yêu cầu bắt buộc, không phải gợi ý. opposition_agenda phải trở thành một đối sách/hành động có hậu quả trong plan, không chỉ là ý định hoặc cảm xúc. state_transition/earned_progression phải có bước chuyển tương xứng chuẩn bị và không dùng trạng thái tuyệt đối thiếu căn cứ.
+Đối thủ phải cản trở trước hoặc trong hành động quyết định; tuyệt đối không biến cú đánh, tai họa hay sai lầm của họ thành lực/công cụ/thời điểm vừa khít giúp main hoàn tất cơ chế.
 Nếu validation báo required fact sai, delta tạo fact phải dùng chính xác expected trong factContracts trước mechanic sử dụng; không dùng mô tả thay marker precondition.
 Sau khi lập lại, tự đối chiếu từng issue với scene và delta mới trước khi trả kết quả.`,
     previousResponse: currentResponse,

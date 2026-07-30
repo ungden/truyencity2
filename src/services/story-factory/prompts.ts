@@ -1,4 +1,4 @@
-export const FACTORY_PROMPT_VERSION = 'story-factory-2026-07-30.27-canonical-units';
+export const FACTORY_PROMPT_VERSION = 'story-factory-2026-07-30.28-opposition-causality';
 
 export const WRITER_SYSTEM_PROMPT = `Bạn là tiểu thuyết gia web-serial tiếng Việt.
 Hãy tiếp nối tự nhiên đoạn cuối chương trước, thực hiện đầy đủ chapter brief và giữ đúng canon, ký ức liên quan, tài nguyên, tri thức, quan hệ cùng vị trí nhân vật.
@@ -49,6 +49,8 @@ Lập tối đa ba chương tiếp theo từ Kernel, Arc và State. Mỗi chươ
 continuityPacket là lịch sử độc giả thực sự đã đọc, có quyền ưu tiên hơn ý định cũ. Không dựng lại cùng sự kiện, phương pháp và kết quả vừa hoàn tất trừ khi có leo thang nhân quả rõ ràng và một kết quả vật chất hoặc quan hệ khác.
 ledgerSnapshot.encounters là nguồn sự thật exact-ID về các cặp đã từng gặp trực tiếp. Không lập lại cảnh tự giới thiệu/lần đầu gặp cho cặp đã có; relationship wording chỉ là thái độ, không được dùng thay cho encounter truth.
 Thất bại của opposition trong mỗi window phải được giới hạn đúng tài sản, quan hệ hoặc địa bàn bị mất. Nếu long promise về sự sụp đổ/thu phục của opposition đến hạn ở stage sau, không dùng relationship delta hay scene action hiện tại để tuyên bố họ hoàn toàn bất lực, mất toàn bộ quyền lực hoặc không còn khả năng phản công.
+Khi opposition là obstacle, họ phải can thiệp trước hoặc trong hành động quyết định và buộc main chọn một đối sách có chi phí; không được chỉ tới sau để chứng kiến kết quả.
+Đòn tấn công, tai họa hoặc sai lầm của opposition không được ngẫu nhiên cung cấp đúng lực, góc, công cụ, đầu vào hay thời điểm giúp main hoàn tất cơ chế. Kết quả của main chỉ được sinh từ capability, chuẩn bị, tài nguyên và lựa chọn đã khóa trong plan.
 Khóa chính xác thời gian, địa điểm, tài nguyên, tri thức, promise và chỉ định các world-rule ID thực sự chi phối chương. Không viết câu thoại, văn mẫu, cảm xúc mẫu hoặc câu hook để tác giả sao chép.
 Chỉ gắn world-rule ID khi cơ chế thực sự được thi hành trong chương. Mọi vật tư/đầu vào mà rule cần phải có sẵn trong State hoặc được cấp bằng delta; vật tư bị dùng hoặc tiêu hao phải có resource delta. Nếu chương mới quyết định sẽ dùng kỹ thuật ở tương lai, chưa gắn rule đó vào chương hiện tại.
 Mọi conversion, capability hoặc constraint thực sự dùng phải khai báo mechanicUse đúng worldMechanic ID, actor, quantity, precondition fact và delta liên quan. Không giấu phép tính, công suất hoặc quyền hạn trong action prose.

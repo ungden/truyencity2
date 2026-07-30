@@ -50,6 +50,8 @@ describe('Story Factory architecture boundary', () => {
     expect(prompts).toContain('không dùng scope=plan để đòi đổi số dư');
     expect(prompts).toContain('amount=15, unit=VND nghĩa là mười lăm đồng');
     expect(prompts).toContain('canonicalUnits là từ điển đơn vị hợp lệ');
+    expect(prompts).toContain('không được ngẫu nhiên cung cấp đúng lực, góc, công cụ');
+    expect(prompts).toContain('họ phải can thiệp trước hoặc trong hành động quyết định');
   });
 
   test('narrative outcomes stay out of Writer context and each rolling window is reviewed', () => {
