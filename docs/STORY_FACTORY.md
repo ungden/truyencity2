@@ -84,6 +84,11 @@ that loop does not terminate.
 ## Getting a novel into production
 
 ```bash
+# 0. Apply migrations first. The smoke writes engine_revision and revive writes
+#    retry_count — against a database without the columns, the run burns its full
+#    provider spend and then fails on the insert.
+supabase db push
+
 # 1. Prove the machine runs on this release with these routes (~$1, ~5 chapters).
 npm run factory:writing-smoke -- --apply
 
@@ -95,6 +100,11 @@ npm run factory:operator -- seed \
 # 3. Watch. The cron does the rest.
 npm run factory:operator -- status
 ```
+
+The smoke authorization is **latest-wins**: the most recent smoke for this release and
+route must have passed. A failing smoke therefore *revokes* a stale approval — rerun
+until green. It binds the four generation routes plus `routeVersion`, and deliberately
+not the engine revision: a prompt fix must never stall the fleet behind a re-smoke.
 
 The novel writes chapters 1–10 with `novels.hidden = true`. Window reviews run at 5 and 10;
 passing chapter 10 with a cover present auto-calls `promote_story_factory_canary`, which
@@ -113,19 +123,34 @@ npm run factory:operator -- stop --job-id=<id> --apply
 npx tsx scripts/pause-all-writing.ts --apply          # fleet kill switch
 ```
 
-Admin UI at `/admin/factory`: per-job state, a revive-all button when jobs are parked, and
-manual publish once a canary reaches chapter 10.
+Admin UI at `/admin/factory`: per-job state, a revive-all button when jobs are parked, a
+warning when jobs sit on an old release, and manual publish once a canary reaches
+chapter 10.
 
 Kill switch: `STORY_FACTORY_ENABLED` must be exactly `true` for any work to happen.
+
+**After a release bump, the order matters**: `restage --all --apply` first (moves the
+project artifacts onto the new release), then `revive --apply` (returns parked jobs to
+the queue). Either alone looks successful and does nothing — revive without restage
+leaves the job invisible to claim because `engine_release` still mismatches; restage
+without revive leaves it parked in a `*_blocked` status. Both the CLI and the admin
+page warn when a revived job still needs restage.
 
 ### When a job stops
 
 | Status | Meaning | Retried? |
 |---|---|---|
-| `infra_blocked` | Provider or transport failure | Yes — backoff 1,2,4,8,16 min, then parks |
+| `infra_blocked` | Provider or transport failure | Yes — backoff 5,10,20,40,80 min, then parks |
 | `plan_blocked` | Planner or Plan Judge could not produce a valid window | One replan, then parks |
 | `quality_blocked` | Editor still failing after one rewrite, or window review found drift | No |
 | `setup_blocked` | Artifacts do not match the running release, or the launch pack is invalid | No |
+
+The retry budget counts **consecutive** failures: any successfully completed stage — a
+chapter commit, a plan, a cover, a window review, an arc transition — resets it. A crash
+(process killed, lease expired) is counted too: expired jobs return to the queue only
+through `reconcile_story_factory_jobs`, which increments the same budget. A transient
+failure during a rewrite keeps the pending draft and the Editor findings and retries the
+rewrite itself, rather than redrafting blind.
 
 Parked statuses are invisible to the claim query by construction. `revive` is how they come
 back.
@@ -137,6 +162,21 @@ back.
 
 Changing a model is a quality decision: run `factory:model-bakeoff`, then re-run the writing
 smoke, which is what the claim gate checks against.
+
+## Offline tools
+
+None of these gate production. They exist for model selection and forensic audit:
+
+| Command | Purpose |
+|---|---|
+| `factory:smoke` | SQL/RPC transaction smoke against live Supabase (commit atomicity, sequence guards). Distinct from `factory:writing-smoke`, which exercises the writing pipeline. |
+| `factory:writer-discovery` / `factory:benchmark:build` | Build writer-comparison corpora (frozen plans, sequential chapters). |
+| `factory:model-bakeoff` | Pairwise writer comparison over a frozen corpus. |
+| `factory:benchmark` | The retired four-run validation chain, kept for offline A/B analysis only. |
+| `factory-golden-audit.ts` / `factory-audit-export.ts` | Re-assess published output; gzip audit export. |
+
+Corpora carry both `engineRelease` and `engineRevision`; the staleness guards require both
+to match, so corpora from different engine generations are never compared head-to-head.
 
 ## Verification
 
@@ -176,7 +216,8 @@ Normative. Change the code and this section together, or one of them starts lyin
 2. `ArcPlan` — the current 20–30 chapter objective, active conflicts, due promises,
    terminal changes.
 3. `StoryState` — current physical canon plus the bounded outcomes of accepted chapters.
-4. `rollingPlan` — mechanical plans for at most three uncommitted chapters, on the job row.
+4. `rollingPlan` — mechanical plans for at most three uncommitted chapters, on the job row
+   (the planner contract is 1–3; the storage schema's ceiling is 5).
 
 Research, market taxonomy and reference works exist only inside Concept Lab. They never
 reach Writer context.

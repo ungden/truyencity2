@@ -113,16 +113,21 @@ async function main() {
   let criticalContinuityViolations = 0;
   let firstPassPublishes = 0;
 
+  // Outside the try: a mistyped --commission path is operator error, and recording it
+  // as an infra_blocked run row would pollute provider-reliability telemetry.
+  const commission = readJson(commissionPath);
+  const research = readJson(researchPath);
+
   try {
     const setup = await runConceptLab({
-      commission: readJson(commissionPath),
-      research: readJson(researchPath),
+      commission,
+      research,
       routes,
     });
     usages.push(...setup.usages);
     const kernel = setup.launchPack.kernel;
     const arc = ArcPlanSchema.parse(setup.launchPack.arc);
-    let state = setup.launchPack.initialState as StoryState;
+    let state: StoryState = setup.launchPack.initialState;
     console.log(`[smoke] launch pack ready: ${kernel.title}`);
 
     let rolling: Awaited<ReturnType<typeof planRollingWindow>>['rollingPlan'] | null = null;
@@ -191,7 +196,10 @@ async function main() {
       chapters.push({ chapterNumber: nextChapter, title: result.draft.title, content: result.draft.content });
       console.log(`[smoke] chapter ${nextChapter} published (${result.wordCount} words, revisions ${result.revisionCount}, $${cost(usages).toFixed(4)} cumulative)`);
 
-      if (state.chapterNumber >= arc.plannedEndChapter) {
+      // Only a boundary reached BEFORE the target is a failure. The check runs after
+      // the append, so without the length guard a target that lands exactly on the
+      // arc boundary would record a false 'blocked' after every chapter succeeded.
+      if (state.chapterNumber >= arc.plannedEndChapter && chapters.length < targetChapters) {
         throw new StoryFactoryError('plan_blocked', 'Smoke reached the arc boundary before completing the chapter target.');
       }
     }

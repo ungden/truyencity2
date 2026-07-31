@@ -13,6 +13,7 @@ import {
   StoryStateSchema,
   STORY_FACTORY_RELEASE,
   runStoryFactoryTick,
+  collectPlanAdvisories,
   validateKernelState,
   validateRollingPlan,
 } from '../src/services/story-factory';
@@ -170,7 +171,11 @@ async function restageJob(jobId: string): Promise<{ jobId: string; title: string
   let rollingPlanDigest: string | null = null;
   if (job.rolling_plan) {
     const rollingPlan = RollingPlanSchema.parse(job.rolling_plan);
-    validateRollingPlan({ kernel, arc, state, rollingPlan });
+    // Advisories don't block a restage (they never block anything), but the operator
+    // should see them — silently dropping them would make this check look cleaner
+    // than the same plan looks to the Plan Judge.
+    const { advisories } = collectPlanAdvisories(() => validateRollingPlan({ kernel, arc, state, rollingPlan }));
+    if (advisories.length) console.warn(`[restage] ${jobId}: ${advisories.length} plan advisory(ies):`, JSON.stringify(advisories, null, 2));
     rollingPlanDigest = digest(rollingPlan);
   }
 
@@ -228,12 +233,30 @@ async function restage() {
 async function revive() {
   const jobId = value('--job-id');
   const query = db.from('story_factory_jobs')
-    .select('id,status,stage,current_chapter,last_error')
+    .select('id,status,stage,current_chapter,last_error,ai_story_projects!story_factory_jobs_project_id_fkey(engine_release)')
     .in('status', ['setup_blocked', 'plan_blocked', 'quality_blocked', 'infra_blocked']);
   const lookup = await (jobId ? query.eq('id', jobId) : query);
   if (lookup.error) throw lookup.error;
-  const jobs = lookup.data ?? [];
+  // Revive returns a job to the claimable set, but claim also requires the project's
+  // engine_release to match the running engine. Reviving a stale-release job without
+  // saying so would report success while the job stays unclaimable forever.
+  const jobs = (lookup.data ?? []).map(row => {
+    const project = row.ai_story_projects as unknown as { engine_release: string } | null;
+    return {
+      id: row.id,
+      status: row.status,
+      stage: row.stage,
+      current_chapter: row.current_chapter,
+      last_error: row.last_error,
+      engineRelease: project?.engine_release ?? null,
+      needsRestage: project?.engine_release !== STORY_FACTORY_RELEASE,
+    };
+  });
+  const staleCount = jobs.filter(job => job.needsRestage).length;
   console.log(JSON.stringify({ dryRun: !apply, command, release: STORY_FACTORY_RELEASE, jobs }, null, 2));
+  if (staleCount) {
+    console.warn(`[revive] ${staleCount} job(s) are on an old engine_release and will stay unclaimable after revive. Run: factory-operator restage --all --apply`);
+  }
   if (!apply || !jobs.length) return;
   const now = new Date().toISOString();
   const updated = await db.from('story_factory_jobs').update({
@@ -244,7 +267,7 @@ async function revive() {
     next_run_at: now, updated_at: now,
   }).in('id', jobs.map(job => job.id));
   if (updated.error) throw updated.error;
-  console.log(JSON.stringify({ revived: jobs.length }, null, 2));
+  console.log(JSON.stringify({ revived: jobs.length, needingRestage: staleCount }, null, 2));
 }
 
 async function main() {

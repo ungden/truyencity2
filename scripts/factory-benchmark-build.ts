@@ -12,6 +12,7 @@ import {
   ResearchSnapshotSchema,
   SequentialBenchmarkCorpusSchema,
   STORY_FACTORY_RELEASE,
+  STORY_FACTORY_REVISION,
   STORY_FACTORY_SEQUENTIAL_PROTOCOL,
   STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL,
   StoryCommissionSchema,
@@ -105,6 +106,7 @@ function loadSuite() {
 type Progress = {
   protocolVersion: string;
   engineRelease: string;
+  engineRevision?: string;
   route: ReturnType<typeof runtimeRoute>;
   continuityJudgeModel: string;
   startedAt: string;
@@ -243,6 +245,7 @@ async function main() {
   if (frozenProgress
     && (frozenProgress.protocolVersion !== STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL
       || frozenProgress.engineRelease !== STORY_FACTORY_RELEASE
+      || frozenProgress.engineRevision !== STORY_FACTORY_REVISION
       || frozenProgress.route.planner !== candidateRoutes.planner
       || frozenProgress.route.planJudge !== candidateRoutes.planJudge
       || frozenProgress.continuityJudgeModel !== continuityJudgeModel
@@ -253,6 +256,7 @@ async function main() {
   const freshProgress: Progress = {
     protocolVersion: buildProtocol,
     engineRelease: STORY_FACTORY_RELEASE,
+    engineRevision: STORY_FACTORY_REVISION,
     route: runtimeRoute(candidateRoutes),
     continuityJudgeModel,
     startedAt: new Date().toISOString(),
@@ -289,6 +293,7 @@ async function main() {
       progress: existingProgress,
       protocolVersion: buildProtocol,
       engineRelease: STORY_FACTORY_RELEASE,
+    engineRevision: STORY_FACTORY_REVISION,
       route: runtimeRoute(candidateRoutes),
       continuityJudgeModel,
       compatibleSetupOnly: Boolean(compatibleSetupProgress),
@@ -705,6 +710,7 @@ async function main() {
       const writerCorpus = WriterBakeoffCorpusSchema.parse({
         protocolVersion: STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL,
         engineRelease: STORY_FACTORY_RELEASE,
+    engineRevision: STORY_FACTORY_REVISION,
         builtAt: new Date().toISOString(),
         planner: candidateRoutes.planner,
         planJudge: candidateRoutes.planJudge,
@@ -752,6 +758,7 @@ async function main() {
     const corpus = SequentialBenchmarkCorpusSchema.parse({
       protocolVersion: STORY_FACTORY_SEQUENTIAL_PROTOCOL,
       engineRelease: STORY_FACTORY_RELEASE,
+    engineRevision: STORY_FACTORY_REVISION,
       builtAt: new Date().toISOString(),
       route: runtimeRoute(candidateRoutes),
       continuityJudgeModel,
@@ -770,6 +777,7 @@ async function main() {
     const writerCorpus = WriterBakeoffCorpusSchema.parse({
       protocolVersion: STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL,
       engineRelease: STORY_FACTORY_RELEASE,
+    engineRevision: STORY_FACTORY_REVISION,
       builtAt: new Date().toISOString(),
       planner: candidateRoutes.planner,
       planJudge: candidateRoutes.planJudge,

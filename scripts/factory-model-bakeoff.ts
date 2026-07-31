@@ -8,6 +8,7 @@ import { z } from 'zod';
 import {
   DEFAULT_MODEL_ROUTES,
   STORY_FACTORY_RELEASE,
+  STORY_FACTORY_REVISION,
   STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL,
   WriterBakeoffCorpusSchema,
   digestArtifact,
@@ -113,6 +114,9 @@ async function main() {
   const corpus = WriterBakeoffCorpusSchema.parse(JSON.parse(readFileSync(corpusPath, 'utf8')));
   if (corpus.engineRelease !== STORY_FACTORY_RELEASE) {
     throw new Error(`Writer corpus release ${corpus.engineRelease} does not match ${STORY_FACTORY_RELEASE}.`);
+  }
+  if (corpus.engineRevision !== STORY_FACTORY_REVISION) {
+    throw new Error(`Writer corpus revision ${corpus.engineRevision ?? 'unknown'} does not match ${STORY_FACTORY_REVISION}. Rebuild with factory:writer-discovery.`);
   }
   const corpusDigest = digestArtifact(corpus);
   const previous = existsSync(outputPath)

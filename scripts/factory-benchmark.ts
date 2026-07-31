@@ -10,6 +10,7 @@ import {
   SequentialBenchmarkCorpusSchema,
   STORY_FACTORY_BENCHMARK_PROTOCOL,
   STORY_FACTORY_RELEASE,
+  STORY_FACTORY_REVISION,
   STORY_FACTORY_SEQUENTIAL_PROTOCOL,
   STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL,
   StoredPairwiseSequentialJudgmentSchema,
@@ -160,6 +161,12 @@ async function main() {
   );
   if (corpus.engineRelease !== STORY_FACTORY_RELEASE || competitorCorpus.engineRelease !== STORY_FACTORY_RELEASE) {
     throw new Error(`Sequential corpora must both match release ${STORY_FACTORY_RELEASE}.`);
+  }
+  // Release equality no longer implies same engine generation: prompt/planner/validator
+  // versions moved to the revision hash. A corpus without a matching revision was built
+  // by different generation code and must be rebuilt, not compared.
+  if (corpus.engineRevision !== STORY_FACTORY_REVISION || competitorCorpus.engineRevision !== STORY_FACTORY_REVISION) {
+    throw new Error(`Sequential corpora must both match engine revision ${STORY_FACTORY_REVISION}. Rebuild with factory:benchmark:build.`);
   }
   assertComparableSequentialCorpora({ candidate: corpus, competitor: competitorCorpus });
   const candidateCorpusDigest = digestArtifact(corpus);
@@ -335,6 +342,7 @@ Chọn phiên bản đọc tự nhiên, nối chương và có sức kéo hơn; 
     const manifest = ValidationManifestSchema.parse({
       protocolVersion: STORY_FACTORY_BENCHMARK_PROTOCOL,
       engineRelease: STORY_FACTORY_RELEASE,
+      engineRevision: STORY_FACTORY_REVISION,
       route: selectedCorpus.route,
       continuityJudgeModel: selectedCorpus.continuityJudgeModel,
       judgeModels,
