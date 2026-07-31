@@ -1,5 +1,5 @@
 import * as dotenv from 'dotenv';
-dotenv.config({ path: '/Users/alexle/Documents/truyencity/.env.runtime' });
+dotenv.config({ path: '.env.runtime' });
 import { createClient } from '@supabase/supabase-js';
 
 const s = createClient(

@@ -1,8 +1,8 @@
 import * as dotenv from 'dotenv';
 import { createClient } from '@supabase/supabase-js';
 
-dotenv.config({ path: '/Users/alexle/Documents/truyencity/.env.runtime', quiet: true });
-dotenv.config({ path: '/Users/alexle/Documents/truyencity/.env.local', quiet: true, override: true });
+dotenv.config({ path: '.env.runtime', quiet: true });
+dotenv.config({ path: '.env.local', quiet: true, override: true });
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
