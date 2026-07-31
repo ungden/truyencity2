@@ -11,7 +11,7 @@ import {
   StoryFactoryError,
 } from './contracts';
 
-export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-32-completed-assets';
+export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-33-prose-heuristics-advisory';
 
 export interface StateEvent {
   chapterNumber: number;
@@ -22,6 +22,42 @@ export interface StateEvent {
   after: unknown;
   source: string | null;
   relatedEntityIds: string[];
+}
+
+/**
+ * A signal the Plan Judge should look at, not a verdict.
+ *
+ * Some checks can only be expressed as pattern matching over free-form Vietnamese
+ * scene text. Those cannot be authoritative: "chế tạo" reads as crafting whether the
+ * scene completes an asset or merely persuades someone to start building one, and a
+ * blocked plan there costs a whole job. The structured delta/mechanic contract remains
+ * the source of truth for what actually moves; these observations go to the judge,
+ * which has the full window and can answer with reasoning instead of a keyword.
+ */
+export interface PlanAdvisory {
+  chapterNumber: number;
+  sceneId: string;
+  observation: string;
+  question: string;
+  evidence: unknown;
+}
+
+let advisoryBuffer: PlanAdvisory[] | null = null;
+
+function advisory(entry: PlanAdvisory): void {
+  advisoryBuffer?.push(entry);
+}
+
+/** Run a synchronous validation and collect any advisories it raised. */
+export function collectPlanAdvisories<T>(run: () => T): { value: T; advisories: PlanAdvisory[] } {
+  const previous = advisoryBuffer;
+  const buffer: PlanAdvisory[] = [];
+  advisoryBuffer = buffer;
+  try {
+    return { value: run(), advisories: buffer };
+  } finally {
+    advisoryBuffer = previous;
+  }
 }
 
 function fail(message: string, evidence?: unknown): never {
@@ -668,19 +704,28 @@ function validateScenes(kernel: StoryKernel, state: StoryState, plan: ChapterPla
     // resource deltas and mechanics.
     if (hasVietnameseTerm(transactionEvidence, String.raw`trả tiền|chi tiền|thanh toán|lấy tiền|chia (?:một )?(?:phần )?lợi nhuận|chia tiền lãi|trích (?:phần trăm|lợi nhuận)|trả công`)
       && !sceneDeltas.some(delta => delta.kind === 'resource_numeric')) {
-      fail(`Scene ${scene.id} describes a transaction without a numeric resource delta.`, {
+      advisory({
         chapterNumber: plan.chapterNumber,
         sceneId: scene.id,
-        action: scene.action,
-        deltaSources: sceneDeltas.flatMap(delta => (
-          'source' in delta && typeof delta.source === 'string' ? [delta.source] : []
-        )),
-        repairRule: 'Choose exactly one: (1) if money or goods actually move in this scene, add the exact numeric resource delta and bind it to one compatible existing effect mechanic; or (2) rewrite the action as a report, negotiation, or future obligation with no present transfer. Do not keep a present-tense purchase, sale, payment, or profit share without ledger movement.',
+        observation: `Scene ${scene.id} uses settlement wording but carries no numeric resource delta.`,
+        question: 'Trong cảnh này tiền hoặc hàng có thật sự đổi chủ ngay không? Nếu có, plan thiếu resource delta và phải bị trả lại. Nếu đây chỉ là tường thuật, thương lượng, hoặc nghĩa vụ tương lai thì plan đang đúng.',
+        evidence: {
+          action: scene.action,
+          deltaSources: sceneDeltas.flatMap(delta => (
+            'source' in delta && typeof delta.source === 'string' ? [delta.source] : []
+          )),
+        },
       });
     }
     if (describesCompletedDurableAsset(realizedAction)
       && !sceneDeltas.some(delta => delta.kind === 'resource_numeric' || delta.kind === 'resource_state' || delta.kind === 'fact')) {
-      fail(`Scene ${scene.id} creates or acquires a durable asset without a state delta.`, scene.action);
+      advisory({
+        chapterNumber: plan.chapterNumber,
+        sceneId: scene.id,
+        observation: `Scene ${scene.id} uses completion wording for a durable asset but carries no state delta.`,
+        question: 'Cảnh này có thật sự hoàn tất một tài sản bền vững không? Nếu có, plan thiếu delta ghi nhận nó. Nếu cảnh chỉ bắt đầu, thuyết phục, hoặc dự định chế tạo thì plan đang đúng.',
+        evidence: { action: scene.action },
+      });
     }
   }
   validateRouteEfficiency(kernel, state, plan);

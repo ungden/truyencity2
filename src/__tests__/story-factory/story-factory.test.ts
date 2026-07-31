@@ -35,6 +35,7 @@ import {
   appendAcceptedOutcome,
   applyCanonExtension,
   applyChapterPlan,
+  collectPlanAdvisories,
   assessStoryDraft,
   assertVoiceSemantics,
   assertComparableSequentialCorpora,
@@ -51,6 +52,7 @@ import {
   digestArtifact,
   prepareDiscoveryResume,
   isStoryFactoryEnabled,
+  shouldStartAnotherStage,
   calculateValidationMetrics,
   calculateComparativeValidationMetrics,
   loadRelevantStoryMemory,
@@ -1287,7 +1289,29 @@ describe('canonical Story Factory', () => {
     expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).toThrow('Precondition resource:money is false');
   });
 
-  test('rejects a planned transaction that has no resource delta', () => {
+  /**
+   * Two checks read free-form Vietnamese scene text to guess whether value moved.
+   * They cannot block a plan — "chế tạo" reads the same whether a scene completes an
+   * asset or only persuades someone to start one, and a wrong block costs a whole job.
+   * They now raise advisories the Plan Judge answers with the window in hand.
+   */
+  const validateFor = (chapter: ReturnType<typeof plan>, over = { kernel, state: initialState }) => {
+    let error: unknown = null;
+    // Advisories are observations gathered during the pass. A later hard check may
+    // still throw on the same fixture; that is a separate assertion.
+    const { advisories } = collectPlanAdvisories(() => {
+      try {
+        applyChapterPlan({ ...over, plan: chapter });
+      } catch (caught) {
+        error = caught;
+      }
+    });
+    return { advisories, error };
+  };
+  const advisoriesFor = (chapter: ReturnType<typeof plan>, over = { kernel, state: initialState }) =>
+    validateFor(chapter, over).advisories;
+
+  test('flags a planned transaction that has no resource delta as an advisory', () => {
     const chapter = plan(1);
     chapter.scenes[0].action = 'Hải trả tiền mặt để thu mua toàn bộ mẻ cá.';
     chapter.requiredDeltas = [{ id: 'move', kind: 'location', characterId: 'main', beforeLocationId: 'home', afterLocationId: 'beach' }];
@@ -1295,43 +1319,33 @@ describe('canonical Story Factory', () => {
     chapter.scenes[0].travelMinutesFromPrevious = 20;
     chapter.storyTimeAfterMinutes = 80;
     chapter.scenes[0].requiredDeltaIds = ['move'];
-    try {
-      applyChapterPlan({ kernel, state: initialState, plan: chapter });
-      throw new Error('Expected missing-ledger transaction to fail.');
-    } catch (error) {
-      expect(error).toMatchObject({
-        code: 'plan_blocked',
-        evidence: {
-          chapterNumber: 1,
-          sceneId: 'scene_1',
-          action: chapter.scenes[0].action,
-        },
-      });
-      expect((error as StoryFactoryError).evidence).toMatchObject({
-        repairRule: expect.stringContaining('Do not keep a present-tense purchase'),
-      });
-    }
+    expect(advisoriesFor(chapter)).toMatchObject([{
+      chapterNumber: 1,
+      sceneId: 'scene_1',
+      observation: expect.stringContaining('settlement wording'),
+      evidence: { action: chapter.scenes[0].action },
+    }]);
   });
 
   test('does not book a transaction when a scene only analyzes a future purchase', () => {
     const chapter = plan(1);
     chapter.scenes[0].action = 'Hải phân tích việc gánh bộ quá sức và cần mua xe kéo chở hàng.';
-    expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).not.toThrow();
+    expect(validateFor(chapter)).toEqual({ advisories: [], error: null });
   });
 
   test('does not treat a promised future purchase as a completed transaction', () => {
     const chapter = plan(1);
     chapter.scenes[0].action = 'Hải đưa tiền lãi cho mẹ và hứa sẽ sớm mua máy khâu.';
-    expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).not.toThrow();
+    expect(validateFor(chapter)).toEqual({ advisories: [], error: null });
   });
 
   test('does not treat an internal cash hand-off as a net resource transaction', () => {
     const chapter = plan(1);
     chapter.scenes[0].action = 'Hải thuyết phục mẹ và nhận tiền để đi mua phế liệu.';
-    expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).not.toThrow();
+    expect(validateFor(chapter)).toEqual({ advisories: [], error: null });
   });
 
-  test('profit sharing requires a numeric ledger delta even when hidden in relationship provenance', () => {
+  test('profit sharing hidden in relationship provenance still raises an advisory', () => {
     const chapter = plan(1);
     chapter.scenes[0].action = 'Hải gặp Tấn để củng cố thỏa thuận hợp tác.';
     chapter.requiredDeltas = [{
@@ -1344,20 +1358,19 @@ describe('canonical Story Factory', () => {
       source: 'Hải chia một phần lợi nhuận cho Tấn',
     }];
     chapter.scenes[0].requiredDeltaIds = ['relationship_profit_share'];
-    expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter }))
-      .toThrow('transaction without a numeric resource delta');
+    expect(advisoriesFor(chapter)).toMatchObject([{ observation: expect.stringContaining('settlement wording') }]);
   });
 
   test('a future profit-share promise does not create a fake current transaction', () => {
     const chapter = plan(1);
     chapter.scenes[0].action = 'Hải hứa sẽ chia một phần lợi nhuận cho Tấn ở mẻ hàng sau.';
-    expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).not.toThrow();
+    expect(validateFor(chapter)).toEqual({ advisories: [], error: null });
   });
 
   test('reporting a past sale and committing a future profit share is not a new transaction', () => {
     const chapter = plan(1);
     chapter.scenes[0].action = 'Hải thông báo kết quả bán hàng thành công và cam kết sẽ chia lợi nhuận khi chốt sổ cuối tháng, chưa nhận tiền ngay.';
-    expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).not.toThrow();
+    expect(validateFor(chapter)).toEqual({ advisories: [], error: null });
   });
 
   test('a detailed past-sale report and deferred profit share are not a current transfer', () => {
@@ -1373,14 +1386,13 @@ describe('canonical Story Factory', () => {
       source: 'Nghe tin mẻ hàng đầu tiên bán thành công và chờ đợi chia lợi nhuận',
     }];
     chapter.scenes[0].requiredDeltaIds = ['relationship_future_share'];
-    expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).not.toThrow();
+    expect(validateFor(chapter)).toEqual({ advisories: [], error: null });
   });
 
-  test('a real profit share after reporting a past sale still requires a ledger delta', () => {
+  test('a real profit share after reporting a past sale still raises an advisory', () => {
     const chapter = plan(1);
     chapter.scenes[0].action = 'Hải thông báo kết quả bán hàng thành công, rồi chia tiền lãi ngay cho Tấn.';
-    expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter }))
-      .toThrow('transaction without a numeric resource delta');
+    expect(advisoriesFor(chapter)).toMatchObject([{ observation: expect.stringContaining('settlement wording') }]);
   });
 
   test('owned resource direction cannot increase when its owner pays out', () => {
@@ -1481,23 +1493,18 @@ describe('canonical Story Factory', () => {
   test('does not treat agreeing to begin fabrication as a completed durable asset', () => {
     const chapter = plan(1);
     chapter.scenes[0].action = 'Khương Lục trình bày số liệu và thuyết phục Đường Thiết bắt tay vào chế tạo.';
-    expect(() => applyChapterPlan({
-      kernel,
-      state: initialState,
-      plan: chapter,
-    })).not.toThrow();
+    expect(validateFor(chapter)).toEqual({ advisories: [], error: null });
   });
 
-  test('still requires state when a durable asset is explicitly completed', () => {
+  test('an explicitly completed durable asset without state raises an advisory', () => {
     const chapter = plan(1);
     chapter.scenes[0].action = 'Khương Lục và Đường Thiết hoàn tất việc chế tạo guồng nước.';
     chapter.scenes[0].requiredDeltaIds = [];
     chapter.requiredDeltas = [];
-    expect(() => applyChapterPlan({
-      kernel,
-      state: initialState,
-      plan: chapter,
-    })).toThrow('creates or acquires a durable asset without a state delta');
+    expect(advisoriesFor(chapter)).toMatchObject([{
+      observation: expect.stringContaining('completion wording'),
+      question: expect.stringContaining('hoàn tất một tài sản bền vững'),
+    }]);
   });
 
   test('does not read thủ công plus a physical quantity as an owner receipt', () => {
@@ -1598,21 +1605,19 @@ describe('canonical Story Factory', () => {
   test('does not treat a policy prohibiting sales as a completed transaction', () => {
     const chapter = plan(1);
     chapter.scenes[0].action = 'Thẩm Uyên ký lệnh nghiêm cấm việc bán quặng thô cho xưởng rèn không phép.';
-    expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter })).not.toThrow();
+    expect(validateFor(chapter)).toEqual({ advisories: [], error: null });
   });
 
-  test('still rejects a real sale after a policy prohibition is announced', () => {
+  test('a real sale after a policy prohibition still raises an advisory', () => {
     const chapter = plan(1);
     chapter.scenes[0].action = 'Thẩm Uyên ký lệnh cấm bán quặng thô, nhưng thuộc hạ vẫn bán một xe quặng lấy tiền.';
-    expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter }))
-      .toThrow('transaction without a numeric resource delta');
+    expect(advisoriesFor(chapter)).toMatchObject([{ observation: expect.stringContaining('settlement wording') }]);
   });
 
-  test('still rejects an actual purchase hidden beside future intent', () => {
+  test('an actual purchase hidden beside future intent still raises an advisory', () => {
     const chapter = plan(1);
     chapter.scenes[0].action = 'Hải hứa sẽ sớm mua máy khâu, rồi trả tiền mặt mua ngay một cuộn lưới.';
-    expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter }))
-      .toThrow('transaction without a numeric resource delta');
+    expect(advisoriesFor(chapter)).toMatchObject([{ observation: expect.stringContaining('settlement wording') }]);
   });
 
   test('allows a connective scene without inventing a fake state delta', () => {
@@ -4565,6 +4570,18 @@ describe('canonical Story Factory', () => {
     expect(isStoryFactoryEnabled('true\n')).toBe(true);
     expect(isStoryFactoryEnabled('false')).toBe(false);
     expect(isStoryFactoryEnabled(undefined)).toBe(false);
+  });
+
+  test('one invocation drains cheap stages but never starts a chapter it cannot finish', () => {
+    const budgetMs = 200_000;
+    // The first stage always runs, otherwise a slow fleet never makes progress at all.
+    expect(shouldStartAnotherStage({ completed: 0, elapsedMs: 199_999, slowestStageMs: 0, budgetMs })).toBe(true);
+    // Cheap stages keep the queue draining.
+    expect(shouldStartAnotherStage({ completed: 4, elapsedMs: 20_000, slowestStageMs: 5_000, budgetMs })).toBe(true);
+    // A stage that has already taken two provider timeouts must not be started again
+    // late in the invocation: finishing past the route ceiling loses a paid chapter.
+    expect(shouldStartAnotherStage({ completed: 1, elapsedMs: 60_000, slowestStageMs: 240_000, budgetMs })).toBe(false);
+    expect(shouldStartAnotherStage({ completed: 1, elapsedMs: 190_000, slowestStageMs: 20_000, budgetMs })).toBe(false);
   });
 
   test('window review runs immediately but the following chapter respects the Vietnam daily quota', () => {

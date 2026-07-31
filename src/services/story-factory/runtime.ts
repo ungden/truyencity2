@@ -83,6 +83,12 @@ export interface FactoryTickResult {
 /** Consecutive transient failures a job absorbs before it parks for an operator. */
 export const INFRA_RETRY_LIMIT = 5;
 
+/**
+ * How long one invocation keeps claiming work. Below the route's 300s ceiling by
+ * enough that a stage started just under the deadline still finishes and commits.
+ */
+export const TICK_BUDGET_MS = 200_000;
+
 export function isStoryFactoryEnabled(value: string | undefined = process.env.STORY_FACTORY_ENABLED): boolean {
   return value?.trim() === 'true';
 }
@@ -401,6 +407,7 @@ async function runPlan(db: SupabaseClient, job: FactoryJobRow, project: FactoryP
       output_artifact: {
         ...planned.rollingPlan,
         attemptLineage: planned.attempts,
+        advisories: planned.advisories,
       },
       editor_assessment: planned.assessment,
       usage: planned.usages, estimated_cost_usd: usageCost(planned.usages), finished_at: now,
@@ -714,6 +721,60 @@ async function runArc(db: SupabaseClient, job: FactoryJobRow, project: FactoryPr
   } catch (error) {
     return blockRun(db, job, runId, error);
   }
+}
+
+/**
+ * Execute as many queued stages as fit in the invocation budget.
+ *
+ * One stage per invocation capped the entire fleet at the cron frequency: on a five
+ * minute schedule that is 288 stage executions per day shared across every novel, and
+ * a chapter costs one to two of them. Claiming is FOR UPDATE ... SKIP LOCKED, so draining
+ * inside one invocation is safe for concurrent workers. Each job is isolated so one
+ * blocked novel cannot end the batch for the others.
+ */
+export async function runStoryFactoryTicks(options?: {
+  db?: SupabaseClient;
+  provider?: StoryModelProvider;
+  workerId?: string;
+  budgetMs?: number;
+  now?: () => number;
+}): Promise<{ status: 'disabled' | 'idle' | 'completed'; results: FactoryTickResult[] }> {
+  if (!isStoryFactoryEnabled()) return { status: 'disabled', results: [] };
+  const clock = options?.now ?? (() => Date.now());
+  const budget = options?.budgetMs ?? TICK_BUDGET_MS;
+  const start = clock();
+  const results: FactoryTickResult[] = [];
+  let slowestStageMs = 0;
+  for (;;) {
+    const stageStart = clock();
+    if (!shouldStartAnotherStage({
+      completed: results.length,
+      elapsedMs: stageStart - start,
+      slowestStageMs,
+      budgetMs: budget,
+    })) break;
+    const result = await runStoryFactoryTick(options);
+    slowestStageMs = Math.max(slowestStageMs, clock() - stageStart);
+    if (result.status === 'idle' || result.status === 'disabled') break;
+    results.push(result);
+  }
+  return { status: results.length ? 'completed' : 'idle', results };
+}
+
+/**
+ * Adaptive, because stage cost varies by an order of magnitude: a cover or an already
+ * planned chapter finishes in seconds, while a chapter needing a rewrite can run two
+ * full provider timeouts. Admit another stage only if the slowest one observed so far
+ * would still fit with margin, so the invocation is never cut off mid-chapter.
+ */
+export function shouldStartAnotherStage(input: {
+  completed: number;
+  elapsedMs: number;
+  slowestStageMs: number;
+  budgetMs: number;
+}): boolean {
+  if (input.completed === 0) return true;
+  return input.elapsedMs + input.slowestStageMs * 1.5 <= input.budgetMs;
 }
 
 export async function runStoryFactoryTick(options?: {

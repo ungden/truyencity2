@@ -19,9 +19,11 @@ import { geminiProvider } from './provider';
 import { EDITOR_SYSTEM_PROMPT, PLANNER_SYSTEM_PROMPT, PLAN_JUDGE_SYSTEM_PROMPT } from './prompts';
 import {
   applyCanonExtension,
+  collectPlanAdvisories,
   validateArcAgainstKernel,
   validateArcResourceReachability,
   validateRollingPlan,
+  type PlanAdvisory,
 } from './validation';
 
 type PlanRevisionIssues = Extract<PlanAssessment, { status: 'revise' }>['issues'];
@@ -1402,6 +1404,7 @@ export async function assessRollingPlan(input: {
   rollingPlan: RollingPlan;
   model: string;
   repairIssues?: PlanRevisionIssues;
+  advisories?: PlanAdvisory[];
 }): Promise<{ assessment: PlanAssessment; usage: ProviderUsage }> {
   const auditSignals = input.rollingPlan.plans.map(chapter => ({
     chapterNumber: chapter.chapterNumber,
@@ -1440,6 +1443,14 @@ export async function assessRollingPlan(input: {
       state: input.state,
       rollingPlan: input.rollingPlan,
       auditSignals,
+      // Pattern matches over free-form scene text that the code refuses to treat as
+      // verdicts. Each is a question to answer from the window, not a defect to accept.
+      advisorySignals: input.advisories?.length
+        ? {
+          note: 'Đây là tín hiệu từ dò khuôn mẫu trên văn bản cảnh, KHÔNG phải lỗi đã xác nhận. Chỉ mở issue nếu bạn đọc plan và thấy đúng là sai; nếu không thì bỏ qua.',
+          signals: input.advisories,
+        }
+        : undefined,
       mandatoryChecks: {
         protagonistAgency: 'Nhân vật chính hoặc POV phải đưa ra lựa chọn có ý nghĩa và chịu hậu quả, không chỉ được cơ hội rơi vào tay.',
         earnedProgression: 'Độ lớn thay đổi phải tương xứng chuẩn bị, chi phí, rủi ro và thang hiện tại; thay đổi trên 5 lần baseline cần tích lũy nhiều bước cụ thể.',
@@ -1488,6 +1499,7 @@ export async function planRollingWindow(input: {
   assessment: PlanAssessment;
   usages: ProviderUsage[];
   attempts: PlannerAttemptTelemetry[];
+  advisories: PlanAdvisory[];
 }> {
   const provider = input.provider ?? geminiProvider;
   const usages: ProviderUsage[] = [];
@@ -1587,6 +1599,7 @@ export async function planRollingWindow(input: {
     return result;
   };
 
+  let advisories: PlanAdvisory[] = [];
   const materializeAndValidate = (value: z.infer<typeof PlannerRollingPlanResponseSchema>): RollingPlan => {
     const parsed = materializePlannerRollingPlan(value, input.state, input.kernel);
     if (input.requiredWindowSize && parsed.plans.length !== input.requiredWindowSize) {
@@ -1595,7 +1608,10 @@ export async function planRollingWindow(input: {
         actualWindowSize: parsed.plans.length,
       });
     }
-    validateRollingPlan({ kernel: input.kernel, arc: input.arc, state: input.state, rollingPlan: parsed });
+    const collected = collectPlanAdvisories(() => validateRollingPlan({
+      kernel: input.kernel, arc: input.arc, state: input.state, rollingPlan: parsed,
+    }));
+    advisories = collected.advisories;
     return parsed;
   };
 
@@ -1674,10 +1690,11 @@ export async function planRollingWindow(input: {
     state: input.state,
     rollingPlan: currentPlan,
     model: input.routes.planJudge,
+    advisories,
   });
   usages.push(judged.usage);
   if (judged.assessment.status === 'pass') {
-    return { rollingPlan: currentPlan, assessment: judged.assessment, usages, attempts };
+    return { rollingPlan: currentPlan, assessment: judged.assessment, usages, attempts, advisories };
   }
 
   const judgeRepair = await requestPlan({
@@ -1764,10 +1781,11 @@ Sau khi lập lại, tự đối chiếu từng issue với scene và delta mớ
     rollingPlan: repairedPlan,
     model: input.routes.planJudge,
     repairIssues: judged.assessment.issues,
+    advisories,
   });
   usages.push(rejudged.usage);
   if (rejudged.assessment.status === 'pass') {
-    return { rollingPlan: repairedPlan, assessment: rejudged.assessment, usages, attempts };
+    return { rollingPlan: repairedPlan, assessment: rejudged.assessment, usages, attempts, advisories };
   }
   throw new StoryFactoryError('plan_blocked', 'Plan Judge rejected the rolling window after one full replan.', {
     firstAssessment: judged.assessment,
