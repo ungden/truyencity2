@@ -65,6 +65,7 @@ export const PlanQualifiedWriterBriefSchema = z.object({
 export const WriterBakeoffCorpusSchema = z.object({
   protocolVersion: z.literal(STORY_FACTORY_WRITER_BAKEOFF_PROTOCOL),
   engineRelease: z.string().trim().min(4),
+  engineRevision: z.string().trim().min(4).optional(),
   builtAt: z.string().datetime(),
   planner: z.string().trim().min(3),
   planJudge: z.string().trim().min(3),
@@ -164,6 +165,7 @@ export const SequentialBenchmarkSampleSchema = z.object({
 export const SequentialBenchmarkCorpusSchema = z.object({
   protocolVersion: z.literal(STORY_FACTORY_SEQUENTIAL_PROTOCOL),
   engineRelease: z.string().trim().min(4),
+  engineRevision: z.string().trim().min(4).optional(),
   builtAt: z.string().datetime(),
   route: BenchmarkRouteSchema,
   continuityJudgeModel: z.string().trim().min(3),
@@ -303,6 +305,7 @@ export const ValidationMetricsSchema = z.object({
 export const ValidationManifestSchema = z.object({
   protocolVersion: z.literal(STORY_FACTORY_BENCHMARK_PROTOCOL),
   engineRelease: z.string().trim().min(4),
+  engineRevision: z.string().trim().min(4).optional(),
   route: BenchmarkRouteSchema,
   continuityJudgeModel: z.string().trim().min(3),
   judgeModels: z.array(z.string().trim().min(3)).length(3),
@@ -370,7 +373,12 @@ export function assertComparableSequentialCorpora(input: {
 }): void {
   const candidate = SequentialBenchmarkCorpusSchema.parse(input.candidate);
   const competitor = SequentialBenchmarkCorpusSchema.parse(input.competitor);
+  // Compare the revision as well as the release: after the identity split, prompt,
+  // planner and validator changes no longer move the release hash, so release
+  // equality alone would let corpora from different engine generations be compared
+  // head-to-head — exactly the confound this guard exists to prevent.
   if (candidate.engineRelease !== competitor.engineRelease
+    || candidate.engineRevision !== competitor.engineRevision
     || candidate.route.writer === competitor.route.writer
     || candidate.route.planner !== competitor.route.planner
     || candidate.route.planJudge !== competitor.route.planJudge

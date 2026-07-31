@@ -84,6 +84,16 @@ export interface FactoryTickResult {
 export const INFRA_RETRY_LIMIT = 5;
 
 /**
+ * 5, 10, 20, 40, 80 minutes. The 5-minute floor is deliberately above TICK_BUDGET_MS:
+ * with a 1-minute floor, a failing job re-entered the queue inside the same batched
+ * invocation and burned two or three of its five retries in one cron slot. Mirrors
+ * the SQL backoff in reconcile_story_factory_jobs — change both together.
+ */
+export function infraBackoffMs(retryCount: number): number {
+  return 5 * 2 ** Math.min(retryCount, INFRA_RETRY_LIMIT) * 60_000;
+}
+
+/**
  * How long one invocation keeps claiming work. Below the route's 300s ceiling by
  * enough that a stage started just under the deadline still finishes and commits.
  */
@@ -151,7 +161,7 @@ async function blockRun(db: SupabaseClient, job: FactoryJobRow, runId: string | 
     const output = existing.data?.output_artifact && typeof existing.data.output_artifact === 'object'
       ? existing.data.output_artifact as Record<string, unknown>
       : {};
-    await db.from('story_factory_runs').update({
+    const runUpdate = await db.from('story_factory_runs').update({
       status: factoryError.code === 'infra_blocked' ? 'infra_blocked' : 'blocked',
       error_code: factoryError.code,
       error_message: factoryError.message,
@@ -171,6 +181,9 @@ async function blockRun(db: SupabaseClient, job: FactoryJobRow, runId: string | 
         : null,
       finished_at: new Date().toISOString(),
     }).eq('id', runId).eq('status', 'running');
+    // blockRun is the terminal handler — it must not throw — but a swallowed failure
+    // here leaves a run row lying about its outcome, so at least say it happened.
+    if (runUpdate.error) console.warn('[story-factory] blockRun run update failed:', runUpdate.error.message);
   }
   // Infrastructure failures are transient by definition — a provider hiccup, a socket
   // reset, an expired lease. Parking the job on the first one made the fleet drain to
@@ -178,7 +191,7 @@ async function blockRun(db: SupabaseClient, job: FactoryJobRow, runId: string | 
   // the story itself and still park immediately for an operator to look at.
   const retryable = factoryError.code === 'infra_blocked' && job.retry_count < INFRA_RETRY_LIMIT;
   const now = new Date();
-  await db.from('story_factory_jobs').update({
+  const jobUpdate = await db.from('story_factory_jobs').update({
     status: retryable ? 'ready' : factoryError.code,
     retry_count: job.retry_count + 1,
     last_error: factoryError.message,
@@ -187,9 +200,10 @@ async function blockRun(db: SupabaseClient, job: FactoryJobRow, runId: string | 
     lease_until: null,
     updated_at: now.toISOString(),
     ...(retryable
-      ? { next_run_at: new Date(now.getTime() + 2 ** job.retry_count * 60_000).toISOString() }
+      ? { next_run_at: new Date(now.getTime() + infraBackoffMs(job.retry_count)).toISOString() }
       : {}),
   }).eq('id', job.id).eq('lease_token', job.lease_token);
+  if (jobUpdate.error) console.warn('[story-factory] blockRun job update failed:', jobUpdate.error.message);
   return {
     status: retryable ? 'completed' : 'blocked',
     jobId: job.id,
@@ -315,7 +329,7 @@ async function runSetup(db: SupabaseClient, job: FactoryJobRow, project: Factory
     }).eq('id', job.novel_id);
     if (novelUpdate.error) throw novelUpdate.error;
     const jobUpdate = await db.from('story_factory_jobs').update({
-      status: 'ready', stage: 'cover', rolling_plan: null, setup_input: null,
+      status: 'ready', stage: 'cover', rolling_plan: null, setup_input: null, retry_count: 0,
       launch_pack_digest: launchPackDigest,
       lease_owner: null, lease_token: null, lease_until: null, next_run_at: now, updated_at: now,
     }).eq('id', job.id).eq('lease_token', job.lease_token);
@@ -358,7 +372,7 @@ async function runCover(db: SupabaseClient, job: FactoryJobRow, project: Factory
     const novelUpdate = await db.from('novels').update({ cover_url: cover.coverUrl, updated_at: now }).eq('id', job.novel_id);
     if (novelUpdate.error) throw novelUpdate.error;
     const jobUpdate = await db.from('story_factory_jobs').update({
-      status: 'ready', stage: 'plan', lease_owner: null, lease_token: null, lease_until: null, next_run_at: now, updated_at: now,
+      status: 'ready', stage: 'plan', retry_count: 0, lease_owner: null, lease_token: null, lease_until: null, next_run_at: now, updated_at: now,
     }).eq('id', job.id).eq('lease_token', job.lease_token);
     if (jobUpdate.error) throw jobUpdate.error;
     const runUpdate = await db.from('story_factory_runs').update({ status: 'passed', output_artifact: cover, finished_at: now }).eq('id', runId);
@@ -397,7 +411,7 @@ async function runPlan(db: SupabaseClient, job: FactoryJobRow, project: FactoryP
     });
     const now = new Date().toISOString();
     const jobUpdate = await db.from('story_factory_jobs').update({
-      rolling_plan: planned.rollingPlan, plan_feedback: null, status: 'ready', stage: 'write', lease_owner: null,
+      rolling_plan: planned.rollingPlan, plan_feedback: null, status: 'ready', stage: 'write', retry_count: 0, lease_owner: null,
       lease_token: null, lease_until: null, next_run_at: now, updated_at: now,
     }).eq('id', job.id).eq('lease_token', job.lease_token);
     if (jobUpdate.error) throw jobUpdate.error;
@@ -543,7 +557,7 @@ async function handOffRevision(
   }).eq('id', runId).eq('status', 'running');
   if (runUpdate.error) throw runUpdate.error;
   const jobUpdate = await db.from('story_factory_jobs').update({
-    status: 'ready', stage: 'revise',
+    status: 'ready', stage: 'revise', retry_count: 0,
     lease_owner: null, lease_token: null, lease_until: null,
     next_run_at: now, updated_at: now,
   }).eq('id', job.id).eq('lease_token', job.lease_token);
@@ -551,14 +565,19 @@ async function handOffRevision(
   return { status: 'completed', jobId: job.id, stage: 'revise', chapterNumber };
 }
 
-function readPendingRevision(artifact: unknown): PendingRevision | null {
+export function readPendingRevision(artifact: unknown): PendingRevision | null {
   if (!artifact || typeof artifact !== 'object') return null;
   const pending = (artifact as { pendingRevision?: unknown }).pendingRevision;
   if (!pending || typeof pending !== 'object') return null;
   const candidate = pending as Partial<PendingRevision>;
   const draft = candidate.draft as { title?: unknown; content?: unknown } | undefined;
   if (typeof draft?.title !== 'string' || typeof draft.content !== 'string') return null;
-  if (!candidate.assessment || typeof candidate.assessment !== 'object') return null;
+  // Only a 'revise' assessment can drive a rewrite: buildRevisionContext throws on
+  // anything else, which would cost a claim plus two provider calls before failing.
+  // Rejecting here instead routes to restartDraft, which is free.
+  const assessment = candidate.assessment as { status?: unknown; continuityIssues?: unknown; readingIssues?: unknown } | undefined;
+  if (assessment?.status !== 'revise') return null;
+  if (!Array.isArray(assessment.continuityIssues) || !Array.isArray(assessment.readingIssues)) return null;
   return {
     draft: candidate.draft as PendingRevision['draft'],
     assessment: candidate.assessment as PendingRevision['assessment'],
@@ -575,6 +594,18 @@ async function runRevision(db: SupabaseClient, job: FactoryJobRow, project: Fact
     // A lost or unreadable pending draft is recoverable: redraft the chapter from the
     // committed state. Nothing was persisted, so this is a clean retry rather than a block.
     const now = new Date().toISOString();
+    if (job.last_run_id) {
+      // Close the abandoned run first. Leaving it 'running' orphans it forever: the
+      // next createRun repoints last_run_id, and both sweepers key on job state this
+      // run will never see again — the row would sit "in flight" in telemetry for good.
+      const closed = await db.from('story_factory_runs').update({
+        status: 'failed',
+        error_code: 'revision_restarted',
+        error_message: reason,
+        finished_at: now,
+      }).eq('id', job.last_run_id).eq('job_id', job.id).eq('status', 'running');
+      if (closed.error) console.warn('[story-factory] could not close abandoned revision run:', closed.error.message);
+    }
     const update = await db.from('story_factory_jobs').update({
       status: 'ready', stage: 'write', last_error: reason,
       lease_owner: null, lease_token: null, lease_until: null, next_run_at: now, updated_at: now,
@@ -636,6 +667,30 @@ async function runRevision(db: SupabaseClient, job: FactoryJobRow, project: Fact
     if (error instanceof StoryFactoryError && error.code === 'plan_blocked') {
       return recoverUncommittedPlan(db, job, runRow.data.id, error);
     }
+    // A transient failure during the rewrite must not discard the paid first draft
+    // and the Editor findings that motivated it: blockRun would close the run, and
+    // the next tick's restartDraft would redraft blind — likely reproducing the same
+    // defect at the cost of two more provider calls. Keep the run (and its pending
+    // payload) open and retry the rewrite itself, with backoff.
+    const infra = error instanceof StoryFactoryError && error.code === 'infra_blocked'
+      ? error
+      : !(error instanceof StoryFactoryError)
+        ? new StoryFactoryError('infra_blocked', error instanceof Error ? error.message : String(error))
+        : null;
+    if (infra && job.retry_count < INFRA_RETRY_LIMIT) {
+      const now = new Date();
+      const held = await db.from('story_factory_jobs').update({
+        status: 'ready',
+        stage: 'revise',
+        retry_count: job.retry_count + 1,
+        last_error: infra.message,
+        lease_owner: null, lease_token: null, lease_until: null,
+        next_run_at: new Date(now.getTime() + infraBackoffMs(job.retry_count)).toISOString(),
+        updated_at: now.toISOString(),
+      }).eq('id', job.id).eq('lease_token', job.lease_token);
+      if (held.error) console.warn('[story-factory] could not hold revision for retry:', held.error.message);
+      return { status: 'completed', jobId: job.id, stage: 'revise', chapterNumber: job.current_chapter, error: infra.message };
+    }
     return blockRun(db, job, runRow.data.id, error);
   }
 }
@@ -671,13 +726,26 @@ async function runWindowReview(db: SupabaseClient, job: FactoryJobRow, project: 
     }).eq('id', runId);
     if (runUpdate.error) throw runUpdate.error;
     const jobUpdate = await db.from('story_factory_jobs').update({
-      status: 'ready', stage: nextStage, lease_owner: null, lease_token: null, lease_until: null,
+      status: 'ready', stage: nextStage, retry_count: 0, lease_owner: null, lease_token: null, lease_until: null,
       next_run_at: nextRunAt, updated_at: now,
     }).eq('id', job.id).eq('lease_token', job.lease_token);
     if (jobUpdate.error) throw jobUpdate.error;
-    if (job.current_chapter === 10 && job.execution_mode === 'hidden_canary') {
+    // >= 10, not === 10: a promotion that fails once (missing cover, digest mismatch)
+    // must get another chance at the next window review — with strict equality the
+    // novel kept writing chapters forever with hidden = true and no reader. Promotion
+    // failure is also non-fatal by design: the review itself passed and the job should
+    // keep writing; blockRun here would be wrong twice over (the review run is already
+    // 'passed', so its error write would no-op, and an infra retry would re-run a
+    // review that already succeeded).
+    if (job.current_chapter >= 10 && job.execution_mode === 'hidden_canary') {
       const promoted = await db.rpc('promote_story_factory_canary', { p_job_id: job.id, p_engine_release: STORY_FACTORY_RELEASE });
-      if (promoted.error) throw promoted.error;
+      if (promoted.error) {
+        console.warn('[story-factory] canary promotion deferred:', promoted.error.message);
+        const noted = await db.from('story_factory_jobs')
+          .update({ last_error: `promotion deferred: ${promoted.error.message}`, updated_at: new Date().toISOString() })
+          .eq('id', job.id);
+        if (noted.error) console.warn('[story-factory] could not record promotion failure:', noted.error.message);
+      }
     }
     return { status: 'completed', jobId: job.id, stage: 'window_review', chapterNumber: job.current_chapter };
   } catch (error) {
@@ -745,6 +813,7 @@ export async function runStoryFactoryTicks(options?: {
   const start = clock();
   const results: FactoryTickResult[] = [];
   let slowestStageMs = 0;
+  let consecutiveThrows = 0;
   for (;;) {
     const stageStart = clock();
     if (!shouldStartAnotherStage({
@@ -753,7 +822,25 @@ export async function runStoryFactoryTicks(options?: {
       slowestStageMs,
       budgetMs: budget,
     })) break;
-    const result = await runStoryFactoryTick(options);
+    // The isolation boundary. Several failure points sit outside any stage's own
+    // try (createRun, the claim RPC, run-row lookups): without this catch, one
+    // job's transient DB error aborts the whole invocation and erases the report
+    // of chapters other jobs already committed in this batch.
+    let result: FactoryTickResult;
+    try {
+      result = await runStoryFactoryTick(options);
+      consecutiveThrows = 0;
+    } catch (error) {
+      consecutiveThrows += 1;
+      const message = error instanceof Error ? error.message : String(error);
+      console.warn('[story-factory] tick threw outside stage handling:', message);
+      results.push({ status: 'blocked', error: message });
+      // Three raw throws in a row means the failure is environmental (DB down,
+      // credentials), not job-specific — stop burning the budget against it.
+      if (consecutiveThrows >= 3) break;
+      slowestStageMs = Math.max(slowestStageMs, clock() - stageStart);
+      continue;
+    }
     slowestStageMs = Math.max(slowestStageMs, clock() - stageStart);
     if (result.status === 'idle' || result.status === 'disabled') break;
     results.push(result);
@@ -785,7 +872,12 @@ export async function runStoryFactoryTick(options?: {
   if (!isStoryFactoryEnabled()) return { status: 'disabled' };
   const db = options?.db ?? getSupabaseAdmin();
   const workerId = options?.workerId ?? `factory-${crypto.randomUUID()}`;
-  await db.rpc('reconcile_story_factory_jobs', { p_stale_minutes: 10 });
+  // Stale window 0: reconcile is the only path that returns an expired-lease job to
+  // the queue (claim no longer admits 'writing'), and it must run before this tick's
+  // claim so every crash is counted against the retry budget. With the old 10-minute
+  // window, claim re-acquired the job the moment its lease expired and a crash-looping
+  // job retried forever with retry_count frozen at zero.
+  await db.rpc('reconcile_story_factory_jobs', { p_stale_minutes: 0 });
   const { data, error } = await db.rpc('claim_story_factory_job', { p_worker_id: workerId, p_engine_release: STORY_FACTORY_RELEASE });
   if (error) throw error;
   const job = (Array.isArray(data) ? data[0] : data) as FactoryJobRow | undefined;

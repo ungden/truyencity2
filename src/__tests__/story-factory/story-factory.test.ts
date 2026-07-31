@@ -69,6 +69,9 @@ import {
   validateArcResourceReachability,
   validateKernelState,
   validationPasses,
+  draftStoryChapter,
+  readPendingRevision,
+  reviseStoryChapter,
   writeStoryChapter,
 } from '@/services/story-factory';
 import type { ProviderResult, StoryModelProvider } from '@/services/story-factory/provider';
@@ -2547,6 +2550,74 @@ describe('canonical Story Factory', () => {
     });
     expect(REVISION_SYSTEM_PROMPT).toContain('thời lượng cảnh, thời gian di chuyển');
     expect(REVISION_SYSTEM_PROMPT).toContain('không được tạo mâu thuẫn mới');
+  });
+
+  test('a pending revision survives the JSONB round-trip across the tick boundary', async () => {
+    // Production splits draft and rewrite into separate cron ticks; the pending payload
+    // crosses the boundary as JSONB on the run row. The writing smoke runs both stages
+    // in one process, so serialization fidelity is only proven here.
+    const first = { title: 'Bản đầu', content: 'Hải nhìn quanh căn nhà nhỏ rồi bắt đầu làm việc với tấm lưới cũ.' };
+    const reviseWire = {
+      v: 3 as const,
+      findings: [{
+        category: 'canon' as const,
+        severity: 'moderate' as const,
+        scope: 'prose' as const,
+        evidence: first.content.slice(0, 40),
+        referenceId: 'scene_1',
+        instruction: 'Thể hiện rõ required delta qua hành động cụ thể.',
+      }],
+      deltaChecks: [{ deltaId: 'delta_1', realized: false, evidence: 'bắt đầu làm việc' }],
+      outcome: null,
+    };
+    const draftProvider = new QueueProvider([first, reviseWire]);
+    const drafted = await draftStoryChapter({ kernel, state: initialState, plan: plan(1), routes, provider: draftProvider });
+    expect(drafted.decision).toBe('revise');
+    if (drafted.decision !== 'revise') throw new Error('unreachable');
+    expect(draftProvider.calls).toEqual(['writer', 'editor']);
+
+    const stored = JSON.parse(JSON.stringify({ pendingRevision: drafted.pending }));
+    const pending = readPendingRevision(stored);
+    expect(pending).not.toBeNull();
+    expect(pending!.draft).toEqual(first);
+    expect(pending!.usages).toHaveLength(2);
+
+    const revised = { title: 'Bắt tay vào việc', content: 'Hải trải tấm lưới lên hiên, chia việc với mẹ rồi hoàn tất mẻ thử đầu tiên trước trưa.' };
+    const reviseProvider = new QueueProvider([revised, editorWirePass('delta_1', 'chia việc với mẹ')]);
+    const result = await reviseStoryChapter({
+      kernel, state: initialState, plan: plan(1), routes, provider: reviseProvider, pending: pending!,
+    });
+    expect(reviseProvider.calls).toEqual(['writer', 'editor']);
+    expect(result.draft).toEqual(revised);
+    expect(result.revisionCount).toBe(1);
+    expect(result.attemptTelemetry).toMatchObject({
+      initialDraft: first,
+      revisionDraft: revised,
+      draftAttempts: 2,
+      firstPass: false,
+    });
+    // The paid draft-tick usages carry through to the committed total.
+    expect(result.usages).toHaveLength(4);
+  });
+
+  test('readPendingRevision rejects unusable payloads so recovery costs nothing', () => {
+    expect(readPendingRevision(null)).toBeNull();
+    expect(readPendingRevision({})).toBeNull();
+    expect(readPendingRevision({ pendingRevision: { draft: { title: 'x' } } })).toBeNull();
+    // A pass assessment cannot drive a rewrite — buildRevisionContext would throw after
+    // a claim and two provider calls; rejecting here routes to a free restartDraft.
+    expect(readPendingRevision({
+      pendingRevision: {
+        draft: { title: 'ok', content: 'Nội dung đủ dài để hợp lệ trong schema.' },
+        assessment: { status: 'pass', continuityIssues: [], readingIssues: [] },
+      },
+    })).toBeNull();
+    expect(readPendingRevision({
+      pendingRevision: {
+        draft: { title: 'ok', content: 'Nội dung đủ dài để hợp lệ trong schema.' },
+        assessment: { status: 'revise' },
+      },
+    })).toBeNull();
   });
 
   test('revision keeps the current chapter number and title evidence is grounded', async () => {

@@ -21,19 +21,33 @@ function files(root: string): string[] {
 }
 
 /**
- * Migrations replay in filename order, so only the last definition of a function is live.
- * Asserting a named historical file lets a later migration silently revert it — which is
- * exactly how a 5 minute lease replaced a 30 minute one while the test stayed green.
+ * Migrations replay in filename order, so only the last mention of an object is what
+ * production runs. Asserting a named historical file lets a later migration silently
+ * revert it — which is exactly how a 5 minute lease replaced a 30 minute one while the
+ * test stayed green.
  */
-function latestMigrationDefining(functionName: string): string {
-  const marker = `FUNCTION ${functionName}(`;
+function latestMigrationContaining(marker: string): string {
   const match = readdirSync('supabase/migrations')
     .filter(entry => entry.endsWith('.sql'))
     .sort()
     .reverse()
     .find(entry => readFileSync(path.join('supabase/migrations', entry), 'utf8').includes(marker));
-  if (!match) throw new Error(`No migration defines ${functionName}`);
+  if (!match) throw new Error(`No migration contains ${marker}`);
   return path.join('supabase/migrations', match);
+}
+
+function latestMigrationDefining(functionName: string): string {
+  return latestMigrationContaining(`FUNCTION ${functionName}(`);
+}
+
+/** A slice bounded by two markers; throws instead of returning '' when a marker moves. */
+function sliceBetween(source: string, startMarker: string, endMarker: string): string {
+  const start = source.indexOf(startMarker);
+  const end = source.indexOf(endMarker);
+  if (start < 0 || end < 0 || end <= start) {
+    throw new Error(`Markers out of order: ${startMarker} .. ${endMarker}`);
+  }
+  return source.slice(start, end);
 }
 
 const read = (target: string) => readFileSync(target, 'utf8');
@@ -84,10 +98,9 @@ describe('Story Factory architecture boundary', () => {
     // The Writer owns prose; the Planner owns causality. Leaking deltas, mechanics or
     // prior outcomes into the brief turns the Writer into a summariser of its own plan.
     const context = read('src/services/story-factory/context.ts');
-    const brief = context.slice(
-      context.indexOf('export function buildWriterBrief'),
-      context.indexOf('export function selectPreviousTail'),
-    );
+    // sliceBetween throws if either marker moves — a silent '' here would turn the
+    // strongest leak checks in this file into tautologies.
+    const brief = sliceBetween(context, 'export function buildWriterBrief', 'export function selectPreviousTail');
     for (const leak of [
       'recentOutcomes',
       'scene.action',
@@ -170,13 +183,18 @@ describe('Story Factory architecture boundary', () => {
     expect(pipeline).toContain('export async function reviseStoryChapter');
     expect(read('src/services/story-factory/runtime.ts')).toContain("if (job.stage === 'revise') return runRevision(");
 
-    // Two provider calls per tick must fit inside maxDuration with headroom.
+    // Two chapter-tick provider calls must fit inside maxDuration with headroom.
+    // The tight timeout applies only to Writer/Editor calls — setup and planner
+    // legitimately run long and keep the generous default.
     const route = read('src/app/api/cron/story-factory/route.ts');
+    const provider = read('src/services/story-factory/provider.ts');
     const maxDurationSeconds = Number(route.match(/maxDuration\s*=\s*(\d+)/)![1]);
-    const providerTimeoutMs = Number(
-      read('src/services/story-factory/provider.ts').match(/REQUEST_TIMEOUT_MS = (\d[\d_]*)/)![1].replace(/_/g, ''),
+    const chapterTimeoutMs = Number(
+      provider.match(/CHAPTER_CALL_TIMEOUT_MS = (\d[\d_]*)/)![1].replace(/_/g, ''),
     );
-    expect(providerTimeoutMs * 2).toBeLessThan(maxDurationSeconds * 1000);
+    expect(chapterTimeoutMs * 2).toBeLessThan(maxDurationSeconds * 1000);
+    // All three chapter-tick call sites (Writer, Rewrite, shared Editor) opt in.
+    expect(pipeline.match(/timeoutMs: CHAPTER_CALL_TIMEOUT_MS/g)?.length).toBe(3);
   });
 
   test('prose heuristics can advise but never block a job', () => {
@@ -219,6 +237,11 @@ describe('Story Factory architecture boundary', () => {
     expect(migration).not.toContain("lease_until = now() + interval '5 minutes'");
     expect(migration).toContain('FOR UPDATE OF job SKIP LOCKED');
     expect(migration).toContain('SECURITY INVOKER');
+    // Expired-lease jobs return only through reconcile, which counts the crash against
+    // the retry budget. Claim admitting 'writing' would beat that accounting every time
+    // and let a crash-looping job burn provider spend forever.
+    expect(migration).toContain("WHERE job.status IN ('setup', 'ready', 'finale')");
+    expect(read('src/services/story-factory/runtime.ts')).toContain('p_stale_minutes: 0');
   });
 
   test('canary promotion requires the latest chapter-10 review on the exact release', () => {
@@ -236,17 +259,17 @@ describe('Story Factory architecture boundary', () => {
     expect(commit).not.toContain('p_expected_chapter % 10 = 0');
     // A committed chapter resets the transient-failure budget: it proves the job is healthy.
     expect(commit).toContain('retry_count = 0');
-    const memory = read('supabase/migrations/20260724074948_long_series_spine_exact_id_memory.sql');
+    const memory = read(latestMigrationContaining('USING gin (related_entity_ids)'));
     expect(memory).toContain('related_entity_ids text[]');
-    expect(memory).toContain('USING gin (related_entity_ids)');
+    expect(memory).not.toContain('DROP INDEX');
     const runtime = read('src/services/story-factory/runtime.ts');
     expect(runtime).toContain("db.rpc('commit_story_factory_arc_transition'");
     expect(runtime).not.toContain('update({ arc_plan: result.lifecycle.nextArc');
   });
 
   test('run telemetry is terminally consistent and reader judges never see internal plans', () => {
-    const migration = read('supabase/migrations/20260725135035_story_factory_benchmark_v2_telemetry.sql');
-    expect(migration).toContain('story_factory_runs_terminal_consistency_check');
+    const migration = read(latestMigrationContaining('story_factory_runs_terminal_consistency_check'));
+    expect(migration).toContain('ADD CONSTRAINT story_factory_runs_terminal_consistency_check');
     const benchmark = read('scripts/factory-benchmark.ts');
     expect(benchmark).toContain('buildBlindReaderComparison({');
     for (const internal of ['sample.plan', 'stateBefore', 'chapterPlan']) {

@@ -15,7 +15,7 @@ import {
 import { buildChapterContexts, buildRevisionContext, type ContextManifestEntry } from './context';
 import type { ContinuityPacket } from './memory';
 import type { ProviderUsage, StoryModelProvider } from './provider';
-import { geminiProvider } from './provider';
+import { CHAPTER_CALL_TIMEOUT_MS, geminiProvider } from './provider';
 import { EDITOR_SYSTEM_PROMPT, REVISION_SYSTEM_PROMPT, WRITER_SYSTEM_PROMPT } from './prompts';
 import {
   appendAcceptedOutcome,
@@ -527,6 +527,7 @@ export async function assessStoryDraft(input: {
   const responseSchema = buildEditorWireAssessmentSchema({ deltaIds });
   const response = await input.provider.json({
     model: input.model,
+    timeoutMs: CHAPTER_CALL_TIMEOUT_MS,
     system: EDITOR_SYSTEM_PROMPT,
     prompt: editorPrompt({ ...input, deterministicIssues }),
     schema: responseSchema,
@@ -666,6 +667,7 @@ export async function draftStoryChapter(input: ChapterStageInput): Promise<Chapt
   try {
     const initial = await provider.json({
       model: input.routes.writer,
+      timeoutMs: CHAPTER_CALL_TIMEOUT_MS,
       system: WRITER_SYSTEM_PROMPT,
       prompt: JSON.stringify({
         task: 'Viết chương truyện hoàn chỉnh.',
@@ -729,16 +731,14 @@ export async function draftStoryChapter(input: ChapterStageInput): Promise<Chapt
 }
 
 /**
- * Rewrite + Editor. The state transition and contexts are pure functions of
- * kernel/state/plan, and nothing was committed by the draft stage, so recomputing
- * them here is exact rather than a re-derivation risk.
+ * Rewrite + Editor. The state transition and contexts are recomputed here — they are
+ * pure functions of kernel/state/plan and nothing was committed by the draft stage,
+ * so this is exact rather than a re-derivation risk.
  */
 export async function reviseStoryChapter(
   input: ChapterStageInput & { pending: PendingRevision },
 ): Promise<ChapterPipelineResult> {
   const provider = input.provider ?? geminiProvider;
-  const transition = applyChapterPlan({ kernel: input.kernel, state: input.state, plan: input.plan });
-  const contexts = buildChapterContexts({ ...input, stateAfter: transition.state });
   const usages: ProviderUsage[] = [...input.pending.usages];
   let revisionDraft: ChapterDraft | null = null;
   let finalAssessment: EditorAssessment | null = input.pending.assessment;
@@ -754,8 +754,15 @@ export async function reviseStoryChapter(
   });
 
   try {
+    // Inside the try: this stage carries the draft tick's paid usages, and a throw
+    // here (applyChapterPlan can raise plan_blocked) must surface them through
+    // rethrowWithTelemetry — outside the try, the run row would record $0 for a
+    // chapter attempt that already spent two provider calls.
+    const transition = applyChapterPlan({ kernel: input.kernel, state: input.state, plan: input.plan });
+    const contexts = buildChapterContexts({ ...input, stateAfter: transition.state });
     const revision = await provider.json({
       model: input.routes.writer,
+      timeoutMs: CHAPTER_CALL_TIMEOUT_MS,
       system: REVISION_SYSTEM_PROMPT,
       prompt: JSON.stringify(buildRevisionContext({
         brief: contexts.brief,

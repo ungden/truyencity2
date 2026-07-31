@@ -20,6 +20,7 @@ export type DiscoveryResumeLineage = {
 export type ResumableDiscoveryProgress = {
   protocolVersion: string;
   engineRelease: string;
+  engineRevision?: string;
   route: unknown;
   continuityJudgeModel: string;
   startedAt: string;
@@ -60,6 +61,7 @@ export function prepareDiscoveryResume<T extends ResumableDiscoveryProgress>(inp
   progress: T;
   protocolVersion: string;
   engineRelease: string;
+  engineRevision?: string;
   route: Record<string, unknown>;
   continuityJudgeModel: string;
   resumedAt?: string;
@@ -70,8 +72,15 @@ export function prepareDiscoveryResume<T extends ResumableDiscoveryProgress>(inp
 } {
   const { progress } = input;
   const releaseMatches = progress.engineRelease === input.engineRelease;
+  // Release equality no longer implies same generation code: prompt/planner/validator
+  // versions live in the revision hash. Progress built by a different revision must be
+  // rebuilt, not resumed — except in setup-only mode, where runConceptLab revalidates
+  // the immutable checkpoint against its own provenance.
+  const revisionMatches = input.engineRevision === undefined
+    || progress.engineRevision === input.engineRevision;
   if ((progress.protocolVersion !== input.protocolVersion && !input.compatibleSetupOnly)
     || (!releaseMatches && !input.compatibleSetupOnly)
+    || (!revisionMatches && !input.compatibleSetupOnly)
     || !progress.route
     || typeof progress.route !== 'object'
     // In setup-only mode runConceptLab validates the immutable checkpoint
@@ -111,6 +120,7 @@ export function prepareDiscoveryResume<T extends ResumableDiscoveryProgress>(inp
     ...progress,
     protocolVersion: input.protocolVersion,
     engineRelease: input.engineRelease,
+    engineRevision: input.engineRevision ?? progress.engineRevision,
     route: input.route,
     continuityJudgeModel: input.continuityJudgeModel,
     // The discovery loop deterministically replays every lane from its

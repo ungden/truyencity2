@@ -7,10 +7,16 @@ const TRANSIENT_STATUS = new Set([408, 409, 429]);
 const RETRY_DELAYS_MS = [1_000, 3_000];
 
 /**
- * A tick runs at most two provider calls (Writer + Editor, or Rewrite + Editor) and the
- * route ceiling is 300s. 120s each leaves headroom for request overhead and the commit.
+ * Default per-request timeout. Setup and planner calls legitimately run long — a
+ * pro-class model emitting a full three-chapter window of structured JSON, or a
+ * search-grounded research call — so the default stays generous. The chapter tick,
+ * which must fit two calls inside the 300s route ceiling, passes CHAPTER_CALL_TIMEOUT_MS
+ * explicitly (see pipeline.ts).
  */
-const REQUEST_TIMEOUT_MS = 120_000;
+const DEFAULT_TIMEOUT_MS = 240_000;
+
+/** Two of these plus commit overhead must fit inside maxDuration = 300s. */
+export const CHAPTER_CALL_TIMEOUT_MS = 120_000;
 
 const PRICING: Record<string, { input: number; output: number }> = {
   'gemini-2.5-pro': { input: 1.25, output: 10 },
@@ -47,6 +53,7 @@ export interface StoryModelProvider {
     thinkingLevel?: 'minimal' | 'low' | 'medium' | 'high';
     thinkingBudget?: number;
     grounding?: 'google_search';
+    timeoutMs?: number;
   }): Promise<ProviderResult<string>>;
   json<T>(input: {
     model: string;
@@ -59,6 +66,7 @@ export interface StoryModelProvider {
     thinkingLevel?: 'minimal' | 'low' | 'medium' | 'high';
     thinkingBudget?: number;
     grounding?: 'google_search';
+    timeoutMs?: number;
   }): Promise<ProviderResult<T>>;
 }
 
@@ -153,6 +161,7 @@ async function generate(input: {
   googleSearch?: boolean;
   thinkingLevel?: 'minimal' | 'low' | 'medium' | 'high';
   thinkingBudget?: number;
+  timeoutMs?: number;
 }): Promise<ProviderResult<string>> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new StoryFactoryError('infra_blocked', 'GEMINI_API_KEY is not configured.');
@@ -193,7 +202,7 @@ async function generate(input: {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
         body: JSON.stringify(body),
-        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+        signal: AbortSignal.timeout(input.timeoutMs ?? DEFAULT_TIMEOUT_MS),
       });
       if (!response.ok) {
         const detail = await response.text().catch(() => '');
@@ -260,6 +269,7 @@ export const geminiProvider: StoryModelProvider = {
     thinkingLevel?: 'minimal' | 'low' | 'medium' | 'high';
     thinkingBudget?: number;
     grounding?: 'google_search';
+    timeoutMs?: number;
   }): Promise<ProviderResult<T>> {
     const responseSchema = toGeminiResponseSchema(input.schema, {
       complexity: input.schemaComplexity ?? 'default',

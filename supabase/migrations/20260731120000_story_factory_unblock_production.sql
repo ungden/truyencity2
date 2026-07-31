@@ -23,6 +23,10 @@
 -- on real accumulating state, and the chapters are saleable output rather than
 -- discarded benchmark samples.
 
+-- DDL below takes ACCESS EXCLUSIVE locks while a 2-minute cron holds row locks from
+-- claim/commit. Fail fast rather than queueing every reader behind a blocked ALTER.
+SET lock_timeout = '5s';
+
 -- 1. Telemetry: record the engine revision (prompt/planner/validator/route versions)
 --    that produced each run, now that those no longer belong to the release identity.
 ALTER TABLE public.story_factory_runs
@@ -54,6 +58,18 @@ ALTER TABLE public.story_factory_jobs
 --
 -- p_benchmark_id is retained for signature compatibility and provenance but is no
 -- longer required to match: a job does not need to carry a benchmark id to run.
+-- The LATEST smoke for this release and route must have passed — not merely "some
+-- smoke once passed". An EXISTS over history could never be revoked: a later smoke
+-- recording a failure would change nothing, and withdrawing approval would require
+-- deleting rows. Same "latest, not any" rule promote_story_factory_canary applies
+-- to the chapter-10 window review.
+--
+-- Route binding covers the four generation slots plus routeVersion. routeVersion
+-- deliberately moved out of the release identity, so a model swap no longer bumps
+-- the release — without binding it here, a smoke run that never exercised the new
+-- model would keep authorizing the fleet. engine_revision is intentionally NOT
+-- bound: a prompt fix must not stall the fleet behind a re-smoke; prompt quality
+-- is judged by the hidden canary and window review.
 CREATE OR REPLACE FUNCTION public.story_factory_release_is_approved(
   p_benchmark_id uuid,
   p_engine_release text,
@@ -65,19 +81,22 @@ STABLE
 SECURITY INVOKER
 SET search_path = public
 AS $$
-  SELECT EXISTS (
-    SELECT 1
+  SELECT COALESCE((
+    SELECT smoke.status = 'passed'
+      AND smoke.error_code IS NULL
+      AND COALESCE((smoke.output_artifact->>'chaptersCompleted')::integer, 0) >= 5
+      AND COALESCE((smoke.output_artifact->>'criticalContinuityViolations')::integer, -1) = 0
     FROM public.story_factory_runs smoke
     WHERE smoke.kind = 'smoke'
-      AND smoke.status = 'passed'
-      AND smoke.error_code IS NULL
       AND smoke.engine_release = p_engine_release
       AND smoke.model_routes->'route'->>'writer' = p_model_routes->>'writer'
       AND smoke.model_routes->'route'->>'editor' = p_model_routes->>'editor'
       AND smoke.model_routes->'route'->>'planner' = p_model_routes->>'planner'
-      AND COALESCE((smoke.output_artifact->>'chaptersCompleted')::integer, 0) >= 5
-      AND COALESCE((smoke.output_artifact->>'criticalContinuityViolations')::integer, -1) = 0
-  );
+      AND smoke.model_routes->'route'->>'planJudge' = p_model_routes->>'planJudge'
+      AND smoke.model_routes->'route'->>'routeVersion' = p_model_routes->>'routeVersion'
+    ORDER BY smoke.finished_at DESC NULLS LAST, smoke.started_at DESC
+    LIMIT 1
+  ), false);
 $$;
 
 REVOKE ALL ON FUNCTION public.story_factory_release_is_approved(uuid, text, jsonb) FROM PUBLIC, anon, authenticated;
@@ -114,11 +133,17 @@ BEGIN
     AND project.engine_release = p_engine_release
     AND (job.execution_mode = 'production' OR novel.hidden = true);
 
+  -- 'writing' is deliberately NOT claimable. With it in the set, claim re-acquired an
+  -- expired-lease job the instant its lease lapsed — always beating reconcile's retry
+  -- accounting, so a crash-looping job retried forever with retry_count frozen at
+  -- zero and the backoff/park logic dead. Expired jobs come back exclusively through
+  -- reconcile_story_factory_jobs (called with p_stale_minutes = 0 at the start of
+  -- every tick), which counts the crash and requeues with backoff.
   SELECT job.id INTO claimed_id
   FROM public.story_factory_jobs job
   JOIN public.ai_story_projects project ON project.id = job.project_id
   JOIN public.novels novel ON novel.id = job.novel_id
-  WHERE job.status IN ('setup', 'ready', 'finale', 'writing')
+  WHERE job.status IN ('setup', 'ready', 'finale')
     AND job.next_run_at <= now()
     AND (job.lease_until IS NULL OR job.lease_until < now())
     AND project.status = 'paused'
@@ -165,12 +190,16 @@ BEGIN
   WHERE run.id = job.last_run_id AND run.status = 'running'
     AND job.status = 'writing' AND job.lease_until < now() - make_interval(mins => p_stale_minutes);
 
+  -- Backoff 5, 10, 20, 40, 80 minutes. The 5-minute floor sits above the invocation
+  -- budget (200s) so one batched invocation cannot re-claim the same failing job and
+  -- burn several of its five retries in a single cron slot. Mirrors infraBackoffMs in
+  -- runtime.ts — change both together.
   UPDATE public.story_factory_jobs
   SET status = CASE WHEN retry_count >= 5 THEN 'infra_blocked' ELSE 'ready' END,
       retry_count = retry_count + 1,
       next_run_at = CASE
         WHEN retry_count >= 5 THEN next_run_at
-        ELSE now() + make_interval(mins => power(2, LEAST(retry_count, 5))::integer)
+        ELSE now() + make_interval(mins => (5 * power(2, LEAST(retry_count, 5)))::integer)
       END,
       last_error = 'Worker lease expired.',
       lease_owner = NULL,
@@ -388,3 +417,109 @@ END $$;
 
 REVOKE ALL ON FUNCTION public.promote_story_factory_canary(uuid, text) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.promote_story_factory_canary(uuid, text) TO service_role;
+
+-- 9. Arc transitions also prove the job healthy: reset the retry budget on commit.
+--    Body identical to 20260724074948 except the retry_count reset — the budget is
+--    for CONSECUTIVE failures, and without resets on non-chapter successes a new
+--    job could exhaust it across its whole setup→plan→write lifetime.
+CREATE OR REPLACE FUNCTION public.commit_story_factory_arc_transition(
+  p_job_id uuid,
+  p_lease_token uuid,
+  p_run_id uuid,
+  p_lifecycle_status text,
+  p_kernel_after jsonb,
+  p_state_after jsonb,
+  p_next_arc jsonb,
+  p_output_artifact jsonb,
+  p_usage jsonb,
+  p_cost_usd numeric,
+  p_engine_release text
+)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY INVOKER
+SET search_path = public
+AS $$
+DECLARE job public.story_factory_jobs;
+DECLARE project public.ai_story_projects;
+BEGIN
+  SELECT * INTO job FROM public.story_factory_jobs WHERE id = p_job_id FOR UPDATE;
+  IF job.id IS NULL OR job.lease_token IS DISTINCT FROM p_lease_token OR job.lease_until < now() THEN
+    RAISE EXCEPTION 'FACTORY_LEASE_INVALID';
+  END IF;
+  IF job.stage <> 'arc' OR job.current_chapter < 1 THEN RAISE EXCEPTION 'FACTORY_ARC_STAGE_INVALID'; END IF;
+  IF p_lifecycle_status NOT IN ('continue', 'finale', 'complete') THEN RAISE EXCEPTION 'FACTORY_ARC_STATUS_INVALID'; END IF;
+
+  SELECT * INTO project FROM public.ai_story_projects WHERE id = job.project_id FOR UPDATE;
+  IF project.engine_release IS DISTINCT FROM p_engine_release THEN RAISE EXCEPTION 'FACTORY_RELEASE_MISMATCH'; END IF;
+  IF project.current_chapter <> job.current_chapter THEN RAISE EXCEPTION 'FACTORY_CHAPTER_SEQUENCE_MISMATCH'; END IF;
+  IF (p_state_after->>'chapterNumber')::integer <> job.current_chapter THEN RAISE EXCEPTION 'FACTORY_STATE_SEQUENCE_MISMATCH'; END IF;
+  IF p_lifecycle_status = 'complete' AND p_next_arc IS NOT NULL THEN RAISE EXCEPTION 'FACTORY_COMPLETE_ARC_MUST_BE_NULL'; END IF;
+  IF p_lifecycle_status <> 'complete' AND p_next_arc IS NULL THEN RAISE EXCEPTION 'FACTORY_NEXT_ARC_MISSING'; END IF;
+
+  UPDATE public.ai_story_projects
+  SET story_kernel = p_kernel_after,
+      story_state = p_state_after,
+      arc_plan = CASE WHEN p_lifecycle_status = 'complete' THEN arc_plan ELSE p_next_arc END,
+      updated_at = now()
+  WHERE id = project.id;
+
+  UPDATE public.story_factory_jobs
+  SET status = CASE
+        WHEN p_lifecycle_status = 'complete' THEN 'completed'
+        WHEN p_lifecycle_status = 'finale' THEN 'finale'
+        ELSE 'ready'
+      END,
+      stage = CASE WHEN p_lifecycle_status = 'complete' THEN 'done' ELSE 'plan' END,
+      rolling_plan = NULL,
+      retry_count = 0,
+      lease_owner = NULL,
+      lease_token = NULL,
+      lease_until = NULL,
+      next_run_at = now(),
+      completed_at = CASE WHEN p_lifecycle_status = 'complete' THEN now() ELSE completed_at END,
+      last_run_id = p_run_id,
+      updated_at = now()
+  WHERE id = job.id;
+
+  IF p_lifecycle_status = 'complete' THEN
+    UPDATE public.novels SET status = 'Hoàn thành', updated_at = now() WHERE id = job.novel_id;
+  END IF;
+
+  UPDATE public.story_factory_runs
+  SET status = 'passed',
+      output_artifact = p_output_artifact,
+      usage = p_usage,
+      estimated_cost_usd = p_cost_usd,
+      finished_at = now()
+  WHERE id = p_run_id AND job_id = job.id AND kind = 'arc' AND status = 'running';
+  IF NOT FOUND THEN RAISE EXCEPTION 'FACTORY_RUN_NOT_RUNNING'; END IF;
+
+  RETURN jsonb_build_object('status', p_lifecycle_status, 'chapterNumber', job.current_chapter);
+END $$;
+
+REVOKE ALL ON FUNCTION public.commit_story_factory_arc_transition(
+  uuid, uuid, uuid, text, jsonb, jsonb, jsonb, jsonb, jsonb, numeric, text
+) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.commit_story_factory_arc_transition(
+  uuid, uuid, uuid, text, jsonb, jsonb, jsonb, jsonb, jsonb, numeric, text
+) TO service_role;
+
+-- 10. Return the parked fleet to the queue.
+--
+-- Every currently blocked job is a casualty of the old self-invalidating gate, not a
+-- genuine editorial verdict: the release hash churned faster than any benchmark chain
+-- could complete, so jobs accumulated in blocked statuses that the claim query cannot
+-- see. Requeue them once. Jobs still on an old engine_release remain unclaimable until
+-- an operator runs `factory-operator restage --all --apply` — this UPDATE makes them
+-- eligible, not runnable.
+UPDATE public.story_factory_jobs
+SET status = 'ready',
+    retry_count = 0,
+    last_error = NULL,
+    lease_owner = NULL,
+    lease_token = NULL,
+    lease_until = NULL,
+    next_run_at = now(),
+    updated_at = now()
+WHERE status IN ('setup_blocked', 'plan_blocked', 'quality_blocked', 'infra_blocked');

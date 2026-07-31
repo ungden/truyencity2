@@ -48,7 +48,13 @@ function advisory(entry: PlanAdvisory): void {
   advisoryBuffer?.push(entry);
 }
 
-/** Run a synchronous validation and collect any advisories it raised. */
+/**
+ * Run a SYNCHRONOUS validation and collect any advisories it raised.
+ *
+ * The buffer is module-global and restored in `finally`, so an async callback would
+ * lose (or misattribute) anything raised after its first await. Every current caller
+ * passes a synchronous validator; keep it that way.
+ */
 export function collectPlanAdvisories<T>(run: () => T): { value: T; advisories: PlanAdvisory[] } {
   const previous = advisoryBuffer;
   const buffer: PlanAdvisory[] = [];
