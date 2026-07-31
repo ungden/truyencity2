@@ -6,6 +6,12 @@ const API_BASE = 'https://generativelanguage.googleapis.com/v1beta';
 const TRANSIENT_STATUS = new Set([408, 409, 429]);
 const RETRY_DELAYS_MS = [1_000, 3_000];
 
+/**
+ * A tick runs at most two provider calls (Writer + Editor, or Rewrite + Editor) and the
+ * route ceiling is 300s. 120s each leaves headroom for request overhead and the commit.
+ */
+const REQUEST_TIMEOUT_MS = 120_000;
+
 const PRICING: Record<string, { input: number; output: number }> = {
   'gemini-2.5-pro': { input: 1.25, output: 10 },
   'gemini-2.5-flash': { input: 0.3, output: 2.5 },
@@ -187,7 +193,7 @@ async function generate(input: {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
         body: JSON.stringify(body),
-        signal: AbortSignal.timeout(240_000),
+        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
       });
       if (!response.ok) {
         const detail = await response.text().catch(() => '');

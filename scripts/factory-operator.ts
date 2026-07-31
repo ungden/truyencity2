@@ -11,7 +11,6 @@ import {
   RollingPlanSchema,
   StoryKernelSchema,
   StoryStateSchema,
-  STORY_FACTORY_BENCHMARK_PROTOCOL,
   STORY_FACTORY_RELEASE,
   runStoryFactoryTick,
   validateKernelState,
@@ -51,23 +50,24 @@ async function seed() {
   const routes = routesPath
     ? ModelRoutesSchema.parse(JSON.parse(readFileSync(path.resolve(routesPath), 'utf8')))
     : DEFAULT_MODEL_ROUTES;
-  const benchmarkResult = await db.from('story_factory_runs')
-    .select('id,model_routes')
-    .eq('kind', 'benchmark')
+  // Same condition claim_story_factory_job enforces, surfaced here so seeding fails
+  // with a clear message instead of producing a job that silently never gets claimed.
+  const smokeResult = await db.from('story_factory_runs')
+    .select('id,model_routes,output_artifact')
+    .eq('kind', 'smoke')
     .eq('status', 'passed')
     .eq('engine_release', STORY_FACTORY_RELEASE)
-    .eq('benchmark_protocol_version', STORY_FACTORY_BENCHMARK_PROTOCOL)
     .order('finished_at', { ascending: false })
     .limit(1)
     .maybeSingle();
-  if (benchmarkResult.error) throw benchmarkResult.error;
-  if (!benchmarkResult.data) {
-    throw new Error(`No approved ${STORY_FACTORY_BENCHMARK_PROTOCOL} run exists for ${STORY_FACTORY_RELEASE}.`);
+  if (smokeResult.error) throw smokeResult.error;
+  if (!smokeResult.data) {
+    throw new Error(`No passed writing smoke exists for ${STORY_FACTORY_RELEASE}. Run: npm run factory:writing-smoke -- --apply`);
   }
-  const approvedRoute = (benchmarkResult.data.model_routes as { route?: Record<string, unknown> } | null)?.route;
-  for (const keyName of ['planner', 'planJudge', 'writer', 'editor', 'routeVersion'] as const) {
+  const approvedRoute = (smokeResult.data.model_routes as { route?: Record<string, unknown> } | null)?.route;
+  for (const keyName of ['planner', 'writer', 'editor'] as const) {
     if (approvedRoute?.[keyName] !== routes[keyName]) {
-      throw new Error(`Approved benchmark route mismatch at ${keyName}.`);
+      throw new Error(`Smoke route mismatch at ${keyName}: smoke ran ${String(approvedRoute?.[keyName])}, seed requests ${routes[keyName]}.`);
     }
   }
   const seedToken = Date.now();
@@ -76,7 +76,7 @@ async function seed() {
     dryRun: !apply,
     command,
     release: STORY_FACTORY_RELEASE,
-    benchmarkRunId: benchmarkResult.data.id,
+    smokeRunId: smokeResult.data.id,
     commission,
     researchId: research.snapshotId,
     routes,
@@ -112,7 +112,7 @@ async function seed() {
     status: 'setup',
     stage: 'setup',
     setup_input: { commission, research },
-    benchmark_run_id: benchmarkResult.data.id,
+    benchmark_run_id: smokeResult.data.id,
     daily_target: Number(value('--daily-target') || 5),
   }).select('id').single();
   if (jobInsert.error) {
@@ -143,43 +143,108 @@ async function mutate() {
   if (updated.error) throw updated.error;
 }
 
-async function restage() {
-  const jobId = value('--job-id');
-  const fromRelease = value('--from-release');
-  if (!jobId || !fromRelease) throw new Error('restage requires --job-id and --from-release.');
+const digest = (artifact: unknown) => createHash('sha256').update(JSON.stringify(artifact)).digest('hex');
+
+/**
+ * Migrate one job onto the running release.
+ *
+ * The gate is what it should always have been: do the persisted artifacts still parse
+ * and validate under the current schemas? Requiring current_chapter === 0 meant a novel
+ * that had written a single chapter could never move release again — with the release
+ * hash changing on nearly every commit, that orphaned the whole fleet permanently.
+ */
+async function restageJob(jobId: string): Promise<{ jobId: string; title: string; fromRelease: string; chapter: number }> {
   const lookup = await db.from('story_factory_jobs').select('*,ai_story_projects!story_factory_jobs_project_id_fkey(*)').eq('id', jobId).single();
   if (lookup.error) throw lookup.error;
   const job = lookup.data;
   const project = job.ai_story_projects;
-  if (job.current_chapter !== 0 || job.stage !== 'cover' || project.engine_release !== fromRelease) {
-    throw new Error('restage only accepts a chapter-zero job at cover stage on the declared source release.');
-  }
+  const fromRelease: string = project.engine_release;
+  if (fromRelease === STORY_FACTORY_RELEASE) throw new Error(`Job ${jobId} already runs the current release.`);
+
   const kernel = StoryKernelSchema.parse(project.story_kernel);
   const arc = ArcPlanSchema.parse(project.arc_plan);
   const state = StoryStateSchema.parse(project.story_state);
-  const rollingPlan = RollingPlanSchema.parse(job.rolling_plan);
   validateKernelState(kernel, state);
-  validateRollingPlan({ kernel, arc, state, rollingPlan });
-  const source = await db.from('story_factory_runs').select('id').eq('job_id', jobId).eq('kind', 'setup')
-    .eq('status', 'passed').eq('engine_release', fromRelease).order('started_at', { ascending: false }).limit(1).single();
-  if (source.error) throw source.error;
-  const digest = (artifact: unknown) => createHash('sha256').update(JSON.stringify(artifact)).digest('hex');
-  console.log(JSON.stringify({ dryRun: !apply, command, jobId, fromRelease, toRelease: STORY_FACTORY_RELEASE, title: kernel.title }, null, 2));
-  if (!apply) return;
+  // An uncommitted rolling window is disposable: recoverUncommittedPlan replans it.
+  // Only reject the migration if a plan that IS present is incoherent with the artifacts.
+  let rollingPlanDigest: string | null = null;
+  if (job.rolling_plan) {
+    const rollingPlan = RollingPlanSchema.parse(job.rolling_plan);
+    validateRollingPlan({ kernel, arc, state, rollingPlan });
+    rollingPlanDigest = digest(rollingPlan);
+  }
+
+  if (!apply) return { jobId, title: kernel.title, fromRelease, chapter: job.current_chapter };
   const update = await db.from('ai_story_projects').update({ engine_release: STORY_FACTORY_RELEASE, updated_at: new Date().toISOString() })
-    .eq('id', project.id).eq('engine_release', fromRelease).eq('current_chapter', 0);
+    .eq('id', project.id).eq('engine_release', fromRelease);
   if (update.error) throw update.error;
   const inserted = await db.from('story_factory_runs').insert({
     job_id: jobId, project_id: project.id, novel_id: job.novel_id, kind: 'setup', status: 'passed',
     engine_release: STORY_FACTORY_RELEASE, model_routes: project.model_routes,
-    input_artifact: { restagedFromRunId: source.data.id, fromRelease },
+    input_artifact: { fromRelease, atChapter: job.current_chapter },
     output_artifact: {
-      validation: 'current_runtime_passed', kernelDigest: digest(kernel), arcDigest: digest(arc),
-      stateDigest: digest(state), rollingPlanDigest: digest(rollingPlan),
+      validation: 'current_runtime_passed',
+      launchPackDigest: job.launch_pack_digest,
+      kernelDigest: digest(kernel), arcDigest: digest(arc),
+      stateDigest: digest(state), rollingPlanDigest,
     },
     finished_at: new Date().toISOString(),
   });
   if (inserted.error) throw inserted.error;
+  return { jobId, title: kernel.title, fromRelease, chapter: job.current_chapter };
+}
+
+async function restage() {
+  const jobId = value('--job-id');
+  if (jobId) {
+    console.log(JSON.stringify({ dryRun: !apply, command, toRelease: STORY_FACTORY_RELEASE, ...(await restageJob(jobId)) }, null, 2));
+    return;
+  }
+  if (!args.includes('--all')) throw new Error('restage requires --job-id or --all.');
+  const stale = await db.from('story_factory_jobs')
+    .select('id,ai_story_projects!story_factory_jobs_project_id_fkey(engine_release)')
+    .not('status', 'in', '("completed","cancelled")');
+  if (stale.error) throw stale.error;
+  const candidates = (stale.data ?? []).filter(row => {
+    const project = row.ai_story_projects as unknown as { engine_release: string } | null;
+    return project && project.engine_release !== STORY_FACTORY_RELEASE;
+  });
+  const migrated: unknown[] = [];
+  const skipped: unknown[] = [];
+  for (const row of candidates) {
+    try {
+      migrated.push(await restageJob(row.id));
+    } catch (error) {
+      skipped.push({ jobId: row.id, reason: error instanceof Error ? error.message : String(error) });
+    }
+  }
+  console.log(JSON.stringify({ dryRun: !apply, command, toRelease: STORY_FACTORY_RELEASE, migrated, skipped }, null, 2));
+}
+
+/**
+ * Return parked jobs to the queue. Blocked jobs are unclaimable by construction, so
+ * without this a transient failure removes a novel from production until a human notices.
+ */
+async function revive() {
+  const jobId = value('--job-id');
+  const query = db.from('story_factory_jobs')
+    .select('id,status,stage,current_chapter,last_error')
+    .in('status', ['setup_blocked', 'plan_blocked', 'quality_blocked', 'infra_blocked']);
+  const lookup = await (jobId ? query.eq('id', jobId) : query);
+  if (lookup.error) throw lookup.error;
+  const jobs = lookup.data ?? [];
+  console.log(JSON.stringify({ dryRun: !apply, command, release: STORY_FACTORY_RELEASE, jobs }, null, 2));
+  if (!apply || !jobs.length) return;
+  const now = new Date().toISOString();
+  const updated = await db.from('story_factory_jobs').update({
+    status: 'ready',
+    retry_count: 0,
+    last_error: null,
+    lease_owner: null, lease_token: null, lease_until: null,
+    next_run_at: now, updated_at: now,
+  }).in('id', jobs.map(job => job.id));
+  if (updated.error) throw updated.error;
+  console.log(JSON.stringify({ revived: jobs.length }, null, 2));
 }
 
 async function main() {
@@ -190,6 +255,7 @@ async function main() {
   }
   if (command === 'seed') return seed();
   if (command === 'restage') return restage();
+  if (command === 'revive') return revive();
   if (command === 'tick') {
     console.log(JSON.stringify({ dryRun: !apply, command, release: STORY_FACTORY_RELEASE }, null, 2));
     if (!apply) return;
@@ -199,7 +265,7 @@ async function main() {
     return;
   }
   if (['start', 'stop', 'release'].includes(command)) return mutate();
-  throw new Error('Usage: factory-operator.ts status|portfolio|seed|restage|tick|start|stop|release [options] [--apply]');
+  throw new Error('Usage: factory-operator.ts status|portfolio|seed|restage|revive|tick|start|stop|release [options] [--apply]');
 }
 
 main().catch(error => { console.error(error); process.exitCode = 1; });

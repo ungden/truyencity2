@@ -11,32 +11,53 @@ export const FACTORY_PLANNER_VERSION = 'story-factory-planner-65-replan-mechanic
 export const FACTORY_CONTEXT_VERSION = 'story-factory-context-24-canonical-units';
 export const FACTORY_MEMORY_POLICY_VERSION = 'story-factory-memory-6-in-memory-parity';
 export const FACTORY_WINDOW_REVIEW_VERSION = 'story-factory-window-review-4-code-derived-decision';
-const FACTORY_ENGINE_SETUP_COMPATIBILITY = FACTORY_SETUP_VERSION;
 
-const identity = {
-  promptVersion: FACTORY_PROMPT_VERSION,
+/**
+ * Compatibility identity: the ONLY versions that decide whether artifacts already
+ * persisted on a project (story_kernel, arc_plan, story_state, rolling_plan) still
+ * parse under the running code. A change here genuinely orphans stored data, so it
+ * must invalidate the release and force an explicit restage.
+ *
+ * Prompt, planner, validator, context, memory and window-review revisions are
+ * deliberately NOT here. Those change how the next chapter is produced, never how
+ * an existing artifact is read. Gating on them made every prompt fix orphan the
+ * whole fleet and destroy the benchmark evidence that the same fix was needed to
+ * obtain — a deadlock that produced zero published chapters over 19 days.
+ */
+const compatibilityIdentity = {
   contractVersion: FACTORY_CONTRACT_VERSION,
+  stateVersion: FACTORY_STATE_VERSION,
+  setupVersion: FACTORY_SETUP_VERSION,
+};
+
+/**
+ * Revision identity: everything that shapes generation quality. Recorded on every
+ * run row as telemetry so a quality regression can still be attributed to an exact
+ * engine revision. It never gates job claiming.
+ */
+const revisionIdentity = {
+  promptVersion: FACTORY_PROMPT_VERSION,
+  plannerVersion: FACTORY_PLANNER_VERSION,
   causalValidatorVersion: CAUSAL_VALIDATOR_VERSION,
   contextProjectionVersion: FACTORY_CONTEXT_VERSION,
   memoryPolicyVersion: FACTORY_MEMORY_POLICY_VERSION,
-  stateVersion: FACTORY_STATE_VERSION,
-  plannerVersion: FACTORY_PLANNER_VERSION,
   windowReviewVersion: FACTORY_WINDOW_REVIEW_VERSION,
-  // Setup revisions are tracked independently so a Launch-Pack-only change does
-  // not invalidate an already proven Writer/Editor runtime release.
-  setupVersion: FACTORY_ENGINE_SETUP_COMPATIBILITY,
   routeVersion: DEFAULT_MODEL_ROUTES.routeVersion,
   benchmarkProtocolVersion: STORY_FACTORY_BENCHMARK_PROTOCOL,
 };
 
-export const STORY_FACTORY_RELEASE = `sf_${createHash('sha256')
-  .update(JSON.stringify(identity))
-  .digest('hex')
-  .slice(0, 16)}`;
+function digest(value: unknown): string {
+  return createHash('sha256').update(JSON.stringify(value)).digest('hex').slice(0, 16);
+}
+
+export const STORY_FACTORY_RELEASE = `sf_${digest(compatibilityIdentity)}`;
+export const STORY_FACTORY_REVISION = `rev_${digest(revisionIdentity)}`;
 
 export const STORY_FACTORY_RELEASE_MANIFEST = {
-  ...identity,
+  ...compatibilityIdentity,
+  ...revisionIdentity,
+  releaseId: STORY_FACTORY_RELEASE,
+  revisionId: STORY_FACTORY_REVISION,
   setupRevision: FACTORY_SETUP_VERSION,
   plannerRevision: FACTORY_PLANNER_VERSION,
-  releaseId: STORY_FACTORY_RELEASE,
 } as const;

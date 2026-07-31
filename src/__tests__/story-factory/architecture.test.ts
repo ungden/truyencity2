@@ -9,6 +9,21 @@ function files(root: string): string[] {
   });
 }
 
+/**
+ * Migrations replay in filename order, so only the last definition of a function is
+ * live. Asserting a named historical file lets a later migration silently revert it.
+ */
+function latestMigrationDefining(functionName: string): string {
+  const marker = `FUNCTION ${functionName}(`;
+  const match = readdirSync('supabase/migrations')
+    .filter(entry => entry.endsWith('.sql'))
+    .sort()
+    .reverse()
+    .find(entry => readFileSync(path.join('supabase/migrations', entry), 'utf8').includes(marker));
+  if (!match) throw new Error(`No migration defines ${functionName}`);
+  return path.join('supabase/migrations', match);
+}
+
 describe('Story Factory architecture boundary', () => {
   test('legacy engines and write endpoints no longer exist', () => {
     expect(files('src/services/story-engine')).toHaveLength(0);
@@ -210,12 +225,55 @@ describe('Story Factory architecture boundary', () => {
     expect(planner).toContain('judge_replan_mechanical_repair');
   });
 
-  test('Planner contract changes participate in the engine release identity', () => {
+  test('the release identity covers artifact compatibility only, not generation quality', () => {
     const release = readFileSync('src/services/story-factory/release.ts', 'utf8');
-    expect(release).toContain('plannerVersion: FACTORY_PLANNER_VERSION');
-    expect(release).toContain('causalValidatorVersion: CAUSAL_VALIDATOR_VERSION');
-    expect(release).toContain('contextProjectionVersion: FACTORY_CONTEXT_VERSION');
-    expect(release).toContain('memoryPolicyVersion: FACTORY_MEMORY_POLICY_VERSION');
+    const compat = release.slice(release.indexOf('const compatibilityIdentity'), release.indexOf('const revisionIdentity'));
+    const revision = release.slice(release.indexOf('const revisionIdentity'), release.indexOf('function digest'));
+
+    // Only versions that decide whether a persisted artifact still parses may gate
+    // job claiming. Gating on prompt/planner/validator revisions meant every fix
+    // orphaned the fleet and invalidated the benchmark the fix was made to pass.
+    expect(compat).toContain('contractVersion: FACTORY_CONTRACT_VERSION');
+    expect(compat).toContain('stateVersion: FACTORY_STATE_VERSION');
+    expect(compat).toContain('setupVersion: FACTORY_SETUP_VERSION');
+    for (const generationVersion of [
+      'promptVersion',
+      'plannerVersion',
+      'causalValidatorVersion',
+      'contextProjectionVersion',
+      'memoryPolicyVersion',
+      'windowReviewVersion',
+      'routeVersion',
+    ]) {
+      expect(compat).not.toContain(generationVersion);
+      expect(revision).toContain(generationVersion);
+    }
+
+    // Quality regressions must still be attributable to an exact engine revision.
+    const runtime = readFileSync('src/services/story-factory/runtime.ts', 'utf8');
+    expect(runtime).toContain('engine_revision: STORY_FACTORY_REVISION');
+  });
+
+  test('a transient infrastructure failure retries with backoff instead of parking the job', () => {
+    const runtime = readFileSync('src/services/story-factory/runtime.ts', 'utf8');
+    expect(runtime).toContain("factoryError.code === 'infra_blocked' && job.retry_count < INFRA_RETRY_LIMIT");
+    // Semantic verdicts about the story are not retried — they need a human or a replan.
+    expect(runtime).toContain("status: retryable ? 'ready' : factoryError.code");
+  });
+
+  test('the rewrite path runs in its own tick so no chapter exceeds the route ceiling', () => {
+    const pipeline = readFileSync('src/services/story-factory/pipeline.ts', 'utf8');
+    const runtime = readFileSync('src/services/story-factory/runtime.ts', 'utf8');
+    const route = readFileSync('src/app/api/cron/story-factory/route.ts', 'utf8');
+    const provider = readFileSync('src/services/story-factory/provider.ts', 'utf8');
+    expect(pipeline).toContain('export async function draftStoryChapter');
+    expect(pipeline).toContain('export async function reviseStoryChapter');
+    expect(runtime).toContain("if (job.stage === 'revise') return runRevision(");
+
+    // Two provider calls per tick must fit inside maxDuration with headroom.
+    const maxDurationSeconds = Number(route.match(/maxDuration\s*=\s*(\d+)/)![1]);
+    const providerTimeoutMs = Number(provider.match(/REQUEST_TIMEOUT_MS = (\d[\d_]*)/)![1].replace(/_/g, ''));
+    expect(providerTimeoutMs * 2).toBeLessThan(maxDurationSeconds * 1000);
   });
 
   test('canary promotion requires the latest chapter-10 review on the exact release', () => {
@@ -314,14 +372,31 @@ describe('Story Factory architecture boundary', () => {
   });
 
   test('one slow provider stage cannot be reclaimed by another worker', () => {
-    const migration = readFileSync(
-      'supabase/migrations/20260726091255_restore_story_factory_30_minute_lease_v3.sql',
-      'utf8',
-    );
+    // Assert the migration that actually defines the function last. Reading a fixed
+    // historical file let 20260726133707 silently reinstate a 5 minute lease five hours
+    // after 20260726091255 restored 30 minutes — the test kept passing while production
+    // ran a lease exactly equal to maxDuration, discarding paid-for chapters on commit.
+    const migration = readFileSync(latestMigrationDefining('public.claim_story_factory_job'), 'utf8');
     expect(migration).toContain("lease_until = now() + interval '30 minutes'");
     expect(migration).not.toContain("lease_until = now() + interval '5 minutes'");
     expect(migration).toContain('FOR UPDATE OF job SKIP LOCKED');
     expect(migration).toContain('SECURITY INVOKER');
+  });
+
+  test('the production gate is a mechanical smoke check, not a self-invalidating benchmark chain', () => {
+    const migration = readFileSync(latestMigrationDefining('public.story_factory_release_is_approved'), 'utf8');
+    const body = migration.slice(
+      migration.indexOf('FUNCTION public.story_factory_release_is_approved('),
+      migration.indexOf('FUNCTION public.claim_story_factory_job('),
+    );
+    expect(body).toContain("smoke.kind = 'smoke'");
+    expect(body).toContain("(smoke.output_artifact->>'chaptersCompleted')::integer, 0) >= 5");
+    expect(body).toContain("(smoke.output_artifact->>'criticalContinuityViolations')::integer, -1) = 0");
+    // The four-run chain required every run to carry the current release, so any fix
+    // destroyed the evidence it was made to obtain. None of it may gate claiming again.
+    expect(body).not.toContain('writerBakeoffRunId');
+    expect(body).not.toContain('competingSequentialRunId');
+    expect(body).not.toContain('samplesCompleted');
   });
 
   test('the long-series outline is story-specific and never injected from a genre template', () => {

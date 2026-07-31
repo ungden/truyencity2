@@ -569,7 +569,7 @@ export async function assessStoryDraft(input: {
   return { assessment: mergePreflight(assessment, deterministicIssues), usage: response.usage };
 }
 
-export async function writeStoryChapter(input: {
+export interface ChapterStageInput {
   kernel: StoryKernel;
   state: StoryState;
   plan: ChapterPlan;
@@ -578,7 +578,73 @@ export async function writeStoryChapter(input: {
   continuityPacket?: ContinuityPacket;
   routes: ModelRoutes;
   provider?: StoryModelProvider;
-}): Promise<ChapterPipelineResult> {
+}
+
+/**
+ * A draft that the Editor asked to rewrite, carried across a tick boundary.
+ *
+ * Writer + Editor + Rewrite + Editor is up to four provider calls. That cannot fit
+ * inside the 300s route ceiling, so the rewrite runs in its own tick. Only prose-scoped
+ * findings ever reach here: artifact-scoped findings are thrown by the draft stage.
+ */
+export interface PendingRevision {
+  draft: ChapterDraft;
+  assessment: EditorAssessment;
+  usages: ProviderUsage[];
+  telemetry: ChapterAttemptTelemetry;
+}
+
+export type ChapterDraftOutcome =
+  | { decision: 'publish'; result: ChapterPipelineResult }
+  | { decision: 'revise'; pending: PendingRevision };
+
+function publishResult(input: {
+  stage: ChapterStageInput;
+  transition: ReturnType<typeof applyChapterPlan>;
+  contexts: ReturnType<typeof buildChapterContexts>;
+  draft: ChapterDraft;
+  assessment: Extract<EditorAssessment, { status: 'pass' }>;
+  usages: ProviderUsage[];
+  revisionCount: 0 | 1;
+  telemetry: ChapterAttemptTelemetry;
+}): ChapterPipelineResult {
+  const stateAfter = appendAcceptedOutcome({
+    state: input.transition.state,
+    title: input.draft.title,
+    content: input.draft.content,
+    outcome: input.assessment.outcome,
+  });
+  const acceptedOutcome = stateAfter.recentOutcomes[stateAfter.recentOutcomes.length - 1];
+  return {
+    decision: 'publish',
+    draft: input.draft,
+    assessment: input.assessment,
+    stateAfter,
+    stateEvents: [
+      ...input.transition.events,
+      ...buildMechanicUseEvents(input.stage.plan),
+      buildChapterOutcomeEvent({ plan: input.stage.plan, outcome: acceptedOutcome }),
+    ],
+    contextManifest: input.contexts.manifest,
+    usages: input.usages,
+    revisionCount: input.revisionCount,
+    wordCount: wordCount(input.draft.content),
+    attemptTelemetry: input.telemetry,
+  };
+}
+
+function rethrowWithTelemetry(error: unknown, telemetry: ChapterAttemptTelemetry): never {
+  const factoryError = error instanceof StoryFactoryError
+    ? error
+    : new StoryFactoryError('infra_blocked', error instanceof Error ? error.message : String(error));
+  throw new StoryFactoryError(factoryError.code, factoryError.message, {
+    cause: factoryError.evidence ?? null,
+    pipelineTelemetry: telemetry,
+  });
+}
+
+/** Writer + Editor. Publishes on a clean first pass, otherwise hands back the rewrite payload. */
+export async function draftStoryChapter(input: ChapterStageInput): Promise<ChapterDraftOutcome> {
   const provider = input.provider ?? geminiProvider;
   // Validate and materialize the exact state transition before spending a model call.
   const transition = applyChapterPlan({ kernel: input.kernel, state: input.state, plan: input.plan });
@@ -586,16 +652,14 @@ export async function writeStoryChapter(input: {
   const usages: ProviderUsage[] = [];
   let initialDraft: ChapterDraft | null = null;
   let initialAssessment: EditorAssessment | null = null;
-  let revisionDraft: ChapterDraft | null = null;
-  let finalAssessment: EditorAssessment | null = null;
   const telemetry = (): ChapterAttemptTelemetry => ({
     initialDraft,
     initialAssessment,
-    revisionDraft,
-    finalAssessment,
+    revisionDraft: null,
+    finalAssessment: initialAssessment,
     usages: [...usages],
-    revisionCount: revisionDraft ? 1 : 0,
-    draftAttempts: revisionDraft ? 2 : initialDraft ? 1 : 0,
+    revisionCount: 0,
+    draftAttempts: initialDraft ? 1 : 0,
     firstPass: initialAssessment ? initialAssessment.status === 'pass' : null,
   });
 
@@ -623,32 +687,21 @@ export async function writeStoryChapter(input: {
       draft: initial.value,
     });
     initialAssessment = firstAssessment.assessment;
-    finalAssessment = firstAssessment.assessment;
     usages.push(firstAssessment.usage);
 
     if (firstAssessment.assessment.status === 'pass') {
-      const stateAfter = appendAcceptedOutcome({
-        state: transition.state,
-        title: initial.value.title,
-        content: initial.value.content,
-        outcome: firstAssessment.assessment.outcome,
-      });
-      const acceptedOutcome = stateAfter.recentOutcomes[stateAfter.recentOutcomes.length - 1];
       return {
         decision: 'publish',
-        draft: initial.value,
-        assessment: firstAssessment.assessment,
-        stateAfter,
-        stateEvents: [
-          ...transition.events,
-          ...buildMechanicUseEvents(input.plan),
-          buildChapterOutcomeEvent({ plan: input.plan, outcome: acceptedOutcome }),
-        ],
-        contextManifest: contexts.manifest,
-        usages,
-        revisionCount: 0,
-        wordCount: wordCount(initial.value.content),
-        attemptTelemetry: telemetry(),
+        result: publishResult({
+          stage: input,
+          transition,
+          contexts,
+          draft: initial.value,
+          assessment: firstAssessment.assessment,
+          usages,
+          revisionCount: 0,
+          telemetry: telemetry(),
+        }),
       };
     }
 
@@ -661,13 +714,53 @@ export async function writeStoryChapter(input: {
       );
     }
 
+    return {
+      decision: 'revise',
+      pending: {
+        draft: initial.value,
+        assessment: firstAssessment.assessment,
+        usages,
+        telemetry: telemetry(),
+      },
+    };
+  } catch (error) {
+    rethrowWithTelemetry(error, telemetry());
+  }
+}
+
+/**
+ * Rewrite + Editor. The state transition and contexts are pure functions of
+ * kernel/state/plan, and nothing was committed by the draft stage, so recomputing
+ * them here is exact rather than a re-derivation risk.
+ */
+export async function reviseStoryChapter(
+  input: ChapterStageInput & { pending: PendingRevision },
+): Promise<ChapterPipelineResult> {
+  const provider = input.provider ?? geminiProvider;
+  const transition = applyChapterPlan({ kernel: input.kernel, state: input.state, plan: input.plan });
+  const contexts = buildChapterContexts({ ...input, stateAfter: transition.state });
+  const usages: ProviderUsage[] = [...input.pending.usages];
+  let revisionDraft: ChapterDraft | null = null;
+  let finalAssessment: EditorAssessment | null = input.pending.assessment;
+  const telemetry = (): ChapterAttemptTelemetry => ({
+    initialDraft: input.pending.telemetry.initialDraft,
+    initialAssessment: input.pending.assessment,
+    revisionDraft,
+    finalAssessment,
+    usages: [...usages],
+    revisionCount: revisionDraft ? 1 : 0,
+    draftAttempts: revisionDraft ? 2 : 1,
+    firstPass: false,
+  });
+
+  try {
     const revision = await provider.json({
       model: input.routes.writer,
       system: REVISION_SYSTEM_PROMPT,
       prompt: JSON.stringify(buildRevisionContext({
         brief: contexts.brief,
         previousTail: contexts.previousTail,
-        assessment: firstAssessment.assessment,
+        assessment: input.pending.assessment,
       })),
       schema: ChapterDraftSchema,
       temperature: 1,
@@ -691,36 +784,27 @@ export async function writeStoryChapter(input: {
       }
       throw new StoryFactoryError('quality_blocked', 'Chapter still fails after one evidence-based full rewrite.', secondAssessment.assessment);
     }
-    const stateAfter = appendAcceptedOutcome({
-      state: transition.state,
-      title: revision.value.title,
-      content: revision.value.content,
-      outcome: secondAssessment.assessment.outcome,
-    });
-    const acceptedOutcome = stateAfter.recentOutcomes[stateAfter.recentOutcomes.length - 1];
-    return {
-      decision: 'publish',
+    return publishResult({
+      stage: input,
+      transition,
+      contexts,
       draft: revision.value,
       assessment: secondAssessment.assessment,
-      stateAfter,
-      stateEvents: [
-        ...transition.events,
-        ...buildMechanicUseEvents(input.plan),
-        buildChapterOutcomeEvent({ plan: input.plan, outcome: acceptedOutcome }),
-      ],
-      contextManifest: contexts.manifest,
       usages,
       revisionCount: 1,
-      wordCount: wordCount(revision.value.content),
-      attemptTelemetry: telemetry(),
-    };
-  } catch (error) {
-    const factoryError = error instanceof StoryFactoryError
-      ? error
-      : new StoryFactoryError('infra_blocked', error instanceof Error ? error.message : String(error));
-    throw new StoryFactoryError(factoryError.code, factoryError.message, {
-      cause: factoryError.evidence ?? null,
-      pipelineTelemetry: telemetry(),
+      telemetry: telemetry(),
     });
+  } catch (error) {
+    rethrowWithTelemetry(error, telemetry());
   }
+}
+
+/**
+ * Both stages in one call. Used by the offline benchmark and bake-off harnesses,
+ * which are not bound by the route's execution ceiling.
+ */
+export async function writeStoryChapter(input: ChapterStageInput): Promise<ChapterPipelineResult> {
+  const drafted = await draftStoryChapter(input);
+  if (drafted.decision === 'publish') return drafted.result;
+  return reviseStoryChapter({ ...input, pending: drafted.pending });
 }

@@ -9,7 +9,9 @@ import {
   StoryFactoryError,
   StoryKernelSchema,
   StoryStateSchema,
+  type ChapterPlan,
   type ModelRoutes,
+  type RollingPlan,
 } from './contracts';
 import { generateFactoryCover } from './cover';
 import {
@@ -17,11 +19,22 @@ import {
   memoryEntityIdsForArc,
   memoryEntityIdsForPlan,
 } from './memory';
-import { writeStoryChapter, type ChapterAttemptTelemetry } from './pipeline';
+import {
+  draftStoryChapter,
+  reviseStoryChapter,
+  type ChapterAttemptTelemetry,
+  type ChapterPipelineResult,
+  type PendingRevision,
+} from './pipeline';
 import { planArcLifecycle, planRollingWindow, reviewFiveChapterWindow } from './planner';
 import type { ProviderUsage, StoryModelProvider } from './provider';
 import { digestArtifact } from './benchmark';
-import { FACTORY_PLANNER_VERSION, FACTORY_SETUP_VERSION, STORY_FACTORY_RELEASE } from './release';
+import {
+  FACTORY_PLANNER_VERSION,
+  FACTORY_SETUP_VERSION,
+  STORY_FACTORY_RELEASE,
+  STORY_FACTORY_REVISION,
+} from './release';
 import { runConceptLab } from './setup';
 import type { SetupCheckpoint } from './setup';
 
@@ -31,11 +44,13 @@ interface FactoryJobRow {
   novel_id: string;
   execution_mode: 'hidden_canary' | 'production';
   status: string;
-  stage: 'setup' | 'plan' | 'write' | 'window_review' | 'arc' | 'cover' | 'done';
+  stage: 'setup' | 'plan' | 'write' | 'revise' | 'window_review' | 'arc' | 'cover' | 'done';
   current_chapter: number;
   rolling_plan: unknown;
   plan_feedback: unknown;
   replan_attempts: number;
+  retry_count: number;
+  last_run_id: string | null;
   setup_input: unknown;
   minimum_chapters: number;
   maximum_chapters: number;
@@ -64,6 +79,9 @@ export interface FactoryTickResult {
   chapterNumber?: number;
   error?: string;
 }
+
+/** Consecutive transient failures a job absorbs before it parks for an operator. */
+export const INFRA_RETRY_LIMIT = 5;
 
 export function isStoryFactoryEnabled(value: string | undefined = process.env.STORY_FACTORY_ENABLED): boolean {
   return value?.trim() === 'true';
@@ -103,6 +121,7 @@ async function createRun(db: SupabaseClient, job: FactoryJobRow, kind: string, c
     chapter_number: chapterNumber ?? null,
     status: 'running',
     engine_release: STORY_FACTORY_RELEASE,
+    engine_revision: STORY_FACTORY_REVISION,
   }).select('id').single();
   if (error) throw error;
   const { error: jobError } = await db.from('story_factory_jobs').update({ last_run_id: data.id }).eq('id', job.id).eq('lease_token', job.lease_token);
@@ -147,15 +166,31 @@ async function blockRun(db: SupabaseClient, job: FactoryJobRow, runId: string | 
       finished_at: new Date().toISOString(),
     }).eq('id', runId).eq('status', 'running');
   }
+  // Infrastructure failures are transient by definition — a provider hiccup, a socket
+  // reset, an expired lease. Parking the job on the first one made the fleet drain to
+  // zero with nothing running. Semantic blocks (setup/plan/quality) are verdicts about
+  // the story itself and still park immediately for an operator to look at.
+  const retryable = factoryError.code === 'infra_blocked' && job.retry_count < INFRA_RETRY_LIMIT;
+  const now = new Date();
   await db.from('story_factory_jobs').update({
-    status: factoryError.code,
+    status: retryable ? 'ready' : factoryError.code,
+    retry_count: job.retry_count + 1,
     last_error: factoryError.message,
     lease_owner: null,
     lease_token: null,
     lease_until: null,
-    updated_at: new Date().toISOString(),
+    updated_at: now.toISOString(),
+    ...(retryable
+      ? { next_run_at: new Date(now.getTime() + 2 ** job.retry_count * 60_000).toISOString() }
+      : {}),
   }).eq('id', job.id).eq('lease_token', job.lease_token);
-  return { status: 'blocked', jobId: job.id, stage: job.stage, chapterNumber: job.current_chapter, error: factoryError.message };
+  return {
+    status: retryable ? 'completed' : 'blocked',
+    jobId: job.id,
+    stage: job.stage,
+    chapterNumber: job.current_chapter,
+    error: factoryError.message,
+  };
 }
 
 async function recoverUncommittedPlan(
@@ -421,7 +456,7 @@ async function runChapter(db: SupabaseClient, job: FactoryJobRow, project: Facto
       if (error || !data?.content) throw new StoryFactoryError('plan_blocked', 'Previous published chapter is missing.');
       previousChapter = data.content;
     }
-    const result = await writeStoryChapter({
+    const drafted = await draftStoryChapter({
       kernel,
       state,
       plan,
@@ -431,33 +466,170 @@ async function runChapter(db: SupabaseClient, job: FactoryJobRow, project: Facto
       routes,
       provider,
     });
-    const remainingPlan = { ...rolling, startChapter: plan.chapterNumber + 1, plans: rolling.plans.filter(item => item.chapterNumber > plan.chapterNumber) };
-    const { error } = await db.rpc('commit_story_factory_chapter', {
-      p_job_id: job.id,
-      p_lease_token: job.lease_token,
-      p_run_id: runId,
-      p_expected_chapter: plan.chapterNumber,
-      p_title: result.draft.title,
-      p_content: result.draft.content,
-      p_state_after: result.stateAfter,
-      p_remaining_plan: remainingPlan,
-      p_events: result.stateEvents,
-      p_assessment: result.assessment,
-      p_context_manifest: result.contextManifest,
-      p_usage: result.usages,
-      p_cost_usd: usageCost(result.usages),
-      p_word_count: result.wordCount,
-      p_revision_count: result.revisionCount,
-      p_attempt_telemetry: result.attemptTelemetry,
-      p_engine_release: STORY_FACTORY_RELEASE,
-    });
-    if (error) throw error;
-    return { status: 'completed', jobId: job.id, stage: 'write', chapterNumber: plan.chapterNumber };
+    if (drafted.decision === 'revise') {
+      // Hand the rewrite to its own tick. The run row stays 'running' so it remains the
+      // single record of this chapter attempt and the commit guard still applies.
+      return handOffRevision(db, job, runId, drafted.pending, plan.chapterNumber);
+    }
+    return commitChapter(db, job, runId, rolling, plan, drafted.result, 'write');
   } catch (error) {
     if (error instanceof StoryFactoryError && error.code === 'plan_blocked') {
       return recoverUncommittedPlan(db, job, runId, error);
     }
     return blockRun(db, job, runId, error);
+  }
+}
+
+async function commitChapter(
+  db: SupabaseClient,
+  job: FactoryJobRow,
+  runId: string,
+  rolling: RollingPlan,
+  plan: ChapterPlan,
+  result: ChapterPipelineResult,
+  stage: 'write' | 'revise',
+): Promise<FactoryTickResult> {
+  const remainingPlan = {
+    ...rolling,
+    startChapter: plan.chapterNumber + 1,
+    plans: rolling.plans.filter(item => item.chapterNumber > plan.chapterNumber),
+  };
+  const { error } = await db.rpc('commit_story_factory_chapter', {
+    p_job_id: job.id,
+    p_lease_token: job.lease_token,
+    p_run_id: runId,
+    p_expected_chapter: plan.chapterNumber,
+    p_title: result.draft.title,
+    p_content: result.draft.content,
+    p_state_after: result.stateAfter,
+    p_remaining_plan: remainingPlan,
+    p_events: result.stateEvents,
+    p_assessment: result.assessment,
+    p_context_manifest: result.contextManifest,
+    p_usage: result.usages,
+    p_cost_usd: usageCost(result.usages),
+    p_word_count: result.wordCount,
+    p_revision_count: result.revisionCount,
+    p_attempt_telemetry: result.attemptTelemetry,
+    p_engine_release: STORY_FACTORY_RELEASE,
+  });
+  if (error) throw error;
+  return { status: 'completed', jobId: job.id, stage, chapterNumber: plan.chapterNumber };
+}
+
+async function handOffRevision(
+  db: SupabaseClient,
+  job: FactoryJobRow,
+  runId: string,
+  pending: PendingRevision,
+  chapterNumber: number,
+): Promise<FactoryTickResult> {
+  const now = new Date().toISOString();
+  const runUpdate = await db.from('story_factory_runs').update({
+    output_artifact: { pendingRevision: pending },
+    editor_assessment: pending.assessment,
+    usage: pending.usages,
+    estimated_cost_usd: usageCost(pending.usages),
+    revision_count: 0,
+    draft_attempts: 1,
+    first_pass: false,
+  }).eq('id', runId).eq('status', 'running');
+  if (runUpdate.error) throw runUpdate.error;
+  const jobUpdate = await db.from('story_factory_jobs').update({
+    status: 'ready', stage: 'revise',
+    lease_owner: null, lease_token: null, lease_until: null,
+    next_run_at: now, updated_at: now,
+  }).eq('id', job.id).eq('lease_token', job.lease_token);
+  if (jobUpdate.error) throw jobUpdate.error;
+  return { status: 'completed', jobId: job.id, stage: 'revise', chapterNumber };
+}
+
+function readPendingRevision(artifact: unknown): PendingRevision | null {
+  if (!artifact || typeof artifact !== 'object') return null;
+  const pending = (artifact as { pendingRevision?: unknown }).pendingRevision;
+  if (!pending || typeof pending !== 'object') return null;
+  const candidate = pending as Partial<PendingRevision>;
+  const draft = candidate.draft as { title?: unknown; content?: unknown } | undefined;
+  if (typeof draft?.title !== 'string' || typeof draft.content !== 'string') return null;
+  if (!candidate.assessment || typeof candidate.assessment !== 'object') return null;
+  return {
+    draft: candidate.draft as PendingRevision['draft'],
+    assessment: candidate.assessment as PendingRevision['assessment'],
+    usages: Array.isArray(candidate.usages) ? candidate.usages as ProviderUsage[] : [],
+    telemetry: (candidate.telemetry ?? {
+      initialDraft: null, initialAssessment: null, revisionDraft: null, finalAssessment: null,
+      usages: [], revisionCount: 0, draftAttempts: 1, firstPass: false,
+    }) as ChapterAttemptTelemetry,
+  };
+}
+
+async function runRevision(db: SupabaseClient, job: FactoryJobRow, project: FactoryProjectRow, provider?: StoryModelProvider): Promise<FactoryTickResult> {
+  const restartDraft = async (reason: string): Promise<FactoryTickResult> => {
+    // A lost or unreadable pending draft is recoverable: redraft the chapter from the
+    // committed state. Nothing was persisted, so this is a clean retry rather than a block.
+    const now = new Date().toISOString();
+    const update = await db.from('story_factory_jobs').update({
+      status: 'ready', stage: 'write', last_error: reason,
+      lease_owner: null, lease_token: null, lease_until: null, next_run_at: now, updated_at: now,
+    }).eq('id', job.id).eq('lease_token', job.lease_token);
+    if (update.error) throw update.error;
+    return { status: 'completed', jobId: job.id, stage: 'write', chapterNumber: job.current_chapter };
+  };
+
+  if (!job.last_run_id) return restartDraft('Revision stage has no run to resume.');
+  const runRow = await db.from('story_factory_runs').select('id,output_artifact,status')
+    .eq('id', job.last_run_id).eq('job_id', job.id).maybeSingle();
+  if (runRow.error) throw runRow.error;
+  if (!runRow.data || runRow.data.status !== 'running') return restartDraft('Revision run is no longer open.');
+  const pending = readPendingRevision(runRow.data.output_artifact);
+  if (!pending) return restartDraft('Revision run has no readable pending draft.');
+
+  const stateResult = StoryStateSchema.safeParse(project.story_state);
+  const kernelResult = StoryKernelSchema.safeParse(project.story_kernel);
+  const arcResult = ArcPlanSchema.safeParse(project.arc_plan);
+  const routesResult = ModelRoutesSchema.safeParse(project.model_routes);
+  const rollingResult = RollingPlanSchema.safeParse(job.rolling_plan);
+  if (!stateResult.success || !kernelResult.success || !arcResult.success || !routesResult.success) {
+    return blockRun(db, job, runRow.data.id, new StoryFactoryError('setup_blocked', 'Story setup artifacts are invalid.'));
+  }
+  if (!rollingResult.success) {
+    return blockRun(db, job, runRow.data.id, new StoryFactoryError('plan_blocked', 'Rolling plan is invalid.', rollingResult.error.issues));
+  }
+  const nextChapter = stateResult.data.chapterNumber + 1;
+  const plan = rollingResult.data.plans.find(item => item.chapterNumber === nextChapter);
+  if (!plan) return restartDraft('Rolling plan no longer covers the pending chapter.');
+  const nextPlan = rollingResult.data.plans.find(item => item.chapterNumber === nextChapter + 1);
+
+  try {
+    const continuityPacket = await loadContinuityPacket({
+      db,
+      projectId: project.id,
+      state: stateResult.data,
+      entityIds: memoryEntityIdsForPlan(kernelResult.data, plan),
+    });
+    let previousChapter: string | undefined;
+    if (plan.chapterNumber > 1) {
+      const { data, error } = await db.from('chapters').select('content').eq('novel_id', job.novel_id).eq('chapter_number', plan.chapterNumber - 1).single();
+      if (error || !data?.content) throw new StoryFactoryError('plan_blocked', 'Previous published chapter is missing.');
+      previousChapter = data.content;
+    }
+    const result = await reviseStoryChapter({
+      kernel: kernelResult.data,
+      state: stateResult.data,
+      plan,
+      nextPlan,
+      previousChapter,
+      continuityPacket,
+      routes: routesResult.data,
+      provider,
+      pending,
+    });
+    return commitChapter(db, job, runRow.data.id, rollingResult.data, plan, result, 'revise');
+  } catch (error) {
+    if (error instanceof StoryFactoryError && error.code === 'plan_blocked') {
+      return recoverUncommittedPlan(db, job, runRow.data.id, error);
+    }
+    return blockRun(db, job, runRow.data.id, error);
   }
 }
 
@@ -568,5 +740,6 @@ export async function runStoryFactoryTick(options?: {
   if (job.stage === 'window_review') return runWindowReview(db, job, project, options?.provider);
   if (job.stage === 'arc') return runArc(db, job, project, options?.provider);
   if (job.stage === 'plan') return runPlan(db, job, project, options?.provider);
+  if (job.stage === 'revise') return runRevision(db, job, project, options?.provider);
   return runChapter(db, job, project, options?.provider);
 }
