@@ -51,9 +51,11 @@ npm run factory:operator -- revive --apply    # un-park blocked jobs
 
 Exact routes live in `src/services/story-factory/routes.ts`. All Gemini.
 
-**No fallback, ever.** If the routed model fails, the stage throws and the job retries on a
-later tick. Never substitute a different provider or a template. `architecture.test.ts`
-asserts `provider.ts` contains no `fallback|openrouter|deepseek`.
+**No substitution, ever.** If the routed model fails, the stage throws and the job retries
+the SAME route on a later tick — never a different model or a template. The provider
+dispatches by model id: slash-vendor ids (`deepseek/…`) go through OpenRouter, `gpt-*`
+direct to OpenAI, the rest to Gemini. `architecture.test.ts` enforces the no-substitution
+structure.
 
 Changing a model is a quality decision, not a config tweak: run `factory:model-bakeoff`,
 then re-run the writing smoke — that is what the claim gate checks.

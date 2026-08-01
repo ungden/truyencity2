@@ -1,0 +1,12 @@
+{
+  "setupGeneratorA": "gemini-3.5-flash",
+  "setupGeneratorB": "gemini-2.5-pro",
+  "setupJudge": "gemini-3.1-pro-preview",
+  "openingSimulator": "gemini-3.5-flash",
+  "launchArchitect": "gemini-3.1-pro-preview",
+  "planner": "gemini-3.1-pro-preview",
+  "planJudge": "gemini-2.5-pro",
+  "writer": "gemini-2.5-pro",
+  "editor": "deepseek/deepseek-v4-flash-0731",
+  "routeVersion": "or-deepseek-editor-experiment-2026-08-01.1"
+}

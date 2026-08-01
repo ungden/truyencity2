@@ -27,6 +27,15 @@ const PRICING: Record<string, { input: number; output: number }> = {
   'gemini-3.6-flash': { input: 1.5, output: 7.5 },
   // Post-discount pricing announced 2026-07-30.
   'gpt-5.6-luna': { input: 0.2, output: 1.2 },
+  'gpt-5.6-terra': { input: 1, output: 6 },
+  // Routed through OpenRouter (model ids contain a vendor slash). Prices from the
+  // OpenRouter models endpoint, 2026-08-01.
+  'deepseek/deepseek-v4-flash-0731': { input: 0.14, output: 0.28 },
+  'qwen/qwen3.7-flash': { input: 0.03, output: 0.13 },
+  'google/gemini-3.6-flash': { input: 1.5, output: 7.5 },
+  'moonshotai/kimi-k3': { input: 3, output: 15 },
+  'openai/gpt-5.6-terra': { input: 1, output: 6 },
+  'x-ai/grok-4.5': { input: 2, output: 6 },
 };
 
 export interface ProviderUsage {
@@ -181,12 +190,29 @@ async function openaiGenerate(input: {
   if (!apiKey) throw new StoryFactoryError('infra_blocked', 'OPENAI_API_KEY is not configured for a gpt-* route.');
   const strictSchema = input.responseSchema
     ? JSON.parse(JSON.stringify(input.responseSchema), (key, value) => {
-      if (value && typeof value === 'object' && !Array.isArray(value) && value.type === 'object' && value.properties) {
-        return {
-          ...value,
-          additionalProperties: false,
-          required: Object.keys(value.properties as Record<string, unknown>),
-        };
+      if (value && typeof value === 'object' && !Array.isArray(value)) {
+        const node = value as Record<string, unknown>;
+        // Strict mode rejects array-length keywords; preserve the constraint as
+        // guidance so the model still aims for it — application Zod re-validates.
+        const lengthRules: string[] = [];
+        if (typeof node.minItems === 'number') lengthRules.push(`at least ${node.minItems} items`);
+        if (typeof node.maxItems === 'number') lengthRules.push(`at most ${node.maxItems} items`);
+        if (lengthRules.length) {
+          const guidance = `Application constraint: array must have ${lengthRules.join(' and ')}.`;
+          node.description = typeof node.description === 'string' && node.description.trim()
+            ? `${node.description} ${guidance}`
+            : guidance;
+          delete node.minItems;
+          delete node.maxItems;
+        }
+        if (node.type === 'object' && node.properties) {
+          return {
+            ...node,
+            additionalProperties: false,
+            required: Object.keys(node.properties as Record<string, unknown>),
+          };
+        }
+        return node;
       }
       return value;
     })
@@ -257,6 +283,103 @@ async function openaiGenerate(input: {
   throw new StoryFactoryError('infra_blocked', 'Provider retry loop ended unexpectedly.');
 }
 
+/**
+ * OpenRouter path for models whose id carries a vendor slash (deepseek/…, qwen/…).
+ * Same routed-vendor contract as the other paths: the model comes from the versioned
+ * route; on failure the stage throws and retries the SAME route. JSON output uses
+ * OpenAI-compatible response_format json_schema (strict) with the same length-keyword
+ * stripping as the direct OpenAI path; application Zod re-validates afterwards.
+ */
+async function openrouterGenerate(input: {
+  model: string;
+  system: string;
+  prompt: string;
+  temperature: number;
+  responseSchema?: Record<string, unknown>;
+  jsonMode?: boolean;
+  timeoutMs?: number;
+}): Promise<ProviderResult<string>> {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) throw new StoryFactoryError('infra_blocked', 'OPENROUTER_API_KEY is not configured for a slash-vendor route.');
+  const strictSchema = input.responseSchema
+    ? JSON.parse(JSON.stringify(input.responseSchema), (key, value) => {
+      if (value && typeof value === 'object' && !Array.isArray(value)) {
+        const node = value as Record<string, unknown>;
+        delete node.minItems;
+        delete node.maxItems;
+        if (node.type === 'object' && node.properties) {
+          return {
+            ...node,
+            additionalProperties: false,
+            required: Object.keys(node.properties as Record<string, unknown>),
+          };
+        }
+        return node;
+      }
+      return value;
+    })
+    : undefined;
+  const body: Record<string, unknown> = {
+    model: input.model,
+    messages: [
+      { role: 'system', content: input.system },
+      { role: 'user', content: input.prompt },
+    ],
+    temperature: input.temperature,
+    max_tokens: 65_536,
+    ...(strictSchema
+      ? { response_format: { type: 'json_schema', json_schema: { name: 'response', schema: strictSchema, strict: true } } }
+      : input.jsonMode
+        ? { response_format: { type: 'json_object' } }
+        : {}),
+  };
+  for (let attempt = 0; attempt <= RETRY_DELAYS_MS.length; attempt += 1) {
+    try {
+      if (attempt > 0) await new Promise(resolve => setTimeout(resolve, RETRY_DELAYS_MS[attempt - 1]));
+      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`,
+          'HTTP-Referer': 'https://truyencity.com',
+          'X-Title': 'TruyenCity Story Factory',
+        },
+        body: JSON.stringify(body),
+        signal: AbortSignal.timeout(input.timeoutMs ?? DEFAULT_TIMEOUT_MS),
+      });
+      if (!response.ok) {
+        const detail = await response.text().catch(() => '');
+        throw new ProviderHttpError(response.status, `OpenRouter ${input.model} ${response.status}: ${detail.slice(0, 500)}`);
+      }
+      const payload = await response.json();
+      const choice = payload?.choices?.[0];
+      const value = (choice?.message?.content ?? '').trim();
+      const finishReason = choice?.finish_reason ?? 'UNKNOWN';
+      if (!value || finishReason === 'length') {
+        throw new StoryFactoryError('infra_blocked', `OpenRouter returned ${value ? 'truncated' : 'empty'} output (${finishReason}).`);
+      }
+      const inputTokens = payload?.usage?.prompt_tokens ?? 0;
+      const outputTokens = payload?.usage?.completion_tokens ?? 0;
+      return {
+        value,
+        usage: {
+          model: input.model,
+          inputTokens,
+          outputTokens,
+          costUsd: cost(input.model, inputTokens, outputTokens),
+          finishReason,
+        },
+      };
+    } catch (error) {
+      if (error instanceof StoryFactoryError) throw error;
+      if (!retryable(error) || attempt === RETRY_DELAYS_MS.length) {
+        throw new StoryFactoryError('infra_blocked', error instanceof Error ? error.message : String(error));
+      }
+    }
+  }
+  throw new StoryFactoryError('infra_blocked', 'Provider retry loop ended unexpectedly.');
+}
+
 async function generate(input: {
   model: string;
   system: string;
@@ -271,6 +394,12 @@ async function generate(input: {
 }): Promise<ProviderResult<string>> {
   // Dispatch by the routed model's vendor prefix — a deliberate route selection;
   // on failure the stage throws and retries on the SAME route, never another model.
+  if (input.model.includes('/')) {
+    if (input.googleSearch) {
+      throw new StoryFactoryError('infra_blocked', 'Search grounding is only routed through Gemini.');
+    }
+    return openrouterGenerate(input);
+  }
   if (input.model.startsWith('gpt-')) {
     if (input.googleSearch) {
       throw new StoryFactoryError('infra_blocked', 'Search grounding is only routed through Gemini.');

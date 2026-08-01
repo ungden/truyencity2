@@ -157,11 +157,12 @@ back.
 
 ## Models
 
-`routes.ts` is the exact, versioned route. There is no fallback: a stage's model comes
-from the route and nothing substitutes on failure. The provider layer dispatches by
-vendor prefix — `gpt-*` goes to the OpenAI Responses API (strict JSON schema, per-call
-`reasoningEffort`/`verbosity`, no temperature — reasoning models reject it), everything
-else to Gemini. `OPENAI_API_KEY` is needed only when a route uses a `gpt-*` model.
+`routes.ts` is the exact, versioned route. There is no substitution: a stage's model
+comes from the route and on failure the stage throws and retries the same route. The
+provider dispatches by model id — slash-vendor ids (`deepseek/…`, `qwen/…`) through
+OpenRouter's chat completions API, `gpt-*` direct to the OpenAI Responses API (strict
+JSON schema, per-call `reasoningEffort`/`verbosity`, no temperature), everything else to
+Gemini. `OPENAI_API_KEY` / `OPENROUTER_API_KEY` are needed only when a route uses them.
 
 **GPT-5.6 Luna was evaluated and rejected for all three roles** (2026-08-01, one-variable
 A/B on the same launch pack and prompts, docs-correct settings, independent pinned

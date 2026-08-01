@@ -85,13 +85,22 @@ describe('Story Factory architecture boundary', () => {
     expect(source).not.toContain('@/services/story-writing-factory');
   });
 
-  test('publication never gates on length and the provider has no fallback', () => {
+  test('publication never gates on length and the provider never substitutes a model', () => {
     // Word count is telemetry. A length gate makes the Writer pad, which is the one
     // failure mode no downstream check can distinguish from a legitimately long chapter.
     expect(read('src/services/story-factory/pipeline.ts'))
       .not.toMatch(/min(?:imum)?Words|max(?:imum)?Words|targetWord/i);
-    expect(read('src/services/story-factory/provider.ts'))
-      .not.toMatch(/fallback|openrouter|deepseek/i);
+    // The historical ban here was on vendor NAMES, from an era when a failing call
+    // silently fell back to template output. Vendors are now legitimate routed paths
+    // (Gemini, OpenAI, OpenRouter) — what stays banned is substitution: every path
+    // must exhaust its bounded retries on the SAME routed model and then throw.
+    const provider = read('src/services/story-factory/provider.ts');
+    expect(provider).not.toMatch(/fallback/i);
+    // One bounded retry loop per vendor path, all ending in the same terminal throw.
+    expect(provider.match(/Provider retry loop ended unexpectedly\./g)?.length).toBe(3);
+    // Dispatch is a pure function of the routed model id — no catch clause ever
+    // invokes a different vendor's generate.
+    expect(provider).not.toMatch(/catch[^}]*(openaiGenerate|openrouterGenerate)\(/s);
   });
 
   test('the Writer never sees plan internals or narrative outcomes', () => {
