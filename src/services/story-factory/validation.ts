@@ -248,6 +248,39 @@ export function validateKernelState(kernel: StoryKernel, state: StoryState): voi
  * models provenance, not quantity scheduling; exact balances remain the
  * rolling-plan validator's responsibility.
  */
+/**
+ * Every resource an active conversion CONSUMES must be PRODUCED by at least one
+ * active mechanic. Opening stock does not count: a finite balance is a countdown,
+ * not an acquisition path. The first production canary passed balance-seeded
+ * reachability at setup, spent its opening inventory across three chapters, and
+ * dead-ended — its arc could preserve and sell fish but nothing could ever acquire
+ * fish again. Production-graph form deliberately accepts bootstrap loops (money
+ * buys fish, selling fish yields money) that a zero-balance reachability check
+ * would wrongly reject.
+ */
+export function assertRenewableConversionInputs(kernel: StoryKernel, arc: ArcPlan): void {
+  const activeMechanics = arc.activeMechanicIds.map(id => (
+    kernel.worldMechanics.find(mechanic => mechanic.id === id)
+  )).filter((mechanic): mechanic is StoryKernel['worldMechanics'][number] => Boolean(mechanic));
+  const produced = new Set<string>();
+  const consumed = new Set<string>();
+  for (const mechanic of activeMechanics) {
+    if (mechanic.kind === 'conversion') {
+      mechanic.outputsPerBatch.forEach(item => produced.add(item.resourceId));
+      mechanic.inputsPerBatch.forEach(item => consumed.add(item.resourceId));
+    } else if (mechanic.kind === 'capability') {
+      mechanic.effectResources.forEach(effect => produced.add(effect.resourceId));
+    }
+  }
+  const sinkOnly = [...consumed].filter(resourceId => !produced.has(resourceId));
+  if (sinkOnly.length) {
+    fail('Active conversions consume resources no active mechanic can produce.', {
+      resourceIds: sinkOnly,
+      repairRule: 'Add an active acquisition mechanic (purchase, harvest, production) for each listed resource, or deactivate the conversion that consumes it. A finite opening balance is not an acquisition path.',
+    });
+  }
+}
+
 export function validateArcResourceReachability(input: {
   kernel: StoryKernel;
   arc: ArcPlan;
