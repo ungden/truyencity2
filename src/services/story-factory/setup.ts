@@ -468,8 +468,17 @@ export async function runConceptLab(input: {
     research,
     routes: input.routes,
   });
-  if (input.resume
-    && JSON.stringify(input.resume.provenance) !== JSON.stringify(provenance)) {
+  // Field-by-field, never JSON.stringify: the stored checkpoint round-trips through
+  // Postgres JSONB, which re-orders object keys, so stringified equality fails on
+  // identical values. Latent since the checkpoint system was written — surfaced by
+  // the first setup that actually resumed across invocations instead of finishing
+  // inside one process.
+  const provenanceMatches = (stored: SetupCheckpointProvenance | undefined): boolean => !!stored
+    && stored.version === provenance.version
+    && stored.commissionDigest === provenance.commissionDigest
+    && stored.researchDigest === provenance.researchDigest
+    && stored.setupRouteDigest === provenance.setupRouteDigest;
+  if (input.resume && !provenanceMatches(input.resume.provenance)) {
     throw new StoryFactoryError(
       'setup_blocked',
       'Setup checkpoint belongs to a different commission, research snapshot, or setup route.',

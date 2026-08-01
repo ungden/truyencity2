@@ -238,7 +238,9 @@ describe('Story Factory architecture boundary', () => {
 
   test('one slow provider stage cannot be reclaimed by another worker', () => {
     const migration = read(latestMigrationDefining('public.claim_story_factory_job'));
-    expect(migration).toContain("lease_until = now() + interval '30 minutes'");
+    // Chapter work keeps the full 30 minutes; only setup — whose slices die at the
+    // route ceiling by design — gets the short lease for fast resume.
+    expect(migration).toMatch(/CASE WHEN job\.stage = 'setup' THEN interval '8 minutes' ELSE interval '30 minutes' END/);
     expect(migration).not.toContain("lease_until = now() + interval '5 minutes'");
     expect(migration).toContain('FOR UPDATE OF job SKIP LOCKED');
     expect(migration).toContain('SECURITY INVOKER');
