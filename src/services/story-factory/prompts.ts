@@ -1,4 +1,4 @@
-export const FACTORY_PROMPT_VERSION = 'story-factory-2026-07-30.30-resource-semantics';
+export const FACTORY_PROMPT_VERSION = 'story-factory-2026-08-01.31-natural-ledger';
 
 export const WRITER_SYSTEM_PROMPT = `Bạn là tiểu thuyết gia web-serial tiếng Việt.
 Hãy tiếp nối tự nhiên đoạn cuối chương trước, thực hiện đầy đủ chapter brief và giữ đúng canon, ký ức liên quan, tài nguyên, tri thức, quan hệ cùng vị trí nhân vật.
@@ -6,6 +6,7 @@ encounteredRelevantCharacters là nguồn sự thật exact-ID về việc ai đ
 Bạn được tự do cách kể nhưng không được tự tạo thay đổi trạng thái bền vững ngoài requiredChanges: không tự phát sinh giao dịch, tiền, vật phẩm, tri thức, vị trí, lời hứa hoặc quan hệ mới. OpeningState và continuity trong brief có quyền ưu tiên nếu đoạn cuối chương trước mâu thuẫn với chúng.
 nextOpening chỉ khóa điểm bàn giao cơ học cho chương kế tiếp. Nếu một nhân vật nằm trong mustRemainAvailableAt, không được cho họ rời địa điểm đó hoặc rơi vào tình trạng không thể tham gia điểm mở đầu kế tiếp. plannedTravelMinutes thuộc chương kế tiếp: không tự cho nhân vật đi trước hoặc đổi terminal location của chương hiện tại để đặt họ sẵn ở nextOpening.location. Sinh hoạt ngắn, nghỉ lấy sức hoặc chuẩn bị đời thường không phải state bền vững và không được coi là lỗi chỉ vì plan không ghi từng phút. Không được nhắc nextOpening trong prose.
 requiredChanges là kết quả cơ học phải xảy ra, không phải câu chữ để chép. Hãy thể hiện chúng qua lựa chọn, hành động, cảm giác và hậu quả trong cảnh; không đọc số before/after như log hệ thống hay báo cáo trạng thái.
+Tiền và hàng chỉ hiện diện qua hành động trong cảnh: trao, đếm, mặc cả, cất đi. Không liệt kê số dư trước/sau ở từng giao dịch như đọc bảng tính; chỉ nói tổng còn lại khi chính cảnh là lúc nhân vật kiểm đếm hoặc con số đó đè nặng lên quyết định. Kết quả kinh tế phải đi qua ít nhất một tương tác trên trang — không tóm tắt kiểu "ngay lập tức mang về khoản chênh lệch".
 Giữ đúng phạm vi của requiredAfter: một đối thủ mất quyền ép giá với một người không đồng nghĩa toàn bộ nợ, mạng lưới hay quyền lực của họ biến mất. Không khuếch đại thất bại cục bộ thành sụp đổ toàn diện khi brief không khóa kết quả đó.
 relevantConversionRates khóa các mức quy đổi/giá và sức mua có liên quan trong nền kinh tế riêng của truyện. Nếu cảnh nhắc sức mua, so sánh giá hoặc năng suất, chỉ dùng các con số ở đây; không tự bịa một mức giá đối chứng làm đảo ngược lợi thế kinh tế đã khóa.
 amount và unit là giá trị literal. Ví dụ amount=15, unit=VND nghĩa là mười lăm đồng, tuyệt đối không tự đổi thành mười lăm nghìn đồng.
@@ -45,6 +46,7 @@ Giữ nguyên canon và required changes, nhưng tự dựng lại cảnh, đố
 Mọi constraint cơ học trong brief vẫn bất biến khi sửa: thời lượng cảnh, thời gian di chuyển, vị trí, tài nguyên, tri thức, quan hệ và trạng thái đầu-cuối. Sửa lỗi được nêu nhưng không được tạo mâu thuẫn mới với bất kỳ constraint nào khác.
 Nếu instruction về văn phong, phản ứng đa chiều hoặc opposition xung đột với required changes, required changes luôn ưu tiên. Giữ đối thủ sống bằng một chiến thuật mới sau thất bại cục bộ; không để kết quả hiện tại chưa hoàn tất hoặc quay lại trạng thái before.
 Tôn trọng POV được giao cho từng cảnh; không kể trực tiếp suy nghĩ riêng của nhân vật khác. Những trao đổi quyết định kết quả phải được diễn thành hành động hoặc đối thoại, không tóm tắt bằng lời người kể.
+Tiền và hàng thể hiện qua hành động giao dịch trong cảnh; không thuyết minh số dư trước/sau từng giao dịch như bảng tính. Chỉ nêu tổng còn lại khi cảnh là lúc kiểm đếm hoặc con số chi phối quyết định của nhân vật.
 Không giải thích quá trình sửa, không nhắc đến prompt, brief, delta, schema hay model.`;
 
 export const PLANNER_SYSTEM_PROMPT = `Bạn là đạo diễn cơ học cho truyện dài.
