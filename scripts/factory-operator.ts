@@ -65,8 +65,10 @@ async function seed() {
   if (!smokeResult.data) {
     throw new Error(`No passed writing smoke exists for ${STORY_FACTORY_RELEASE}. Run: npm run factory:writing-smoke -- --apply`);
   }
+  // Mirror the five keys story_factory_release_is_approved binds, so a mismatch fails
+  // here with a clear message instead of seeding a job the claim query never sees.
   const approvedRoute = (smokeResult.data.model_routes as { route?: Record<string, unknown> } | null)?.route;
-  for (const keyName of ['planner', 'writer', 'editor'] as const) {
+  for (const keyName of ['planner', 'planJudge', 'writer', 'editor', 'routeVersion'] as const) {
     if (approvedRoute?.[keyName] !== routes[keyName]) {
       throw new Error(`Smoke route mismatch at ${keyName}: smoke ran ${String(approvedRoute?.[keyName])}, seed requests ${routes[keyName]}.`);
     }
