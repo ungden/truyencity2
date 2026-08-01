@@ -101,12 +101,16 @@ describe('Story Factory architecture boundary', () => {
     // sliceBetween throws if either marker moves — a silent '' here would turn the
     // strongest leak checks in this file into tautologies.
     const brief = sliceBetween(context, 'export function buildWriterBrief', 'export function selectPreviousTail');
+    // 'worldRules' is deliberately absent from this list: the brief now projects the
+    // DESCRIPTIONS of the chapter's required world rules as physicalLaws. That is
+    // kernel canon, not plan internals — and denying it produced a canon violation
+    // (prose contradicting a rule the Writer had never seen) that only the
+    // independent continuity judge caught.
     for (const leak of [
       'recentOutcomes',
       'scene.action',
       'requiredDeltaIds:',
       'deltaId:',
-      'worldRules',
       'source:',
       'sink:',
       'uniqueMechanism',
@@ -116,6 +120,7 @@ describe('Story Factory architecture boundary', () => {
     ]) {
       expect(brief).not.toContain(leak);
     }
+    expect(brief).toContain('physicalLaws');
     // The Editor and Planner do receive them.
     expect(context).toContain('recentOutcomes: input.state.recentOutcomes');
   });

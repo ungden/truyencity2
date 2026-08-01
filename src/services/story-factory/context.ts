@@ -25,6 +25,7 @@ export interface WriterBrief {
   chapterNumber: number;
   cast: unknown[];
   canonicalUnits: string[];
+  physicalLaws: string[];
   openingState: unknown[];
   scenes: unknown[];
   operationalConstraints: string[];
@@ -261,6 +262,16 @@ export function buildWriterBrief(input: {
     chapterNumber: input.plan.chapterNumber,
     canonicalUnits: [...new Set(input.kernel.resources.flatMap(resource =>
       resource.kind === 'numeric' ? [resource.unit] : []))],
+    // Canon laws governing this chapter, verbatim. The Writer used to be denied all
+    // world-rule text and promptly contradicted one it had never seen (crabs drifting
+    // with the current against a rule that says they work upstream) — a violation the
+    // Editor missed and only the independent continuity judge caught. Rule TEXT is
+    // kernel canon, not plan internals; exposing it does not leak mechanics.
+    physicalLaws: input.kernel.worldRules
+      .filter(rule => input.plan.requiredWorldRuleIds.includes(rule.id))
+      .map(rule => (rule.exceptions.length
+        ? `${rule.claim} (ngoại lệ: ${rule.exceptions.join('; ')})`
+        : rule.claim)),
     cast: input.kernel.characters.filter(character => ids.characters.has(character.id)).map(character => ({
       name: character.name,
       agenda: character.agenda,

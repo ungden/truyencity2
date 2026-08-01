@@ -8,7 +8,7 @@ export const FACTORY_CONTRACT_VERSION = 'story-factory-contracts-43-literal-reso
 export const FACTORY_STATE_VERSION = 'story-factory-state-10-exact-first-encounter';
 export const FACTORY_SETUP_VERSION = 'story-factory-setup-49-exact-first-encounter';
 export const FACTORY_PLANNER_VERSION = 'story-factory-planner-65-replan-mechanical-repair';
-export const FACTORY_CONTEXT_VERSION = 'story-factory-context-24-canonical-units';
+export const FACTORY_CONTEXT_VERSION = 'story-factory-context-25-physical-laws';
 export const FACTORY_MEMORY_POLICY_VERSION = 'story-factory-memory-6-in-memory-parity';
 export const FACTORY_WINDOW_REVIEW_VERSION = 'story-factory-window-review-4-code-derived-decision';
 
