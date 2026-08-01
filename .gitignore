@@ -97,3 +97,4 @@ mobile/test-*.js
 mobile/expo_output.log
 .claude/
 /scratch/
+factory/smoke-pack.local.json

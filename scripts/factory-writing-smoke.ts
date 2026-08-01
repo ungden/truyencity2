@@ -17,11 +17,12 @@
  *   npm run factory:writing-smoke -- --apply --chapters=5 --commission=factory/canary/commission.json
  */
 import dotenv from 'dotenv';
-import { readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { createClient } from '@supabase/supabase-js';
 import {
   ArcPlanSchema,
+  LaunchPackSchema,
   DEFAULT_MODEL_ROUTES,
   ModelRoutesSchema,
   STORY_FACTORY_RELEASE,
@@ -52,6 +53,12 @@ const commissionPath = flag('commission', 'factory/canary/commission.json');
 const researchPath = flag('research', 'factory/canary/research.json');
 const routesPath = flag('routes', '');
 const targetChapters = Number(flag('chapters', '5'));
+// Concept Lab is ~80% of a smoke's cost and rolls a fresh concept every run, which
+// makes prompt iteration both expensive and noisy. --pack reuses a saved launch pack
+// so an iteration only re-runs plan → write → edit (~$0.3, same story every time).
+// Every full run saves its pack here automatically.
+const packPath = flag('pack', '');
+const savePackPath = flag('save-pack', 'factory/smoke-pack.local.json');
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -119,15 +126,25 @@ async function main() {
   const research = readJson(researchPath);
 
   try {
-    const setup = await runConceptLab({
-      commission,
-      research,
-      routes,
-    });
-    usages.push(...setup.usages);
-    const kernel = setup.launchPack.kernel;
-    const arc = ArcPlanSchema.parse(setup.launchPack.arc);
-    let state: StoryState = setup.launchPack.initialState;
+    let launchPack: { kernel: unknown; arc: unknown; initialState: unknown };
+    if (packPath) {
+      launchPack = LaunchPackSchema.parse(readJson(packPath));
+      console.log(`[smoke] reusing launch pack from ${packPath}`);
+    } else {
+      const setup = await runConceptLab({
+        commission,
+        research,
+        routes,
+      });
+      usages.push(...setup.usages);
+      launchPack = setup.launchPack;
+      writeFileSync(path.resolve(savePackPath), `${JSON.stringify(setup.launchPack, null, 2)}\n`);
+      console.log(`[smoke] launch pack saved to ${savePackPath}`);
+    }
+    const parsedPack = LaunchPackSchema.parse(launchPack);
+    const kernel = parsedPack.kernel;
+    const arc = ArcPlanSchema.parse(parsedPack.arc);
+    let state: StoryState = parsedPack.initialState;
     console.log(`[smoke] launch pack ready: ${kernel.title}`);
 
     let rolling: Awaited<ReturnType<typeof planRollingWindow>>['rollingPlan'] | null = null;
@@ -214,7 +231,7 @@ async function main() {
         criticalContinuityViolations,
         firstPassPublishRate: chapters.length ? firstPassPublishes / chapters.length : 0,
         totalCostUsd: cost(usages),
-        title: setup.launchPack.kernel.title,
+        title: kernel.title,
         chapterTitles: chapters.map(chapter => chapter.title),
       },
       errorCode: passed ? undefined : 'quality_blocked',
