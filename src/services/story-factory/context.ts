@@ -405,11 +405,18 @@ export function buildRevisionContext(input: {
   brief: WriterBrief;
   previousTail: string;
   assessment: EditorAssessment;
+  rejectedDraft?: { title: string; content: string };
 }) {
   if (input.assessment.status !== 'revise') throw new Error('Revision context requires a revise assessment.');
   return {
     writerBrief: input.brief,
     previousChapterTail: input.previousTail,
+    // The rejected draft IS provided. The original design withheld it to prevent
+    // sentence-patching, and the result was measurable: across six smokes and two
+    // writer models, zero rewrites survived the second edit — each from-scratch
+    // rewrite fixed the cited findings and rolled brand-new violations elsewhere.
+    // A targeted repair keeps the ~90% of the draft that already passed inspection.
+    rejectedDraft: input.rejectedDraft ?? null,
     continuityIssues: input.assessment.continuityIssues,
     readingIssues: input.assessment.readingIssues,
   };

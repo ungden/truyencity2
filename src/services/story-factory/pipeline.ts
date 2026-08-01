@@ -768,6 +768,7 @@ export async function reviseStoryChapter(
         brief: contexts.brief,
         previousTail: contexts.previousTail,
         assessment: input.pending.assessment,
+        rejectedDraft: input.pending.draft,
       })),
       schema: ChapterDraftSchema,
       temperature: 1,

@@ -3234,8 +3234,12 @@ describe('canonical Story Factory', () => {
       status: 'revise',
       continuityIssues: [{ category: 'required_delta', referenceId: 'delta_1' }],
     });
-    expect(provider.prompts[2]).not.toContain('currentDraft');
-    expect(provider.prompts[2]).not.toContain(first.content);
+    // The rejected draft IS in the revision context. The original design withheld it
+    // and, across six live smokes and two writer models, zero from-scratch rewrites
+    // survived the second edit — each fixed the cited findings and invented new
+    // violations elsewhere. Targeted repair keeps what already passed inspection.
+    expect(provider.prompts[2]).toContain('rejectedDraft');
+    expect(provider.prompts[2]).toContain(first.content);
     expect(provider.prompts[2]).toContain('required_delta');
   });
 
