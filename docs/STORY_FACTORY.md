@@ -157,8 +157,22 @@ back.
 
 ## Models
 
-`routes.ts` is the exact, versioned route. There is no fallback and no other provider —
-`architecture.test.ts` asserts `provider.ts` contains no `fallback|openrouter|deepseek`.
+`routes.ts` is the exact, versioned route. There is no fallback: a stage's model comes
+from the route and nothing substitutes on failure. The provider layer dispatches by
+vendor prefix — `gpt-*` goes to the OpenAI Responses API (strict JSON schema, per-call
+`reasoningEffort`/`verbosity`, no temperature — reasoning models reject it), everything
+else to Gemini. `OPENAI_API_KEY` is needed only when a route uses a `gpt-*` model.
+
+**GPT-5.6 Luna was evaluated and rejected for all three roles** (2026-08-01, one-variable
+A/B on the same launch pack and prompts, docs-correct settings, independent pinned
+judge). Writer: 5/5 chapters published at 2-4K words but leaked a canon violation the
+editor missed — the incumbent passed the same story clean. Planner at effort high:
+mechanically valid windows, but chapter 1 was unrescuable under its plan. Editor: judged
+two chapters without leaking violations, then killed chapter 3 through revise
+persistence the writer could not satisfy. Savings ceiling was ~18% anyway — 75% of
+chapter cost is the Editor+Planner tier that cannot be downgraded. Route files for
+re-testing future models: `factory/routes.luna-*.json`; each test is one
+`factory:writing-smoke --pack --routes` command (~$0.4).
 
 Changing a model is a quality decision: run `factory:model-bakeoff`, then re-run the writing
 smoke, which is what the claim gate checks against.
