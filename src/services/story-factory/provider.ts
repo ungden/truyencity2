@@ -56,6 +56,8 @@ export interface StoryModelProvider {
     thinkingBudget?: number;
     grounding?: 'google_search';
     timeoutMs?: number;
+    reasoningEffort?: 'none' | 'low' | 'medium' | 'high' | 'xhigh' | 'max';
+    verbosity?: 'low' | 'medium' | 'high';
   }): Promise<ProviderResult<string>>;
   json<T>(input: {
     model: string;
@@ -69,6 +71,8 @@ export interface StoryModelProvider {
     thinkingBudget?: number;
     grounding?: 'google_search';
     timeoutMs?: number;
+    reasoningEffort?: 'none' | 'low' | 'medium' | 'high' | 'xhigh' | 'max';
+    verbosity?: 'low' | 'medium' | 'high';
   }): Promise<ProviderResult<T>>;
 }
 
@@ -170,6 +174,8 @@ async function openaiGenerate(input: {
   responseSchema?: Record<string, unknown>;
   jsonMode?: boolean;
   timeoutMs?: number;
+  reasoningEffort?: 'none' | 'low' | 'medium' | 'high' | 'xhigh' | 'max';
+  verbosity?: 'low' | 'medium' | 'high';
 }): Promise<ProviderResult<string>> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) throw new StoryFactoryError('infra_blocked', 'OPENAI_API_KEY is not configured for a gpt-* route.');
@@ -186,19 +192,21 @@ async function openaiGenerate(input: {
     })
     : undefined;
   // Reasoning-tier models reject the temperature parameter outright (400) — sampling
-  // is controlled by reasoning effort instead. The route's temperature is simply not
-  // transmissible on this vendor path.
+  // is governed by reasoning effort. Per the GPT-5.6 guide: effort defaults to
+  // medium (forcing 'low' everywhere measurably weakened constraint-heavy calls),
+  // and text.verbosity is the documented lever for output length — 5.6 is more
+  // concise by default than its predecessors, so long-form callers pass 'high'.
+  const text: Record<string, unknown> = {};
+  if (strictSchema) text.format = { type: 'json_schema', name: 'response', schema: strictSchema, strict: true };
+  else if (input.jsonMode) text.format = { type: 'json_object' };
+  if (input.verbosity) text.verbosity = input.verbosity;
   const body: Record<string, unknown> = {
     model: input.model,
     instructions: input.system,
     input: [{ role: 'user', content: input.prompt }],
-    max_output_tokens: 32_768,
-    reasoning: { effort: 'low' },
-    ...(strictSchema
-      ? { text: { format: { type: 'json_schema', name: 'response', schema: strictSchema, strict: true } } }
-      : input.jsonMode
-        ? { text: { format: { type: 'json_object' } } }
-        : {}),
+    max_output_tokens: 65_536,
+    reasoning: { effort: input.reasoningEffort ?? 'medium' },
+    ...(Object.keys(text).length ? { text } : {}),
   };
   for (let attempt = 0; attempt <= RETRY_DELAYS_MS.length; attempt += 1) {
     try {

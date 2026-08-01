@@ -668,6 +668,7 @@ export async function draftStoryChapter(input: ChapterStageInput): Promise<Chapt
     const initial = await provider.json({
       model: input.routes.writer,
       timeoutMs: CHAPTER_CALL_TIMEOUT_MS,
+      verbosity: 'high',
       system: WRITER_SYSTEM_PROMPT,
       prompt: JSON.stringify({
         task: 'Viết chương truyện hoàn chỉnh.',
@@ -763,6 +764,7 @@ export async function reviseStoryChapter(
     const revision = await provider.json({
       model: input.routes.writer,
       timeoutMs: CHAPTER_CALL_TIMEOUT_MS,
+      verbosity: 'high',
       system: REVISION_SYSTEM_PROMPT,
       prompt: JSON.stringify(buildRevisionContext({
         brief: contexts.brief,

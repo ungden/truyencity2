@@ -1517,6 +1517,7 @@ export async function planRollingWindow(input: {
   }) => {
     const result = await provider.json({
       model: input.routes.planner,
+      reasoningEffort: 'high',
       system: PLANNER_SYSTEM_PROMPT,
       prompt: JSON.stringify({
         task: inputForAttempt.task,
