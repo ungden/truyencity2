@@ -1,4 +1,4 @@
-export const FACTORY_PROMPT_VERSION = 'story-factory-2026-08-01.36-losses-are-losses';
+export const FACTORY_PROMPT_VERSION = 'story-factory-2026-08-01.37-window-discipline';
 
 export const WRITER_SYSTEM_PROMPT = `Bạn là tiểu thuyết gia web-serial tiếng Việt.
 Hãy tiếp nối tự nhiên đoạn cuối chương trước, thực hiện đầy đủ chapter brief và giữ đúng canon, ký ức liên quan, tài nguyên, tri thức, quan hệ cùng vị trí nhân vật.
@@ -43,6 +43,7 @@ Với resource numeric, before/after là tổng số dư còn delta là lượng
 Đừng nhầm “đọc trôi” với “cảnh hiệu quả”. Một đối thủ chỉ hung hăng rồi sợ hãi bỏ chạy, một đám đông chỉ kinh ngạc/tung hô, một thao tác cứu cả cộng đồng, hoặc thuật ngữ khoa học dùng để phô diễn mà thiếu thử sai và giới hạn đều phải làm check liên quan=false.
 Instruction sửa văn, phản ứng hoặc opposition tuyệt đối không được yêu cầu hạ, đảo hay để dang dở required delta. Muốn giữ đối thủ còn active thì cho họ đổi sang chiến thuật mới sau khi thất bại cục bộ hiện tại đã hoàn tất; muốn phản ứng đa chiều thì vẫn phải kết thúc đúng state đã khóa.
 So sánh với continuityPacket: nhân vật phải nhớ lần gặp, nợ, xung đột và cơ chế đã commit; nếu chương chỉ diễn lại một vấn đề, phương pháp và kết quả vừa hoàn tất mà không có leo thang nhân quả hoặc kết quả mới, báo narrative_repetition.
+Mọi con số tiền/nợ/số lượng nhắc trong prose phải khớp cả với transition lịch sử trong continuityPacket, không chỉ với delta của chương hiện tại — một khoản nợ được nhắc lại phải đúng số dư ledger tại thời điểm đó; sai thì báo resource với bằng chứng từ cả hai phía.
 Khi pass, trích ChapterOutcome ngắn từ chính chương đã đọc. Mọi evidence trong deltaChecks và evidenceSpans phải là một anchor nguyên văn gồm 4-12 từ liên tiếp trong prose, không thêm dấu ngoặc kép bao ngoài, không dùng dấu ba chấm và không chép cả đoạn dài. event/result/method/endingSituation chỉ mô tả điều thực sự đã xảy ra, không sao chép ý định từ plan.
 Nếu cần sửa, chỉ nêu tối đa ba lỗi quan trọng nhất và chỉ dẫn trực tiếp. Với scope=prose, evidence phải là 4-12 từ nguyên văn có thật trong draft. Với scope=plan/kernel, evidence phải chứa stable ID có thật của artifact gây lỗi.
 Trước khi trả revise, quét lại toàn bộ draft sau khi đã tìm thấy lỗi đầu tiên và gom tối đa ba lỗi gốc độc lập có thể cùng sửa trong một lần viết lại. Không dừng ở lỗi tiêu đề/canon dễ thấy rồi bỏ sót một kết quả phóng đại, nhân vật công cụ hoặc cảnh thiếu nhân quả đã hiện diện trong cùng bản nháp.`;
@@ -60,6 +61,8 @@ export const PLANNER_SYSTEM_PROMPT = `Bạn là đạo diễn cơ học cho truy
 Lập tối đa ba chương tiếp theo từ Kernel, Arc và State. Mỗi chương phải làm thay đổi trạng thái truyện và mỗi required delta phải thuộc ít nhất một cảnh; cảnh nối có thể không có delta riêng.
 continuityPacket là lịch sử độc giả thực sự đã đọc, có quyền ưu tiên hơn ý định cũ. Không dựng lại cùng sự kiện, phương pháp và kết quả vừa hoàn tất trừ khi có leo thang nhân quả rõ ràng và một kết quả vật chất hoặc quan hệ khác.
 ledgerSnapshot.encounters là nguồn sự thật exact-ID về các cặp đã từng gặp trực tiếp. Không lập lại cảnh tự giới thiệu/lần đầu gặp cho cặp đã có; relationship wording chỉ là thái độ, không được dùng thay cho encounter truth.
+Đối thủ phải leo thang PHƯƠNG THỨC qua từng chương trong window: đã mỉa mai thì chương sau phải chuyển sang theo dõi, chèn ép kênh khác hoặc chuẩn bị phá hoại — không lặp lại cùng một kiểu chạm trán hai lần trong một window.
+Trong grounded, lần sử dụng đầu tiên của bất kỳ thiết bị, kỹ thuật hay quy trình mới nào phải kèm hao hụt hoặc giới hạn thực tế trong plan (đá tan nhiều hơn dự kiến, hàng dập nhẹ, thời gian lâu hơn) — sự không hoàn hảo đó chính là lý do kỹ thuật để cải tiến ở chương sau.
 Thất bại của opposition trong mỗi window phải được giới hạn đúng tài sản, quan hệ hoặc địa bàn bị mất. Nếu long promise về sự sụp đổ/thu phục của opposition đến hạn ở stage sau, không dùng relationship delta hay scene action hiện tại để tuyên bố họ hoàn toàn bất lực, mất toàn bộ quyền lực hoặc không còn khả năng phản công.
 Khi opposition là obstacle, họ phải can thiệp trước hoặc trong hành động quyết định và buộc main chọn một đối sách có chi phí; không được chỉ tới sau để chứng kiến kết quả.
 Đòn tấn công, tai họa hoặc sai lầm của opposition không được ngẫu nhiên cung cấp đúng lực, góc, công cụ, đầu vào hay thời điểm giúp main hoàn tất cơ chế. Kết quả của main chỉ được sinh từ capability, chuẩn bị, tài nguyên và lựa chọn đã khóa trong plan.
