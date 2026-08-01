@@ -60,6 +60,9 @@ const targetChapters = Number(flag('chapters', '5'));
 const packPath = flag('pack', '');
 const savePackPath = flag('save-pack', 'factory/smoke-pack.local.json');
 
+/** The smoke's independent referee. Fixed on the strongest editor-class model. */
+const SEQUENTIAL_JUDGE_MODEL = 'gemini-3.1-pro-preview';
+
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 if (!url || !key) throw new Error('Supabase server environment is missing.');
@@ -187,7 +190,10 @@ async function main() {
       if (result.revisionCount === 0) firstPassPublishes += 1;
 
       // Independent continuity read: the Editor judges one chapter against its plan,
-      // this judges the chapter against the chapter before it.
+      // this judges the chapter against the chapter before it. The judge model is
+      // PINNED, not taken from routes.editor: when the editor route itself is under
+      // experiment, the smoke's referee must not be the model being examined —
+      // otherwise a lenient editor candidate would mark its own exam.
       const continuity = await assessSequentialContinuity({
         kernel,
         plan,
@@ -200,7 +206,7 @@ async function main() {
           events,
         }),
         content: result.draft.content,
-        model: routes.editor,
+        model: SEQUENTIAL_JUDGE_MODEL,
       });
       usages.push(continuity.usage);
       if (continuity.assessment.status !== 'pass') {

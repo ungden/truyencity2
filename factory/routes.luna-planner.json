@@ -1,0 +1,12 @@
+{
+  "setupGeneratorA": "gemini-3.5-flash",
+  "setupGeneratorB": "gemini-2.5-pro",
+  "setupJudge": "gemini-3.1-pro-preview",
+  "openingSimulator": "gemini-3.5-flash",
+  "launchArchitect": "gemini-3.1-pro-preview",
+  "planner": "gpt-5.6-luna",
+  "planJudge": "gemini-2.5-pro",
+  "writer": "gemini-2.5-pro",
+  "editor": "gemini-3.1-pro-preview",
+  "routeVersion": "luna-planner-experiment-2026-08-01.1"
+}

@@ -25,6 +25,8 @@ const PRICING: Record<string, { input: number; output: number }> = {
   'gemini-3-flash-preview': { input: 0.5, output: 3 },
   'gemini-3.1-pro-preview': { input: 2, output: 12 },
   'gemini-3.6-flash': { input: 1.5, output: 7.5 },
+  // Post-discount pricing announced 2026-07-30.
+  'gpt-5.6-luna': { input: 0.2, output: 1.2 },
 };
 
 export interface ProviderUsage {
@@ -151,6 +153,102 @@ export function toGeminiResponseSchema<T>(
   return converted;
 }
 
+/**
+ * OpenAI Responses API path for gpt-* routed models.
+ *
+ * This is a routed provider: a stage's model comes from the versioned route and
+ * nothing ever substitutes another model on failure — the same no-substitution
+ * contract the Gemini path honours. Strict JSON schema needs
+ * additionalProperties:false and every property required, which the schemas we
+ * route here already satisfy.
+ */
+async function openaiGenerate(input: {
+  model: string;
+  system: string;
+  prompt: string;
+  temperature: number;
+  responseSchema?: Record<string, unknown>;
+  jsonMode?: boolean;
+  timeoutMs?: number;
+}): Promise<ProviderResult<string>> {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) throw new StoryFactoryError('infra_blocked', 'OPENAI_API_KEY is not configured for a gpt-* route.');
+  const strictSchema = input.responseSchema
+    ? JSON.parse(JSON.stringify(input.responseSchema), (key, value) => {
+      if (value && typeof value === 'object' && !Array.isArray(value) && value.type === 'object' && value.properties) {
+        return {
+          ...value,
+          additionalProperties: false,
+          required: Object.keys(value.properties as Record<string, unknown>),
+        };
+      }
+      return value;
+    })
+    : undefined;
+  // Reasoning-tier models reject the temperature parameter outright (400) — sampling
+  // is controlled by reasoning effort instead. The route's temperature is simply not
+  // transmissible on this vendor path.
+  const body: Record<string, unknown> = {
+    model: input.model,
+    instructions: input.system,
+    input: [{ role: 'user', content: input.prompt }],
+    max_output_tokens: 32_768,
+    reasoning: { effort: 'low' },
+    ...(strictSchema
+      ? { text: { format: { type: 'json_schema', name: 'response', schema: strictSchema, strict: true } } }
+      : input.jsonMode
+        ? { text: { format: { type: 'json_object' } } }
+        : {}),
+  };
+  for (let attempt = 0; attempt <= RETRY_DELAYS_MS.length; attempt += 1) {
+    try {
+      if (attempt > 0) await new Promise(resolve => setTimeout(resolve, RETRY_DELAYS_MS[attempt - 1]));
+      const response = await fetch('https://api.openai.com/v1/responses', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+        body: JSON.stringify(body),
+        signal: AbortSignal.timeout(input.timeoutMs ?? DEFAULT_TIMEOUT_MS),
+      });
+      if (!response.ok) {
+        const detail = await response.text().catch(() => '');
+        throw new ProviderHttpError(response.status, `OpenAI ${input.model} ${response.status}: ${detail.slice(0, 500)}`);
+      }
+      const payload = await response.json();
+      const value = (typeof payload?.output_text === 'string' && payload.output_text.trim())
+        || (Array.isArray(payload?.output)
+          ? payload.output
+            .flatMap((item: { content?: Array<{ type?: string; text?: string }> }) => item?.content ?? [])
+            .filter((part: { type?: string }) => part?.type === 'output_text')
+            .map((part: { text?: string }) => part.text ?? '')
+            .join('')
+            .trim()
+          : '');
+      const finishReason = payload?.status ?? 'UNKNOWN';
+      if (!value || payload?.status === 'incomplete') {
+        throw new StoryFactoryError('infra_blocked', `OpenAI returned ${value ? 'truncated' : 'empty'} output (${finishReason}).`);
+      }
+      const inputTokens = payload?.usage?.input_tokens ?? 0;
+      const outputTokens = payload?.usage?.output_tokens ?? 0;
+      return {
+        value,
+        usage: {
+          model: input.model,
+          inputTokens,
+          outputTokens,
+          costUsd: cost(input.model, inputTokens, outputTokens),
+          finishReason,
+        },
+      };
+    } catch (error) {
+      if (error instanceof StoryFactoryError) throw error;
+      if (!retryable(error) || attempt === RETRY_DELAYS_MS.length) {
+        throw new StoryFactoryError('infra_blocked', error instanceof Error ? error.message : String(error));
+      }
+    }
+  }
+  throw new StoryFactoryError('infra_blocked', 'Provider retry loop ended unexpectedly.');
+}
+
 async function generate(input: {
   model: string;
   system: string;
@@ -163,6 +261,14 @@ async function generate(input: {
   thinkingBudget?: number;
   timeoutMs?: number;
 }): Promise<ProviderResult<string>> {
+  // Dispatch by the routed model's vendor prefix — a deliberate route selection;
+  // on failure the stage throws and retries on the SAME route, never another model.
+  if (input.model.startsWith('gpt-')) {
+    if (input.googleSearch) {
+      throw new StoryFactoryError('infra_blocked', 'Search grounding is only routed through Gemini.');
+    }
+    return openaiGenerate(input);
+  }
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new StoryFactoryError('infra_blocked', 'GEMINI_API_KEY is not configured.');
 
