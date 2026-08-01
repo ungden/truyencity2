@@ -100,7 +100,7 @@ describe('Story Factory architecture boundary', () => {
     expect(provider.match(/Provider retry loop ended unexpectedly\./g)?.length).toBe(3);
     // Dispatch is a pure function of the routed model id — no catch clause ever
     // invokes a different vendor's generate.
-    expect(provider).not.toMatch(/catch[^}]*(openaiGenerate|openrouterGenerate)\(/s);
+    expect(provider).not.toMatch(/catch[\s\S]{0,200}?(openaiGenerate|openrouterGenerate)\(/);
   });
 
   test('the Writer never sees plan internals or narrative outcomes', () => {

@@ -536,7 +536,45 @@ export const geminiProvider: StoryModelProvider = {
         usage: response.usage,
       });
     }
-    const parsed = input.schema.safeParse(raw);
+    let parsed = input.schema.safeParse(raw);
+    if (!parsed.success && (input.model.startsWith('gpt-') || input.model.includes('/'))) {
+      // Gemini enforces exact shapes through constrained decoding; OpenAI-compatible
+      // strict mode cannot express array-length constraints, so a wrong-count roll is
+      // an expected failure there. One corrective regeneration on the SAME model —
+      // this is a same-route retry, not substitution.
+      const corrective = await generate({
+        ...input,
+        prompt: `${prompt}
+
+Bản trả trước không hợp lệ theo schema ứng dụng: ${JSON.stringify(parsed.error.issues.slice(0, 5))}
+Trả lại đúng một object JSON đã sửa, không giải thích.`,
+        temperature: input.temperature ?? 0.7,
+        responseSchema: input.constrainSchema === false ? undefined : responseSchema,
+        jsonMode: true,
+        googleSearch: input.grounding === 'google_search',
+      });
+      try {
+        raw = JSON.parse(corrective.value);
+      } catch {
+        throw new StoryFactoryError('infra_blocked', 'Provider violated the structured-output JSON contract.', {
+          usage: corrective.usage,
+        });
+      }
+      const usageTotal = {
+        ...corrective.usage,
+        inputTokens: response.usage.inputTokens + corrective.usage.inputTokens,
+        outputTokens: response.usage.outputTokens + corrective.usage.outputTokens,
+        costUsd: response.usage.costUsd + corrective.usage.costUsd,
+      };
+      parsed = input.schema.safeParse(raw);
+      if (!parsed.success) {
+        throw new StoryFactoryError('infra_blocked', 'Provider output failed application schema validation after one correction.', {
+          issues: parsed.error.issues,
+          usage: usageTotal,
+        });
+      }
+      return { value: parsed.data, usage: usageTotal };
+    }
     if (!parsed.success) {
       throw new StoryFactoryError('infra_blocked', 'Provider output failed application schema validation.', {
         issues: parsed.error.issues,
