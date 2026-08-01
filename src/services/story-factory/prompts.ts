@@ -1,4 +1,4 @@
-export const FACTORY_PROMPT_VERSION = 'story-factory-2026-08-01.31-natural-ledger';
+export const FACTORY_PROMPT_VERSION = 'story-factory-2026-08-01.32-transactable-amounts';
 
 export const WRITER_SYSTEM_PROMPT = `Bạn là tiểu thuyết gia web-serial tiếng Việt.
 Hãy tiếp nối tự nhiên đoạn cuối chương trước, thực hiện đầy đủ chapter brief và giữ đúng canon, ký ức liên quan, tài nguyên, tri thức, quan hệ cùng vị trí nhân vật.
@@ -14,6 +14,7 @@ canonicalUnits là từ điển đơn vị hợp lệ của riêng thế giới 
 Với numeric transition trong continuity: before + change = after. change là lượng thực sự tăng/giảm ở chương đó; after là tổng còn lại sau giao dịch. Không được gọi after là lượng “vừa mua”, “vừa bán” hoặc “vừa nhận”.
 timeBudgetMinutes và travelFromPreviousMinutes khóa thời gian cơ học của từng cảnh. Có thể kể co giãn nhịp văn, nhưng không được nói một thao tác kéo dài lâu hơn ngân sách hoặc thêm hành trình vượt thời gian di chuyển đã cho.
 Viết thành một chương truyện hoàn chỉnh có cảnh, hành động, đối thoại, phản ứng và hậu quả; không viết như tóm tắt hay dàn ý.
+Không chép nguyên văn mô tả trạng thái đích của plan vào lời kể — thái độ, quan hệ hay kết quả phải bộc lộ qua biểu cảm, cử chỉ và hành vi của nhân vật. Prose thuần tiếng Việt; không lẫn từ tiếng Anh ngoài tên riêng đã khóa trong canon.
 Bạn tự quyết định cách kể, nhịp, cảm xúc và độ dài cần thiết. Không nhắc đến prompt, brief, delta, schema hay model.`;
 
 export const EDITOR_SYSTEM_PROMPT = `Bạn là biên tập viên độc lập của truyện dài tiếng Việt.
@@ -60,6 +61,7 @@ Khóa chính xác thời gian, địa điểm, tài nguyên, tri thức, promise
 Chỉ gắn world-rule ID khi cơ chế thực sự được thi hành trong chương. Mọi vật tư/đầu vào mà rule cần phải có sẵn trong State hoặc được cấp bằng delta; vật tư bị dùng hoặc tiêu hao phải có resource delta. Nếu chương mới quyết định sẽ dùng kỹ thuật ở tương lai, chưa gắn rule đó vào chương hiện tại.
 Mọi conversion, capability hoặc constraint thực sự dùng phải khai báo mechanicUse đúng worldMechanic ID, actor, quantity, precondition fact và delta liên quan. Không giấu phép tính, công suất hoặc quyền hạn trong action prose.
 Khoản thu hoặc tài nguyên tăng vẫn phải do mechanic hợp lệ tạo ra. Riêng khoản trả nợ, trả phí, chia lợi nhuận hoặc tiêu hao ra bên ngoài được ghi resource delta âm không cần mechanic giả khi đúng chủ sở hữu resource có mặt trong scene và sink nêu rõ bên nhận/đích tiêu hao; đầu vào của conversion vẫn phải gắn conversion.
+Số tiền và khối lượng trong delta phải giao dịch được trong đời sống của thế giới truyện: chọn đơn giá, khối lượng và cỡ batch sao cho thành tiền trả được bằng mệnh giá hiện hành và khối lượng cân đong được bằng dụng cụ trong cảnh. Không tạo số lẻ vô nghĩa kiểu 95.625 đồng hay 2,125 ký — làm tròn ngay từ plan, đừng bắt Writer và Editor gánh số không ai trả nổi.
 Trong scene, participantIds/people chỉ là nhân vật có mặt vật lý tại scene.loc. Nếu chỉ được nhớ tới, nhắc tới hoặc là mục tiêu cảm xúc ở nơi khác, không đưa vào people.
 Thời gian cuối chương là mốc tuyệt đối và phải được cộng tuần tự từ State: ít nhất bằng thời gian đầu chương cộng toàn bộ duration và travel của các cảnh trong chương.
 Mọi nhân vật kết thúc chương ở địa điểm khác state đầu chương phải có location delta khớp vị trí đầu và scene cuối.
