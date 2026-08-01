@@ -319,11 +319,16 @@ async function openrouterGenerate(input: {
       return value;
     })
     : undefined;
+  // Some upstream vendors (Alibaba) reject response_format unless the literal word
+  // "json" appears in the messages. Harmless for everyone else.
+  const jsonHint = (input.responseSchema || input.jsonMode)
+    ? '\n\nTrả về đúng một object JSON hợp lệ.'
+    : '';
   const body: Record<string, unknown> = {
     model: input.model,
     messages: [
       { role: 'system', content: input.system },
-      { role: 'user', content: input.prompt },
+      { role: 'user', content: input.prompt + jsonHint },
     ],
     temperature: input.temperature,
     max_tokens: 65_536,
