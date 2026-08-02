@@ -1889,19 +1889,58 @@ Trạng thái pass cũng phải có bằng chứng cụ thể. Chỉ báo tối 
     schema: WindowReviewWireSchema,
     temperature: 0.4,
   });
-  try {
-    const materialized = materializeWindowReview(result.value);
+  const materializeAndGround = (value: unknown) => {
+    const materialized = materializeWindowReview(value);
     validateWindowEvidence(materialized, input.chapters);
-    const review = applyDeterministicWindowPolicy(materialized, input.kernel.realityMode);
-    return { review, usage: result.usage };
+    return applyDeterministicWindowPolicy(materialized, input.kernel.realityMode);
+  };
+  try {
+    return { review: materializeAndGround(result.value), usage: result.usage };
   } catch (error) {
-    if (error instanceof StoryFactoryError) {
-      throw new StoryFactoryError(error.code, error.message, {
-        validation: error.evidence,
-        usages: [result.usage],
-      });
+    // Reviewing five long chapters at once, the model measurably tends to compress or
+    // paraphrase its quotes: one production window failed grounding four rolls in a
+    // row and would have parked the job. Evidence grounding is a wire-discipline
+    // failure, not a verdict — give the SAME model one corrective pass with the exact
+    // grounding errors before treating it as infrastructure.
+    if (!(error instanceof StoryFactoryError)) throw error;
+    const corrective = await provider.json({
+      model: input.routes.editor,
+      system: `${EDITOR_SYSTEM_PROMPT}
+Bản review trước bị từ chối vì evidence không sao chép NGUYÊN VĂN từ prose. Lập lại toàn bộ review; mỗi quote trong evidence, patterns và issues phải là 4-12 từ liên tiếp copy đúng từng ký tự từ content của đúng chapterNumber, và mỗi check phải có bằng chứng từ ít nhất hai chương khác nhau.`,
+      prompt: JSON.stringify({
+        task: 'Chấm lại window sau khi bị từ chối vì evidence không nguyên văn.',
+        groundingErrors: { message: error.message, evidence: error.evidence ?? null },
+        realityMode: input.kernel.realityMode,
+        chapters: input.chapters,
+        kernelIdentity: {
+          protagonistId: input.kernel.protagonistId,
+          characters: input.kernel.characters,
+          pleasureLoop: input.kernel.pleasureLoop,
+        },
+        arc: input.arc,
+        currentState: input.state,
+      }),
+      schema: WindowReviewWireSchema,
+      temperature: 0.2,
+    });
+    const usageTotal = {
+      ...corrective.usage,
+      inputTokens: result.usage.inputTokens + corrective.usage.inputTokens,
+      outputTokens: result.usage.outputTokens + corrective.usage.outputTokens,
+      costUsd: result.usage.costUsd + corrective.usage.costUsd,
+    };
+    try {
+      return { review: materializeAndGround(corrective.value), usage: usageTotal };
+    } catch (secondError) {
+      if (secondError instanceof StoryFactoryError) {
+        throw new StoryFactoryError(secondError.code, secondError.message, {
+          validation: secondError.evidence,
+          firstAttempt: { message: error.message },
+          usages: [usageTotal],
+        });
+      }
+      throw secondError;
     }
-    throw error;
   }
 }
 

@@ -4596,20 +4596,37 @@ describe('canonical Story Factory', () => {
     });
   });
 
-  test('window review fails closed when quoted evidence is not in committed prose', async () => {
+  test('one corrective pass recovers a review whose quotes were paraphrased', async () => {
+    // Reviewing five long chapters, the model measurably compresses quotes — one
+    // production window failed grounding four rolls straight. A single same-model
+    // corrective pass with the grounding errors is allowed before failing closed.
     const chapters = Array.from({ length: 5 }, (_, index) => ({
       chapterNumber: index + 1,
       title: `Chương ${index + 1}`,
       content: `Bằng chứng nguyên văn chương ${index + 1}.`,
     }));
-    const review = windowReviewWirePass();
-    review.evidence[0].q = 'Câu này không tồn tại trong chương.';
-    const provider = new QueueProvider([review]);
+    const bad = windowReviewWirePass();
+    bad.evidence[0].q = 'Câu này không tồn tại trong chương.';
+    const good = windowReviewWirePass();
+    const provider = new QueueProvider([bad, good]);
+    const result = await reviewFiveChapterWindow({ kernel, arc, state: initialState, chapters, routes, provider });
+    expect(result.review.status).toBe('pass');
+    expect(provider.calls).toEqual(['editor', 'editor']);
+  });
+
+  test('window review fails closed when the corrective pass also cannot ground', async () => {
+    const chapters = Array.from({ length: 5 }, (_, index) => ({
+      chapterNumber: index + 1,
+      title: `Chương ${index + 1}`,
+      content: `Bằng chứng nguyên văn chương ${index + 1}.`,
+    }));
+    const bad = windowReviewWirePass();
+    bad.evidence[0].q = 'Câu này không tồn tại trong chương.';
+    const stillBad = windowReviewWirePass();
+    stillBad.evidence[0].q = 'Vẫn không có trong chương.';
+    const provider = new QueueProvider([bad, stillBad]);
     await expect(reviewFiveChapterWindow({ kernel, arc, state: initialState, chapters, routes, provider }))
-      .rejects.toMatchObject({
-        code: 'infra_blocked',
-        evidence: { usages: [usage] },
-      });
+      .rejects.toMatchObject({ code: 'infra_blocked' });
   });
 
   test('state remains bounded across 1,200 transitions', () => {
