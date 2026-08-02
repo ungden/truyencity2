@@ -438,7 +438,7 @@ function generatorPrompt(input: {
       'Có 8-15 arena/giai đoạn thực sự khác nhau để đi đến 800-1.200 chương; seriality1000 phải mô tả biến đổi macro, không đổi tên cùng một vòng lặp.',
       'Nêu earlyEndingRisk: vì sao truyện có thể cạn sớm và cơ chế nào ngăn điều đó mà không sinh filler.',
           'Không dựa vào đối thủ ngu, may mắn liên tục hoặc tài nguyên vô nguồn.',
-          'Tên dài, trực diện, dễ hiểu với độc giả Việt.',
+          'Tên truyện BÁN reader fantasy, không tóm tắt cơ chế hay quy trình. Chỉ hai khuôn được phép: (1) ngắn 3–6 chữ có sức nặng, ví dụ "Vua Câu Mực Đêm", "Toàn Chức Cao Thủ"; (2) dài tối đa 10 chữ có móc câu về thân phận, cheat hoặc khởi đầu, ví dụ "Trùng Sinh Thập Niên 80: Ông Trùm Hải Sản", "Bắt Đầu Với Mười Vạn Sức Mạnh". Cấm tên kiểu nhãn mô tả nối bằng "và/của/giúp", ví dụ sai: "Đội Tàu Câu Mực Đêm Và Sáng Kiến Ướp Muối Khô Giữ Giá Trị Thương Phẩm". Mỗi chữ trong tên phải gợi tò mò, quyền năng hoặc khát vọng; chữ nào chỉ mô tả kỹ thuật thì bỏ.',
           'Mỗi mechanismFingerprint, rewardLoopFingerprint và conflictEconomyFingerprint chỉ là một cụm phân loại tối đa 12 từ; không giải thích, không viết thành câu dài.',
           'Viết metadata cô đọng: mỗi ý một hoặc hai câu, seriality30 đúng sáu ý và seriality1000 từ tám đến mười lăm ý; không diễn giải lại research.',
     ],
