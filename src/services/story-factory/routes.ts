@@ -1,6 +1,19 @@
 import { ModelRoutesSchema } from './contracts';
 
-/** Exact, versioned official-Gemini route. No runtime provider/model fallback. */
+/**
+ * Exact, versioned route. No runtime model substitution.
+ *
+ * Writer is GPT-5.6 Terra, adopted 2026-08-02 after a 7-model bakeoff on one frozen
+ * launch pack: Terra was the only candidate to pass the writing smoke (5/5 chapters,
+ * zero rewrites, zero violations — the Gemini 2.5-pro incumbent needed a rewrite),
+ * then wrote six production chapters with one \$0.07 repair while the pro control
+ * needed multiple operator revives. Editor and Planner stay on Gemini 3.1-pro:
+ * every cheaper challenger (Luna, Terra-as-editor, deepseek, qwen, grok) failed.
+ *
+ * routeVersion is kept EXACTLY equal to the passed smoke's label — the claim gate
+ * binds writer/editor/planner/planJudge/routeVersion to a passed smoke, so adopting
+ * the proven identity authorizes new seeds with zero re-smoke.
+ */
 export const DEFAULT_MODEL_ROUTES = ModelRoutesSchema.parse({
   setupGeneratorA: 'gemini-3.5-flash',
   setupGeneratorB: 'gemini-2.5-pro',
@@ -9,7 +22,7 @@ export const DEFAULT_MODEL_ROUTES = ModelRoutesSchema.parse({
   launchArchitect: 'gemini-3.1-pro-preview',
   planner: 'gemini-3.1-pro-preview',
   planJudge: 'gemini-2.5-pro',
-  writer: 'gemini-3.6-flash',
+  writer: 'gpt-5.6-terra',
   editor: 'gemini-3.1-pro-preview',
-  routeVersion: 'official-gemini-quality-2026-07-29.7-pro-planner',
+  routeVersion: 'terra-writer-experiment-2026-08-01.1',
 });
