@@ -16,6 +16,7 @@ import {
 import type { ContinuityPacket } from './memory';
 import type { ProviderUsage, StoryModelProvider } from './provider';
 import { geminiProvider } from './provider';
+import { FACTORY_PLANNER_VERSION } from './release';
 import { EDITOR_SYSTEM_PROMPT, PLANNER_SYSTEM_PROMPT, PLAN_JUDGE_SYSTEM_PROMPT } from './prompts';
 import {
   applyCanonExtension,
@@ -1485,6 +1486,30 @@ export async function assessRollingPlan(input: {
   return { assessment, usage: result.usage };
 }
 
+/**
+ * A judge-replan chain runs up to six planner/judge calls, each of which can take
+ * 100-250s against Vercel's 300s ceiling. Every stable intermediate — the validated
+ * mechanical plan, the first judge verdict, the validated replan — is checkpointed
+ * into the run row, so a killed invocation resumes mid-chain instead of re-buying
+ * the whole sequence. Raw planner responses are stored, not materialized plans:
+ * resume re-materializes and re-validates deterministically against current durable
+ * state, so a checkpoint written against different state simply fails validation
+ * and is ignored. Provenance is compared field-by-field (never by serialized JSON —
+ * Postgres JSONB reorders object keys).
+ */
+export const PlanCheckpointSchema = z.object({
+  provenance: z.object({
+    nextChapter: z.number().int(),
+    plannerVersion: z.string(),
+    routeVersion: z.string(),
+    recoveryDigest: z.string().nullable(),
+  }),
+  mechanicalResponse: z.unknown(),
+  judgeAssessment: PlanAssessmentSchema.optional(),
+  judgeReplanResponse: z.unknown().optional(),
+});
+export type PlanCheckpoint = z.infer<typeof PlanCheckpointSchema>;
+
 export async function planRollingWindow(input: {
   kernel: StoryKernel;
   arc: ArcPlan;
@@ -1494,6 +1519,10 @@ export async function planRollingWindow(input: {
   recoveryEvidence?: unknown;
   continuityPacket?: ContinuityPacket;
   provider?: StoryModelProvider;
+  /** Raw candidate checkpoint (from a prior run row); validated and matched internally. */
+  resume?: unknown;
+  /** Persist a checkpoint; failures are logged and never abort the chain. */
+  onCheckpoint?: (checkpoint: PlanCheckpoint) => Promise<void>;
 }): Promise<{
   rollingPlan: RollingPlan;
   assessment: PlanAssessment;
@@ -1509,6 +1538,31 @@ export async function planRollingWindow(input: {
     arc: input.arc,
     state: input.state,
   });
+
+  const provenance: PlanCheckpoint['provenance'] = {
+    nextChapter: input.state.chapterNumber + 1,
+    plannerVersion: FACTORY_PLANNER_VERSION,
+    routeVersion: input.routes.routeVersion,
+    recoveryDigest: input.recoveryEvidence === undefined
+      ? null
+      : createHash('sha256').update(JSON.stringify(input.recoveryEvidence)).digest('hex'),
+  };
+  const resumeParsed = input.resume === undefined ? undefined : PlanCheckpointSchema.safeParse(input.resume);
+  const resume = resumeParsed?.success
+    && resumeParsed.data.provenance.nextChapter === provenance.nextChapter
+    && resumeParsed.data.provenance.plannerVersion === provenance.plannerVersion
+    && resumeParsed.data.provenance.routeVersion === provenance.routeVersion
+    && resumeParsed.data.provenance.recoveryDigest === provenance.recoveryDigest
+    ? resumeParsed.data
+    : undefined;
+  const saveCheckpoint = async (checkpoint: Omit<PlanCheckpoint, 'provenance'>) => {
+    try {
+      await input.onCheckpoint?.({ provenance, ...checkpoint });
+    } catch (error) {
+      console.warn('[story-factory] plan checkpoint persist failed (chain continues):',
+        error instanceof Error ? error.message : String(error));
+    }
+  };
   const requestPlan = async (inputForAttempt: {
     task: string;
     previousResponse?: unknown;
@@ -1629,7 +1683,23 @@ export async function planRollingWindow(input: {
   let currentResponse: z.infer<typeof PlannerRollingPlanResponseSchema> | undefined;
   let currentPlan: RollingPlan | undefined;
   let mechanicalError: StoryFactoryError | undefined;
-  for (let mechanicalAttempt = 1; mechanicalAttempt <= 2; mechanicalAttempt += 1) {
+  if (resume) {
+    const stored = PlannerRollingPlanResponseSchema.safeParse(resume.mechanicalResponse);
+    if (stored.success) {
+      try {
+        currentPlan = materializeAndValidate(stored.data);
+        currentResponse = stored.data;
+      } catch (error) {
+        if (error instanceof StoryFactoryError && error.code === 'infra_blocked') throw error;
+        currentPlan = undefined;
+        currentResponse = undefined;
+      }
+    }
+  }
+  // Later checkpoint fields are only trustworthy if the mechanical plan they were
+  // derived from is the one we are actually using.
+  const resumedMechanical = Boolean(currentPlan);
+  for (let mechanicalAttempt = 1; !currentPlan && mechanicalAttempt <= 2; mechanicalAttempt += 1) {
     const result = await requestPlan({
       task: mechanicalAttempt === 1
         ? input.recoveryEvidence
@@ -1683,118 +1753,156 @@ export async function planRollingWindow(input: {
       attempts,
     });
   }
-
-  const judged = await assessRollingPlan({
-    provider,
-    kernel: input.kernel,
-    arc: input.arc,
-    state: input.state,
-    rollingPlan: currentPlan,
-    model: input.routes.planJudge,
-    advisories,
-  });
-  usages.push(judged.usage);
-  if (judged.assessment.status === 'pass') {
-    return { rollingPlan: currentPlan, assessment: judged.assessment, usages, attempts, advisories };
+  if (!resumedMechanical) {
+    await saveCheckpoint({ mechanicalResponse: currentResponse });
   }
 
-  const judgeRepair = await requestPlan({
-    task: `Tạo lại toàn bộ rolling window đúng một lần theo evidence của Plan Judge; giữ contract cơ học hợp lệ và không vá cục bộ.
-Mọi issue là yêu cầu bắt buộc, không phải gợi ý. opposition_agenda phải trở thành một đối sách/hành động có hậu quả trong plan, không chỉ là ý định hoặc cảm xúc. state_transition/earned_progression phải có bước chuyển tương xứng chuẩn bị và không dùng trạng thái tuyệt đối thiếu căn cứ.
-Với relationship state_transition, target phải là chính nhân vật đổi thái độ và after chỉ mô tả thái độ của target đối với counterpart; không dùng relationship delta của người hành động để ghi rằng họ đã thuyết phục người khác.
-Đối thủ phải cản trở trước hoặc trong hành động quyết định; tuyệt đối không biến cú đánh, tai họa hay sai lầm của họ thành lực/công cụ/thời điểm vừa khít giúp main hoàn tất cơ chế.
-Nếu validation báo required fact sai, delta tạo fact phải dùng chính xác expected trong factContracts trước mechanic sử dụng; không dùng mô tả thay marker precondition.
-Sau khi lập lại, tự đối chiếu từng issue với scene và delta mới trước khi trả kết quả.`,
-    previousResponse: currentResponse,
-    validationIssues: judged.assessment.issues,
-    temperature: 0.1,
-  });
-  let repairedPlan: RollingPlan;
-  try {
-    repairedPlan = materializeAndValidate(judgeRepair.value);
-    attempts.push({
-      attempt: 'judge_replan',
-      responseDigest: digestRollingPlan(repairedPlan),
-      status: 'validated',
-      validationMessage: null,
-      validationEvidence: null,
-      usage: judgeRepair.usage,
+  let judgedAssessment: PlanAssessment;
+  if (resumedMechanical && resume?.judgeAssessment) {
+    judgedAssessment = resume.judgeAssessment;
+  } else {
+    const judged = await assessRollingPlan({
+      provider,
+      kernel: input.kernel,
+      arc: input.arc,
+      state: input.state,
+      rollingPlan: currentPlan,
+      model: input.routes.planJudge,
+      advisories,
     });
-  } catch (error) {
-    if (error instanceof StoryFactoryError && error.code === 'infra_blocked') throw error;
-    const normalized = normalizePlanError(error);
-    attempts.push({
-      attempt: 'judge_replan',
-      responseDigest: createHash('sha256')
-        .update(JSON.stringify(judgeRepair.value))
-        .digest('hex'),
-      status: 'invalid',
-      validationMessage: normalized.message,
-      validationEvidence: normalized.evidence ?? null,
-      usage: judgeRepair.usage,
-    });
-    const mechanicalRepair = await requestPlan({
-      task: 'Tạo lại toàn bộ rolling window sau Plan Judge và sửa đúng validation issue cơ học; không thay mục tiêu sửa nội dung của Plan Judge, không vá cục bộ.',
-      previousResponse: judgeRepair.value,
-      validationIssues: {
-        message: normalized.message,
-        evidence: normalized.evidence ?? null,
-        judgeIssues: judged.assessment.issues,
-      },
+    usages.push(judged.usage);
+    judgedAssessment = judged.assessment;
+  }
+  if (judgedAssessment.status === 'pass') {
+    return { rollingPlan: currentPlan, assessment: judgedAssessment, usages, attempts, advisories };
+  }
+  await saveCheckpoint({ mechanicalResponse: currentResponse, judgeAssessment: judgedAssessment });
+
+  let resumedReplan: { plan: RollingPlan; raw: unknown } | undefined;
+  if (resumedMechanical && resume?.judgeAssessment && resume.judgeReplanResponse !== undefined) {
+    const storedReplan = PlannerRollingPlanResponseSchema.safeParse(resume.judgeReplanResponse);
+    if (storedReplan.success) {
+      try {
+        resumedReplan = { plan: materializeAndValidate(storedReplan.data), raw: storedReplan.data };
+      } catch (error) {
+        if (error instanceof StoryFactoryError && error.code === 'infra_blocked') throw error;
+        resumedReplan = undefined;
+      }
+    }
+  }
+
+  const produceReplan = async (): Promise<{ plan: RollingPlan; raw: unknown }> => {
+    const judgeRepair = await requestPlan({
+      task: `Tạo lại toàn bộ rolling window đúng một lần theo evidence của Plan Judge; giữ contract cơ học hợp lệ và không vá cục bộ.
+  Mọi issue là yêu cầu bắt buộc, không phải gợi ý. opposition_agenda phải trở thành một đối sách/hành động có hậu quả trong plan, không chỉ là ý định hoặc cảm xúc. state_transition/earned_progression phải có bước chuyển tương xứng chuẩn bị và không dùng trạng thái tuyệt đối thiếu căn cứ.
+  Với relationship state_transition, target phải là chính nhân vật đổi thái độ và after chỉ mô tả thái độ của target đối với counterpart; không dùng relationship delta của người hành động để ghi rằng họ đã thuyết phục người khác.
+  Đối thủ phải cản trở trước hoặc trong hành động quyết định; tuyệt đối không biến cú đánh, tai họa hay sai lầm của họ thành lực/công cụ/thời điểm vừa khít giúp main hoàn tất cơ chế.
+  Nếu validation báo required fact sai, delta tạo fact phải dùng chính xác expected trong factContracts trước mechanic sử dụng; không dùng mô tả thay marker precondition.
+  Sau khi lập lại, tự đối chiếu từng issue với scene và delta mới trước khi trả kết quả.`,
+      previousResponse: currentResponse,
+      validationIssues: judgedAssessment.issues,
       temperature: 0.1,
     });
+    let repairedPlan: RollingPlan;
+    let repairedRaw: unknown;
     try {
-      repairedPlan = materializeAndValidate(mechanicalRepair.value);
+      repairedPlan = materializeAndValidate(judgeRepair.value);
+      repairedRaw = judgeRepair.value;
       attempts.push({
-        attempt: 'judge_replan_mechanical_repair',
+        attempt: 'judge_replan',
         responseDigest: digestRollingPlan(repairedPlan),
         status: 'validated',
         validationMessage: null,
         validationEvidence: null,
-        usage: mechanicalRepair.usage,
+        usage: judgeRepair.usage,
       });
-    } catch (repairError) {
-      if (repairError instanceof StoryFactoryError && repairError.code === 'infra_blocked') throw repairError;
-      const repairFailure = normalizePlanError(repairError);
+    } catch (error) {
+      if (error instanceof StoryFactoryError && error.code === 'infra_blocked') throw error;
+      const normalized = normalizePlanError(error);
       attempts.push({
-        attempt: 'judge_replan_mechanical_repair',
+        attempt: 'judge_replan',
         responseDigest: createHash('sha256')
-          .update(JSON.stringify(mechanicalRepair.value))
+          .update(JSON.stringify(judgeRepair.value))
           .digest('hex'),
         status: 'invalid',
-        validationMessage: repairFailure.message,
-        validationEvidence: repairFailure.evidence ?? null,
-        usage: mechanicalRepair.usage,
+        validationMessage: normalized.message,
+        validationEvidence: normalized.evidence ?? null,
+        usage: judgeRepair.usage,
       });
-      throw new StoryFactoryError('plan_blocked', repairFailure.message, {
-        validation: repairFailure.evidence ?? null,
-        judgeIssues: judged.assessment.issues,
-        usages,
-        attempts,
+      const mechanicalRepair = await requestPlan({
+        task: 'Tạo lại toàn bộ rolling window sau Plan Judge và sửa đúng validation issue cơ học; không thay mục tiêu sửa nội dung của Plan Judge, không vá cục bộ.',
+        previousResponse: judgeRepair.value,
+        validationIssues: {
+          message: normalized.message,
+          evidence: normalized.evidence ?? null,
+          judgeIssues: judgedAssessment.issues,
+        },
+        temperature: 0.1,
       });
+      try {
+        repairedPlan = materializeAndValidate(mechanicalRepair.value);
+        repairedRaw = mechanicalRepair.value;
+        attempts.push({
+          attempt: 'judge_replan_mechanical_repair',
+          responseDigest: digestRollingPlan(repairedPlan),
+          status: 'validated',
+          validationMessage: null,
+          validationEvidence: null,
+          usage: mechanicalRepair.usage,
+        });
+      } catch (repairError) {
+        if (repairError instanceof StoryFactoryError && repairError.code === 'infra_blocked') throw repairError;
+        const repairFailure = normalizePlanError(repairError);
+        attempts.push({
+          attempt: 'judge_replan_mechanical_repair',
+          responseDigest: createHash('sha256')
+            .update(JSON.stringify(mechanicalRepair.value))
+            .digest('hex'),
+          status: 'invalid',
+          validationMessage: repairFailure.message,
+          validationEvidence: repairFailure.evidence ?? null,
+          usage: mechanicalRepair.usage,
+        });
+        throw new StoryFactoryError('plan_blocked', repairFailure.message, {
+          validation: repairFailure.evidence ?? null,
+          judgeIssues: judgedAssessment.issues,
+          usages,
+          attempts,
+        });
+      }
     }
+    return { plan: repairedPlan, raw: repairedRaw };
+  };
+
+  const repaired = resumedReplan ?? await produceReplan();
+  if (!resumedReplan) {
+    await saveCheckpoint({
+      mechanicalResponse: currentResponse,
+      judgeAssessment: judgedAssessment,
+      judgeReplanResponse: repaired.raw,
+    });
   }
   const rejudged = await assessRollingPlan({
     provider,
     kernel: input.kernel,
     arc: input.arc,
     state: input.state,
-    rollingPlan: repairedPlan,
+    rollingPlan: repaired.plan,
     model: input.routes.planJudge,
-    repairIssues: judged.assessment.issues,
+    repairIssues: judgedAssessment.issues,
     advisories,
   });
   usages.push(rejudged.usage);
   if (rejudged.assessment.status === 'pass') {
-    return { rollingPlan: repairedPlan, assessment: rejudged.assessment, usages, attempts, advisories };
+    return { rollingPlan: repaired.plan, assessment: rejudged.assessment, usages, attempts, advisories };
   }
   throw new StoryFactoryError('plan_blocked', 'Plan Judge rejected the rolling window after one full replan.', {
-    firstAssessment: judged.assessment,
+    firstAssessment: judgedAssessment,
     firstPlanDigest: digestRollingPlan(currentPlan),
-    firstIssueSnapshot: planIssueSnapshot(currentPlan, judged.assessment),
+    firstIssueSnapshot: planIssueSnapshot(currentPlan, judgedAssessment),
     validation: rejudged.assessment.issues,
-    repairedPlanDigest: digestRollingPlan(repairedPlan),
-    repairedIssueSnapshot: planIssueSnapshot(repairedPlan, rejudged.assessment),
+    repairedPlanDigest: digestRollingPlan(repaired.plan),
+    repairedIssueSnapshot: planIssueSnapshot(repaired.plan, rejudged.assessment),
     usages,
     attempts,
   });

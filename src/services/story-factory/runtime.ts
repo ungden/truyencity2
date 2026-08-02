@@ -383,6 +383,30 @@ async function runCover(db: SupabaseClient, job: FactoryJobRow, project: Factory
   }
 }
 
+/**
+ * The newest prior plan run for the same chapter that carries a checkpoint — a run
+ * killed by the 300s ceiling stays 'running' (later swept to infra_blocked) with its
+ * checkpoint intact in output_artifact. Best-effort: any failure just means a cold
+ * start, which is what happened on every plan run before checkpoints existed.
+ */
+async function loadPlanCheckpoint(db: SupabaseClient, job: FactoryJobRow, currentRunId: string): Promise<unknown> {
+  const prior = await db.from('story_factory_runs')
+    .select('output_artifact')
+    .eq('job_id', job.id)
+    .eq('kind', 'plan')
+    .eq('chapter_number', job.current_chapter + 1)
+    .neq('id', currentRunId)
+    .not('output_artifact->planCheckpoint', 'is', null)
+    .order('started_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (prior.error) {
+    console.warn('[story-factory] plan checkpoint lookup failed (cold start):', prior.error.message);
+    return undefined;
+  }
+  return (prior.data?.output_artifact as { planCheckpoint?: unknown } | null | undefined)?.planCheckpoint;
+}
+
 async function runPlan(db: SupabaseClient, job: FactoryJobRow, project: FactoryProjectRow, provider?: StoryModelProvider): Promise<FactoryTickResult> {
   const runId = await createRun(db, job, 'plan', job.current_chapter + 1);
   try {
@@ -390,6 +414,7 @@ async function runPlan(db: SupabaseClient, job: FactoryJobRow, project: FactoryP
       input_artifact: { plannerRevision: FACTORY_PLANNER_VERSION },
     }).eq('id', runId).eq('status', 'running');
     if (versioned.error) throw versioned.error;
+    const resume = await loadPlanCheckpoint(db, job, runId);
     const kernel = StoryKernelSchema.parse(project.story_kernel);
     const arc = ArcPlanSchema.parse(project.arc_plan);
     const state = StoryStateSchema.parse(project.story_state);
@@ -408,6 +433,13 @@ async function runPlan(db: SupabaseClient, job: FactoryJobRow, project: FactoryP
       continuityPacket,
       recoveryEvidence: job.plan_feedback ?? undefined,
       provider,
+      resume,
+      onCheckpoint: async checkpoint => {
+        const saved = await db.from('story_factory_runs').update({
+          output_artifact: { planCheckpoint: checkpoint },
+        }).eq('id', runId).eq('status', 'running');
+        if (saved.error) throw saved.error;
+      },
     });
     const now = new Date().toISOString();
     const jobUpdate = await db.from('story_factory_jobs').update({

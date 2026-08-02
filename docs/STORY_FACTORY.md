@@ -42,7 +42,7 @@ off by the 300s route ceiling.
 |---|---|---|
 | `setup` | 9 (+resumable checkpoints) | `cover` |
 | `cover` | 1 image | `plan` |
-| `plan` | 1–6 (planner ×2 mechanical, judge, replan, repair, re-judge) | `write` |
+| `plan` | 1–6 (planner ×2 mechanical, judge, replan, repair, re-judge; checkpointed) | `write` |
 | `write` | 2 (Writer, Editor) | commit, or `revise` |
 | `revise` | 2 (Rewrite, Editor) | commit |
 | `window_review` | 1, every 5th chapter | `write` or `arc` |
@@ -294,6 +294,12 @@ setup telemetry and never enter Writer context.
 
 Setup is checkpointed per stage and resumable, bound to one commission, research snapshot
 and setup route.
+
+The plan stage is checkpointed the same way: a judge-replan chain can run six calls of
+100–250s each against the 300s ceiling, so every stable intermediate (validated mechanical
+plan, first judge verdict, validated replan) is saved into the run row. A killed invocation
+resumes mid-chain; the checkpoint stores raw planner responses and re-validates them against
+current durable state, so a stale checkpoint is ignored rather than trusted.
 
 ## Time and cadence
 

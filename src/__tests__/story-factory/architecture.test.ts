@@ -139,7 +139,7 @@ describe('Story Factory architecture boundary', () => {
     expect(planner).toContain('model: input.routes.planJudge');
     expect(planner).toContain('const rejudged = await assessRollingPlan({');
     // Bounded repair: two mechanical attempts, then exactly one judge-driven replan.
-    expect(planner).toContain('for (let mechanicalAttempt = 1; mechanicalAttempt <= 2; mechanicalAttempt += 1)');
+    expect(planner).toContain('for (let mechanicalAttempt = 1; !currentPlan && mechanicalAttempt <= 2; mechanicalAttempt += 1)');
     // A judge in the chapter path would grade the plan it just wrote.
     expect(read('src/services/story-factory/pipeline.ts')).not.toContain('planJudge');
   });

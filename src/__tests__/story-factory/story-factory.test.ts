@@ -4190,6 +4190,56 @@ describe('canonical Story Factory', () => {
     expect(provider.calls).toEqual(['planner', 'plan-judge', 'planner', 'plan-judge']);
   });
 
+  test('plan checkpoint resumes a killed judge-replan chain without re-buying completed calls', async () => {
+    const checks = {
+      protagonistAgency: true, earnedProgression: true, domainPlausibility: true, oppositionAgenda: true,
+      sceneVariety: true, stageAlignment: true, outcomeWeight: true,
+    };
+    const checkEvidence = Object.fromEntries(Object.keys(checks).map(key => [key, 'chapter 1 scene_1 delta_1']));
+    const revise = {
+      status: 'revise' as const,
+      checks: { ...checks, earnedProgression: false },
+      checkEvidence,
+      issues: [{
+        category: 'earned_progression' as const,
+        chapterNumber: 1,
+        sceneId: 'scene_1',
+        deltaId: 'delta_1',
+        evidence: 'delta_1 tăng kết quả quá nhanh',
+        instruction: 'Tạo tích lũy và chi phí đủ sức đỡ delta_1.',
+      }],
+    };
+    const pass = { status: 'pass', checks, checkEvidence, issues: [] };
+
+    const checkpoints: unknown[] = [];
+    const first = new QueueProvider([plannerWire(), revise, plannerWire(), pass]);
+    await planRollingWindow({
+      kernel, arc, state: initialState, routes, provider: first,
+      onCheckpoint: async checkpoint => { checkpoints.push(checkpoint); },
+    });
+    // One checkpoint per stable intermediate: mechanical plan, judge verdict, replan.
+    expect(checkpoints).toHaveLength(3);
+
+    // JSONB round-trip (Postgres reorders keys); resume needs only the re-judge call.
+    const stored = JSON.parse(JSON.stringify(checkpoints[2]));
+    const resumed = new QueueProvider([pass]);
+    const result = await planRollingWindow({
+      kernel, arc, state: initialState, routes, provider: resumed, resume: stored,
+    });
+    expect(result.assessment.status).toBe('pass');
+    expect(resumed.calls).toEqual(['plan-judge']);
+
+    // A checkpoint written against different durable state is ignored: cold start.
+    const stale = JSON.parse(JSON.stringify(checkpoints[2])) as { provenance: { nextChapter: number } };
+    stale.provenance.nextChapter += 1;
+    const cold = new QueueProvider([plannerWire(), pass]);
+    const coldResult = await planRollingWindow({
+      kernel, arc, state: initialState, routes, provider: cold, resume: stale,
+    });
+    expect(coldResult.assessment.status).toBe('pass');
+    expect(cold.calls).toEqual(['planner', 'plan-judge']);
+  });
+
   test('mechanical repair does not consume the independent Plan Judge replan budget', async () => {
     const invalidWire = plannerWire();
     invalidWire.chapters[0].mechanics = [{
