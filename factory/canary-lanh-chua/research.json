@@ -1,0 +1,42 @@
+{
+  "snapshotId": "lanh-chua-2026-08-03",
+  "lane": "xuanhuan_civilization",
+  "capturedAt": "2026-08-03T04:30:00.000Z",
+  "signals": [
+    {
+      "id": "vn_reader_demand_convert",
+      "sourceUrl": "https://metruyencv.vn/the-loai/toan-dan",
+      "observation": "Nền tảng convert lớn nhất Việt Nam có hẳn một thể loại 'toàn dân' riêng; hàng loạt bộ Toàn Dân Lãnh Chúa bản convert chạy dài hàng trăm chương chứng tỏ cầu tiếng Việt cho meta-format này đã có sẵn, nhưng chưa có bản viết thuần Việt mượt mà."
+    },
+    {
+      "id": "vn_variant_golden_fingers",
+      "sourceUrl": "https://metruyencv.com/truyen/toan-dan-lanh-chua-ta-ti-le-roi-do-tram-phan-tram",
+      "observation": "Các biến thể ăn khách khác nhau chủ yếu ở kim thủ chỉ khởi đầu (tỉ lệ rơi đồ trăm phần trăm, tăng phúc gấp trăm lần, lãnh địa vô hạn tiến hóa, bắt đầu từ vong linh/nữ anh hùng): một khung chung + một cheat độc đáo là đủ tách bộ mới."
+    },
+    {
+      "id": "cn_format_depth",
+      "sourceUrl": "https://zhuanlan.zhihu.com/p/715293628",
+      "observation": "Danh sách 30 bộ lãnh chúa lưu đã hoàn thành cho thấy format sống được tới hoàn kết ở quy mô lớn khi trục truyện là chuỗi sản xuất - kinh doanh - chinh phạt qua nhiều vị diện, không phải chỉ đánh quái tăng cấp."
+    },
+    {
+      "id": "cn_booklist_mix",
+      "sourceUrl": "https://book.qidian.com/booklist/detail/647089/",
+      "observation": "Booklist chính thức của Qidian gộp lãnh chúa lưu với chủng điền lưu thành cụm 'kiến thiết + kinh doanh + trồng trọt': người đọc dòng này mua cảm giác tự tay xây dựng và tối ưu, phần chiến đấu chỉ là đầu ra của nền sản xuất."
+    },
+    {
+      "id": "cn_fusion_trend",
+      "sourceUrl": "https://maliangwriter.com/blog/web-novel-trends-2026-mid-year/",
+      "observation": "Phân tích thị trường nửa đầu 2026: các bộ nổ đều là lai ghép thể loại (mạt thế + chủng điền, đô thị + kỳ ảo) thay vì thể loại thuần; lãnh chúa lưu lai yếu tố sinh tồn thiên tai hoặc kinh doanh là hướng dễ khác biệt."
+    },
+    {
+      "id": "cn_quality_bar",
+      "sourceUrl": "https://www.cssn.cn/skgz/bwyc/202604/t20260420_5981165.shtml",
+      "observation": "Báo cáo phát triển văn học mạng Trung Quốc 2025 ghi nhận thị trường chuyển sang tinh phẩm hóa và đa dạng hóa: bộ khung quen thuộc vẫn bán được nhưng phải viết chắc tay, nhân vật và thiết định là lõi chứ không phải nhãn thể loại."
+    },
+    {
+      "id": "cn_top_sellers_2025",
+      "sourceUrl": "https://m.maigoo.com/top/444043.html",
+      "observation": "Bảng truyện hot Qidian 2025 cho thấy các bộ đầu bảng giữ độc giả bằng thiết định thế giới có luật chơi rõ và nhịp trả thưởng ổn định hàng trăm chương — đúng điểm mạnh của khung lãnh chúa nếu kinh tế lãnh địa có nhân quả thật."
+    }
+  ]
+}
