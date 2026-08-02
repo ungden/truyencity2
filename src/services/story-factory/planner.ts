@@ -16,7 +16,10 @@ import {
 import type { ContinuityPacket } from './memory';
 import type { ProviderUsage, StoryModelProvider } from './provider';
 import { geminiProvider } from './provider';
-import { FACTORY_PLANNER_VERSION } from './release';
+
+// Defined here, not in release.ts: release → benchmark → planner already exists, so a
+// planner → release import closes a cycle and breaks the production bundle (TDZ at init).
+export const FACTORY_PLANNER_VERSION = 'story-factory-planner-66-plan-checkpoint';
 import { EDITOR_SYSTEM_PROMPT, PLANNER_SYSTEM_PROMPT, PLAN_JUDGE_SYSTEM_PROMPT } from './prompts';
 import {
   applyCanonExtension,

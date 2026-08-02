@@ -142,6 +142,9 @@ describe('Story Factory architecture boundary', () => {
     expect(planner).toContain('for (let mechanicalAttempt = 1; !currentPlan && mechanicalAttempt <= 2; mechanicalAttempt += 1)');
     // A judge in the chapter path would grade the plan it just wrote.
     expect(read('src/services/story-factory/pipeline.ts')).not.toContain('planJudge');
+    // release → benchmark → planner already exists; planner importing release closes a
+    // cycle that typechecks fine but TDZ-crashes the production bundle at module init.
+    expect(planner).not.toContain("from './release'");
   });
 
   test('grounding constrains concept selection instead of auditing after it', () => {
