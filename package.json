@@ -17,7 +17,8 @@
     "factory:benchmark": "node --import tsx scripts/factory-benchmark.ts",
     "factory:model-bakeoff": "node --import tsx scripts/factory-model-bakeoff.ts",
     "factory:smoke": "node --import tsx scripts/factory-smoke.ts",
-    "factory:writing-smoke": "node --import tsx scripts/factory-writing-smoke.ts"
+    "factory:writing-smoke": "node --import tsx scripts/factory-writing-smoke.ts",
+    "factory:window-repair": "node --import tsx scripts/factory-window-repair.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
