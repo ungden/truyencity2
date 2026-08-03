@@ -145,7 +145,7 @@ async function createRun(db: SupabaseClient, job: FactoryJobRow, kind: string, c
   return data.id as string;
 }
 
-async function blockRun(db: SupabaseClient, job: FactoryJobRow, runId: string | null, error: unknown): Promise<FactoryTickResult> {
+async function blockRun(db: SupabaseClient, job: FactoryJobRow, runId: string | null, error: unknown, options?: { retryOnce?: boolean }): Promise<FactoryTickResult> {
   const factoryError = error instanceof StoryFactoryError
     ? error
     : new StoryFactoryError('infra_blocked', error instanceof Error ? error.message : String(error));
@@ -188,8 +188,11 @@ async function blockRun(db: SupabaseClient, job: FactoryJobRow, runId: string | 
   // Infrastructure failures are transient by definition — a provider hiccup, a socket
   // reset, an expired lease. Parking the job on the first one made the fleet drain to
   // zero with nothing running. Semantic blocks (setup/plan/quality) are verdicts about
-  // the story itself and still park immediately for an operator to look at.
-  const retryable = factoryError.code === 'infra_blocked' && job.retry_count < INFRA_RETRY_LIMIT;
+  // the story itself and park for an operator — except when the caller knows the next
+  // attempt materially differs (retryOnce: a first plan verdict whose evidence just
+  // became plan_feedback), which earns exactly one automatic retry before parking.
+  const retryable = (factoryError.code === 'infra_blocked' && job.retry_count < INFRA_RETRY_LIMIT)
+    || options?.retryOnce === true;
   const now = new Date();
   const jobUpdate = await db.from('story_factory_jobs').update({
     status: retryable ? 'ready' : factoryError.code,
@@ -467,6 +470,9 @@ async function runPlan(db: SupabaseClient, job: FactoryJobRow, project: FactoryP
     // would otherwise resume the stored chain and reproduce the same verdict
     // forever. Best-effort: a failed write still parks the job normally.
     if (error instanceof StoryFactoryError && error.code === 'plan_blocked') {
+      // Did THIS attempt already plan against a previous verdict's feedback?
+      // job.plan_feedback is the claim-time snapshot, so it answers exactly that.
+      const alreadyFed = (job.plan_feedback as { source?: string } | null)?.source === 'plan_blocked';
       const evidence = (error.evidence ?? {}) as Record<string, unknown>;
       const fed = await db.from('story_factory_jobs').update({
         plan_feedback: {
@@ -478,6 +484,9 @@ async function runPlan(db: SupabaseClient, job: FactoryJobRow, project: FactoryP
         updated_at: new Date().toISOString(),
       }).eq('id', job.id).eq('lease_token', job.lease_token);
       if (fed.error) console.warn('[story-factory] plan_blocked feedback write failed:', fed.error.message);
+      // First verdict of a chain retries once automatically with the feedback in
+      // hand; a second consecutive verdict parks for an operator.
+      return blockRun(db, job, runId, error, { retryOnce: !fed.error && !alreadyFed });
     }
     return blockRun(db, job, runId, error);
   }
