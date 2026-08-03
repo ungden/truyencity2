@@ -1930,6 +1930,13 @@ export async function reviewFiveChapterWindow(input: {
   arc: ArcPlan;
   state: StoryState;
   chapters: Array<{ chapterNumber: number; title: string; content: string }>;
+  resourceTransitions?: Array<{
+    chapterNumber: number;
+    entityId: string;
+    before: unknown;
+    after: unknown;
+    source: string | null;
+  }>;
   routes: ModelRoutes;
   provider?: StoryModelProvider;
 }): Promise<{ review: WindowReview; usage: ProviderUsage }> {
@@ -1940,6 +1947,7 @@ export async function reviewFiveChapterWindow(input: {
     system: `${EDITOR_SYSTEM_PROMPT}
 Ở chế độ window review, đọc liền mạch năm chương và so với recentOutcomes/state đã commit.
 Block nếu nhân vật phản ứng như quên sự kiện vừa trải qua, cơ chế vật phẩm/công nghệ đổi cách hoạt động, số tiền/khối lượng/giá trong prose lệch với ledger, hoặc năm chương lặp cùng cấu trúc mà không tạo tiến triển.
+Kiểm số dư theo LỊCH SỬ: resourceTransitions là chuỗi giao dịch đã commit theo thứ tự (before → after tại từng chương). Một câu tổng kết số dư trong chương N phải khớp với after của transition cuối cùng tính đến thời điểm đó trong chương N — KHÔNG so với currentState, vì currentState chỉ là số dư sau chương cuối cửa sổ. Chỉ báo lỗi tiền khi con số lệch với transition lịch sử tương ứng.
 Phải đọc trải nghiệm của cả cửa sổ: bắt lặp chức năng “giải thích cơ chế → biểu diễn → quần chúng kinh ngạc”, stock reaction tương đương dù khác từ, main và đối thủ nói cùng giọng, đối thủ liên tục làm công cụ, hoặc progression tăng mạnh thiếu tích lũy/chi phí.
 Không mặc định một thiết kế là tối ưu hoặc một kết quả là tuyệt đối chỉ vì nhân vật giải thích tự tin hay thử thành công một lần. Với realityMode=grounded, kết luận phải tương xứng số lần quan sát và sai số thực tế.
 Lập patterns cho đủ đúng năm chương trước khi kết luận. Mỗi quote trong evidence, patterns và issues phải được sao chép nguyên văn từ content của đúng chapterNumber; mỗi check phải so sánh ít nhất hai chương khác nhau.
@@ -2009,6 +2017,7 @@ Trạng thái pass cũng phải có bằng chứng cụ thể. Chỉ báo tối 
       },
       arc: input.arc,
       currentState: input.state,
+      resourceTransitions: input.resourceTransitions ?? [],
       chapters: input.chapters,
     }),
     schema: WindowReviewWireSchema,

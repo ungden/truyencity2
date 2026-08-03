@@ -738,9 +738,26 @@ async function runWindowReview(db: SupabaseClient, job: FactoryJobRow, project: 
       .eq('novel_id', job.novel_id).gte('chapter_number', job.current_chapter - 4).lte('chapter_number', job.current_chapter)
       .order('chapter_number');
     if (error) throw error;
+    // The reviewer cross-checks balances quoted in prose. currentState only holds
+    // the balance AFTER the last chapter, so without the in-window transition
+    // history every historical "tổng cộng/còn lại" sentence reads as a mismatch —
+    // one canary lost a review round to exactly that false positive.
+    const events = await db.from('story_state_events')
+      .select('chapter_number,entity_id,before_value,after_value,source')
+      .eq('project_id', project.id).eq('kind', 'resource_numeric')
+      .lte('chapter_number', job.current_chapter)
+      .order('chapter_number').order('id');
+    if (events.error) throw events.error;
     const reviewed = await reviewFiveChapterWindow({
       kernel, arc, state,
       chapters: (chapters ?? []).map(chapter => ({ chapterNumber: chapter.chapter_number, title: chapter.title, content: chapter.content ?? '' })),
+      resourceTransitions: (events.data ?? []).map(event => ({
+        chapterNumber: event.chapter_number,
+        entityId: event.entity_id,
+        before: event.before_value,
+        after: event.after_value,
+        source: event.source,
+      })),
       routes, provider,
     });
     if (reviewed.review.status === 'block') {
