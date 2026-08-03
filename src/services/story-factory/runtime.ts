@@ -461,6 +461,24 @@ async function runPlan(db: SupabaseClient, job: FactoryJobRow, project: FactoryP
     if (runUpdate.error) throw runUpdate.error;
     return { status: 'completed', jobId: job.id, stage: 'plan', chapterNumber: job.current_chapter };
   } catch (error) {
+    // A semantic plan verdict must become plan_feedback before the job parks:
+    // the next attempt then plans against the failure evidence, and the changed
+    // recovery digest invalidates the dead chain's checkpoint — a blind revive
+    // would otherwise resume the stored chain and reproduce the same verdict
+    // forever. Best-effort: a failed write still parks the job normally.
+    if (error instanceof StoryFactoryError && error.code === 'plan_blocked') {
+      const evidence = (error.evidence ?? {}) as Record<string, unknown>;
+      const fed = await db.from('story_factory_jobs').update({
+        plan_feedback: {
+          source: 'plan_blocked',
+          message: error.message,
+          validation: evidence.validation ?? null,
+          judgeIssues: evidence.judgeIssues ?? null,
+        },
+        updated_at: new Date().toISOString(),
+      }).eq('id', job.id).eq('lease_token', job.lease_token);
+      if (fed.error) console.warn('[story-factory] plan_blocked feedback write failed:', fed.error.message);
+    }
     return blockRun(db, job, runId, error);
   }
 }
