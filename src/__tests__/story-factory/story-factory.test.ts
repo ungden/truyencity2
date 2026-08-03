@@ -363,6 +363,7 @@ function windowReviewPass(chapterOffset = 0): Extract<WindowReview, { status: 'p
       }],
     })),
     issues: [] as [],
+    advisories: [],
   };
 }
 
@@ -4625,7 +4626,10 @@ describe('canonical Story Factory', () => {
     expect(() => materializeWindowReview(wire)).toThrow('cannot fail a check without an evidence issue');
   });
 
-  test('window review cannot rubber-stamp a repeated explanation-demonstration-surprise formula', async () => {
+  test('window review records style-pattern signals as advisories instead of blocking', async () => {
+    // The pattern labels behind these signals re-roll on every review pass, so a
+    // hard block on them made the promotion gate an unwinnable whack-a-mole (one
+    // production canary failed four consecutive rounds on freshly-rolled labels).
     const chapters = Array.from({ length: 5 }, (_, index) => ({
       chapterNumber: index + 1,
       title: `Chương ${index + 1}`,
@@ -4640,9 +4644,10 @@ describe('canonical Story Factory', () => {
     const provider = new QueueProvider([review]);
     const result = await reviewFiveChapterWindow({ kernel, arc, state: initialState, chapters, routes, provider });
     expect(result.review).toMatchObject({
-      status: 'block',
-      checks: { structureVariety: false },
-      issues: [expect.objectContaining({ category: 'prose_pattern' })],
+      status: 'pass',
+      checks: { structureVariety: true },
+      issues: [],
+      advisories: [expect.objectContaining({ category: 'prose_pattern' })],
     });
   });
 

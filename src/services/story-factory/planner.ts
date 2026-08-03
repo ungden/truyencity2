@@ -1061,6 +1061,16 @@ const WindowIssueSchema = z.object({
   instruction: z.string().trim().min(5).max(1_000),
 }).strict();
 
+/**
+ * Style-of-claim observations (prose_pattern, premature_certainty) are advisories:
+ * recorded on the run row for the Writer prompts of the NEXT window, never blocking.
+ * They are heuristic classifications that re-roll differently on every review pass
+ * (temperature 0.4), so gating publication on them produced an unwinnable
+ * whack-a-mole — the same failure mode the causal validator's advisory split fixed.
+ * Coherence and ledger categories stay hard.
+ */
+export const ADVISORY_WINDOW_CATEGORIES: ReadonlySet<string> = new Set(['prose_pattern', 'premature_certainty']);
+
 export const WindowPassSchema = z.object({
   status: z.literal('pass'),
   checks: z.object({
@@ -1073,6 +1083,7 @@ export const WindowPassSchema = z.object({
   checkEvidence: WindowCheckEvidenceSchema,
   chapterPatterns: z.array(WindowChapterPatternSchema).length(5),
   issues: z.array(z.never()).length(0),
+  advisories: z.array(WindowIssueSchema).max(4).default([]),
 }).strict();
 
 const WindowBlockSchema = z.object({
@@ -1087,6 +1098,7 @@ const WindowBlockSchema = z.object({
   checkEvidence: WindowCheckEvidenceSchema,
   chapterPatterns: z.array(WindowChapterPatternSchema).length(5),
   issues: z.array(WindowIssueSchema).min(1).max(3),
+  advisories: z.array(WindowIssueSchema).max(4).default([]),
 }).strict();
 
 export const WindowReviewSchema = z.discriminatedUnion('status', [
@@ -1198,22 +1210,30 @@ export function materializeWindowReview(value: unknown): WindowReview {
     earnedProgression: wire.checks.e,
     causalLearning: wire.checks.l,
   };
-  const issues = wire.issues.map(issue => ({
+  const reported = wire.issues.map(issue => ({
     category: issueCategories[issue.k],
     evidence: [{ chapterNumber: issue.c, quote: issue.q }],
     instruction: issue.fix,
   }));
-  if (!issues.length && !Object.values(checks).every(Boolean)) {
+  const issues = reported.filter(issue => !ADVISORY_WINDOW_CATEGORIES.has(issue.category));
+  const advisories = reported.filter(issue => ADVISORY_WINDOW_CATEGORIES.has(issue.category));
+  if (!reported.length && !Object.values(checks).every(Boolean)) {
     throw new StoryFactoryError('infra_blocked', 'Window Review cannot fail a check without an evidence issue.');
   }
   for (const issue of issues) {
     if (issue.category === 'voice_drift') checks.voiceSeparation = false;
-    else if (issue.category === 'repetition' || issue.category === 'prose_pattern') checks.structureVariety = false;
+    else if (issue.category === 'repetition') checks.structureVariety = false;
     else if (issue.category === 'opposition_agency') checks.reactionVariety = false;
     else if (issue.category === 'reward_loop'
       || issue.category === 'progression'
       || issue.category === 'earned_progression') checks.earnedProgression = false;
     else checks.causalLearning = false;
+  }
+  if (!issues.length) {
+    // Only advisories (or nothing) remain: the decision is pass, and the pass
+    // contract requires every check true — advisory observations must not leave
+    // a failed check behind as a blocking side channel.
+    for (const key of Object.keys(checks) as Array<keyof typeof checks>) checks[key] = true;
   }
   return WindowReviewSchema.parse({
     status: issues.length ? 'block' : 'pass',
@@ -1228,6 +1248,7 @@ export function materializeWindowReview(value: unknown): WindowReview {
       evidence: [{ chapterNumber: pattern.c, quote: pattern.q }],
     })),
     issues,
+    advisories,
   });
 }
 
@@ -1315,19 +1336,12 @@ function applyDeterministicWindowPolicy(
     });
   }
   if (derivedIssues.length === 0) return review;
-  const issues = review.status === 'block'
-    ? [...review.issues, ...derivedIssues].slice(0, 3)
-    : derivedIssues.slice(0, 3);
-  return WindowBlockSchema.parse({
+  // Derived pattern signals are advisories by definition: the underlying labels
+  // re-roll on every review pass, so blocking on them made the gate unwinnable.
+  // The verdict and checks stay exactly as the reviewer returned them.
+  return WindowReviewSchema.parse({
     ...review,
-    status: 'block',
-    checks: {
-      ...review.checks,
-      structureVariety: explainAndValidate.length >= 3 ? false : review.checks.structureVariety,
-      earnedProgression: prematureCertainty.length > 0 ? false : review.checks.earnedProgression,
-      causalLearning: prematureCertainty.length > 0 ? false : review.checks.causalLearning,
-    },
-    issues,
+    advisories: [...review.advisories, ...derivedIssues].slice(0, 4),
   });
 }
 
