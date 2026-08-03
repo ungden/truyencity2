@@ -11,7 +11,7 @@ import {
   StoryFactoryError,
 } from './contracts';
 
-export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-33-prose-heuristics-advisory';
+export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-34-float-epsilon';
 
 export interface StateEvent {
   chapterNumber: number;
@@ -430,6 +430,7 @@ export function applyCanonExtension(input: {
 }
 
 function preconditionMatches(actual: string | number | undefined, expected: string | number): boolean {
+  if (typeof actual === 'number' && typeof expected === 'number') return nearlyEqual(actual, expected);
   if (actual === expected) return true;
   if (actual === undefined) return false;
   if (typeof actual !== typeof expected) {
@@ -441,7 +442,7 @@ function preconditionMatches(actual: string | number | undefined, expected: stri
       : typeof expected === 'number' ? expected : null;
     if (numberValue !== null && stringValue !== null && stringValue.trim() !== '') {
       const numericString = Number(stringValue);
-      return Number.isFinite(numericString) && numberValue === numericString;
+      return Number.isFinite(numericString) && nearlyEqual(numberValue, numericString);
     }
   }
   return false;
@@ -791,6 +792,16 @@ function nearlyEqual(left: number, right: number): boolean {
   return Math.abs(left - right) <= 1e-9;
 }
 
+// Story quantities are authored at >= 0.01 granularity, but chained deltas
+// accumulate IEEE754 dust (a lãnh-chúa canary parked twice on 0.2 !== 0.2).
+// Every numeric comparison in this file must go through an epsilon.
+const EPSILON = 1e-9;
+
+function valuesEqual(left: string | number | null | undefined, right: string | number | null | undefined): boolean {
+  if (typeof left === 'number' && typeof right === 'number') return nearlyEqual(left, right);
+  return left === right;
+}
+
 /**
  * Validate causal mechanics without asking a model to infer arithmetic or
  * authority from prose. This runs before the Plan Judge and is intentionally
@@ -910,7 +921,7 @@ export function validateCausalMechanics(input: {
       for (const resourceId of mechanic.requiredResourceIds) {
         const currentValue = (use.role === 'support' ? sceneOpeningResources : simulatedResources).get(resourceId);
         if (currentValue === undefined
-          || (typeof currentValue === 'number' && currentValue <= 0)
+          || (typeof currentValue === 'number' && currentValue <= EPSILON)
           || (typeof currentValue === 'string' && currentValue.trim().length === 0)) {
           fail(`Capability ${mechanic.id} lacks usable resource ${resourceId}.`, {
             resourceId,
@@ -987,7 +998,7 @@ export function validateCausalMechanics(input: {
       for (const delta of orderedOwnedDeltas) {
         if (delta.kind === 'fact') {
           const actual = stateFacts.get(delta.factId) ?? null;
-          if (actual !== delta.before) {
+          if (!valuesEqual(actual, delta.before)) {
             fail(`Effect ${use.id} fact ${delta.factId} starts from the wrong value.`, {
               expected: delta.before,
               actual,
@@ -996,7 +1007,7 @@ export function validateCausalMechanics(input: {
           stateFacts.set(delta.factId, delta.after);
         } else if (delta.kind === 'resource_numeric') {
           const actual = simulatedResources.get(delta.resourceId);
-          if (actual !== delta.before) {
+          if (!valuesEqual(actual, delta.before)) {
             fail(`Effect ${use.id} resource ${delta.resourceId} starts from the wrong value.`, {
               expected: delta.before,
               actual,
@@ -1069,7 +1080,7 @@ export function validateCausalMechanics(input: {
         });
         continue;
       }
-      if (definition.minimum !== undefined && calculated < definition.minimum) {
+      if (definition.minimum !== undefined && calculated < definition.minimum - EPSILON) {
         issues.push({
           mechanicUseId: null,
           message: `Scene ${scene.id} external outflow ${delta.id} falls below its minimum.`,
@@ -1077,7 +1088,7 @@ export function validateCausalMechanics(input: {
         });
         continue;
       }
-      if (definition.maximum !== undefined && calculated > definition.maximum) {
+      if (definition.maximum !== undefined && calculated > definition.maximum + EPSILON) {
         issues.push({
           mechanicUseId: null,
           message: `Scene ${scene.id} external outflow ${delta.id} exceeds its maximum.`,
@@ -1223,11 +1234,11 @@ export function applyChapterPlan(input: {
       const definition = kernel.resources.find(item => item.id === delta.resourceId);
       if (!existing || existing.kind !== 'numeric' || !definition || definition.kind !== 'numeric') fail(`Numeric resource ${delta.resourceId} is undefined.`);
       before = existing.value;
-      if (existing.value !== delta.before) fail(`Resource ${delta.resourceId} before-value drifted.`, { expected: delta.before, actual: existing.value });
+      if (!valuesEqual(existing.value, delta.before)) fail(`Resource ${delta.resourceId} before-value drifted.`, { expected: delta.before, actual: existing.value });
       const calculated = delta.before + delta.delta;
       if (Math.abs(calculated - delta.after) > 1e-9) fail(`Resource ${delta.resourceId} arithmetic is invalid.`, { calculated, declared: delta.after });
-      if (definition.minimum !== undefined && calculated < definition.minimum) fail(`Resource ${delta.resourceId} falls below its minimum.`);
-      if (definition.maximum !== undefined && calculated > definition.maximum) fail(`Resource ${delta.resourceId} exceeds its maximum.`);
+      if (definition.minimum !== undefined && calculated < definition.minimum - EPSILON) fail(`Resource ${delta.resourceId} falls below its minimum.`);
+      if (definition.maximum !== undefined && calculated > definition.maximum + EPSILON) fail(`Resource ${delta.resourceId} exceeds its maximum.`);
       if (delta.delta > 0 && !delta.source) fail(`Positive resource delta ${delta.id} has no source.`);
       if (delta.delta < 0 && !delta.sink) fail(`Negative resource delta ${delta.id} has no sink.`);
       existing.value = calculated;
