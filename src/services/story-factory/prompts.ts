@@ -1,4 +1,4 @@
-export const FACTORY_PROMPT_VERSION = 'story-factory-2026-08-03.41-labor-renewal-rule';
+export const FACTORY_PROMPT_VERSION = 'story-factory-2026-08-05.42-capped-pool-renewal';
 
 export const WRITER_SYSTEM_PROMPT = `Bạn là tiểu thuyết gia web-serial tiếng Việt.
 Hãy tiếp nối tự nhiên đoạn cuối chương trước, thực hiện đầy đủ chapter brief và giữ đúng canon, ký ức liên quan, tài nguyên, tri thức, quan hệ cùng vị trí nhân vật.
@@ -76,6 +76,7 @@ Chỉ gắn world-rule ID khi cơ chế thực sự được thi hành trong ch�
 Mọi conversion, capability hoặc constraint thực sự dùng phải khai báo mechanicUse đúng worldMechanic ID, actor, quantity, precondition fact và delta liên quan. Không giấu phép tính, công suất hoặc quyền hạn trong action prose.
 Khoản thu hoặc tài nguyên tăng vẫn phải do mechanic hợp lệ tạo ra. Riêng khoản trả nợ, trả phí, chia lợi nhuận hoặc tiêu hao ra bên ngoài được ghi resource delta âm không cần mechanic giả khi đúng chủ sở hữu resource có mặt trong scene và sink nêu rõ bên nhận/đích tiêu hao; đầu vào của conversion vẫn phải gắn conversion.
 Số tiền và khối lượng trong delta phải giao dịch được trong đời sống của thế giới truyện: chọn đơn giá, khối lượng và cỡ batch sao cho thành tiền trả được bằng mệnh giá hiện hành và khối lượng cân đong được bằng dụng cụ trong cảnh. Không tạo số lẻ vô nghĩa kiểu 95.625 đồng hay 2,125 ký — làm tròn ngay từ plan, đừng bắt Writer và Editor gánh số không ai trả nổi.
+Tài nguyên có trần (maximum) như thể lực, giờ lao động, mana: trước mỗi delta hồi phục/tái tạo phải tính khoảng trống còn lại (maximum trừ số dư hiện tại) và cắt quantity của mechanic — kể cả quantity lẻ — sao cho after đúng bằng hoặc dưới trần. Hồi tới đầy thì dừng; tuyệt đối không để after vượt maximum dù chỉ một đơn vị.
 Trong scene, participantIds/people chỉ là nhân vật có mặt vật lý tại scene.loc. Nếu chỉ được nhớ tới, nhắc tới hoặc là mục tiêu cảm xúc ở nơi khác, không đưa vào people.
 Thời gian cuối chương là mốc tuyệt đối và phải được cộng tuần tự từ State: ít nhất bằng thời gian đầu chương cộng toàn bộ duration và travel của các cảnh trong chương.
 Mọi nhân vật kết thúc chương ở địa điểm khác state đầu chương phải có location delta khớp vị trí đầu và scene cuối.
