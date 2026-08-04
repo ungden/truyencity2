@@ -435,6 +435,12 @@ async function runPlan(db: SupabaseClient, job: FactoryJobRow, project: FactoryP
       routes,
       continuityPacket,
       recoveryEvidence: job.plan_feedback ?? undefined,
+      // Recovery plans one chapter at a time: multi-pool worlds fail on the
+      // arithmetic of threading balances across a three-chapter window (a
+      // lãnh-chúa canary mis-chained stamina/corpse/fertility twice in a row).
+      // One chapter cuts the chained bookkeeping to a third; the next window is
+      // planned fresh from committed state.
+      requiredWindowSize: job.plan_feedback ? 1 : undefined,
       provider,
       resume,
       onCheckpoint: async checkpoint => {
