@@ -794,6 +794,36 @@ async function runWindowReview(db: SupabaseClient, job: FactoryJobRow, project: 
       routes, provider,
     });
     if (reviewed.review.status === 'block') {
+      // Hidden chapters are still drafts: park so the operator can repair the
+      // prose and re-review. Published chapters are canon a reader may have seen
+      // — they cannot be repaired, so parking would stall the novel forever on a
+      // verdict about unchangeable text. Instead the verdict becomes steering:
+      // the issues land in plan_feedback, the stale rolling plan is dropped, and
+      // the next window is planned against them. The run row still records the
+      // honest blocked verdict for telemetry.
+      if (job.execution_mode === 'production') {
+        const now = new Date().toISOString();
+        const runUpdate = await db.from('story_factory_runs').update({
+          status: 'blocked', error_code: 'quality_blocked',
+          error_message: 'Window review blocked on published canon; verdict fed forward to the next window plan.',
+          output_artifact: { evidence: { review: reviewed.review } },
+          usage: [reviewed.usage], estimated_cost_usd: reviewed.usage.costUsd, finished_at: now,
+        }).eq('id', runId);
+        if (runUpdate.error) throw runUpdate.error;
+        const jobUpdate = await db.from('story_factory_jobs').update({
+          status: 'ready', stage: 'plan', retry_count: 0,
+          rolling_plan: null,
+          plan_feedback: {
+            source: 'window_review_public',
+            message: 'Cửa sổ vừa xuất bản bị reviewer chê; không thể sửa chương đã đăng — cửa sổ kế tiếp phải đổi hướng theo các issue này.',
+            issues: reviewed.review.issues,
+          },
+          lease_owner: null, lease_token: null, lease_until: null,
+          next_run_at: nextRunAfterNonChapterStage(job, new Date(now)), updated_at: now,
+        }).eq('id', job.id).eq('lease_token', job.lease_token);
+        if (jobUpdate.error) throw jobUpdate.error;
+        return { status: 'completed', jobId: job.id, stage: 'window_review', chapterNumber: job.current_chapter };
+      }
       throw new StoryFactoryError('quality_blocked', 'Five-chapter window review detected drift.', {
         review: reviewed.review,
         usages: [reviewed.usage],
