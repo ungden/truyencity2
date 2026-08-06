@@ -6,6 +6,7 @@ import {
   PlanAssessmentSchema,
   RollingPlanSchema,
   StoryFactoryError,
+  WorldMechanicSchema,
   type ArcPlan,
   type ModelRoutes,
   type PlanAssessment,
@@ -2096,14 +2097,20 @@ export async function planArcLifecycle(input: {
     throw new Error('Arc lifecycle can only run at an arc boundary.');
   }
   const provider = input.provider ?? geminiProvider;
-  // Gemini constrained decoding rejects the canonical discriminated union (its
-  // 'complete' option carries z.null() members, which have no representation in
-  // the response-schema dialect — the first arc boundary ever reached in
-  // production 400'd INVALID_ARGUMENT on exactly this). Ask for one flat
-  // nullable shape and re-derive the strict union in code.
+  // Gemini constrained decoding rejects two shapes in the canonical
+  // ArcLifecycleSchema (bisected live after the first arc boundary ever reached
+  // in production 400'd INVALID_ARGUMENT): the discriminated union at the top,
+  // and WorldMechanicSchema — itself a union — inside canonExtension. Same cure
+  // the Launch World Architect already uses: flat nullable shape, mechanics
+  // split into one array per kind, and the strict contract re-derived in code.
+  const CanonExtensionWireSchema = CanonExtensionSchema.omit({ worldMechanics: true }).extend({
+    mechanicConversions: z.array(z.object({ seedId: z.string(), definition: WorldMechanicSchema.options[0] }).strict()).max(8),
+    mechanicCapabilities: z.array(z.object({ seedId: z.string(), definition: WorldMechanicSchema.options[1] }).strict()).max(8),
+    mechanicConstraints: z.array(z.object({ seedId: z.string(), definition: WorldMechanicSchema.options[2] }).strict()).max(8),
+  }).strict();
   const wireResult = await provider.json({
     model: input.routes.planner,
-    system: `${PLANNER_SYSTEM_PROMPT}\nỞ ranh giới arc, quyết định tiếp tục, vào finale hoặc kết thúc tự nhiên. Không kéo dài chỉ để đủ quota.\nNếu status là continue hoặc finale thì nextArc và canonExtension là bắt buộc; nếu status là complete thì cả hai để null.`,
+    system: `${PLANNER_SYSTEM_PROMPT}\nỞ ranh giới arc, quyết định tiếp tục, vào finale hoặc kết thúc tự nhiên. Không kéo dài chỉ để đủ quota.\nNếu status là continue hoặc finale thì nextArc và canonExtension là bắt buộc; nếu status là complete thì cả hai để null. Trong canonExtension, khai báo mechanic mới theo đúng ba mảng mechanicConversions/mechanicCapabilities/mechanicConstraints (mảng rỗng nếu không thêm loại đó); tổng cả ba tối đa tám.`,
     prompt: JSON.stringify({
       task: 'Đánh giá ending direction và lập arc tiếp theo nếu truyện chưa hoàn tất.',
       endingDirection: input.kernel.endingDirection,
@@ -2121,14 +2128,26 @@ export async function planArcLifecycle(input: {
     schema: z.object({
       status: z.enum(['continue', 'finale', 'complete']),
       nextArc: ArcPlanSchema.nullable(),
-      canonExtension: CanonExtensionSchema.nullable(),
+      canonExtension: CanonExtensionWireSchema.nullable(),
     }).strict(),
+    // Bisected live: Gemini's responseFormat compiler unrolls maxItems-bounded
+    // arrays into the decoding grammar, and this schema's combined bound budget
+    // deterministically 400s (any two of the arrays pass; all three fail). The
+    // planner path avoids the same explosion the same way; zod still enforces
+    // every bound after parse.
+    schemaComplexity: 'omit_array_max',
     temperature: 0.6,
   });
+  const materializedExtension = wireResult.value.canonExtension === null
+    ? null
+    : (({ mechanicConversions, mechanicCapabilities, mechanicConstraints, ...rest }) => ({
+      ...rest,
+      worldMechanics: [...mechanicConversions, ...mechanicCapabilities, ...mechanicConstraints],
+    }))(wireResult.value.canonExtension);
   const lifecycleParsed = ArcLifecycleSchema.safeParse(
     wireResult.value.status === 'complete'
       ? { status: 'complete', nextArc: null, canonExtension: null }
-      : { status: wireResult.value.status, nextArc: wireResult.value.nextArc, canonExtension: wireResult.value.canonExtension },
+      : { status: wireResult.value.status, nextArc: wireResult.value.nextArc, canonExtension: materializedExtension },
   );
   if (!lifecycleParsed.success) {
     throw new StoryFactoryError('plan_blocked', 'Arc lifecycle response is missing the next arc or canon extension.', {
