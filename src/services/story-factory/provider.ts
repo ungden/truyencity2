@@ -29,6 +29,7 @@ const PRICING: Record<string, { input: number; output: number }> = {
   'gpt-5.6-luna': { input: 0.2, output: 1.2 },
   'gpt-5.6-terra': { input: 1, output: 6 },
   'meta/muse-spark-1.2': { input: 1.25, output: 4.25 },
+  'qwen/qwen3.8-max': { input: 2, output: 6 },
   // Routed through OpenRouter (model ids contain a vendor slash). Prices from the
   // OpenRouter models endpoint, 2026-08-01.
   'deepseek/deepseek-v4-flash-0731': { input: 0.14, output: 0.28 },
