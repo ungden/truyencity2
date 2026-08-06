@@ -756,6 +756,20 @@ async function runRevision(db: SupabaseClient, job: FactoryJobRow, project: Fact
       if (held.error) console.warn('[story-factory] could not hold revision for retry:', held.error.message);
       return { status: 'completed', jobId: job.id, stage: 'revise', chapterNumber: job.current_chapter, error: infra.message };
     }
+    // A draft that fails its one rewrite parks — but a FRESH draft usually passes
+    // (every manual revive of this state has), so the first such park per chapter
+    // earns one automatic restart. The run history is the counter: a second
+    // quality park on the same chapter parks for the operator. Uses retry backoff,
+    // and the next tick's restartDraft redrafts from committed state.
+    if (error instanceof StoryFactoryError && error.code === 'quality_blocked') {
+      const chapterNumber = job.current_chapter + 1;
+      const prior = await db.from('story_factory_runs')
+        .select('id', { count: 'exact', head: true })
+        .eq('job_id', job.id).eq('kind', 'chapter').eq('chapter_number', chapterNumber)
+        .eq('error_code', 'quality_blocked').neq('id', runRow.data.id);
+      const retryOnce = !prior.error && (prior.count ?? 0) === 0;
+      return blockRun(db, job, runRow.data.id, error, { retryOnce });
+    }
     return blockRun(db, job, runRow.data.id, error);
   }
 }
