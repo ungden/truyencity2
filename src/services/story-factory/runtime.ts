@@ -811,7 +811,11 @@ async function runWindowReview(db: SupabaseClient, job: FactoryJobRow, project: 
         }).eq('id', runId);
         if (runUpdate.error) throw runUpdate.error;
         const jobUpdate = await db.from('story_factory_jobs').update({
-          status: 'ready', stage: 'plan', retry_count: 0,
+          // Steering must still respect the arc boundary: at plannedEndChapter the
+          // next stage is the arc transition, not a plan for a chapter the current
+          // arc cannot contain (two seniors dead-ended planning ch26 of a 25-chapter
+          // arc). The feedback survives either way and steers the next window.
+          status: 'ready', stage: state.chapterNumber >= arc.plannedEndChapter ? 'arc' : 'plan', retry_count: 0,
           rolling_plan: null,
           plan_feedback: {
             source: 'window_review_public',
