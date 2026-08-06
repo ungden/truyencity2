@@ -2110,7 +2110,7 @@ export async function planArcLifecycle(input: {
   }).strict();
   const wireResult = await provider.json({
     model: input.routes.planner,
-    system: `${PLANNER_SYSTEM_PROMPT}\nỞ ranh giới arc, quyết định tiếp tục, vào finale hoặc kết thúc tự nhiên. Không kéo dài chỉ để đủ quota.\nNếu status là continue hoặc finale thì nextArc và canonExtension là bắt buộc; nếu status là complete thì cả hai để null. Trong canonExtension, khai báo mechanic mới theo đúng ba mảng mechanicConversions/mechanicCapabilities/mechanicConstraints (mảng rỗng nếu không thêm loại đó); tổng cả ba tối đa tám.`,
+    system: `${PLANNER_SYSTEM_PROMPT}\nỞ ranh giới arc, quyết định tiếp tục, vào finale hoặc kết thúc tự nhiên. Không kéo dài chỉ để đủ quota.\nNếu status là continue hoặc finale thì nextArc và canonExtension là bắt buộc; nếu status là complete thì cả hai để null. Trong canonExtension, khai báo mechanic mới theo đúng ba mảng mechanicConversions/mechanicCapabilities/mechanicConstraints (mảng rỗng nếu không thêm loại đó); tổng cả ba tối đa tám.\nMọi phần tử mới trong canonExtension đều tiêu một expansion seed: seedId phải lấy NGUYÊN VĂN từ permittedExpansionSeeds của đúng stage đích, kind của seed phải khớp loại phần tử (character/location/promise/world_rule/world_mechanic), và seedId chưa nằm trong usedExpansionSeedIds. Tuyệt đối không tự bịa seedId; nếu stage đích không còn seed của một loại thì không thêm phần tử loại đó.`,
     prompt: JSON.stringify({
       task: 'Đánh giá ending direction và lập arc tiếp theo nếu truyện chưa hoàn tất.',
       endingDirection: input.kernel.endingDirection,
@@ -2122,6 +2122,11 @@ export async function planArcLifecycle(input: {
       )) ?? null,
       currentArc: input.arc,
       currentState: input.state,
+      permittedExpansionSeeds: Object.fromEntries(input.kernel.seriesSpine.stages.map(stage => [
+        stage.id,
+        stage.expansionSeeds.map(seed => ({ id: seed.id, kind: seed.kind, description: seed.description })),
+      ])),
+      usedExpansionSeedIds: input.state.usedExpansionSeedIds,
       minimumCompletionChapter: input.minimumCompletionChapter,
       maximumChapter: input.maximumChapter,
     }),
