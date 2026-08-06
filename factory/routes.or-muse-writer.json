@@ -1,0 +1,12 @@
+{
+  "setupGeneratorA": "gemini-3.5-flash",
+  "setupGeneratorB": "gemini-2.5-pro",
+  "setupJudge": "gemini-3.1-pro-preview",
+  "openingSimulator": "gemini-3.5-flash",
+  "launchArchitect": "gemini-3.1-pro-preview",
+  "planner": "gemini-3.1-pro-preview",
+  "planJudge": "gemini-2.5-pro",
+  "writer": "meta/muse-spark-1.2",
+  "editor": "gemini-3.1-pro-preview",
+  "routeVersion": "or-muse-writer-experiment-2026-08-06.1"
+}
