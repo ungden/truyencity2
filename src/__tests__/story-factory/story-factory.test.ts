@@ -1999,7 +1999,8 @@ describe('canonical Story Factory', () => {
       nextArc: skippedArc,
       canonExtension: {
         stageId: 'stage_3',
-        characters: [], locations: [], travelRules: [], promises: [], worldRules: [], worldMechanics: [],
+        characters: [], locations: [], travelRules: [], promises: [], worldRules: [],
+        mechanicConversions: [], mechanicCapabilities: [], mechanicConstraints: [],
       },
     }]);
     await expect(planArcLifecycle({
@@ -2022,7 +2023,8 @@ describe('canonical Story Factory', () => {
       nextArc: fillerArc,
       canonExtension: {
         stageId: 'stage_1',
-        characters: [], locations: [], travelRules: [], promises: [], worldRules: [], worldMechanics: [],
+        characters: [], locations: [], travelRules: [], promises: [], worldRules: [],
+        mechanicConversions: [], mechanicCapabilities: [], mechanicConstraints: [],
       },
     }]);
     await expect(planArcLifecycle({
