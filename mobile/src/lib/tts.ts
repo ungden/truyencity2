@@ -73,6 +73,12 @@ export function stripHtml(html: string): string {
 export function sanitizeForTTS(text: string): string {
   let out = text;
 
+  // Thousands separators read as punctuation in vi-VN: "1.000" becomes
+  // "một chấm không không không". Strip the dot between digit groups so the
+  // engine sees a plain integer. Only the dot — Vietnamese uses the comma as a
+  // decimal separator, so touching it would corrupt real numbers.
+  out = out.replace(/(\d)\.(?=\d{3}\b)/g, "$1");
+
   // Em-dash / en-dash at start of line (dialogue marker) → drop
   out = out.replace(/(^|\n)\s*[—–]\s*/g, "$1");
 
@@ -91,6 +97,12 @@ export function sanitizeForTTS(text: string): string {
   // Asterisks / underscores / brackets sometimes leaked from markdown
   out = out.replace(/[*_]+/g, "");
   out = out.replace(/[\[\]]/g, "");
+
+  // A line break is not a pause cue — vi-VN engines only pause on punctuation.
+  // Dialogue lines lost their leading dash above, so consecutive lines would
+  // otherwise run together into one breathless sentence. Give any paragraph
+  // that doesn't already end in punctuation a full stop.
+  out = out.replace(/([^\s.!?…:;,])[ \t]*\n/g, "$1.\n");
 
   // Normalize whitespace
   out = out.replace(/[ \t]+/g, " ");
@@ -134,11 +146,23 @@ export function splitIntoChunks(
     const window = remaining.slice(0, maxLength);
     let splitAt = -1;
 
-    // Search for sentence endings, take the last one within window
-    SENTENCE_END.lastIndex = 0;
-    let match: RegExpExecArray | null;
-    while ((match = SENTENCE_END.exec(window)) !== null) {
-      splitAt = match.index + match[0].length;
+    // Prefer a paragraph break. Each chunk becomes a separate utterance, and
+    // the engine leaves a small gap between utterances — landing that gap on a
+    // paragraph boundary makes it read as a deliberate pause instead of a cut
+    // mid-sentence. Only when the break is late enough in the window, so we
+    // don't trade a natural seam for lots of tiny chunks.
+    const paragraphIdx = window.lastIndexOf("\n\n");
+    if (paragraphIdx > maxLength * 0.5) {
+      splitAt = paragraphIdx + 2;
+    }
+
+    // Otherwise fall back to the last sentence ending within the window.
+    if (splitAt <= 0) {
+      SENTENCE_END.lastIndex = 0;
+      let match: RegExpExecArray | null;
+      while ((match = SENTENCE_END.exec(window)) !== null) {
+        splitAt = match.index + match[0].length;
+      }
     }
 
     if (splitAt <= 0) {

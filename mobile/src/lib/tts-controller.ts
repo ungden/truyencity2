@@ -29,6 +29,7 @@ import TrackPlayer, {
 } from "react-native-track-player";
 import { Asset } from "expo-asset";
 import { stripHtml, splitIntoChunks, sanitizeForTTS, TTS_LANGUAGE } from "@/lib/tts";
+import { resolveBestVoice, resolveBestOfflineVoice } from "@/lib/tts-voices";
 
 const isIOS = process.env.EXPO_OS === "ios";
 
@@ -128,8 +129,30 @@ class TTSControllerImpl {
   private currentIndex = 0;
   private isStopped = false;
   private isPaused = false;
-  private isChangingSpeed = false;
   private metadata: TTSMetadata | null = null;
+
+  // ─── Voice ───
+  // Without an explicit identifier the OS picks the compact (worst) vi-VN voice,
+  // and on iOS 26 it also overrides the voice the user chose in Settings
+  // (Apple FB20271264). Resolved once per chapter so a voice the user installs
+  // mid-session is picked up on the next chapter.
+  private voiceId: string | null = null;
+  private voiceIsNetwork = false;
+  private triedOfflineFallback = false;
+
+  // ─── Resume position ───
+  // `onBoundary` reports the character offset of each word as it is spoken, on
+  // both platforms. Tracking it lets a resume continue from where the listener
+  // actually stopped instead of re-reading the whole chunk.
+  private charOffset = 0;
+  private utteranceLive = false;
+
+  // ─── Generation token ───
+  // Every operation that interrupts speech (speed change, chunk skip) stops the
+  // engine and re-speaks after a short settle delay. The token invalidates the
+  // pending callback so a pause landing inside that window can't be overridden
+  // by a restart that was already in flight.
+  private generation = 0;
   private onChunkAdvanceHandlers: Set<(i: number, total: number) => void> = new Set();
   private onChapterCompleteHandlers: Set<() => void> = new Set();
   private listeners: Set<Listener> = new Set();
@@ -170,17 +193,21 @@ class TTSControllerImpl {
     };
   }
 
-  onChunkAdvance(cb: (i: number, total: number) => void) {
+  onChunkAdvance(cb: (i: number, total: number) => void): () => void {
     this.onChunkAdvanceHandlers.add(cb);
-    return () => this.onChunkAdvanceHandlers.delete(cb);
+    return () => {
+      this.onChunkAdvanceHandlers.delete(cb);
+    };
   }
 
   /** Fires when the entire chapter has finished speaking (last chunk's onDone).
    *  Used by the reader screen to auto-advance to the next chapter. Does NOT
    *  fire when stopped manually, paused, or interrupted by speed-change. */
-  onChapterComplete(cb: () => void) {
+  onChapterComplete(cb: () => void): () => void {
     this.onChapterCompleteHandlers.add(cb);
-    return () => this.onChapterCompleteHandlers.delete(cb);
+    return () => {
+      this.onChapterCompleteHandlers.delete(cb);
+    };
   }
 
   // ─── Remote event wiring (attached once on first speak) ───
@@ -219,13 +246,21 @@ class TTSControllerImpl {
     if (chunks.length === 0) return;
 
     // Stop any existing speech before starting fresh
+    this.generation++;
     try { Speech.stop(); } catch {}
+
+    // Re-resolved every chapter: cheap (one native call per ~10 minutes of
+    // audio) and it picks up a higher-quality voice the moment the user
+    // installs one, without needing an app restart.
+    await this.refreshVoice();
 
     this.chunks = chunks;
     this.currentIndex = 0;
+    this.charOffset = 0;
     this.isStopped = false;
     this.isPaused = false;
-    this.isChangingSpeed = false;
+    this.utteranceLive = false;
+    this.triedOfflineFallback = false;
     this.metadata = metadata;
 
     await this.loadSilentTrack(metadata);
@@ -257,11 +292,14 @@ class TTSControllerImpl {
   pause() {
     if (this.status === "idle") return;
     this.isPaused = true;
-    if (isIOS) {
+    if (isIOS && this.utteranceLive) {
+      // `pauseSpeaking(at: .immediate)` leaves the utterance alive — no cancel
+      // event, so resume() picks it back up seamlessly mid-word.
       try { Speech.pause(); } catch {}
     } else {
-      // Android: pseudo-pause via stop (we re-speak current chunk on resume)
-      try { Speech.stop(); } catch {}
+      // Android has no real pause. Stop, and resume from the character offset
+      // that onBoundary last reported.
+      this.invalidateLiveUtterance();
     }
     TrackPlayer.pause().catch(() => {});
     this.setStatus("paused");
@@ -271,23 +309,30 @@ class TTSControllerImpl {
     if (this.status !== "paused") return;
     this.isPaused = false;
     this.isStopped = false;
-    if (isIOS) {
+    if (isIOS && this.utteranceLive) {
       try { Speech.resume(); } catch {}
+      this.setStatus("playing");
     } else {
-      this.speakChunk(this.currentIndex);
+      // No live utterance to continue — either Android, or iOS where the
+      // utterance was cancelled by a speed change just before the pause.
+      // Either way, re-speak from where the listener actually stopped.
+      this.setStatus("playing");
+      this.speakChunk(this.currentIndex, this.charOffset);
     }
     TrackPlayer.play().catch(() => {});
-    this.setStatus("playing");
   }
 
   async stop() {
     // Manual stop wins over any pending auto-resume from a prior chapter end.
     this.cancelAutoStop();
     this.pendingAutoResume = false;
+    this.generation++;
     this.isStopped = true;
     this.isPaused = false;
+    this.utteranceLive = false;
     this.chunks = [];
     this.currentIndex = 0;
+    this.charOffset = 0;
     try { Speech.stop(); } catch {}
     try {
       await TrackPlayer.stop();
@@ -298,15 +343,13 @@ class TTSControllerImpl {
 
   setSpeed(rate: number) {
     this.speed = rate;
-    if (this.status === "playing" && !this.isPaused && !this.isStopped) {
-      this.isChangingSpeed = true;
-      this.isPaused = true; // prevent onDone from advancing
-      try { Speech.stop(); } catch {}
-      setTimeout(() => {
-        this.isPaused = false;
-        this.isChangingSpeed = false;
-        this.speakChunk(this.currentIndex);
-      }, 100);
+    if (this.status === "playing" && !this.isStopped) {
+      // Resume at the current word rather than restarting the chunk.
+      this.restart(this.currentIndex, this.charOffset);
+    } else if (this.status === "paused" && this.utteranceLive) {
+      // A paused iOS utterance would continue at its original rate. Drop it so
+      // resume() re-speaks the remainder at the new speed instead.
+      this.invalidateLiveUtterance();
     }
     this.emit();
   }
@@ -325,22 +368,65 @@ class TTSControllerImpl {
   }
 
   private jumpToChunk(index: number) {
-    // Guard against onDone from the outgoing chunk double-advancing.
-    this.isChangingSpeed = true;
-    this.isPaused = true;
+    this.currentIndex = index;
+    this.charOffset = 0;
+    if (this.status === "paused") {
+      // Move the playhead without starting audio — the user paused on purpose.
+      // The paused utterance still holds the *old* chunk, so it has to go or
+      // resume() would carry on reading what the user just skipped away from.
+      this.invalidateLiveUtterance();
+      this.notifyChunkAdvance();
+      return;
+    }
+    this.restart(index, 0);
+  }
+
+  /** Cancel the current utterance and make its pending callbacks no-ops. */
+  private invalidateLiveUtterance() {
+    this.generation++;
     try { Speech.stop(); } catch {}
+    this.utteranceLive = false;
+  }
+
+  /**
+   * Stop the engine and re-speak after a short settle delay.
+   *
+   * The delay is why this needs a generation token: `Speech.stop()` is async on
+   * both platforms, so we can't speak again immediately. If the user pauses (or
+   * stops, or changes speed again) inside that window, the in-flight callback
+   * must not fire — otherwise audio restarts while the UI reads "Tạm dừng".
+   */
+  private restart(index: number, offset: number) {
+    const gen = ++this.generation;
+    try { Speech.stop(); } catch {}
+    this.utteranceLive = false;
     setTimeout(() => {
-      this.isPaused = false;
-      this.isChangingSpeed = false;
-      this.speakChunk(index);
+      if (gen !== this.generation) return;   // superseded by a later restart
+      if (this.isPaused || this.isStopped) return; // pause/stop won the race
+      this.speakChunk(index, offset);
     }, 100);
   }
 
+  /** Pick the best Vietnamese voice installed on this device, if any. */
+  private async refreshVoice() {
+    try {
+      this.voiceId = await resolveBestVoice();
+      this.voiceIsNetwork = !!this.voiceId && this.voiceId.toLowerCase().endsWith("-network");
+    } catch (e) {
+      // No voice resolved — speakChunk falls back to `{ language: "vi-VN" }`,
+      // which is exactly the old behaviour.
+      console.warn("[TTS] voice resolution failed:", e);
+      this.voiceId = null;
+      this.voiceIsNetwork = false;
+    }
+  }
+
   // ─── Internals ───
-  private speakChunk(index: number) {
+  private speakChunk(index: number, offset = 0) {
     if (index >= this.chunks.length || this.isStopped) {
       const naturalEnd = !this.isStopped && index >= this.chunks.length;
       this.currentIndex = 0;
+      this.charOffset = 0;
       this.chunks = [];
 
       if (naturalEnd) {
@@ -369,26 +455,85 @@ class TTSControllerImpl {
       return;
     }
     this.currentIndex = index;
+    this.charOffset = offset;
     this.isPaused = false;
     this.notifyChunkAdvance();
 
-    Speech.speak(text, {
+    const gen = this.generation;
+    const spoken = offset > 0 ? text.slice(offset) : text;
+    this.utteranceLive = true;
+
+    Speech.speak(spoken, {
       language: TTS_LANGUAGE,
+      // Explicit identifier — without it the OS falls back to the compact voice,
+      // and on iOS 26 it also discards the user's own Settings choice.
+      ...(this.voiceId ? { voice: this.voiceId } : {}),
+      // Android applies rate/pitch to the shared engine instance, so both must
+      // be set on every call or they leak in from whatever spoke last.
       rate: this.speed,
       pitch: 1.0,
+      // expo-speech types this as a union with the web callback, so the native
+      // payload has to be spelled out. `NativeBoundaryEvent` isn't re-exported.
+      onBoundary: (ev: { charIndex: number; charLength: number }) => {
+        if (gen !== this.generation) return;
+        this.charOffset = offset + ev.charIndex;
+      },
       onDone: () => {
-        if (!this.isPaused && !this.isStopped && !this.isChangingSpeed) {
-          this.speakChunk(index + 1);
-        }
+        if (gen !== this.generation) return;
+        this.utteranceLive = false;
+        if (this.isPaused || this.isStopped) return;
+        this.speakChunk(index + 1);
       },
       onStopped: () => {
-        // Pause/stop/speed-change handlers own status transitions.
+        if (gen !== this.generation) return;
+        this.utteranceLive = false;
+        // Pause/stop/restart handlers own status transitions.
       },
       onError: () => {
-        if (!this.isStopped) this.speakChunk(index + 1);
+        if (gen !== this.generation) return;
+        this.utteranceLive = false;
+        if (this.isStopped) return;
+        this.handleSpeakError(index);
       },
     });
     this.emit();
+  }
+
+  /**
+   * Recover from a failed utterance without losing text.
+   *
+   * Only Android reaches here — expo-speech never emits this event on iOS. The
+   * common cause is a network voice failing on a flaky connection, so the first
+   * response is to drop to an offline voice and re-read the *same* text.
+   * Skipping ahead would silently swallow up to a full chunk (~3000 characters,
+   * roughly three minutes of story), which is what this code used to do.
+   */
+  private handleSpeakError(index: number) {
+    const gen = this.generation;
+
+    if (this.voiceIsNetwork && !this.triedOfflineFallback) {
+      this.triedOfflineFallback = true;
+      resolveBestOfflineVoice()
+        .then((offlineVoice) => {
+          if (gen !== this.generation || this.isStopped || this.isPaused) return;
+          if (offlineVoice) {
+            this.voiceId = offlineVoice;
+            this.voiceIsNetwork = false;
+            this.speakChunk(index, this.charOffset); // same text, offline voice
+          } else {
+            this.speakChunk(index + 1);
+          }
+        })
+        .catch(() => {
+          if (gen !== this.generation || this.isStopped || this.isPaused) return;
+          this.speakChunk(index + 1);
+        });
+      return;
+    }
+
+    // Already offline, or the offline retry failed too — skipping is all that
+    // is left.
+    this.speakChunk(index + 1);
   }
 
   private setStatus(s: TTSStatus) {

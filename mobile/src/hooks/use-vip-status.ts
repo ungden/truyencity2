@@ -262,6 +262,9 @@ export function useVipStatus() {
     ...status,
     isVip: status.reader_tier === "vip" || status.reader_tier === "super_vip",
     isSuperVip: status.reader_tier === "super_vip",
+    // `recordTTS` returns null both when nobody is signed in and when the RPC
+    // fails, so callers need this to tell "not metered" from "metering broke".
+    isSignedIn: !!userId,
     loading,
     refresh,
     recordTTS,

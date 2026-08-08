@@ -8,6 +8,7 @@ import {
   Animated,
   StatusBar,
   AppState,
+  Alert,
 } from "react-native";
 import { View, Text, Pressable } from "@/tw";
 import { useLocalSearchParams, Stack, router } from "expo-router";
@@ -27,6 +28,11 @@ import { useTTS } from "@/hooks/use-tts";
 import { ttsController } from "@/lib/tts-controller";
 import { useDevice } from "@/hooks/use-device";
 import { TTS_SPEEDS } from "@/lib/tts";
+import {
+  addAnonymousSeconds,
+  getAnonymousSecondsUsedToday,
+  ANONYMOUS_DAILY_LIMIT_SECONDS,
+} from "@/lib/tts-quota";
 import { getChapterOffline } from "@/lib/offline-db";
 import {
   getCachedChapter,
@@ -230,7 +236,36 @@ export default function ReadingScreen() {
 
   const vipStatus = useVipStatus();
 
+  // Mirrors the device-local counter for signed-out readers so the remaining-
+  // minutes chip tells them the truth. Signed-in usage comes from the RPC.
+  const [anonymousSeconds, setAnonymousSeconds] = useState(0);
+  useEffect(() => {
+    if (!vipStatus.isSignedIn) setAnonymousSeconds(getAnonymousSecondsUsedToday());
+  }, [vipStatus.isSignedIn]);
+
+  const ttsSecondsUsedToday = vipStatus.isSignedIn
+    ? vipStatus.tts_seconds_used_today
+    : anonymousSeconds;
+
+  /** Whether the reader may start (or keep) listening right now. */
+  function hasTtsQuota(): boolean {
+    if (vipStatus.isVip) return true;
+    if (vipStatus.isSignedIn) return vipStatus.loading || vipStatus.can_use_tts;
+    return getAnonymousSecondsUsedToday() < ANONYMOUS_DAILY_LIMIT_SECONDS;
+  }
+
   function showTtsLimitPaywall() {
+    if (!vipStatus.isSignedIn) {
+      Alert.alert(
+        "Hết lượt nghe trong ngày",
+        "Bạn đã dùng hết 1 tiếng nghe miễn phí hôm nay. Đăng nhập để đồng bộ lượt nghe giữa các thiết bị, hoặc nâng cấp VIP để nghe không giới hạn.",
+        [
+          { text: "Để sau", style: "cancel" },
+          { text: "Đăng nhập", onPress: () => router.push("/(account)/login") },
+        ]
+      );
+      return;
+    }
     Alert.alert(
       "Hết lượt nghe trong ngày",
       "Bạn đã dùng hết 1 tiếng nghe miễn phí hôm nay. Nâng cấp VIP để nghe không giới hạn.",
@@ -249,7 +284,7 @@ export default function ReadingScreen() {
       // Free users get 1 hour of TTS per day. After that, fall through to a
       // paywall CTA. Skip while VIP status is still loading to avoid false
       // blocks on first launch.
-      if (!vipStatus.loading && !vipStatus.can_use_tts) {
+      if (!hasTtsQuota()) {
         showTtsLimitPaywall();
         return;
       }
@@ -270,23 +305,85 @@ export default function ReadingScreen() {
     }
   }
 
-  // ── TTS usage tracking — periodic increment while playing ──
-  // Calls record_tts_usage RPC every 60s. The RPC returns can_continue=false
-  // once the daily quota is hit; we stop TTS immediately and surface the
-  // paywall. VIP users get can_continue=true unconditionally (limit = -1).
+  // ── TTS usage tracking ──
+  // Measured from wall-clock timestamps, not from counting timer ticks. The old
+  // version added a flat 60s per interval tick, so anything shorter than a tick
+  // — including the tail of every listening session — was never charged, and
+  // stopping at 59s repeatedly cost nothing at all.
+  const listeningSinceRef = useRef<number | null>(null);
+
+  /**
+   * Charge the time listened since the last flush and report whether the reader
+   * may keep going. Signed-in users are metered server-side; signed-out ones
+   * fall back to a device-local counter so the free cap still exists for them.
+   */
+  const flushTtsUsage = useCallback(async (): Promise<boolean> => {
+    const since = listeningSinceRef.current;
+    if (since === null) return true;
+
+    const elapsed = Math.round((Date.now() - since) / 1000);
+    if (elapsed < 1) return true;
+    listeningSinceRef.current = Date.now();
+
+    if (vipStatus.isVip) return true; // unlimited — nothing worth recording
+
+    if (vipStatus.isSignedIn) {
+      const result = await vipStatus.recordTTS(elapsed);
+      // A null result means the RPC failed. Don't cut off a paying-attention
+      // reader because the network blipped.
+      return result ? result.can_continue : true;
+    }
+
+    const used = addAnonymousSeconds(elapsed);
+    setAnonymousSeconds(used);
+    return used < ANONYMOUS_DAILY_LIMIT_SECONDS;
+  }, [vipStatus.isVip, vipStatus.isSignedIn, vipStatus.recordTTS]);
+
+  // Held in a ref so the effects below can depend on `tts.status` alone.
+  // Depending on the callback itself would restart them every time vipStatus
+  // updates — which happens on every flush — and each restart would reset the
+  // timestamp, silently discarding the time accumulated since the last charge.
+  const flushTtsUsageRef = useRef(flushTtsUsage);
   useEffect(() => {
-    if (tts.status !== "playing") return;
-    const RECORD_INTERVAL_MS = 60_000;
+    flushTtsUsageRef.current = flushTtsUsage;
+  }, [flushTtsUsage]);
+
+  // Flush on a timer so the cap is enforced mid-chapter, and again whenever
+  // playback stops so the final partial minute is never lost.
+  useEffect(() => {
+    if (tts.status !== "playing") {
+      if (listeningSinceRef.current !== null) {
+        flushTtsUsageRef.current();
+        listeningSinceRef.current = null;
+      }
+      return;
+    }
+
+    listeningSinceRef.current = Date.now();
+    const FLUSH_INTERVAL_MS = 30_000;
     const id = setInterval(async () => {
-      const result = await vipStatus.recordTTS(60);
-      if (result && !result.can_continue) {
+      const canContinue = await flushTtsUsageRef.current();
+      if (!canContinue) {
+        listeningSinceRef.current = null;
         tts.stop();
         showTtsLimitPaywall();
       }
-    }, RECORD_INTERVAL_MS);
+    }, FLUSH_INTERVAL_MS);
+
     return () => clearInterval(id);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tts.status]);
+
+  // Leaving the screen mid-playback (navigated away, unmounted) still has to
+  // settle the time already listened.
+  useEffect(() => {
+    return () => {
+      if (listeningSinceRef.current !== null) {
+        flushTtsUsageRef.current();
+        listeningSinceRef.current = null;
+      }
+    };
+  }, []);
 
   function cycleTTSSpeed() {
     const currentIdx = TTS_SPEEDS.findIndex((s) => s.rate === tts.speed);
@@ -505,8 +602,8 @@ export default function ReadingScreen() {
     if (!ttsController.consumeAutoResume()) return;
     // Free user may have exhausted their daily quota mid-listen — silently
     // skip auto-resume rather than start audio they'll be cut off from.
-    // The paywall already fired on the previous chapter's recordTTS tick.
-    if (!vipStatus.loading && !vipStatus.can_use_tts) return;
+    // The paywall already fired when the previous chapter's usage was flushed.
+    if (!hasTtsQuota()) return;
     const chapterLabel = currentChapter.title
       ? `Chương ${currentChapter.chapter_number}: ${currentChapter.title}`
       : `Chương ${currentChapter.chapter_number}`;
@@ -1102,7 +1199,7 @@ export default function ReadingScreen() {
               {!vipStatus.isVip && vipStatus.daily_tts_limit_seconds > 0 && (() => {
                 const remaining = Math.max(
                   0,
-                  vipStatus.daily_tts_limit_seconds - vipStatus.tts_seconds_used_today
+                  vipStatus.daily_tts_limit_seconds - ttsSecondsUsedToday
                 );
                 const minutes = Math.ceil(remaining / 60);
                 const lowQuota = remaining < 600; // <10 min
@@ -1247,7 +1344,7 @@ export default function ReadingScreen() {
               ? "⏸ Dừng"
               : tts.status === "paused"
               ? "▶ Tiếp"
-              : !vipStatus.loading && !vipStatus.can_use_tts
+              : !hasTtsQuota()
               ? "🔒 Hết lượt"
               : "🔊 Nghe"}
           </Text>
