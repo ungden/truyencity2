@@ -18,7 +18,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ios: {
     supportsTablet: true,
     bundleIdentifier: "com.truyencity.app",
-    buildNumber: "47",
+    // Mirrors the remote value EAS assigned; not read at build time because
+    // eas.json uses appVersionSource: "remote" with autoIncrement.
+    buildNumber: "50",
     usesIapIOS: true, // Enable In-App Purchase capability (required for subscriptions)
     appStoreUrl: "https://apps.apple.com/app/truyencity/id6759160705",
     // Allow iPad multitasking (Split View, Slide Over). Required — apps that

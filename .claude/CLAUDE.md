@@ -128,8 +128,11 @@ npx eas build --platform ios --profile production --non-interactive --auto-submi
 
 ### Every new build, in order
 
-1. Bump `mobile/app.config.ts` — `version`, `ios.buildNumber`, `android.versionCode`.
-   Build numbers increase monotonically and never reset.
+1. Bump **only** `version` in `mobile/app.config.ts`. `eas.json` sets
+   `appVersionSource: "remote"` with `autoIncrement: true` on the production
+   profile, so EAS owns `ios.buildNumber` / `android.versionCode` and raises them
+   itself — the values in `app.config.ts` are ignored at build time and are kept
+   in sync here only so the file doesn't lie. Editing them by hand does nothing.
 2. Build and submit through EAS.
 3. **After the store shows Ready for Sale**, update the `app_versions` row:
    ```sql
@@ -146,7 +149,8 @@ npx eas build --platform ios --profile production --non-interactive --auto-submi
 npx tsx scripts/update-app-versions.ts
 ```
 
-Current: **1.0.5**, iOS build 43, Android versionCode 4. Android build not yet cut.
+Current: **1.0.10**, iOS build 50 (uploaded 2026-08-08, awaiting release). Android
+versionCode 8 in config; no Android build cut for this version.
 
 ## Git
 
