@@ -180,12 +180,30 @@ function injectDeterministicMissingDeltaFinding(
 
 interface PreflightIssue {
   kind: 'continuity' | 'reading';
-  category: 'canon' | 'prompt_leak' | 'resource' | 'unnatural_dialogue';
+  category: 'canon' | 'prompt_leak' | 'resource' | 'unnatural_dialogue' | 'expository_prose';
   evidence: string;
   conflictingEvidence?: string;
   referenceId?: string;
   instruction: string;
 }
+
+/**
+ * The negate-then-correct cadence ("Không phải X. Là Y.") is a signature LLM
+ * rhythm rather than a Vietnamese prose habit, and it is audible — especially
+ * once a chapter is read aloud by the app's TTS.
+ *
+ * Counted with this exact pattern over the 237 chapters already published:
+ * 44% of chapters open a sentence with it at least once, 8.0% do it three or
+ * more times, 3.8% four or more, 0.8% five. The Writer prompt carries the real
+ * budget of one per chapter; this only catches the tail at four times that.
+ *
+ * Deliberately not tighter. A deterministic reading finding forces a rewrite,
+ * and a rewrite that trips it again ends as `quality_blocked`, which no retry
+ * clears — the same failure mode already parking jobs in this fleet. A style
+ * nit must not be able to stop a novel.
+ */
+const NEGATE_THEN_CORRECT = /(?:^|[.!?…\n]\s*)Không phải\b/gu;
+const NEGATE_THEN_CORRECT_BUDGET = 4;
 
 export interface ChapterPipelineResult {
   decision: 'publish';
@@ -251,6 +269,16 @@ function preflight(
     evidence: foreign[0],
     instruction: 'Thay ký tự Hán bằng tiếng Việt tự nhiên phù hợp bối cảnh.',
   });
+  const negations = [...draft.content.matchAll(NEGATE_THEN_CORRECT)];
+  if (negations.length >= NEGATE_THEN_CORRECT_BUDGET) {
+    const anchorIndex = negations[negations.length - 1].index ?? 0;
+    issues.push({
+      kind: 'reading',
+      category: 'expository_prose',
+      evidence: draft.content.slice(anchorIndex, anchorIndex + 80).trim(),
+      instruction: `Chương dùng khuôn phủ định-rồi-đính-chính "Không phải…" ${negations.length} lần. Giữ lại nhiều nhất một lần ở đúng khoảnh khắc lật nhận thức quan trọng nhất; viết lại những chỗ còn lại thành câu khẳng định nói thẳng điều đang xảy ra.`,
+    });
+  }
   const literalCurrencyResources = kernel.resources.filter(
     (resource): resource is Extract<StoryKernel['resources'][number], { kind: 'numeric' }> =>
       resource.kind === 'numeric' && /^(?:vnd|đồng)$/iu.test(resource.unit.trim()),
@@ -356,7 +384,11 @@ function mergePreflight(assessment: EditorAssessment, deterministic: PreflightIs
   ];
   const readingIssues = [
     ...deterministic.filter(issue => issue.kind === 'reading').map(issue => ({
-      category: 'unnatural_dialogue' as const,
+      // Preflight reading checks carry their own category; anything outside the
+      // reading taxonomy falls back to the historical default.
+      category: issue.category === 'expository_prose'
+        ? ('expository_prose' as const)
+        : ('unnatural_dialogue' as const),
       severity: 'major' as const,
       evidence: issue.evidence,
       instruction: issue.instruction,
