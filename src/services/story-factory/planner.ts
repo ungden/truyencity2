@@ -20,7 +20,7 @@ import { geminiProvider } from './provider';
 
 // Defined here, not in release.ts: release → benchmark → planner already exists, so a
 // planner → release import closes a cycle and breaks the production bundle (TDZ at init).
-export const FACTORY_PLANNER_VERSION = 'story-factory-planner-66-plan-checkpoint';
+export const FACTORY_PLANNER_VERSION = 'story-factory-planner-67-arc-sees-travel-graph';
 import { EDITOR_SYSTEM_PROMPT, PLANNER_SYSTEM_PROMPT, PLAN_JUDGE_SYSTEM_PROMPT } from './prompts';
 import {
   applyCanonExtension,
@@ -2110,7 +2110,9 @@ export async function planArcLifecycle(input: {
   }).strict();
   const wireResult = await provider.json({
     model: input.routes.planner,
-    system: `${PLANNER_SYSTEM_PROMPT}\nỞ ranh giới arc, quyết định tiếp tục, vào finale hoặc kết thúc tự nhiên. Không kéo dài chỉ để đủ quota.\nNếu status là continue hoặc finale thì nextArc và canonExtension là bắt buộc; nếu status là complete thì cả hai để null. Trong canonExtension, khai báo mechanic mới theo đúng ba mảng mechanicConversions/mechanicCapabilities/mechanicConstraints (mảng rỗng nếu không thêm loại đó); tổng cả ba tối đa tám.\nMọi phần tử mới trong canonExtension đều tiêu một expansion seed: seedId phải lấy NGUYÊN VĂN từ permittedExpansionSeeds của đúng stage đích, kind của seed phải khớp loại phần tử (character/location/promise/world_rule/world_mechanic), và seedId chưa nằm trong usedExpansionSeedIds. Tuyệt đối không tự bịa seedId; nếu stage đích không còn seed của một loại thì không thêm phần tử loại đó.`,
+    system: `${PLANNER_SYSTEM_PROMPT}\nỞ ranh giới arc, quyết định tiếp tục, vào finale hoặc kết thúc tự nhiên. Không kéo dài chỉ để đủ quota.\nNếu status là continue hoặc finale thì nextArc và canonExtension là bắt buộc; nếu status là complete thì cả hai để null. Trong canonExtension, khai báo mechanic mới theo đúng ba mảng mechanicConversions/mechanicCapabilities/mechanicConstraints (mảng rỗng nếu không thêm loại đó); tổng cả ba tối đa tám.\nMọi phần tử mới trong canonExtension đều tiêu một expansion seed: seedId phải lấy NGUYÊN VĂN từ permittedExpansionSeeds của đúng stage đích, kind của seed phải khớp loại phần tử (character/location/promise/world_rule/world_mechanic), và seedId chưa nằm trong usedExpansionSeedIds. Tuyệt đối không tự bịa seedId; nếu stage đích không còn seed của một loại thì không thêm phần tử loại đó.
+travelRules là đồ thị CÓ HƯỚNG và mỗi chiều là một phần tử riêng. Với mỗi địa điểm mới, phải khai đủ cả chiều đi lẫn chiều về: main phải tới được nó từ protagonistLocationId và từ nó quay về được. Một cạnh một chiều sẽ bị từ chối và làm hỏng cả arc.
+fromLocationId/toLocationId chỉ được là ID có thật trong existingLocations hoặc ID của địa điểm vừa khai trong chính canonExtension này. Không khai lại cạnh đã có trong existingTravelRules — trùng cạnh cũng bị từ chối.`,
     prompt: JSON.stringify({
       task: 'Đánh giá ending direction và lập arc tiếp theo nếu truyện chưa hoàn tất.',
       endingDirection: input.kernel.endingDirection,
@@ -2122,6 +2124,14 @@ export async function planArcLifecycle(input: {
       )) ?? null,
       currentArc: input.arc,
       currentState: input.state,
+      // The model is asked to author travelRules, so it has to see the graph it
+      // is extending. Without these it guesses location IDs out of currentState
+      // and omits return edges — which is exactly how an arc boundary died with
+      // `noReturn: [loc_hang_ngam]` after adding a one-way passage.
+      existingLocations: input.kernel.locations,
+      existingTravelRules: input.kernel.travelRules,
+      protagonistLocationId: input.state.characters
+        .find(character => character.characterId === input.kernel.protagonistId)?.locationId ?? null,
       permittedExpansionSeeds: Object.fromEntries(input.kernel.seriesSpine.stages.map(stage => [
         stage.id,
         stage.expansionSeeds.map(seed => ({ id: seed.id, kind: seed.kind, description: seed.description })),

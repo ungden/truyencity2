@@ -233,11 +233,17 @@ export function validateKernelState(kernel: StoryKernel, state: StoryState): voi
   const noReturn = kernel.locations.map(item => item.id)
     .filter(locationId => !reachableFrom(locationId).has(protagonistLocation));
   if (unreachable.length || noReturn.length) {
-    fail('Kernel travel graph must let the protagonist reach every declared location and return.', {
-      protagonistLocation,
-      unreachable,
-      noReturn,
-    });
+    // Name the offending locations in the message, not just the evidence: this
+    // string is what lands in `story_factory_jobs.last_error`, and a generic
+    // sentence there costs a round trip to the run row before anyone can act.
+    const parts = [
+      unreachable.length ? `không tới được: ${unreachable.join(', ')}` : '',
+      noReturn.length ? `không có đường về: ${noReturn.join(', ')}` : '',
+    ].filter(Boolean);
+    fail(
+      `Kernel travel graph must let the protagonist reach every declared location and return (từ ${protagonistLocation} — ${parts.join('; ')}).`,
+      { protagonistLocation, unreachable, noReturn },
+    );
   }
 }
 
