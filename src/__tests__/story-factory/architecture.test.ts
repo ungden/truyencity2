@@ -210,8 +210,9 @@ describe('Story Factory architecture boundary', () => {
       provider.match(/CHAPTER_CALL_TIMEOUT_MS = (\d[\d_]*)/)![1].replace(/_/g, ''),
     );
     expect(chapterTimeoutMs * 2).toBeLessThan(maxDurationSeconds * 1000);
-    // All three chapter-tick call sites (Writer, Rewrite, shared Editor) opt in.
-    expect(pipeline.match(/timeoutMs: CHAPTER_CALL_TIMEOUT_MS/g)?.length).toBe(3);
+    // All four chapter-tick call sites (Writer, Rewrite, shared Editor and its
+    // grounding-corrective re-roll) opt in.
+    expect(pipeline.match(/timeoutMs: CHAPTER_CALL_TIMEOUT_MS/g)?.length).toBe(4);
   });
 
   test('prose heuristics can advise but never block a job', () => {

@@ -557,6 +557,43 @@ export async function assessStoryDraft(input: {
   const deterministicIssues = preflight(input.draft, input.plan, input.kernel);
   const deltaIds = [...narrativelyObservableDeltaIds(input.kernel, input.plan)];
   const responseSchema = buildEditorWireAssessmentSchema({ deltaIds });
+  const materialize = (value: Parameters<typeof injectDeterministicMissingDeltaFinding>[0]): EditorAssessment => {
+    let assessment: EditorAssessment;
+    try {
+      assessment = materializeEditorAssessment(injectDeterministicMissingDeltaFinding(value, input.draft));
+    } catch (error) {
+      if (error instanceof StoryFactoryError) throw error;
+      throw new StoryFactoryError('infra_blocked', 'Editor output failed the exact application contract.', error instanceof z.ZodError ? error.issues : undefined);
+    }
+    if (assessment.status === 'pass') {
+      const deltaChecks = assessment.deltaChecks.map(check => ({
+        ...check,
+        evidence: groundEvidenceSpan(input.draft.content, check.evidence),
+      }));
+      const evidenceSpans = assessment.outcome.evidenceSpans.map(span => groundEvidenceSpan(input.draft.content, span));
+      if (deltaChecks.some(check => check.evidence === null) || evidenceSpans.some(span => span === null)) {
+        throw new StoryFactoryError('infra_blocked', 'Editor pass contains an evidence anchor that code cannot ground in prose.', {
+          deltaChecks: deltaChecks.filter(check => check.evidence === null).map(check => check.deltaId),
+          outcomeSpans: assessment.outcome.evidenceSpans.filter((_, index) => evidenceSpans[index] === null),
+        });
+      }
+      assessment = EditorAssessmentSchema.parse({
+        ...assessment,
+        deltaChecks: deltaChecks.map(check => ({ ...check, evidence: check.evidence as string })),
+        outcome: { ...assessment.outcome, evidenceSpans: evidenceSpans as string[] },
+      });
+    } else {
+      assessment = groundIssueEvidence({
+        assessment,
+        draft: input.draft,
+        kernel: input.kernel,
+        plan: input.plan,
+        state: input.state,
+      });
+    }
+    assertDeltaCoverage(input.kernel, input.plan, assessment);
+    return assessment;
+  };
   const response = await input.provider.json({
     model: input.model,
     timeoutMs: CHAPTER_CALL_TIMEOUT_MS,
@@ -565,41 +602,35 @@ export async function assessStoryDraft(input: {
     schema: responseSchema,
     temperature: 0.4,
   });
-  let assessment: EditorAssessment;
   try {
-    assessment = materializeEditorAssessment(injectDeterministicMissingDeltaFinding(response.value, input.draft));
+    return { assessment: mergePreflight(materialize(response.value), deterministicIssues), usage: response.usage };
   } catch (error) {
-    if (error instanceof StoryFactoryError) throw error;
-    throw new StoryFactoryError('infra_blocked', 'Editor output failed the exact application contract.', error instanceof z.ZodError ? error.issues : undefined);
-  }
-  if (assessment.status === 'pass') {
-    const deltaChecks = assessment.deltaChecks.map(check => ({
-      ...check,
-      evidence: groundEvidenceSpan(input.draft.content, check.evidence),
-    }));
-    const evidenceSpans = assessment.outcome.evidenceSpans.map(span => groundEvidenceSpan(input.draft.content, span));
-    if (deltaChecks.some(check => check.evidence === null) || evidenceSpans.some(span => span === null)) {
-      throw new StoryFactoryError('infra_blocked', 'Editor pass contains an evidence anchor that code cannot ground in prose.', {
-        deltaChecks: deltaChecks.filter(check => check.evidence === null).map(check => check.deltaId),
-        outcomeSpans: assessment.outcome.evidenceSpans.filter((_, index) => evidenceSpans[index] === null),
-      });
-    }
-    assessment = EditorAssessmentSchema.parse({
-      ...assessment,
-      deltaChecks: deltaChecks.map(check => ({ ...check, evidence: check.evidence as string })),
-      outcome: { ...assessment.outcome, evidenceSpans: evidenceSpans as string[] },
+    // Paraphrased anchors and dangling reference IDs are wire-discipline failures,
+    // not verdicts — the same disease the window review corrective pass cures. Two
+    // production novels parked over a weekend on exactly this loop (bad anchor →
+    // full editor re-roll → bad anchor again, until the retry budget drained). Give
+    // the SAME model one corrective pass with the exact failure before treating it
+    // as infrastructure; a second failure falls through unchanged.
+    if (!(error instanceof StoryFactoryError) || error.code !== 'infra_blocked') throw error;
+    const corrective = await input.provider.json({
+      model: input.model,
+      timeoutMs: CHAPTER_CALL_TIMEOUT_MS,
+      system: `${EDITOR_SYSTEM_PROMPT}
+Bản assessment trước bị từ chối vì evidence không đạt hợp đồng grounding. Chấm lại toàn bộ: mỗi anchor evidence phải là 4-12 từ liên tiếp copy đúng từng ký tự từ draft, referenceId phải là stable ID có thật, và mọi issue phải sửa đúng lỗi grounding được nêu.`,
+      prompt: `${editorPrompt({ ...input, deterministicIssues })}
+
+GROUNDING_ERRORS: ${JSON.stringify({ message: error.message, evidence: error.evidence ?? null })}`,
+      schema: responseSchema,
+      temperature: 0.2,
     });
-  } else {
-    assessment = groundIssueEvidence({
-      assessment,
-      draft: input.draft,
-      kernel: input.kernel,
-      plan: input.plan,
-      state: input.state,
-    });
+    const usageTotal = {
+      ...corrective.usage,
+      inputTokens: response.usage.inputTokens + corrective.usage.inputTokens,
+      outputTokens: response.usage.outputTokens + corrective.usage.outputTokens,
+      costUsd: response.usage.costUsd + corrective.usage.costUsd,
+    };
+    return { assessment: mergePreflight(materialize(corrective.value), deterministicIssues), usage: usageTotal };
   }
-  assertDeltaCoverage(input.kernel, input.plan, assessment);
-  return { assessment: mergePreflight(assessment, deterministicIssues), usage: response.usage };
 }
 
 export interface ChapterStageInput {

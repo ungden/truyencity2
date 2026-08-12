@@ -2469,6 +2469,33 @@ describe('canonical Story Factory', () => {
     expect(result.wordCount).toBeLessThan(100);
   });
 
+  test('one corrective pass recovers an editor assessment with a paraphrased anchor', async () => {
+    // Two production novels parked over a weekend on the loop: paraphrased anchor →
+    // infra → full editor re-roll → paraphrased anchor again, until retries drained.
+    const draft = { title: 'Mẻ hàng đầu tiên', content: 'Hải đặt rổ xuống giữa nhà. Anh không hứa suông mà chia việc, kiểm lại số tiền rồi cùng mẹ bắt tay làm ngay trong buổi sáng.' };
+    const bad = editorWirePass('delta_1', 'câu này không tồn tại trong bản nháp');
+    const good = editorWirePass('delta_1', 'chia việc');
+    const provider = new QueueProvider([bad, good]);
+    const assessed = await assessStoryDraft({
+      provider, model: routes.editor, kernel, state: initialState, plan: plan(1), draft,
+    });
+    expect(assessed.assessment.status).toBe('pass');
+    expect(provider.calls).toEqual(['editor', 'editor']);
+    expect(provider.prompts[1]).toContain('GROUNDING_ERRORS');
+    // Both calls are billed on the one returned usage.
+    expect(assessed.usage.inputTokens).toBe(2);
+  });
+
+  test('editor grounding fails closed when the corrective pass also cannot ground', async () => {
+    const draft = { title: 'Mẻ hàng đầu tiên', content: 'Hải chia việc rồi cùng mẹ bắt tay làm.' };
+    const bad = editorWirePass('delta_1', 'câu này không tồn tại trong bản nháp');
+    const provider = new QueueProvider([bad, structuredClone(bad)]);
+    await expect(assessStoryDraft({
+      provider, model: routes.editor, kernel, state: initialState, plan: plan(1), draft,
+    })).rejects.toThrow('cannot ground');
+    expect(provider.calls).toEqual(['editor', 'editor']);
+  });
+
   test('chapter pipeline forwards next-opening handoff to both Writer and Editor', async () => {
     const draft = { title: 'Mẻ hàng đầu tiên', content: 'Hải và mẹ vẫn ở trong nhà. Anh chia việc rồi cất tiền cẩn thận, sẵn sàng đón người mua vào sáng hôm sau.' };
     const provider = new QueueProvider([draft, editorWirePass('delta_1', 'chia việc')]);
