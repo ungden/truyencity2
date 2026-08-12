@@ -222,7 +222,21 @@ async function recoverUncommittedPlan(
   runId: string,
   error: StoryFactoryError,
 ): Promise<FactoryTickResult> {
-  if (job.replan_attempts >= 1) return blockRun(db, job, runId, error);
+  if (job.replan_attempts >= 1) {
+    // The second plan-scope verdict parks — but its evidence must survive, and the
+    // rejected window must not: a plain revive would otherwise re-write from the
+    // SAME uncommitted plan and reproduce the verdict (one novel looped exactly so
+    // on a repeated sales-cycle window). Feed forward, drop the window, and point
+    // the revive straight at an informed replan.
+    const fed = await db.from('story_factory_jobs').update({
+      stage: 'plan',
+      rolling_plan: null,
+      plan_feedback: { source: 'editor_plan_scope', message: error.message, evidence: error.evidence ?? null },
+      updated_at: new Date().toISOString(),
+    }).eq('id', job.id).eq('lease_token', job.lease_token);
+    if (fed.error) console.warn('[story-factory] plan-scope feedback write failed:', fed.error.message);
+    return blockRun(db, job, runId, error);
+  }
   const now = new Date().toISOString();
   const pipelineTelemetry = pipelineTelemetryFromError(error);
   const runUpdate = await db.from('story_factory_runs').update({
