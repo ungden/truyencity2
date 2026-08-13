@@ -4157,10 +4157,21 @@ describe('canonical Story Factory', () => {
       },
       issues: [],
     }]);
-    const result = await planRollingWindow({ kernel, arc, state: initialState, routes, provider });
+    const result = await planRollingWindow({
+      kernel,
+      arc,
+      state: initialState,
+      routes,
+      provider,
+      authorDirective: 'Không dùng lại đối thủ địa phương; chuyển sang cổng thị trường cấp vùng.',
+    });
     expect(result.assessment.status).toBe('pass');
     expect(provider.calls).toEqual(['planner', 'plan-judge']);
     expect(provider.temperatures).toEqual([0.2, 0.3]);
+    expect(JSON.parse(provider.prompts[1])).toEqual(expect.objectContaining({
+      authorDirective: 'Không dùng lại đối thủ địa phương; chuyển sang cổng thị trường cấp vùng.',
+      marketBlueprint: null,
+    }));
     expect(result.attempts).toEqual([
       expect.objectContaining({
         attempt: 'initial',

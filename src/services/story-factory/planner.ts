@@ -21,7 +21,7 @@ import type { MarketBlueprint } from './setup';
 
 // Defined here, not in release.ts: release → benchmark → planner already exists, so a
 // planner → release import closes a cycle and breaks the production bundle (TDZ at init).
-export const FACTORY_PLANNER_VERSION = 'story-factory-planner-71-market-blueprint';
+export const FACTORY_PLANNER_VERSION = 'story-factory-planner-72-market-judge';
 import { EDITOR_SYSTEM_PROMPT, PLANNER_SYSTEM_PROMPT, PLAN_JUDGE_SYSTEM_PROMPT } from './prompts';
 import {
   ARC_ACTIVE_MECHANIC_BUDGET,
@@ -1425,6 +1425,8 @@ export async function assessRollingPlan(input: {
   state: StoryState;
   rollingPlan: RollingPlan;
   model: string;
+  authorDirective?: string | null;
+  marketBlueprint?: MarketBlueprint | null;
   repairIssues?: PlanRevisionIssues;
   advisories?: PlanAdvisory[];
 }): Promise<{ assessment: PlanAssessment; usage: ProviderUsage }> {
@@ -1443,7 +1445,11 @@ export async function assessRollingPlan(input: {
     model: input.model,
     system: PLAN_JUDGE_SYSTEM_PROMPT,
     prompt: JSON.stringify({
-      task: 'Đánh giá rolling plan theo agency, đối lực, tích lũy, biến hóa cảnh và stage; không chấm prose, không kiểm số học.',
+      task: 'Đánh giá rolling plan theo agency, đối lực, tích lũy, biến hóa cảnh, stage và hợp đồng sản phẩm; không chấm prose, không kiểm số học.',
+      authorDirective: input.authorDirective?.trim()
+        ? input.authorDirective.trim().slice(0, 1_500)
+        : null,
+      marketBlueprint: input.marketBlueprint ?? null,
       kernel: {
         protagonistId: input.kernel.protagonistId,
         realityMode: input.kernel.realityMode,
@@ -1479,7 +1485,7 @@ export async function assessRollingPlan(input: {
         domainPlausibility: 'Grounded phải khả thi về công cụ, dung sai, thời gian, lao động và kết quả ngoài đời; speculative phải nhất quán nguồn lực, chi phí và giới hạn nội tại.',
         oppositionAgenda: 'Đối lực phải có lựa chọn, đối sách và hậu quả theo agenda riêng; chỉ gây hấn rồi kinh ngạc/thua/chạy không đạt.',
         sceneVariety: 'Window không được lặp công thức giải thích cơ chế → biểu diễn thành công → người khác kinh ngạc/tôn sùng → nhận thưởng.',
-        stageAlignment: 'Xung đột và reward loop phải phục vụ stage hiện tại, không nhảy sớm.',
+        stageAlignment: 'Xung đột và reward loop phải phục vụ stage hiện tại đồng thời tuân thủ authorDirective và tiến ít nhất một trục của marketBlueprint; không được hợp thức hóa vòng lặp đã bị cấm bằng cùng đối thủ hoặc một biến thể địa hình nhỏ.',
         outcomeWeight: 'Kết quả phải có trọng lượng tương xứng chuẩn bị và phản lực. Quyết định, phân tích, ký hợp tác hoặc mua đầu vào chỉ là setup; không được commit fact tuyên bố đã hết lỗ, có lãi, thành công hay giải quyết xung đột trước khi hành động tạo kết quả thực sự xảy ra.',
         stateTransitionOwnership: 'Mỗi relationship delta phải cập nhật đúng người thực sự đổi thái độ: characterId/target là chủ thể của thái độ, counterpartId là người thái độ hướng tới. “A thuyết phục được B” không phải trạng thái quan hệ của A; nếu B chuyển từ nghi ngờ sang tin thì B phải là target. Hai phía cùng đổi cần hai delta.',
       },
@@ -1805,6 +1811,8 @@ export async function planRollingWindow(input: {
       state: input.state,
       rollingPlan: currentPlan,
       model: input.routes.planJudge,
+      authorDirective: input.authorDirective,
+      marketBlueprint: input.marketBlueprint,
       advisories,
     });
     usages.push(judged.usage);
@@ -1926,6 +1934,8 @@ export async function planRollingWindow(input: {
     state: input.state,
     rollingPlan: repaired.plan,
     model: input.routes.planJudge,
+    authorDirective: input.authorDirective,
+    marketBlueprint: input.marketBlueprint,
     repairIssues: judgedAssessment.issues,
     advisories,
   });
