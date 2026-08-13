@@ -35,6 +35,8 @@ const PRICING: Record<string, { input: number; output: number }> = {
   'deepseek/deepseek-v4-flash-0731': { input: 0.14, output: 0.28 },
   // OpenRouter models endpoint, 2026-08-13 (v4-pro released the same day).
   'deepseek/deepseek-v4-pro-0813': { input: 0.435, output: 0.87 },
+  'qwen/qwen3.8-2.4t-a95b': { input: 2, output: 6 },
+  'x-ai/grok-4.6': { input: 2, output: 6 },
   'qwen/qwen3.7-flash': { input: 0.03, output: 0.13 },
   'google/gemini-3.6-flash': { input: 1.5, output: 7.5 },
   'moonshotai/kimi-k3': { input: 3, output: 15 },
@@ -53,6 +55,15 @@ const PRICING: Record<string, { input: number; output: number }> = {
  */
 const OPENROUTER_MODEL_PARAMS: Record<string, Record<string, unknown>> = {
   'deepseek/deepseek-v4-pro-0813': { reasoning: { enabled: false } },
+  // Reasoning is mandatory on this endpoint (enabled:false 400s); low effort
+  // measured 2026-08-13 at 520 reasoning tokens / 79s for a full scene vs
+  // 1,024 / 101s at default — the difference between fitting the 120s chapter
+  // budget and timing out.
+  'x-ai/grok-4.6': { reasoning: { effort: 'low' } },
+  // Same mandatory-reasoning endpoint shape as grok-4.6. Default effort passed
+  // two smoke chapters clean then blew the 120s budget on a heavy-thinking
+  // roll; low effort measured at 1.9k reasoning tokens / 44s for a full scene.
+  'qwen/qwen3.8-2.4t-a95b': { reasoning: { effort: 'low' } },
 };
 
 export interface ProviderUsage {
