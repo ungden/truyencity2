@@ -297,6 +297,30 @@ function jaccard(left: string, right: string): number {
   return union ? intersection / union : 0;
 }
 
+const MARKET_TITLE_SEPARATOR = /[:：,，]/u;
+const MARKET_TITLE_HOOK = /(?:khởi\s*đầu|mở\s*đầu|trùng\s*sinh|xuyên\s*(?:không|việt|qua|về|đến)|toàn\s*dân|vạn\s*giới|mỗi\s*ngày|của\s*ta|ta\s+(?:có|là|dùng|mang|triệu\s*hoán|thức\s*tỉnh|bắt\s*đầu)|từ\s+.+\s+đến)/iu;
+
+/**
+ * Faloo-style packaging sells the genre, protagonist advantage and first fantasy
+ * before the reader opens chapter one. Vietnamese needs more words than Chinese,
+ * so the contract is deliberately based on words and a generous cover-safe cap.
+ */
+export function assertMarketableSerialTitle(title: string): void {
+  const words = title.trim().split(/\s+/u).filter(Boolean);
+  const hasPackagingStructure = MARKET_TITLE_SEPARATOR.test(title) || MARKET_TITLE_HOOK.test(title);
+  if (words.length < 7 || words.length > 26 || !hasPackagingStructure) {
+    throw new StoryFactoryError(
+      'setup_blocked',
+      'Story title does not expose a marketable genre/identity hook and reader fantasy.',
+      {
+        title,
+        wordCount: words.length,
+        instruction: 'Use 7-26 Vietnamese words. Prefer “đề tài/thân phận: lợi thế hoặc payoff cụ thể”; a hook-led title without punctuation is allowed only when it still names the premise directly.',
+      },
+    );
+  }
+}
+
 export function assertPortfolioDiversity(candidate: z.infer<typeof ConceptCandidateSchema>, existing: PortfolioSignature[]): void {
   for (const signature of existing) {
     const scores = [
@@ -435,17 +459,21 @@ function generatorPrompt(input: {
     task: `Generator ${input.generator}: tạo đúng sáu concept khác nhau về cơ chế, reward loop và conflict economy.`,
     requirements: [
       'Không tạo ID; code sẽ gán stable ID bất biến theo generator và vị trí.',
-      'Cơ chế phải hoạt động trong ba chương đầu.',
+      'Đây là web-serial sảng văn thương mại theo tín hiệu Faloo, nhưng là IP nguyên bản: học cách đóng gói trực diện, não động lớn, nhịp nhanh và sảng điểm dày; tuyệt đối không sao chép nhân vật, thế giới, tên riêng, franchise hoặc tiêu đề đang có.',
+      'Concept phải ghép ba lớp nhìn là hiểu: một đề tài/đấu trường có nhu cầu rộng + một thân phận hoặc thế yếu cụ thể + một lợi thế độc nhất tạo payoff hữu hình. Chất đời sống hoặc nghề nghiệp chỉ là nền; không được chọn một quy trình lao động yên ả làm fantasy chính.',
+      'Cơ chế phải được kích hoạt và tạo lần lật thế/thu hoạch đầu tiên ngay trong chương 1; chương 2 mở rộng tác dụng hoặc người chứng kiến; hết chương 3 phải có đối thủ/đấu trường/mục tiêu lớn hơn xuất hiện. Không dùng ba chương chỉ để giới thiệu, chế thử rồi hẹn ngày mai.',
       'Có vật liệu nhân quả để biến hóa ít nhất ba mươi chương.',
       'Có 8-15 arena/giai đoạn thực sự khác nhau để đi đến 800-1.200 chương; seriality1000 phải mô tả biến đổi macro, không đổi tên cùng một vòng lặp.',
       'Nêu earlyEndingRisk: vì sao truyện có thể cạn sớm và cơ chế nào ngăn điều đó mà không sinh filler.',
-          'Không dựa vào đối thủ ngu, may mắn liên tục hoặc tài nguyên vô nguồn.',
+      'Không dựa vào đối thủ ngu, may mắn liên tục hoặc tài nguyên vô nguồn.',
       'Premise phải mở một kỳ vọng lớn ngay từ tên + mô tả (một mục tiêu/món nợ/lời thề/cơ hội mà độc giả muốn thấy trả), và kỳ vọng đó phải trả dần qua hàng trăm chương — cấm premise kiểu ngửa bài xong là hết chuyện.',
-      'Reward loop phải trả thưởng dày: mỗi chương một nhịp nhỏ, mỗi vòng năm chương một keo vừa; pleasure đến từ tự tay tích lũy và lật thế, đọc xong thấy nhẹ nhõm chứ không hả hê nặng nề.',
+      'Reward loop phải trả thưởng dày: mỗi chương một nhịp thắng/thu hoạch/xác nhận năng lực nhìn thấy được, ba chương tăng một nấc phạm vi hoặc vị thế, mỗi vòng năm chương có một keo vừa. Sảng cảm đến từ main chủ động dùng lợi thế khiến cục diện đổi trước mắt độc giả; không thay payoff bằng lời hứa, quy trình hoặc cảm giác êm đềm.',
       'Main chủ động và tư lợi hợp lý theo giá trị của thế giới: giúp ai cũng có lý do hoặc cái giá, không thánh mẫu làm việc miễn phí khi thế giới có giá cả.',
-          'Tên truyện BÁN reader fantasy, không tóm tắt cơ chế hay quy trình. Chỉ hai khuôn được phép: (1) ngắn 3–6 chữ có sức nặng, ví dụ "Vua Câu Mực Đêm", "Toàn Chức Cao Thủ"; (2) dài tối đa 10 chữ có móc câu về thân phận, cheat hoặc khởi đầu, ví dụ "Trùng Sinh Thập Niên 80: Ông Trùm Hải Sản", "Bắt Đầu Với Mười Vạn Sức Mạnh". Cấm tên kiểu nhãn mô tả nối bằng "và/của/giúp", ví dụ sai: "Đội Tàu Câu Mực Đêm Và Sáng Kiến Ướp Muối Khô Giữ Giá Trị Thương Phẩm". Mỗi chữ trong tên phải gợi tò mò, quyền năng hoặc khát vọng; chữ nào chỉ mô tả kỹ thuật thì bỏ.',
-          'Mỗi mechanismFingerprint, rewardLoopFingerprint và conflictEconomyFingerprint chỉ là một cụm phân loại tối đa 12 từ; không giải thích, không viết thành câu dài.',
-          'Viết metadata cô đọng: mỗi ý một hoặc hai câu, seriality30 đúng sáu ý và seriality1000 từ tám đến mười lăm ý; không diễn giải lại research.',
+      'Tên truyện là quảng cáo một câu, dài 7-26 từ tiếng Việt. Ưu tiên khuôn “ĐỀ TÀI/THÂN PHẬN: TA + LỢI THẾ + PAYOFF”, nói thẳng điều độc giả sẽ được xem; ví dụ cấu trúc “Toàn Dân Chuyển Chức: Nghề Phế Của Ta Tiến Hóa Vô Hạn” hoặc “Trùng Sinh 1988: Từ Chiếc Thuyền Nát Đến Ông Trùm Hải Sản”. Không dùng lại ví dụ, không giấu premise sau tên văn học trừu tượng, chức danh tĩnh hoặc một dụng cụ kỹ thuật.',
+      'Văn án phải đưa ngay hoàn cảnh main, lợi thế độc nhất, lần payoff đầu và đường leo thang; không mở bằng triết lý, phong cảnh hay lịch sử thế giới.',
+      'Chọn não động dễ hình dung và có cảnh biểu diễn mạnh. Tránh cụm đề tài chỉ hấp dẫn như tài liệu nghề nghiệp (sửa một chi tiết máy, tối ưu một khâu lạnh, nghiên cứu một quy trình) nếu không gắn nó với quyền lực, cạnh tranh, danh tiếng hoặc biến đổi quy mô lớn ngay từ đầu.',
+      'Mỗi mechanismFingerprint, rewardLoopFingerprint và conflictEconomyFingerprint chỉ là một cụm phân loại tối đa 12 từ; không giải thích, không viết thành câu dài.',
+      'Viết metadata cô đọng: mỗi ý một hoặc hai câu, seriality30 đúng sáu ý và seriality1000 từ tám đến mười lăm ý; không diễn giải lại research.',
     ],
     commission: input.commission,
     researchSignals: input.research.signals,
@@ -558,10 +586,10 @@ export async function runConceptLab(input: {
     ? { value: rankingSchema.parse(checkpoint.ranking.value), usage: checkpoint.ranking.usage }
     : await setupStage('Blind Concept Judge', provider.json({
     model: input.routes.setupJudge,
-    system: `Bạn là Blind Concept Judge. Chọn theo sức hút, nhân quả thế giới và khả năng serial; không biết model nào tạo concept.
+    system: `Bạn là Blind Concept Judge. Chọn theo sức hút thương mại, nhân quả thế giới và khả năng serial; không biết model nào tạo concept.
 Grounded Domain Research là ràng buộc theo realityPolicy. Áp dụng realityPolicy trước khi đọc research. Với grounded, không chọn claim bị research bác hoặc đòi hạ tầng, vốn, thời gian, năng lượng hay mức an toàn trái commission. Với speculative, tiền đề siêu nhiên được phép; chỉ loại khi concept không khóa được logic nội tại, nguồn lực, chi phí, giới hạn, actor hoặc hậu quả.`,
     prompt: JSON.stringify({
-      task: 'Chọn đúng hai concept mạnh nhất và khả thi về domain.',
+      task: 'Chọn đúng hai concept mạnh nhất. Ưu tiên theo thứ tự: title+premise nói thẳng reader fantasy; chương 1 có cheat/payoff thật; sảng điểm và escalation 3-5 chương; cuối cùng mới đến độ dài 800-1.200 chương. Loại concept chỉ “hay nghề”, cozy hoặc hợp lý nhưng thiếu cú móc và thiếu biến đổi vị thế.',
       realityPolicy: groundedRealityPolicy,
       commission,
       groundedDomainResearch: domainResearch.value,
@@ -584,8 +612,8 @@ Grounded Domain Research là ràng buộc theo realityPolicy. Áp dụng reality
     : await setupStage('Opening Simulator', provider.json({
     model: input.routes.openingSimulator,
     system: `Bạn là Opening Simulator độc lập và không thay đổi concept.
-Với mỗi concept, viết actual opening sample tiếng Việt đủ dài để đánh giá như một cảnh mở đầu hoàn chỉnh: có nhân vật hành động, đối thoại tự nhiên, đối lực có agenda riêng và một thay đổi cụ thể. Không kéo dài để đạt số từ. Đây là mẫu để chọn concept, không phải canon và không được đưa vào Kernel.
-Sau sample, mô tả ngắn hướng chương 2 và 3, chemistry nhân vật, agency của xung đột và audit seriality/nhân quả.
+Với mỗi concept, viết actual opening sample tiếng Việt đủ dài để đánh giá như chương 1 của một sảng văn thương mại: vào áp lực/cơ hội ngay, main hành động, lợi thế độc nhất kích hoạt và tạo một payoff hữu hình trước khi sample kết thúc. Có đối thoại tự nhiên, đối lực có agenda riêng và một thay đổi vị thế cụ thể; không dùng phong cảnh, hồi tưởng hoặc hướng dẫn thao tác để trì hoãn premise. Không kéo dài để đạt số từ. Đây là mẫu để chọn concept, không phải canon và không được đưa vào Kernel.
+Sau sample, mô tả hướng chương 2 phải mở rộng tác dụng/người chứng kiến, chương 3 phải mở đối thủ/đấu trường/mục tiêu lớn hơn; đồng thời audit chemistry, agency, seriality và nhân quả.
 Đánh domainFeasibility=reject nếu ba chương đầu đòi hạ tầng, vốn, thời gian, năng lượng, kỹ năng hoặc mức an toàn không thực tế. Không được coi kiến thức tương lai là vật tư hay thời gian miễn phí.
 Phải áp dụng realityPolicy: grounded dùng chuẩn thực tế ngoài đời; speculative chấp nhận tiên đề siêu nhiên nhưng vẫn reject nếu thiếu nguồn năng lượng/vật tư, actor có quyền, chi phí, giới hạn, thời gian hoặc hậu quả nhất quán trong chính thế giới đó.
 Đánh longRunFeasibility=reject nếu concept có thể kết thúc ở arc đầu, chỉ lặp một vòng kiếm tiền/sức mạnh, hoặc không có đủ arena, xung đột và progression cho 800-1.200 chương.`,
@@ -628,6 +656,7 @@ Phải áp dụng realityPolicy: grounded dùng chuẩn thực tế ngoài đờ
       model: input.routes.launchArchitect,
       system: `Bạn chịu trách nhiệm chọn concept và khóa bản sắc truyện. Trả đúng structured-output schema, không markdown.
 Chọn dựa trên chất lượng actual opening sample, chemistry nhân vật, agency của đối lực và khả năng biến hóa; không chỉ dựa vào metadata cơ chế. Opening sample chỉ là bằng chứng lựa chọn: tuyệt đối không chép câu, cử chỉ hoặc thoại từ sample vào Kernel.
+Giữ packaging sảng văn trực diện: kernel.title dài 7-26 từ, nêu đề tài/thân phận cùng lợi thế hoặc payoff cụ thể; ưu tiên dấu hai chấm. kernel.description là văn án bán truyện, phải nói ngay hoàn cảnh main, lợi thế, payoff đầu và nấc leo thang — không viết như tóm tắt văn học. readerFantasy và pleasureLoop phải nhấn vào quyền chủ động, thắng lợi nhìn thấy được và vị thế mở rộng; comfort chỉ là lớp phụ.
 VoiceContract chỉ được dùng thuộc tính trung tính register, sentenceRhythm, directness, addressRules, vocabulary, reasoningStyle, emotionDisplay và humorStyle. Không chứa câu thoại, cử chỉ, phản ứng mẫu, stressResponse hoặc avoidances.
 sentenceRhythm chỉ mô tả độ dài, nhịp và cấu trúc câu; không mô tả âm lượng, động tác phát ngôn hoặc thói quen như cười, nhếch, quát, gằn giọng, lẩm bẩm.
 Xuất đúng một protagonist, ít nhất một opposition có agenda độc lập thật sự và ít nhất một supporting character. Không dùng supporting character làm đối thủ giả.
@@ -676,6 +705,8 @@ Chỉ được chọn concept có domainFeasibility=pass và longRunFeasibility=
     throw new StoryFactoryError('setup_blocked', 'Launch Architect selected a concept rejected by the domain or long-run audit.', selectedSimulation);
   }
   const selectedConcept = candidates.find(candidate => candidate.id === launchIdentity.value.selectedConceptId)!;
+  assertMarketableSerialTitle(selectedConcept.workingTitle);
+  assertMarketableSerialTitle(launchIdentity.value.kernel.title);
   if (launchIdentity.value.kernel.mechanismFingerprint !== selectedConcept.mechanismFingerprint
     || launchIdentity.value.kernel.rewardLoopFingerprint !== selectedConcept.rewardLoopFingerprint
     || launchIdentity.value.kernel.conflictEconomyFingerprint !== selectedConcept.conflictEconomyFingerprint) {

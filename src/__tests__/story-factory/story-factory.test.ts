@@ -40,6 +40,7 @@ import {
   assertVoiceSemantics,
   assertComparableSequentialCorpora,
   assertGroundedMechanicSemantics,
+  assertMarketableSerialTitle,
   buildBlindReaderComparison,
   buildBlindReaderInput,
   buildChapterContexts,
@@ -421,10 +422,16 @@ class QueueProvider implements StoryModelProvider {
 describe('canonical Story Factory', () => {
   it('retains only the unique genre allocation for the first 30 slots', () => {
     expect(FIRST_30_PORTFOLIO).toHaveLength(30);
-    expect(FIRST_30_PORTFOLIO.filter(slot => slot.group === 'fantasy')).toHaveLength(12);
-    expect(FIRST_30_PORTFOLIO.filter(slot => slot.group === 'urban_era_dual_world')).toHaveLength(18);
+    expect(FIRST_30_PORTFOLIO.filter(slot => slot.group === 'fantasy')).toHaveLength(20);
+    expect(FIRST_30_PORTFOLIO.filter(slot => slot.group === 'urban_era_dual_world')).toHaveLength(10);
     expect(new Set(FIRST_30_PORTFOLIO.map(slot => slot.genreLane)).size).toBe(30);
     expect(JSON.stringify(FIRST_30_PORTFOLIO)).not.toMatch(/title|premise|character|worldRule|rewardLoop/);
+  });
+
+  test('requires a direct market hook in new serial titles', () => {
+    expect(() => assertMarketableSerialTitle('Đại Địa Quy Hoạch Sư')).toThrow('marketable genre/identity hook');
+    expect(() => assertMarketableSerialTitle('Toàn Dân Lãnh Chúa: Ranh Giới Của Ta Tự Sinh Luật')).not.toThrow();
+    expect(() => assertMarketableSerialTitle('Trùng Sinh 1988: Từ Thuyền Nát Đến Ông Trùm Hải Sản')).not.toThrow();
   });
 
   test('applies repeated resource deltas sequentially in one chapter', () => {
@@ -4865,7 +4872,7 @@ describe('canonical Story Factory', () => {
 
   test('Concept Lab grounds all concepts before blind ranking and validates the launch pack', async () => {
     const candidate = (id: string) => ({
-      id, workingTitle: `Tên truyện trực diện ${id}`, premise: 'Một premise đủ dài để kiểm tra khả năng triển khai truyện nối tiếp.',
+      id, workingTitle: `Trùng Sinh Làng Biển: Ta Đưa Cả Nhà Ăn No ${id}`, premise: 'Một premise đủ dài để kiểm tra khả năng triển khai truyện nối tiếp.',
       protagonistContradiction: 'Muốn cứu gia đình nhưng không thể dựa mãi vào ký ức tương lai.',
       uniqueMechanism: 'Cơ chế nghề nghiệp tạo lợi thế nhưng có giới hạn vật chất rõ ràng.',
       rewardLoop: 'Phát hiện cơ hội, lao động, bán hàng rồi tái đầu tư cho gia đình.',

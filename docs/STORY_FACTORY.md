@@ -34,7 +34,7 @@ off by the 300s route ceiling.
 | `memory.ts` | Bounded continuity reads over `story_state_events`. No embeddings, no model calls. |
 | `provider.ts` | Gemini REST. No SDK, no fallback provider, 120s per call. |
 | `benchmark.ts`, `benchmark-resume.ts` | Offline model evaluation. Not a gate. |
-| `cover.ts`, `portfolio.ts`, `prompts.ts`, `release.ts`, `routes.ts`, `index.ts` | Support. |
+| `cover.ts`, `portfolio.ts`, `prompts.ts`, `release.ts`, `routes.ts`, `index.ts` | Support. `portfolio.ts` giữ slate 20 high-concept fantasy / 10 urban-era thay vì nghiêng sang nghề nghiệp-cozy. |
 
 ## Stages
 
@@ -237,6 +237,14 @@ Normative. Change the code and this section together, or one of them starts lyin
 
 Research, market taxonomy and reference works exist only inside Concept Lab. They never
 reach Writer context.
+
+Concept Lab uses a market-packaging contract derived from Faloo's observable product
+grammar: an original high-concept premise, a direct 7–26-word Vietnamese title that sells
+genre/identity + advantage/payoff, the advantage operating with a first payoff in chapter
+one, and a larger arena visible by chapter three. This is a packaging and momentum target,
+not permission to copy existing titles, characters, franchises or prose.
+Research notes and the production drift that motivated the contract are recorded in
+[`FALOO_MARKET_PROFILE.md`](FALOO_MARKET_PROFILE.md).
 
 `ChapterOutcome` is not a fifth artifact. It is a bounded row inside `StoryState` — chapter
 number and title, the principal event, its result, the concrete method, the ending
