@@ -20,7 +20,7 @@ import { geminiProvider } from './provider';
 
 // Defined here, not in release.ts: release → benchmark → planner already exists, so a
 // planner → release import closes a cycle and breaks the production bundle (TDZ at init).
-export const FACTORY_PLANNER_VERSION = 'story-factory-planner-67-arc-sees-travel-graph';
+export const FACTORY_PLANNER_VERSION = 'story-factory-planner-68-code-owns-window-size';
 import { EDITOR_SYSTEM_PROMPT, PLANNER_SYSTEM_PROMPT, PLAN_JUDGE_SYSTEM_PROMPT } from './prompts';
 import {
   applyCanonExtension,
@@ -1674,12 +1674,19 @@ export async function planRollingWindow(input: {
 
   let advisories: PlanAdvisory[] = [];
   const materializeAndValidate = (value: z.infer<typeof PlannerRollingPlanResponseSchema>): RollingPlan => {
-    const parsed = materializePlannerRollingPlan(value, input.state, input.kernel);
-    if (input.requiredWindowSize && parsed.plans.length !== input.requiredWindowSize) {
-      throw new StoryFactoryError('plan_blocked', 'Planner returned the wrong required window size.', {
+    let parsed = materializePlannerRollingPlan(value, input.state, input.kernel);
+    if (input.requiredWindowSize && parsed.plans.length < input.requiredWindowSize) {
+      throw new StoryFactoryError('plan_blocked', 'Planner returned fewer chapters than the required window size.', {
         requiredWindowSize: input.requiredWindowSize,
         actualWindowSize: parsed.plans.length,
       });
+    }
+    if (input.requiredWindowSize && parsed.plans.length > input.requiredWindowSize) {
+      // Window size is code-owned durable state, not a model verdict. A window
+      // that overshoots is trimmed to its prefix instead of failing the run:
+      // uncommitted tail chapters were never going to commit anyway — every
+      // window is replanned from committed state — so trimming loses nothing.
+      parsed = { ...parsed, plans: parsed.plans.slice(0, input.requiredWindowSize) };
     }
     const collected = collectPlanAdvisories(() => validateRollingPlan({
       kernel: input.kernel, arc: input.arc, state: input.state, rollingPlan: parsed,

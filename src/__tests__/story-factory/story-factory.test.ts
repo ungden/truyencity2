@@ -4459,6 +4459,35 @@ describe('canonical Story Factory', () => {
     expect(provider.calls).toEqual(['planner', 'planner']);
   });
 
+  test('an overshooting window is trimmed to the required size instead of blocking', async () => {
+    const wire = plannerWire();
+    wire.chapters.push(structuredClone(plannerWire(2).chapters[0]));
+    const provider = new QueueProvider([wire, {
+      status: 'pass',
+      checks: {
+        protagonistAgency: true, earnedProgression: true, domainPlausibility: true, oppositionAgenda: true,
+        sceneVariety: true, stageAlignment: true, outcomeWeight: true,
+      },
+      checkEvidence: {
+        protagonistAgency: 'chapter 1 scene_1 delta_1',
+        earnedProgression: 'chapter 1 scene_1 delta_1',
+        domainPlausibility: 'chapter 1 scene_1 delta_1',
+        oppositionAgenda: 'chapter 1 scene_1 delta_1',
+        sceneVariety: 'chapter 1 scene_1 delta_1',
+        stageAlignment: 'chapter 1 scene_1 delta_1',
+        outcomeWeight: 'chapter 1 scene_1 delta_1',
+      },
+      issues: [],
+    }]);
+    const result = await planRollingWindow({
+      kernel, arc, state: initialState, routes, provider, requiredWindowSize: 1,
+    });
+    expect(result.rollingPlan.plans).toHaveLength(1);
+    expect(result.rollingPlan.plans[0].chapterNumber).toBe(1);
+    expect(result.assessment.status).toBe('pass');
+    expect(provider.calls).toEqual(['planner', 'plan-judge']);
+  });
+
   test('Planner provider contract rejects a rolling window larger than three chapters', () => {
     const first = plannerWire().chapters[0];
     expect(PlannerRollingPlanResponseSchema.safeParse({
