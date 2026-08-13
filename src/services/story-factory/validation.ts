@@ -1396,6 +1396,24 @@ export function buildMechanicUseEvents(plan: ChapterPlan): StateEvent[] {
   }));
 }
 
+/**
+ * The active mechanic set is the Planner's working memory for one arc, and
+ * planner latency grows with it: an arc that activated all 21 kernel mechanics
+ * pushed a single plan call to ~10 minutes — past Vercel's 300s ceiling — while
+ * fleet arcs with 3–10 active planned in 1–4 minutes. Enforced only where a new
+ * arc is born (launch and arc lifecycle), never against running artifacts.
+ */
+export const ARC_ACTIVE_MECHANIC_BUDGET = 12;
+
+export function validateArcActivationBudget(arc: Pick<ArcPlan, 'activeMechanicIds'>): void {
+  if (arc.activeMechanicIds.length > ARC_ACTIVE_MECHANIC_BUDGET) {
+    fail(
+      `Arc activates ${arc.activeMechanicIds.length} mechanics; the planner working-set budget is ${ARC_ACTIVE_MECHANIC_BUDGET}. Chọn đúng các mechanic mà beat của arc này thật sự dùng — mechanic không chọn vẫn nằm trong kernel và arc sau kích hoạt lại được.`,
+      { activeMechanicIds: arc.activeMechanicIds, budget: ARC_ACTIVE_MECHANIC_BUDGET },
+    );
+  }
+}
+
 export function validateArcAgainstKernel(kernel: StoryKernel, arc: ArcPlan): void {
   if (!kernel.seriesSpine.stages.some(stage => stage.id === arc.stageId)) {
     fail(`Arc references unknown series stage ${arc.stageId}.`);

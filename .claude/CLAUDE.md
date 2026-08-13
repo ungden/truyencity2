@@ -89,12 +89,14 @@ Notes:
 
 ## Cron
 
-pg_cron is the only scheduler. Secret lives in Supabase Vault as `cron_secret`; every job
-sends `Authorization: Bearer ${CRON_SECRET}`.
+Two schedulers, verified 2026-08-13 against production:
 
-| Job | Schedule | Purpose |
-|---|---|---|
-| `story-factory` | `*/2 * * * *` | The writing pipeline. The only one that matters. |
+- **`story-factory` runs on Vercel Cron** (`vercel.json`, `*/2 * * * *`) — the writing
+  pipeline. It is NOT in `cron.job`, so it cannot be paused from SQL; pausing it means a
+  deploy or the Vercel dashboard.
+- **pg_cron runs the housekeeping jobs** (covers, health check, VIP expiry, RAG archive…),
+  listed in `cron.job`. Secret lives in Supabase Vault as `cron_secret`; every pg_cron job
+  sends `Authorization: Bearer ${CRON_SECRET}`.
 
 Rotating the secret: `openssl rand -hex 32` → `vault.update_secret` → update `CRON_SECRET`
 in Vercel → verify in `cron.job_run_details`.

@@ -66,6 +66,8 @@ import {
   reviewFiveChapterWindow,
   rollingPlanContainsChapter,
   toGeminiResponseSchema,
+  ARC_ACTIVE_MECHANIC_BUDGET,
+  validateArcActivationBudget,
   validateArcResourceReachability,
   validateKernelState,
   validationPasses,
@@ -4486,6 +4488,14 @@ describe('canonical Story Factory', () => {
     expect(result.rollingPlan.plans[0].chapterNumber).toBe(1);
     expect(result.assessment.status).toBe('pass');
     expect(provider.calls).toEqual(['planner', 'plan-judge']);
+  });
+
+  test('a new arc cannot activate more mechanics than the planner working-set budget', () => {
+    const overBudget = Array.from({ length: ARC_ACTIVE_MECHANIC_BUDGET + 1 }, (_, index) => `mech_${index}`);
+    expect(() => validateArcActivationBudget({ activeMechanicIds: overBudget }))
+      .toThrow(/working-set budget/);
+    expect(() => validateArcActivationBudget({ activeMechanicIds: overBudget.slice(0, ARC_ACTIVE_MECHANIC_BUDGET) }))
+      .not.toThrow();
   });
 
   test('Planner provider contract rejects a rolling window larger than three chapters', () => {

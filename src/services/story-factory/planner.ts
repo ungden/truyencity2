@@ -20,11 +20,13 @@ import { geminiProvider } from './provider';
 
 // Defined here, not in release.ts: release → benchmark → planner already exists, so a
 // planner → release import closes a cycle and breaks the production bundle (TDZ at init).
-export const FACTORY_PLANNER_VERSION = 'story-factory-planner-68-code-owns-window-size';
+export const FACTORY_PLANNER_VERSION = 'story-factory-planner-69-arc-mechanic-budget';
 import { EDITOR_SYSTEM_PROMPT, PLANNER_SYSTEM_PROMPT, PLAN_JUDGE_SYSTEM_PROMPT } from './prompts';
 import {
+  ARC_ACTIVE_MECHANIC_BUDGET,
   applyCanonExtension,
   collectPlanAdvisories,
+  validateArcActivationBudget,
   validateArcAgainstKernel,
   validateArcResourceReachability,
   validateRollingPlan,
@@ -2118,6 +2120,7 @@ export async function planArcLifecycle(input: {
   const wireResult = await provider.json({
     model: input.routes.planner,
     system: `${PLANNER_SYSTEM_PROMPT}\nỞ ranh giới arc, quyết định tiếp tục, vào finale hoặc kết thúc tự nhiên. Không kéo dài chỉ để đủ quota.\nNếu status là continue hoặc finale thì nextArc và canonExtension là bắt buộc; nếu status là complete thì cả hai để null. Trong canonExtension, khai báo mechanic mới theo đúng ba mảng mechanicConversions/mechanicCapabilities/mechanicConstraints (mảng rỗng nếu không thêm loại đó); tổng cả ba tối đa tám.\nMọi phần tử mới trong canonExtension đều tiêu một expansion seed: seedId phải lấy NGUYÊN VĂN từ permittedExpansionSeeds của đúng stage đích, kind của seed phải khớp loại phần tử (character/location/promise/world_rule/world_mechanic), và seedId chưa nằm trong usedExpansionSeedIds. Tuyệt đối không tự bịa seedId; nếu stage đích không còn seed của một loại thì không thêm phần tử loại đó.
+activeMechanicIds của nextArc là working set của Planner trong arc đó: chỉ chọn những mechanic mà các beat của arc thật sự dùng (tối đa ${ARC_ACTIVE_MECHANIC_BUDGET}). Mechanic không chọn vẫn nằm nguyên trong kernel — arc sau kích hoạt lại được — nên bỏ bớt không mất gì, còn working set càng gọn thì kế hoạch từng chương càng sắc.
 travelRules là đồ thị CÓ HƯỚNG và mỗi chiều là một phần tử riêng. Với mỗi địa điểm mới, phải khai đủ cả chiều đi lẫn chiều về: main phải tới được nó từ protagonistLocationId và từ nó quay về được. Một cạnh một chiều sẽ bị từ chối và làm hỏng cả arc.
 fromLocationId/toLocationId chỉ được là ID có thật trong existingLocations hoặc ID của địa điểm vừa khai trong chính canonExtension này. Không khai lại cạnh đã có trong existingTravelRules — trùng cạnh cũng bị từ chối.`,
     prompt: JSON.stringify({
@@ -2137,6 +2140,14 @@ fromLocationId/toLocationId chỉ được là ID có thật trong existingLocat
       // `noReturn: [loc_hang_ngam]` after adding a one-way passage.
       existingLocations: input.kernel.locations,
       existingTravelRules: input.kernel.travelRules,
+      // The model picks the next arc's mechanic working set, so it has to see
+      // the inventory it is picking from — name and kind, not full definitions.
+      existingMechanics: input.kernel.worldMechanics.map(mechanic => ({
+        id: mechanic.id,
+        name: mechanic.name,
+        kind: mechanic.kind,
+        activeInCurrentArc: input.arc.activeMechanicIds.includes(mechanic.id),
+      })),
       protagonistLocationId: input.state.characters
         .find(character => character.characterId === input.kernel.protagonistId)?.locationId ?? null,
       permittedExpansionSeeds: Object.fromEntries(input.kernel.seriesSpine.stages.map(stage => [
@@ -2196,6 +2207,7 @@ fromLocationId/toLocationId chỉ được là ID có thật trong existingLocat
     if (next.arcNumber !== input.arc.arcNumber + 1 || next.startChapter !== input.state.chapterNumber + 1) {
       throw new StoryFactoryError('plan_blocked', 'Next arc is not contiguous with committed state.');
     }
+    validateArcActivationBudget(next);
     if (next.plannedEndChapter > input.maximumChapter) {
       throw new StoryFactoryError('plan_blocked', 'Next arc exceeds the hard safety chapter cap.');
     }
