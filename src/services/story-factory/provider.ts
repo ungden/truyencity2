@@ -33,11 +33,26 @@ const PRICING: Record<string, { input: number; output: number }> = {
   // Routed through OpenRouter (model ids contain a vendor slash). Prices from the
   // OpenRouter models endpoint, 2026-08-01.
   'deepseek/deepseek-v4-flash-0731': { input: 0.14, output: 0.28 },
+  // OpenRouter models endpoint, 2026-08-13 (v4-pro released the same day).
+  'deepseek/deepseek-v4-pro-0813': { input: 0.435, output: 0.87 },
   'qwen/qwen3.7-flash': { input: 0.03, output: 0.13 },
   'google/gemini-3.6-flash': { input: 1.5, output: 7.5 },
   'moonshotai/kimi-k3': { input: 3, output: 15 },
   'openai/gpt-5.6-terra': { input: 1, output: 6 },
   'x-ai/grok-4.5': { input: 2, output: 6 },
+};
+
+/**
+ * Per-model wire defaults on the OpenRouter path — same idea as the pricing
+ * table: a row per model, not a new code path. v4-pro defaults to heavy hidden
+ * reasoning (measured 2026-08-13: 4.8k reasoning tokens before prose, blowing
+ * both the 120s chapter budget and the length cap; reasoning off → 3.7k tokens
+ * of clean prose in 65s). Reasoning-off is part of this candidate's tested
+ * identity under routeVersion or-deepseek-v4-pro-writer-experiment — a route
+ * wanting it back on is a different identity and needs its own smoke.
+ */
+const OPENROUTER_MODEL_PARAMS: Record<string, Record<string, unknown>> = {
+  'deepseek/deepseek-v4-pro-0813': { reasoning: { enabled: false } },
 };
 
 export interface ProviderUsage {
@@ -339,7 +354,9 @@ async function openrouterGenerate(input: {
       : input.jsonMode
         ? { response_format: { type: 'json_object' } }
         : {}),
+    ...(OPENROUTER_MODEL_PARAMS[input.model] ?? {}),
   };
+  let formatDowngraded = false;
   for (let attempt = 0; attempt <= RETRY_DELAYS_MS.length; attempt += 1) {
     try {
       if (attempt > 0) await new Promise(resolve => setTimeout(resolve, RETRY_DELAYS_MS[attempt - 1]));
@@ -356,6 +373,19 @@ async function openrouterGenerate(input: {
       });
       if (!response.ok) {
         const detail = await response.text().catch(() => '');
+        // A vendor that has not enabled json_schema yet (DeepSeek v4-pro on its
+        // release day) rejects the response_format TYPE itself. Downgrade the
+        // wire format once to plain JSON mode with the schema stated in-prompt —
+        // the same route on the same model; application Zod still enforces the
+        // real contract afterwards.
+        if (!formatDowngraded && strictSchema && response.status === 400
+          && /response_format type is unavailable/i.test(detail)) {
+          formatDowngraded = true;
+          body.response_format = { type: 'json_object' };
+          (body.messages as Array<{ role: string; content: string }>)[1].content =
+            `${input.prompt}\n\nTrả về đúng một object JSON hợp lệ theo JSON Schema sau, giữ nguyên toàn bộ tên field, không markdown:\n${JSON.stringify(strictSchema)}`;
+          continue;
+        }
         throw new ProviderHttpError(response.status, `OpenRouter ${input.model} ${response.status}: ${detail.slice(0, 500)}`);
       }
       const payload = await response.json();
