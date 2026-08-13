@@ -20,7 +20,7 @@ import { geminiProvider } from './provider';
 
 // Defined here, not in release.ts: release → benchmark → planner already exists, so a
 // planner → release import closes a cycle and breaks the production bundle (TDZ at init).
-export const FACTORY_PLANNER_VERSION = 'story-factory-planner-69-arc-mechanic-budget';
+export const FACTORY_PLANNER_VERSION = 'story-factory-planner-70-author-steering';
 import { EDITOR_SYSTEM_PROMPT, PLANNER_SYSTEM_PROMPT, PLAN_JUDGE_SYSTEM_PROMPT } from './prompts';
 import {
   ARC_ACTIVE_MECHANIC_BUDGET,
@@ -1538,6 +1538,7 @@ export async function planRollingWindow(input: {
   requiredWindowSize?: 1 | 2 | 3;
   recoveryEvidence?: unknown;
   continuityPacket?: ContinuityPacket;
+  authorDirective?: string | null;
   provider?: StoryModelProvider;
   /** Raw candidate checkpoint (from a prior run row); validated and matched internally. */
   resume?: unknown;
@@ -1659,6 +1660,12 @@ export async function planRollingWindow(input: {
           sceneRule: 'Theo dõi vị trí từng người qua từng scene. Code tính shortest path có hướng trên travelEdges; scene.travel phải >= thời gian shortest-path lớn nhất của mọi scene.people đi từ vị trí trước đó tới scene.loc. Không cần tạo scene ở mỗi location trung gian.',
         },
         continuityPacket: input.continuityPacket ?? null,
+        // Author steering: a priority direction for upcoming chapters, applied
+        // through planning choices. It never overrides canon, the ledger, or
+        // validation — when they conflict, canon wins.
+        authorDirective: input.authorDirective?.trim()
+          ? input.authorDirective.trim().slice(0, 1_500)
+          : null,
         nextChapter: input.state.chapterNumber + 1,
         maximumEndChapter: input.arc.plannedEndChapter,
         compactContract: PLANNER_COMPACT_CONTRACT,

@@ -181,6 +181,9 @@ function injectDeterministicMissingDeltaFinding(
 interface PreflightIssue {
   kind: 'continuity' | 'reading';
   category: 'canon' | 'prompt_leak' | 'resource' | 'unnatural_dialogue' | 'expository_prose';
+  // Reading issues may soften to 'moderate' (statistical prose gates); omitted
+  // means 'major', which is what every continuity preflight uses.
+  severity?: 'major' | 'moderate';
   evidence: string;
   conflictingEvidence?: string;
   referenceId?: string;
@@ -204,6 +207,203 @@ interface PreflightIssue {
  */
 const NEGATE_THEN_CORRECT = /(?:^|[.!?…\n]\s*)Không phải\b/gu;
 const NEGATE_THEN_CORRECT_BUDGET = 4;
+
+// ── Prose-craft gates ────────────────────────────────────────────────────────
+// Ported 2026-08-13 from the retired engine (branch ainovel-cli-review) per
+// docs/HANDOFF-prose-craft-factory.md. Same safety philosophy as
+// NEGATE_THEN_CORRECT above: every deterministic finding forces a rewrite and a
+// second failure parks the chapter, so the statistical gates (rhythm, dialogue)
+// are moderate-only and the counting gates fire well above the Writer prompt's
+// own budget. A style nit must not be able to stop a novel.
+
+const escapeRegex = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+const TELL_EMOTION_WORDS = [
+  'vui', 'vui mừng', 'vui sướng', 'mừng rỡ', 'hân hoan', 'hạnh phúc',
+  'buồn', 'buồn bã', 'đau khổ', 'đau lòng', 'chua xót', 'tủi thân',
+  'tức giận', 'giận dữ', 'phẫn nộ', 'bực bội', 'bực tức', 'khó chịu', 'cáu',
+  'sợ', 'sợ hãi', 'hoảng sợ', 'khiếp sợ', 'lo lắng', 'lo sợ', 'bất an',
+  'kinh ngạc', 'ngạc nhiên', 'sửng sốt', 'kinh hãi', 'choáng váng',
+  'hồi hộp', 'phấn khích', 'hưng phấn', 'kích động', 'háo hức',
+  'thất vọng', 'tuyệt vọng', 'chán nản', 'bối rối', 'xấu hổ', 'ngượng ngùng',
+  'xúc động', 'cảm động', 'tự hào', 'hài lòng', 'thỏa mãn', 'mãn nguyện',
+  'ghen tị', 'đố kỵ', 'căm hận', 'căm phẫn', 'cô đơn', 'nhẹ nhõm',
+];
+
+// Unicode-aware boundaries (\p{L}) — ASCII \b breaks on Vietnamese diacritics
+// (\by\b matches the "y" in "mây"). Bare "y" pronoun dropped as collision-prone.
+const PERSON_SUBJECT_RE = /(?<!\p{L})(hắn|gã|nàng|cô ấy|cô|chàng|anh ấy|anh|ông|bà|cậu|lão|nó|bọn họ|họ)(?!\p{L})/iu;
+
+// If the sentence carries the emotion through body, voice, or environment it is
+// at least partially SHOWN — not flagged.
+const EMOTION_CARRIER_RE = new RegExp(
+  [
+    'tim', 'tay', 'chân', 'ngón', 'mắt', 'mặt', 'môi', 'miệng', 'ngực', 'vai',
+    'lưng', 'gáy', 'cổ', 'trán', 'má', 'da', 'máu', 'mồ hôi', 'nước mắt', 'lệ',
+    'run', 'siết', 'nắm', 'nghiến', 'cắn', 'hít', 'thở', 'đập', 'nhịp', 'nuốt',
+    'cười', 'khóc', 'hét', 'gào', 'rít', 'nghẹn', 'lắp bắp', 'giọng',
+    'tái', 'đỏ bừng', 'đỏ mặt', 'nóng bừng', 'lạnh sống lưng', 'sởn', 'nổi da gà',
+    'bước', 'đứng', 'ngồi', 'quỳ', 'ngã', 'lùi', 'giật', 'khựng', 'cứng đờ',
+    'nắm chặt', 'buông', 'đấm', 'đá', 'ném', 'vung',
+  ].map(escapeRegex).join('|'),
+  'i',
+);
+
+const TELL_EMOTION_ALTERNATION = TELL_EMOTION_WORDS
+  .map(escapeRegex)
+  .sort((a, b) => b.length - a.length)
+  .join('|');
+const TELL_EMOTION_RE = new RegExp(
+  `(?:(?:cảm thấy|cảm nhận(?: được| thấy)?)\\s+(?:\\S+\\s+){0,2}(?:${TELL_EMOTION_ALTERNATION}))` +
+  `|(?:(?<!\\p{L})(?:rất|vô cùng|cực kỳ|quá|thật sự|hết sức|đầy)\\s+(?:${TELL_EMOTION_ALTERNATION})(?!\\p{L}))`,
+  'iu',
+);
+
+/**
+ * Narration sentences that name an emotion outright ("hắn tức giận", "nàng rất
+ * vui mừng") with no body/voice/environment carrier. Sentence-per-line splitting
+ * keeps every sample a verbatim span of draft.content. Fires one notch above the
+ * Editor prompt's own soft rule: >4 moderate, >7 major.
+ */
+export function detectRawEmotionTelling(content: string): PreflightIssue | null {
+  let count = 0;
+  const samples: string[] = [];
+  for (const line of content.split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('—') || trimmed.startsWith('-')) continue;
+    for (const raw of trimmed.split(/(?<=[.!?…])\s+/)) {
+      const sentence = raw.trim();
+      if (!sentence || sentence.split(/\s+/).length > 18) continue;
+      if (!PERSON_SUBJECT_RE.test(sentence)) continue;
+      if (!TELL_EMOTION_RE.test(sentence)) continue;
+      if (EMOTION_CARRIER_RE.test(sentence)) continue;
+      count += 1;
+      if (samples.length < 3) samples.push(sentence);
+    }
+  }
+  if (count <= 4) return null;
+  return {
+    kind: 'reading',
+    category: 'expository_prose',
+    severity: count > 7 ? 'major' : 'moderate',
+    evidence: samples[0].slice(0, 200),
+    instruction: `Kể-lể cảm xúc: ${count} câu narration gọi thẳng tên cảm xúc mà không có carrier cơ thể/giọng/môi trường, vd ${samples.map(sample => `"${sample.slice(0, 60)}"`).join(' · ')}. SHOW DON'T TELL — thay "X cảm thấy/rất [cảm xúc]" bằng hành động cơ thể, vi-biểu-cảm hoặc phản ứng môi trường thể hiện cảm xúc đó.`,
+  };
+}
+
+/**
+ * Metronomic prose: flags ONLY when both statistics agree (low coefficient of
+ * variation AND tight clustering around the mean) so an intentionally punchy
+ * action scene is not penalized. Moderate-only.
+ */
+export function detectSentenceRhythmMonotony(content: string): PreflightIssue | null {
+  const sentences: string[] = [];
+  for (const line of content.split('\n')) {
+    for (const raw of line.trim().split(/(?<=[.!?…])\s+/)) {
+      const sentence = raw.replace(/^[—-]\s*/, '').trim();
+      if (sentence && sentence.split(/\s+/).filter(Boolean).length >= 2) sentences.push(sentence);
+    }
+  }
+  const lengths = sentences.map(sentence => sentence.split(/\s+/).filter(Boolean).length);
+  const n = lengths.length;
+  if (n < 40) return null;
+  const mean = lengths.reduce((a, b) => a + b, 0) / n;
+  const std = Math.sqrt(lengths.reduce((a, b) => a + (b - mean) ** 2, 0) / n);
+  const cv = mean > 0 ? std / mean : 0;
+  const clustered = lengths.filter(length => Math.abs(length - mean) <= 3).length / n;
+  if (cv >= 0.38 || clustered <= 0.7) return null;
+  const anchor = sentences.find((_, index) => Math.abs(lengths[index] - mean) <= 3) ?? sentences[0];
+  return {
+    kind: 'reading',
+    category: 'expository_prose',
+    severity: 'moderate',
+    evidence: anchor.slice(0, 200),
+    instruction: `Nhịp câu đơn điệu: ${n} câu dài trung bình ${mean.toFixed(1)} từ, ${Math.round(clustered * 100)}% nằm trong ±3 từ quanh trung bình (CV ${cv.toFixed(2)}) — văn đều như máy đếm nhịp. Trộn nhịp: xen câu cực ngắn (2-5 từ, dứt khoát) với câu dài cuộn (25-35 từ) để tạo nhịp lên-xuống.`,
+  };
+}
+
+/**
+ * "All characters share one voice": needs ≥12 dialogue lines AND four weak
+ * signals agreeing (tight length clustering, almost no questions, almost no
+ * exclamations, low lexical variety). Moderate-only — per-speaker attribution
+ * is too unreliable to hard-gate.
+ */
+export function detectFlatDialogue(content: string): PreflightIssue | null {
+  const originals = content
+    .split('\n')
+    .map(line => line.trim())
+    .filter(line => line.startsWith('—') || line.startsWith('-'));
+  const spoken = originals.map(line => line.replace(/^[—-]\s*/, '').trim()).filter(Boolean);
+  const d = spoken.length;
+  if (d < 12) return null;
+  const lengths = spoken.map(line => line.split(/\s+/).filter(Boolean).length);
+  const mean = lengths.reduce((a, b) => a + b, 0) / d;
+  const clustered = lengths.filter(length => Math.abs(length - mean) <= 3).length / d;
+  const questionShare = spoken.filter(line => line.includes('?')).length / d;
+  const exclamationShare = spoken.filter(line => line.includes('!')).length / d;
+  const words = spoken.join(' ').toLowerCase().split(/\s+/).filter(Boolean);
+  const ttr = words.length > 0 ? new Set(words).size / words.length : 1;
+  if (clustered <= 0.8 || questionShare >= 0.08 || exclamationShare >= 0.08 || ttr >= 0.5) return null;
+  return {
+    kind: 'reading',
+    category: 'unnatural_dialogue',
+    severity: 'moderate',
+    evidence: originals[0].slice(0, 200),
+    instruction: `Thoại phẳng: ${d} câu thoại dài gần đều nhau, gần như không có câu hỏi hay cảm thán, từ vựng lặp (TTR ${ttr.toFixed(2)}) — mọi nhân vật nói cùng một giọng. Tạo khác biệt: người nói cộc lốc/người vòng vo, người hay hỏi ngược, xưng hô và khẩu ngữ riêng theo tính cách.`,
+  };
+}
+
+// Multi-word, literal, high-precision list. Eye/gaze clichés intentionally
+// excluded — the Editor's own reading rules already own those.
+const BLAND_SENSORY_CLICHES: string[] = [
+  'ánh sáng vàng', 'ánh nắng vàng', 'ánh sáng chói', 'ánh sáng le lói',
+  'ánh sáng dịu', 'ánh sáng mờ ảo', 'ánh sáng ấm áp', 'tia sáng le lói',
+  'gió nhẹ', 'làn gió nhẹ', 'cơn gió nhẹ', 'gió thổi nhẹ', 'gió lùa qua',
+  'làn gió thoảng', 'hương thơm thoang thoảng', 'mùi hương thoang thoảng',
+  'thoang thoảng hương', 'hương thơm dịu nhẹ', 'âm thanh vang vọng',
+  'tiếng vang vọng', 'vang vọng khắp', 'không khí lạnh lẽo', 'không khí ngột ngạt',
+  'bầu không khí căng thẳng', 'màu sắc rực rỡ', 'rực rỡ sắc màu',
+  'lung linh huyền ảo', 'lấp lánh ánh sáng', 'êm dịu nhẹ nhàng', 'mát lạnh dễ chịu',
+];
+
+/**
+ * Sensory filler that is "present" but bland — stock phrases that pass any
+ * sense-count heuristic while reading like filler. ≥5 moderate, ≥10 major
+ * (major only at an extreme count, per the calibrated thresholds).
+ */
+export function detectBlandSensoryCliche(content: string): PreflightIssue | null {
+  const lower = content.toLowerCase();
+  let total = 0;
+  let firstIndex = -1;
+  let firstLength = 0;
+  const hits: string[] = [];
+  for (const phrase of BLAND_SENSORY_CLICHES) {
+    const matches = [...lower.matchAll(new RegExp(escapeRegex(phrase), 'g'))];
+    if (!matches.length) continue;
+    total += matches.length;
+    hits.push(`${phrase} (${matches.length})`);
+    const index = matches[0].index ?? -1;
+    if (index >= 0 && (firstIndex === -1 || index < firstIndex)) {
+      firstIndex = index;
+      firstLength = phrase.length;
+    }
+  }
+  if (total < 5 || firstIndex === -1) return null;
+  return {
+    kind: 'reading',
+    category: 'expository_prose',
+    severity: total >= 10 ? 'major' : 'moderate',
+    evidence: content.slice(firstIndex, firstIndex + firstLength),
+    instruction: `Tả giác quan sáo rỗng: ${total} cụm bland [${hits.slice(0, 8).join(', ')}]. Sensory "đủ số lượng" nhưng nhạt. Cụ thể hoá ít nhất một nửa bằng chi tiết riêng — con số, thời điểm, chất liệu, danh từ riêng — vd thay "gió nhẹ" bằng "gió tây nam mang mùi muối từ cửa sông".`,
+  };
+}
+
+const PROSE_CRAFT_GATES = [
+  detectRawEmotionTelling,
+  detectSentenceRhythmMonotony,
+  detectFlatDialogue,
+  detectBlandSensoryCliche,
+];
 
 export interface ChapterPipelineResult {
   decision: 'publish';
@@ -312,6 +512,12 @@ function preflight(
     });
     break;
   }
+  // Prose-craft gates run last so the cap of three prefers the high-precision
+  // continuity checks above when a draft trips everything at once.
+  for (const gate of PROSE_CRAFT_GATES) {
+    const issue = gate(draft.content);
+    if (issue) issues.push(issue);
+  }
   return issues.slice(0, 3);
 }
 
@@ -321,6 +527,7 @@ function editorPrompt(input: {
   plan: ChapterPlan;
   draft: ChapterDraft;
   deterministicIssues: PreflightIssue[];
+  authorDirective?: string | null;
 }): string {
   return JSON.stringify({
     task: 'Đánh giá chương theo canon và hiệu quả đọc. Trả đúng EditorAssessment.',
@@ -329,6 +536,10 @@ function editorPrompt(input: {
     chapterPlan: input.plan,
     draft: input.draft,
     deterministicIssues: input.deterministicIssues,
+    // Author steering is a compliance dimension, never a canon override: prose
+    // ignoring a clear directive is a legitimate reading finding, but following
+    // a directive never excuses a continuity violation.
+    authorDirective: input.authorDirective ?? null,
     audit: {
       findings: 'Nếu có lỗi, trả 1-3 finding. Category continuity dùng evidence nguyên văn từ draft và referenceId thuộc allowedArtifactReferenceIds; code tự lấy artifact evidence nên không được chép lại. Category reading luôn scope=prose, evidence nguyên văn; do provider cần một schema phẳng, hãy chọn phần tử đầu tiên của allowedArtifactReferenceIds cho referenceId (code sẽ bỏ qua anchor này ở reading issue). Không tự báo prompt leak; deterministic preflight chịu trách nhiệm lỗi đó.',
       allowedArtifactReferenceIds: [...collectStableIds({
@@ -389,7 +600,7 @@ function mergePreflight(assessment: EditorAssessment, deterministic: PreflightIs
       category: issue.category === 'expository_prose'
         ? ('expository_prose' as const)
         : ('unnatural_dialogue' as const),
-      severity: 'major' as const,
+      severity: issue.severity ?? ('major' as const),
       evidence: issue.evidence,
       instruction: issue.instruction,
     })),
@@ -553,6 +764,7 @@ export async function assessStoryDraft(input: {
   state: unknown;
   plan: ChapterPlan;
   draft: ChapterDraft;
+  authorDirective?: string | null;
 }): Promise<{ assessment: EditorAssessment; usage: ProviderUsage }> {
   const deterministicIssues = preflight(input.draft, input.plan, input.kernel);
   const deltaIds = [...narrativelyObservableDeltaIds(input.kernel, input.plan)];
@@ -640,6 +852,7 @@ export interface ChapterStageInput {
   nextPlan?: ChapterPlan;
   previousChapter?: string;
   continuityPacket?: ContinuityPacket;
+  authorDirective?: string | null;
   routes: ModelRoutes;
   provider?: StoryModelProvider;
 }
@@ -751,6 +964,7 @@ export async function draftStoryChapter(input: ChapterStageInput): Promise<Chapt
       state: contexts.editorState,
       plan: input.plan,
       draft: initial.value,
+      authorDirective: contexts.brief.authorDirective,
     });
     initialAssessment = firstAssessment.assessment;
     usages.push(firstAssessment.usage);
@@ -847,6 +1061,7 @@ export async function reviseStoryChapter(
       state: contexts.editorState,
       plan: input.plan,
       draft: revision.value,
+      authorDirective: contexts.brief.authorDirective,
     });
     finalAssessment = secondAssessment.assessment;
     usages.push(secondAssessment.usage);

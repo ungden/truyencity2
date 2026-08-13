@@ -189,6 +189,7 @@ None of these gate production. They exist for model selection and forensic audit
 | `factory:model-bakeoff` | Pairwise writer comparison over a frozen corpus. |
 | `factory:benchmark` | The retired four-run validation chain, kept for offline A/B analysis only. |
 | `factory-golden-audit.ts` / `factory-audit-export.ts` | Re-assess published output; gzip audit export. |
+| `set-author-directive.ts` | Author steering: set/get/clear/list chỉ đạo free-text cho một bộ đang chạy (`ai_story_projects.author_directive`, cap 1.500 ký tự). Planner và Writer brief đọc nó từ chương kế tiếp; Editor chấm mức tuân thủ. Không bao giờ thắng canon/validator. |
 
 Corpora carry both `engineRelease` and `engineRevision`; the staleness guards require both
 to match, so corpora from different engine generations are never compared head-to-head.

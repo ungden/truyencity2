@@ -70,6 +70,9 @@ interface FactoryProjectRow {
   story_state: unknown;
   engine_release: string;
   model_routes: unknown;
+  // Free-text author steering for the running novel (nullable). Read by the
+  // Planner and the Writer brief from the next chapter on; never canon.
+  author_directive: string | null;
 }
 
 export interface FactoryTickResult {
@@ -455,6 +458,7 @@ async function runPlan(db: SupabaseClient, job: FactoryJobRow, project: FactoryP
       // One chapter cuts the chained bookkeeping to a third; the next window is
       // planned fresh from committed state.
       requiredWindowSize: job.plan_feedback ? 1 : undefined,
+      authorDirective: project.author_directive,
       provider,
       resume,
       onCheckpoint: async checkpoint => {
@@ -563,6 +567,7 @@ async function runChapter(db: SupabaseClient, job: FactoryJobRow, project: Facto
       nextPlan,
       previousChapter,
       continuityPacket,
+      authorDirective: project.author_directive,
       routes,
       provider,
     });
@@ -737,6 +742,7 @@ async function runRevision(db: SupabaseClient, job: FactoryJobRow, project: Fact
       nextPlan,
       previousChapter,
       continuityPacket,
+      authorDirective: project.author_directive,
       routes: routesResult.data,
       provider,
       pending,

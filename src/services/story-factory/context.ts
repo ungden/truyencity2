@@ -23,6 +23,10 @@ export interface ContextManifestEntry {
 export interface WriterBrief {
   story: { title: string };
   chapterNumber: number;
+  // Free-text steering from the author for the running novel, applied from the
+  // next chapter on. Data in the brief, never concatenated into the system
+  // prompt. Null when the author has nothing queued.
+  authorDirective: string | null;
   cast: unknown[];
   canonicalUnits: string[];
   physicalLaws: string[];
@@ -194,6 +198,7 @@ export function buildWriterBrief(input: {
   stateAfter?: StoryState;
   nextPlan?: ChapterPlan;
   continuityPacket?: ContinuityPacket;
+  authorDirective?: string | null;
 }): WriterBrief {
   const ids = relevantIds(input.plan);
   ids.characters.add(input.kernel.protagonistId);
@@ -260,6 +265,10 @@ export function buildWriterBrief(input: {
   return {
     story: { title: input.kernel.title },
     chapterNumber: input.plan.chapterNumber,
+    // Code owns the cap: 1500 chars, whitespace-only collapses to null.
+    authorDirective: input.authorDirective?.trim()
+      ? input.authorDirective.trim().slice(0, 1_500)
+      : null,
     canonicalUnits: [...new Set(input.kernel.resources.flatMap(resource =>
       resource.kind === 'numeric' ? [resource.unit] : []))],
     // Canon laws governing this chapter, verbatim. The Writer used to be denied all
@@ -353,6 +362,7 @@ export function buildChapterContexts(input: {
   nextPlan?: ChapterPlan;
   previousChapter?: string;
   continuityPacket?: ContinuityPacket;
+  authorDirective?: string | null;
 }) {
   const brief = buildWriterBrief(input);
   const previousTail = input.previousChapter ? selectPreviousTail(input.previousChapter) : '';

@@ -46,6 +46,10 @@ import {
   buildContinuityPacketFromEvents,
   buildPlannerMechanicGuide,
   buildWriterBrief,
+  detectBlandSensoryCliche,
+  detectFlatDialogue,
+  detectRawEmotionTelling,
+  detectSentenceRhythmMonotony,
   buildSetupCheckpointProvenance,
   bookSetupCheckpointCost,
   createLaunchWorldWireSchema,
@@ -4985,5 +4989,79 @@ describe('canonical Story Factory', () => {
     expect(launchStatePrompt).toBeDefined();
     expect(launchStatePrompt).not.toContain('openingSample');
     expect(launchStatePrompt).not.toContain('selectedSimulation');
+  });
+});
+
+describe('prose-craft gates', () => {
+  test('raw emotion telling fires above the budget and escalates to major', () => {
+    const telly = (count: number) => Array.from({ length: count }, (_, index) => (
+      `Hắn cảm thấy tức giận vì chuyện thứ ${index + 1}.`
+    )).join('\n');
+    expect(detectRawEmotionTelling(telly(4))).toBeNull();
+    const moderate = detectRawEmotionTelling(telly(5));
+    expect(moderate).toMatchObject({ kind: 'reading', category: 'expository_prose', severity: 'moderate' });
+    expect(telly(5)).toContain(moderate!.evidence);
+    expect(detectRawEmotionTelling(telly(8))).toMatchObject({ severity: 'major' });
+  });
+
+  test('emotion carried through the body or spoken in dialogue is not telling', () => {
+    const shown = Array.from({ length: 8 }, (_, index) => (
+      `Hắn rất tức giận, bàn tay siết chặt mép bàn thứ ${index + 1}.`
+    )).join('\n');
+    expect(detectRawEmotionTelling(shown)).toBeNull();
+    const dialogue = Array.from({ length: 8 }, () => '— Ta cảm thấy tức giận lắm.').join('\n');
+    expect(detectRawEmotionTelling(dialogue)).toBeNull();
+  });
+
+  test('metronomic sentence rhythm fires moderate with a verbatim anchor', () => {
+    const flat = Array.from({ length: 45 }, (_, index) => (
+      `Mai bước xuống bến cá lúc trời vừa sáng ${index + 1}.`
+    )).join(' ');
+    const issue = detectSentenceRhythmMonotony(flat);
+    expect(issue).toMatchObject({ kind: 'reading', category: 'expository_prose', severity: 'moderate' });
+    expect(flat).toContain(issue!.evidence);
+    const varied = Array.from({ length: 45 }, (_, index) => (index % 2 === 0
+      ? 'Gió dừng.'
+      : `Mai đứng rất lâu trên bến cá nhìn từng chiếc thuyền thúng lặng lẽ trôi qua vũng nước đọng ánh đèn dầu số ${index}.`
+    )).join(' ');
+    expect(detectSentenceRhythmMonotony(varied)).toBeNull();
+  });
+
+  test('flat dialogue needs all four signals to agree', () => {
+    const flat = Array.from({ length: 14 }, () => '— Tôi biết chuyện đó rồi mà.').join('\n');
+    const issue = detectFlatDialogue(flat);
+    expect(issue).toMatchObject({ kind: 'reading', category: 'unnatural_dialogue', severity: 'moderate' });
+    expect(flat).toContain(issue!.evidence);
+    const lively = Array.from({ length: 14 }, (_, index) => (index % 3 === 0
+      ? '— Chú nói thật đấy à?'
+      : `— Tôi biết chuyện đó rồi mà ${index}.`
+    )).join('\n');
+    expect(detectFlatDialogue(lively)).toBeNull();
+  });
+
+  test('bland sensory clichés escalate by count and anchor verbatim', () => {
+    const base = 'Mai nhìn ra biển. ';
+    const moderate = base + Array.from({ length: 5 }, () => 'Ánh sáng vàng phủ lên làn gió nhẹ ngoài khơi.').join(' ');
+    expect(detectBlandSensoryCliche(base.repeat(3))).toBeNull();
+    const issue = detectBlandSensoryCliche(moderate);
+    expect(issue).not.toBeNull();
+    expect(moderate).toContain(issue!.evidence);
+    expect(detectBlandSensoryCliche(moderate + moderate)).toMatchObject({ severity: 'major' });
+  });
+
+  test('author directive is trimmed, capped and null when blank', () => {
+    const brief = buildWriterBrief({
+      kernel,
+      state: initialState,
+      plan: plan(1),
+      authorDirective: `  ${'x'.repeat(2_000)}  `,
+    });
+    expect(brief.authorDirective).toHaveLength(1_500);
+    expect(buildWriterBrief({
+      kernel, state: initialState, plan: plan(1), authorDirective: '   ',
+    }).authorDirective).toBeNull();
+    expect(buildWriterBrief({
+      kernel, state: initialState, plan: plan(1),
+    }).authorDirective).toBeNull();
   });
 });
