@@ -45,6 +45,35 @@ A quiet profession, cozy routine or technical process may supply texture, but it
 be the primary reader fantasy. The concept needs competition, power, status, wealth,
 recognition or territory at a scale the reader can anticipate from the package.
 
+The factory materializes this as a structured `marketBlueprint`, not prompt-only advice:
+
+- `familiarArena` + `noveltyCollision`: a legible category with one fresh collision;
+- `protagonistStartingPosition` + `coreAdvantage`: the starting disadvantage and the
+  repeatable advantage that changes it;
+- `comparisonEngine`: the market, ranking, exam, battle, auction, territory or other
+  causal channel that makes gains visible to interested actors;
+- `worldConflictEngine`: scarce resources, access rules and power tiers that keep creating
+  conflict after the first antagonist loses;
+- exact payoff checkpoints at chapters 1, 3, 5, 7 and 10;
+- a 6–8-step scale ladder that changes arena, status prize, opposition class and how the
+  advantage evolves.
+
+### World and long setup
+
+The world must create decisions and competition. A launch requires at least four meaningful
+geographies, four institutions with different interests and two operating systems, including
+both value creation and a way value/status is distributed or compared. Decorative lore does
+not count.
+
+The 800–1,200-chapter spine must have at least three independent progression tracks and six
+promises. Every stage after the first seeds at least two concrete expansions. Moving to a new
+stage must change the opponent class and the use of the core advantage, not merely rename the
+same workshop, village or monster tier.
+
+The first 20–30 chapter arc is split into mini-cycles and must cash the title promise early.
+It cannot spend the whole arc repairing equipment, gathering materials, learning the world or
+fighting one antagonist through repeated variations of the same exchange.
+
 ### Title and synopsis
 
 - Title: 7–26 Vietnamese words; preferred form is

@@ -13,6 +13,7 @@ import {
   InitialArcPlanSchema,
   InitialStoryStateSchema,
   LaunchStateSchema,
+  MarketBlueprintSchema,
   PlanAssessmentSchema,
   type ArcPlan,
   type ChapterPlan,
@@ -4871,6 +4872,35 @@ describe('canonical Story Factory', () => {
   });
 
   test('Concept Lab grounds all concepts before blind ranking and validates the launch pack', async () => {
+    const marketBlueprint = MarketBlueprintSchema.parse({
+      familiarArena: 'Thời đại đổi mới và cuộc cạnh tranh giành quyền định giá hải sản.',
+      noveltyCollision: 'Kiến thức chuỗi lạnh hiện đại va vào một làng biển chưa có điện lạnh ổn định.',
+      protagonistStartingPosition: 'Hải trở về trong một gia đình thiếu ăn, không vốn và bị mối thu mua giữ đầu ra.',
+      coreAdvantage: 'Hải nhìn được điểm mất giá trong cả chuỗi và biến phế liệu thành lợi thế bảo quản có thể nâng cấp.',
+      comparisonEngine: 'Giá mua công khai, hợp đồng và quyền chọn đầu ra khiến từng chủ ghe trực tiếp so chất lượng và lợi nhuận.',
+      worldConflictEngine: 'Nguồn lạnh, luồng hàng, giấy phép và quyền phân phối khan hiếm gọi ra lớp gatekeeper lớn hơn ở mỗi địa bàn.',
+      earlyPayoffs: [1, 3, 5, 7, 10].map((byChapter, index) => ({
+        byChapter,
+        payoff: `Payoff hữu hình mốc ${byChapter}: hàng, vốn hoặc quyền mặc cả tăng thật trước mắt người có lợi ích.`,
+        visibleTo: `Người mua và chủ ghe trực tiếp ở mốc ${byChapter}.`,
+        positionChange: `Hải tiến thêm một bậc quyền lựa chọn có thể kiểm chứng ở mốc ${byChapter}.`,
+        nextPressure: `Một gatekeeper có quyền lực cao hơn phản ứng với lợi ích bị đổi ở mốc ${byChapter}.`,
+      })),
+      scaleLadder: [
+        ['Gia đình', 'Bãi ngang và căn nhà đang thế chấp.', 'Chủ nợ cùng mối thu mua độc quyền.'],
+        ['Làng biển', 'Bến cá nơi các chủ ghe công khai chọn đầu ra.', 'Nghiệp đoàn vật tư kiểm soát dầu và đá.'],
+        ['Liên tỉnh', 'Tuyến kho lạnh và hợp đồng giữa nhiều cảng.', 'Liên minh phân phối nắm xe tải cùng kho trung chuyển.'],
+        ['Quốc gia', 'Sàn hợp đồng thực phẩm và chuỗi bán lẻ toàn quốc.', 'Tập đoàn chế biến sở hữu chuẩn ngành và vốn lớn.'],
+        ['Thị trường quốc tế', 'Cảng xuất khẩu cùng mạng kiểm định xuyên biên giới.', 'Nhà nhập khẩu và hãng logistics bảo vệ quota toàn cầu.'],
+        ['Giá trị di sản', 'Mạng hợp tác xã tự vận hành tại nhiều vùng duyên hải.', 'Khủng hoảng tài nguyên và nhóm lợi ích muốn thâu tóm hệ thống.'],
+      ].map(([scope, arena, oppositionClass], index) => ({
+        scope,
+        arena,
+        statusPrize: `Quyền định giá hoặc phân phối mới của bậc ${index + 1} mà main chưa từng nắm.`,
+        oppositionClass,
+        advantageEvolution: `Lợi thế chuỗi lạnh đổi sang biến thể tổ chức và công nghệ riêng của bậc ${index + 1}.`,
+      })),
+    });
     const candidate = (id: string) => ({
       id, workingTitle: `Trùng Sinh Làng Biển: Ta Đưa Cả Nhà Ăn No ${id}`, premise: 'Một premise đủ dài để kiểm tra khả năng triển khai truyện nối tiếp.',
       protagonistContradiction: 'Muốn cứu gia đình nhưng không thể dựa mãi vào ký ức tương lai.',
@@ -4878,6 +4908,7 @@ describe('canonical Story Factory', () => {
       rewardLoop: 'Phát hiện cơ hội, lao động, bán hàng rồi tái đầu tư cho gia đình.',
       conflictEconomy: 'Thời tiết, vốn và đầu ra phản ứng theo lợi ích thay vì phản diện ngu.',
       mechanismFingerprint: `mechanism-${id}`, rewardLoopFingerprint: `reward-${id}`, conflictEconomyFingerprint: `conflict-${id}`,
+      marketBlueprint,
       seriality30: Array.from({ length: 6 }, (_, index) => `Biến thể nhân quả đủ dài số ${index + 1}`),
       seriality1000: Array.from({ length: 8 }, (_, index) => `Arena dài hạn số ${index + 1} đổi quy mô và nguồn xung đột`),
       earlyEndingRisk: 'Cơ chế sẽ cạn sớm nếu chỉ lặp bán hàng; mỗi stage phải đổi arena, giới hạn và lợi ích.',
@@ -4885,10 +4916,69 @@ describe('canonical Story Factory', () => {
     const a = Array.from({ length: 6 }, (_, index) => candidate(`a${index + 1}`));
     const b = Array.from({ length: 6 }, (_, index) => candidate(`b${index + 1}`));
     const selected = a[0];
+    const launchStages = seriesStages.map((stage, index) => ({
+      ...stage,
+      expansionSeeds: index === 0 ? stage.expansionSeeds : [
+        { id: `seed_stage_${index + 1}_gate`, kind: 'character' as const, description: `Gatekeeper mới của bậc ${index + 1}.` },
+        { id: `seed_stage_${index + 1}_arena`, kind: 'location' as const, description: `Arena mới của bậc ${index + 1}.` },
+      ],
+    }));
+    const extraPromises = [
+      { id: 'promise_5', description: 'Giành quyền định giá ở thị trường quốc gia.' },
+      { id: 'promise_6', description: 'Xây một tổ chức tự vận hành sau khi Hải rời quyền điều hành.' },
+    ];
+    const extraLongPromises = [
+      { promiseId: 'promise_5', openedStageId: 'stage_3', dueStageId: 'stage_7', payoff: 'Hải giành quyền định giá ở thị trường quốc gia.' },
+      { promiseId: 'promise_6', openedStageId: 'stage_4', dueStageId: 'stage_8', payoff: 'Tổ chức của Hải tự vận hành và bảo vệ quyền lợi người làm nghề.' },
+    ];
+    const launchKernel: StoryKernel = {
+      ...kernel,
+      worldModel: {
+        ...kernel.worldModel,
+        geography: [
+          ...kernel.worldModel.geography,
+          { id: 'geo_province', name: 'Tỉnh cảng', role: 'Địa bàn phân phối liên tỉnh và kiểm định.', constraints: ['Cần giấy phép và sản lượng ổn định.'] },
+          { id: 'geo_export', name: 'Cảng xuất khẩu', role: 'Arena hợp đồng và tiêu chuẩn quốc tế.', constraints: ['Chất lượng và truy xuất phải kiểm chứng được.'] },
+        ],
+        institutions: [
+          ...kernel.worldModel.institutions,
+          { id: 'inst_regulator', name: 'Cơ quan kiểm định', agenda: 'Giữ chuẩn và quyền cấp phép.', authority: 'Cấp hoặc từ chối giấy chứng nhận.', resources: 'Phòng kiểm nghiệm và hồ sơ pháp lý.' },
+          { id: 'inst_distributor', name: 'Liên minh phân phối', agenda: 'Bảo vệ biên lợi nhuận liên tỉnh.', authority: 'Kiểm soát kho và hợp đồng lớn.', resources: 'Kho lạnh, xe tải và vốn lưu động.' },
+        ],
+        systems: [
+          ...kernel.worldModel.systems,
+          { id: 'system_contract_rank', name: 'Thứ bậc hợp đồng', rules: ['Chất lượng và sản lượng quyết định cấp hợp đồng.'], limits: ['Mỗi cấp đòi hồ sơ và năng lực giao hàng cao hơn.'], costs: ['Kiểm định, bảo lãnh và rủi ro phạt hợp đồng.'] },
+        ],
+      },
+      progressionTracks: [
+        ...kernel.progressionTracks,
+        { id: 'track_organization', name: 'Quyền lực tổ chức', initialState: 'Gia đình tự làm mọi việc.', terminalState: 'Một tổ chức liên vùng tự vận hành.', milestones: [
+          { id: 'milestone_org_1', stageId: 'stage_1', state: 'Có nhóm cộng tác đầu tiên.' },
+          { id: 'milestone_org_8', stageId: 'stage_8', state: 'Tổ chức tự vận hành liên vùng.' },
+        ] },
+      ],
+      seriesSpine: { ...kernel.seriesSpine, stages: launchStages },
+      promises: [...kernel.promises, ...extraPromises],
+      longPromises: [...kernel.longPromises, ...extraLongPromises],
+      endingDirection: { ...kernel.endingDirection, promisesToResolve: [...kernel.endingDirection.promisesToResolve, 'promise_5', 'promise_6'] },
+    };
     const pack: LaunchPack = {
       schemaVersion: 2, selectedConceptId: 'concept_a_01',
-      kernel: { ...kernel, mechanismFingerprint: selected.mechanismFingerprint, rewardLoopFingerprint: selected.rewardLoopFingerprint, conflictEconomyFingerprint: selected.conflictEconomyFingerprint },
-      arc: { ...arc, startChapter: 1 }, initialState: InitialStoryStateSchema.parse(initialState),
+      kernel: { ...launchKernel, mechanismFingerprint: selected.mechanismFingerprint, rewardLoopFingerprint: selected.rewardLoopFingerprint, conflictEconomyFingerprint: selected.conflictEconomyFingerprint },
+      arc: {
+        ...arc,
+        startChapter: 1,
+        terminalChanges: ['Có khách hàng đầu tiên.', 'Có vốn quay vòng.', 'Có quyền chọn đầu ra độc lập.'],
+        activeConflicts: ['Thiếu vốn và hàng dễ hỏng.', 'Mối thu mua bảo vệ quyền định giá.'],
+        progression: ['Payoff chương 1.', 'Payoff chương 3.', 'Payoff chương 5.', 'Payoff chương 7.', 'Payoff chương 10.'],
+      }, initialState: InitialStoryStateSchema.parse({
+        ...initialState,
+        promises: [
+          ...initialState.promises,
+          { promiseId: 'promise_5', status: 'open' },
+          { promiseId: 'promise_6', status: 'open' },
+        ],
+      }),
       coverPrompt: 'Một làng biển Việt Nam cuối thập niên tám mươi lúc bình minh, thuyền gỗ và sân phơi cá, không chữ.',
     };
     const openingSample = Array.from({ length: 650 }, (_, index) => (

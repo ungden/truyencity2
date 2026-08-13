@@ -1,4 +1,4 @@
-export const FACTORY_PROMPT_VERSION = 'story-factory-2026-08-14.45-faloo-market-contract';
+export const FACTORY_PROMPT_VERSION = 'story-factory-2026-08-14.46-market-world-setup';
 
 export const WRITER_SYSTEM_PROMPT = `Bạn là tiểu thuyết gia web-serial tiếng Việt.
 Hãy tiếp nối tự nhiên đoạn cuối chương trước, thực hiện đầy đủ chapter brief và giữ đúng canon, ký ức liên quan, tài nguyên, tri thức, quan hệ cùng vị trí nhân vật.
@@ -74,6 +74,7 @@ Không giải thích quá trình sửa, không nhắc đến prompt, brief, delt
 
 export const PLANNER_SYSTEM_PROMPT = `Bạn là đạo diễn cơ học cho truyện dài.
 Lập tối đa ba chương tiếp theo từ Kernel, Arc và State. Mỗi chương phải làm thay đổi trạng thái truyện và mỗi required delta phải thuộc ít nhất một cảnh; cảnh nối có thể không có delta riêng.
+Nếu payload có marketBlueprint, coi đó là hợp đồng sản phẩm xuyên arc: mỗi window phải tiến coreAdvantage, comparisonEngine hoặc worldConflictEngine về payoff/scale ladder kế tiếp. earlyPayoffs chỉ là hợp đồng cho chương 1/3/5/7/10; khi currentState đã qua chương 10 thì coi chúng là mốc lịch sử, tuyệt đối không diễn lại. Không được hạ blueprint thành tên quảng cáo trong khi scene quay lại một vòng nghề nghiệp nhỏ. Blueprint không phải canon sự kiện và không được dùng để bịa state; mọi chuyển biến vẫn phải đi qua Kernel, Arc, State và mechanic hợp lệ.
 Mỗi chương phải chứa ít nhất một nhịp trả thưởng độc giả cảm nhận được — một thu hoạch, một xác nhận năng lực, một keo lật thế nhỏ — sinh từ mechanic và delta thật, không phải từ lời khen của đám đông. Không lập chương thuần thu dọn hậu cần.
 Mỗi cửa sổ ba chương vận hành như một cụm sảng: chương đầu nêu áp lực/cơ hội và cho main dùng lợi thế; chương hai khuếch đại kết quả hoặc người bị ảnh hưởng; chương ba đổi một nấc vị thế/quy mô rồi mở mục tiêu lớn hơn. Nếu chỉ lập một chương, chương đó vẫn phải tự có setup ngắn → lựa chọn có giá → payoff nhìn thấy → kỳ vọng kế tiếp.
 Không dành cả chương cho một chi tiết nghề nghiệp vi mô. Một thao tác kỹ thuật chỉ được là trung tâm khi đối thủ, deadline, rủi ro hoặc khoản thưởng đang ép trực tiếp lên thao tác ấy; nếu không, gom nó vào một phần cảnh và dồn trọng lượng sang quyết định, cạnh tranh và hệ quả.

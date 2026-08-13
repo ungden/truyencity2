@@ -17,10 +17,11 @@ import {
 import type { ContinuityPacket } from './memory';
 import type { ProviderUsage, StoryModelProvider } from './provider';
 import { geminiProvider } from './provider';
+import type { MarketBlueprint } from './setup';
 
 // Defined here, not in release.ts: release → benchmark → planner already exists, so a
 // planner → release import closes a cycle and breaks the production bundle (TDZ at init).
-export const FACTORY_PLANNER_VERSION = 'story-factory-planner-70-author-steering';
+export const FACTORY_PLANNER_VERSION = 'story-factory-planner-71-market-blueprint';
 import { EDITOR_SYSTEM_PROMPT, PLANNER_SYSTEM_PROMPT, PLAN_JUDGE_SYSTEM_PROMPT } from './prompts';
 import {
   ARC_ACTIVE_MECHANIC_BUDGET,
@@ -1539,6 +1540,7 @@ export async function planRollingWindow(input: {
   recoveryEvidence?: unknown;
   continuityPacket?: ContinuityPacket;
   authorDirective?: string | null;
+  marketBlueprint?: MarketBlueprint | null;
   provider?: StoryModelProvider;
   /** Raw candidate checkpoint (from a prior run row); validated and matched internally. */
   resume?: unknown;
@@ -1666,6 +1668,7 @@ export async function planRollingWindow(input: {
         authorDirective: input.authorDirective?.trim()
           ? input.authorDirective.trim().slice(0, 1_500)
           : null,
+        marketBlueprint: input.marketBlueprint ?? null,
         nextChapter: input.state.chapterNumber + 1,
         maximumEndChapter: input.arc.plannedEndChapter,
         compactContract: PLANNER_COMPACT_CONTRACT,
@@ -2102,6 +2105,7 @@ export async function planArcLifecycle(input: {
   minimumCompletionChapter: number;
   maximumChapter: number;
   routes: ModelRoutes;
+  marketBlueprint?: MarketBlueprint | null;
   provider?: StoryModelProvider;
 }): Promise<{
   lifecycle: ArcLifecycle;
@@ -2126,12 +2130,13 @@ export async function planArcLifecycle(input: {
   }).strict();
   const wireResult = await provider.json({
     model: input.routes.planner,
-    system: `${PLANNER_SYSTEM_PROMPT}\nỞ ranh giới arc, quyết định tiếp tục, vào finale hoặc kết thúc tự nhiên. Không kéo dài chỉ để đủ quota.\nNếu status là continue hoặc finale thì nextArc và canonExtension là bắt buộc; nếu status là complete thì cả hai để null. Trong canonExtension, khai báo mechanic mới theo đúng ba mảng mechanicConversions/mechanicCapabilities/mechanicConstraints (mảng rỗng nếu không thêm loại đó); tổng cả ba tối đa tám.\nMọi phần tử mới trong canonExtension đều tiêu một expansion seed: seedId phải lấy NGUYÊN VĂN từ permittedExpansionSeeds của đúng stage đích, kind của seed phải khớp loại phần tử (character/location/promise/world_rule/world_mechanic), và seedId chưa nằm trong usedExpansionSeedIds. Tuyệt đối không tự bịa seedId; nếu stage đích không còn seed của một loại thì không thêm phần tử loại đó.
+    system: `${PLANNER_SYSTEM_PROMPT}\nỞ ranh giới arc, quyết định tiếp tục, vào finale hoặc kết thúc tự nhiên. Không kéo dài chỉ để đủ quota.\nNếu có marketBlueprint, arc tiếp theo phải tiến sang nấc scaleLadder phù hợp hoặc làm thay đổi thực chất coreAdvantage/comparisonEngine/worldConflictEngine; cấm chỉ đổi tên địa điểm hay thay một phản diện cùng cấp.\nNếu status là continue hoặc finale thì nextArc và canonExtension là bắt buộc; nếu status là complete thì cả hai để null. Trong canonExtension, khai báo mechanic mới theo đúng ba mảng mechanicConversions/mechanicCapabilities/mechanicConstraints (mảng rỗng nếu không thêm loại đó); tổng cả ba tối đa tám.\nMọi phần tử mới trong canonExtension đều tiêu một expansion seed: seedId phải lấy NGUYÊN VĂN từ permittedExpansionSeeds của đúng stage đích, kind của seed phải khớp loại phần tử (character/location/promise/world_rule/world_mechanic), và seedId chưa nằm trong usedExpansionSeedIds. Tuyệt đối không tự bịa seedId; nếu stage đích không còn seed của một loại thì không thêm phần tử loại đó.
 activeMechanicIds của nextArc là working set của Planner trong arc đó: chỉ chọn những mechanic mà các beat của arc thật sự dùng (tối đa ${ARC_ACTIVE_MECHANIC_BUDGET}). Mechanic không chọn vẫn nằm nguyên trong kernel — arc sau kích hoạt lại được — nên bỏ bớt không mất gì, còn working set càng gọn thì kế hoạch từng chương càng sắc.
 travelRules là đồ thị CÓ HƯỚNG và mỗi chiều là một phần tử riêng. Với mỗi địa điểm mới, phải khai đủ cả chiều đi lẫn chiều về: main phải tới được nó từ protagonistLocationId và từ nó quay về được. Một cạnh một chiều sẽ bị từ chối và làm hỏng cả arc.
 fromLocationId/toLocationId chỉ được là ID có thật trong existingLocations hoặc ID của địa điểm vừa khai trong chính canonExtension này. Không khai lại cạnh đã có trong existingTravelRules — trùng cạnh cũng bị từ chối.`,
     prompt: JSON.stringify({
       task: 'Đánh giá ending direction và lập arc tiếp theo nếu truyện chưa hoàn tất.',
+      marketBlueprint: input.marketBlueprint ?? null,
       endingDirection: input.kernel.endingDirection,
       seriesSpine: input.kernel.seriesSpine,
       longPromises: input.kernel.longPromises,

@@ -246,6 +246,14 @@ not permission to copy existing titles, characters, franchises or prose.
 Research notes and the production drift that motivated the contract are recorded in
 [`FALOO_MARKET_PROFILE.md`](FALOO_MARKET_PROFILE.md).
 
+The contract covers the story beneath the title. Every generated concept carries a
+structured market blueprint: familiar arena, novelty collision, starting position, evolving
+advantage, comparison engine, world conflict engine, five early payoff checkpoints and a
+6–8-step scale ladder. World Architect must turn it into competing institutions, gated
+geographies and operating systems; Series Architect must rotate arenas and opposition classes;
+Launch State must cash the five early payoffs inside the first arc. Setup fails closed when the
+world, progression tracks, promises, expansion seeds or opening arc are too thin.
+
 `ChapterOutcome` is not a fifth artifact. It is a bounded row inside `StoryState` — chapter
 number and title, the principal event, its result, the concrete method, the ending
 situation, and exact prose evidence spans — extracted by the Editor from accepted prose and

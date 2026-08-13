@@ -43,6 +43,40 @@ export const StoryCommissionSchema = z.object({
   settingBoundary: z.string().trim().min(8).max(800),
 }).strict();
 
+export const MarketBlueprintSchema = z.object({
+  familiarArena: z.string().trim().min(20).max(800),
+  noveltyCollision: z.string().trim().min(20).max(800),
+  protagonistStartingPosition: z.string().trim().min(20).max(800),
+  coreAdvantage: z.string().trim().min(20).max(800),
+  comparisonEngine: z.string().trim().min(20).max(1_000),
+  worldConflictEngine: z.string().trim().min(20).max(1_000),
+  earlyPayoffs: z.array(z.object({
+    byChapter: z.union([z.literal(1), z.literal(3), z.literal(5), z.literal(7), z.literal(10)]),
+    payoff: z.string().trim().min(20).max(800),
+    visibleTo: z.string().trim().min(10).max(500),
+    positionChange: z.string().trim().min(20).max(800),
+    nextPressure: z.string().trim().min(20).max(800),
+  }).strict()).length(5),
+  scaleLadder: z.array(z.object({
+    scope: z.string().trim().min(8).max(120),
+    arena: z.string().trim().min(20).max(800),
+    statusPrize: z.string().trim().min(20).max(800),
+    oppositionClass: z.string().trim().min(20).max(800),
+    advantageEvolution: z.string().trim().min(20).max(800),
+  }).strict()).min(6).max(8),
+}).strict().superRefine((blueprint, ctx) => {
+  const requiredChapters = [1, 3, 5, 7, 10];
+  const actualChapters = blueprint.earlyPayoffs.map(item => item.byChapter).sort((a, b) => a - b);
+  if (actualChapters.some((chapter, index) => chapter !== requiredChapters[index])) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['earlyPayoffs'],
+      message: 'Market blueprint must lock one payoff at each chapter 1, 3, 5, 7, and 10.',
+    });
+  }
+});
+export type MarketBlueprint = z.infer<typeof MarketBlueprintSchema>;
+
 export const ConceptCandidateSchema = z.object({
   id: z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/),
   workingTitle: z.string().trim().min(4).max(180),
@@ -54,6 +88,7 @@ export const ConceptCandidateSchema = z.object({
   mechanismFingerprint: z.string().trim().min(4).max(240),
   rewardLoopFingerprint: z.string().trim().min(4).max(240),
   conflictEconomyFingerprint: z.string().trim().min(4).max(240),
+  marketBlueprint: MarketBlueprintSchema,
   seriality30: z.array(z.string().trim().min(8).max(500)).min(6).max(10),
   seriality1000: z.array(z.string().trim().min(12).max(700)).min(8).max(15),
   earlyEndingRisk: z.string().trim().min(20).max(1_200),
@@ -124,7 +159,7 @@ interface SetupStageArtifact {
   usage: ProviderUsage;
 }
 
-export const SETUP_CHECKPOINT_VERSION = 'story-factory-setup-checkpoint-2-no-simulated-canon';
+export const SETUP_CHECKPOINT_VERSION = 'story-factory-setup-checkpoint-3-market-blueprint';
 
 export interface SetupCheckpointProvenance {
   version: typeof SETUP_CHECKPOINT_VERSION;
@@ -369,6 +404,7 @@ export function assertGroundedMechanicSemantics(
 function assertLaunchSemantics(
   launch: LaunchPack,
   commission: z.infer<typeof StoryCommissionSchema>,
+  selectedConcept: z.infer<typeof ConceptCandidateSchema>,
 ): void {
   const kernel = launch.kernel;
   if (jaccard(kernel.readerFantasy, `${commission.audience} ${commission.tone} ${commission.settingBoundary}`) >= 0.72) {
@@ -378,6 +414,33 @@ function assertLaunchSemantics(
   assertVoiceSemantics(kernel.characters);
   assertIdentityOpposition(kernel);
   assertGroundedMechanicSemantics(kernel);
+
+  const world = kernel.worldModel;
+  if (world.geography.length < 4 || world.institutions.length < 4 || world.systems.length < 2) {
+    throw new StoryFactoryError(
+      'setup_blocked',
+      'World setup is too small to sustain market escalation beyond an opening occupation or location.',
+      {
+        geography: world.geography.length,
+        institutions: world.institutions.length,
+        systems: world.systems.length,
+        minimums: { geography: 4, institutions: 4, systems: 2 },
+      },
+    );
+  }
+
+  const blueprint = selectedConcept.marketBlueprint;
+  for (let index = 1; index < blueprint.scaleLadder.length; index += 1) {
+    const previous = blueprint.scaleLadder[index - 1];
+    const current = blueprint.scaleLadder[index];
+    if (jaccard(previous.arena, current.arena) >= 0.68
+      && jaccard(previous.oppositionClass, current.oppositionClass) >= 0.68) {
+      throw new StoryFactoryError('setup_blocked', 'Market scale ladder only renames the same arena and opposition class.', {
+        previousScope: previous.scope,
+        currentScope: current.scope,
+      });
+    }
+  }
 
   const stages = kernel.seriesSpine.stages;
   for (let index = 1; index < stages.length; index += 1) {
@@ -393,6 +456,34 @@ function assertLaunchSemantics(
         rewardSimilarity,
       });
     }
+  }
+  const stagesWithoutExpansion = stages.filter((stage, index) => index > 0 && stage.expansionSeeds.length < 2);
+  if (stagesWithoutExpansion.length) {
+    throw new StoryFactoryError(
+      'setup_blocked',
+      'Later series stages must seed at least two concrete world expansions instead of stretching the same setup.',
+      { stageIds: stagesWithoutExpansion.map(stage => stage.id) },
+    );
+  }
+  if (kernel.progressionTracks.length < 3 || kernel.longPromises.length < 6) {
+    throw new StoryFactoryError(
+      'setup_blocked',
+      'Long-form setup needs at least three independent progression tracks and six staged promises.',
+      { progressionTracks: kernel.progressionTracks.length, longPromises: kernel.longPromises.length },
+    );
+  }
+  if (launch.arc.progression.length < 5
+    || launch.arc.terminalChanges.length < 3
+    || launch.arc.activeConflicts.length < 2) {
+    throw new StoryFactoryError(
+      'setup_blocked',
+      'Opening arc does not contain enough payoff steps, terminal movement, and independent pressure.',
+      {
+        progression: launch.arc.progression.length,
+        terminalChanges: launch.arc.terminalChanges.length,
+        activeConflicts: launch.arc.activeConflicts.length,
+      },
+    );
   }
   if (!kernel.worldMechanics.some(mechanic => mechanic.kind === 'conversion')
     || !kernel.worldMechanics.some(mechanic => mechanic.kind === 'capability')
@@ -461,6 +552,11 @@ function generatorPrompt(input: {
       'Không tạo ID; code sẽ gán stable ID bất biến theo generator và vị trí.',
       'Đây là web-serial sảng văn thương mại theo tín hiệu Faloo, nhưng là IP nguyên bản: học cách đóng gói trực diện, não động lớn, nhịp nhanh và sảng điểm dày; tuyệt đối không sao chép nhân vật, thế giới, tên riêng, franchise hoặc tiêu đề đang có.',
       'Concept phải ghép ba lớp nhìn là hiểu: một đề tài/đấu trường có nhu cầu rộng + một thân phận hoặc thế yếu cụ thể + một lợi thế độc nhất tạo payoff hữu hình. Chất đời sống hoặc nghề nghiệp chỉ là nền; không được chọn một quy trình lao động yên ả làm fantasy chính.',
+      'marketBlueprint là hợp đồng sản phẩm, không phải phần giới thiệu. familiarArena khóa đề tài quen thuộc; noveltyCollision nói rõ cú ghép mới; protagonistStartingPosition khóa đáy xuất phát; coreAdvantage khóa lợi thế có thể diễn thành cảnh.',
+      'comparisonEngine phải chỉ ra hệ quy chiếu khiến độc giả nhìn thấy main vượt người khác: bảng xếp hạng, kỳ thi, đấu giá, chiến trường, thị trường, lãnh địa, hợp đồng, dư luận hoặc một thước đo xã hội tương đương. Không được chỉ ghi “mọi người khâm phục”.',
+      'worldConflictEngine phải khiến thế giới tự sinh cạnh tranh ngay cả khi phản diện đầu tiên biến mất: tài nguyên khan hiếm, luật phân phối, tầng quyền lực, chu kỳ tai họa, thị trường, tông môn, quốc gia hoặc cơ chế tuyển chọn. Không xây cả truyện quanh một kẻ xấu duy nhất.',
+      'earlyPayoffs phải có đúng năm mốc chapter 1,3,5,7,10. Mỗi mốc khóa payoff hữu hình, ai trực tiếp nhìn thấy, vị thế nào đổi và áp lực mới nào lập tức mở ra. Không dùng lời hứa, hoàn tất chuẩn bị hoặc hiểu thêm quy trình làm payoff.',
+      'scaleLadder có 6-8 bậc thật sự đổi arena, phần thưởng vị thế, lớp đối thủ và cách lợi thế tiến hóa. Grounded có thể đi từ hộ gia đình → địa phương → liên tỉnh → quốc gia → quốc tế → di sản; speculative có thể đi từ cá nhân → tổ đội → thành/trường/phái → quốc gia → thế giới → đa giới. Không bê ví dụ vào concept.',
       'Cơ chế phải được kích hoạt và tạo lần lật thế/thu hoạch đầu tiên ngay trong chương 1; chương 2 mở rộng tác dụng hoặc người chứng kiến; hết chương 3 phải có đối thủ/đấu trường/mục tiêu lớn hơn xuất hiện. Không dùng ba chương chỉ để giới thiệu, chế thử rồi hẹn ngày mai.',
       'Có vật liệu nhân quả để biến hóa ít nhất ba mươi chương.',
       'Có 8-15 arena/giai đoạn thực sự khác nhau để đi đến 800-1.200 chương; seriality1000 phải mô tả biến đổi macro, không đổi tên cùng một vòng lặp.',
@@ -589,7 +685,7 @@ export async function runConceptLab(input: {
     system: `Bạn là Blind Concept Judge. Chọn theo sức hút thương mại, nhân quả thế giới và khả năng serial; không biết model nào tạo concept.
 Grounded Domain Research là ràng buộc theo realityPolicy. Áp dụng realityPolicy trước khi đọc research. Với grounded, không chọn claim bị research bác hoặc đòi hạ tầng, vốn, thời gian, năng lượng hay mức an toàn trái commission. Với speculative, tiền đề siêu nhiên được phép; chỉ loại khi concept không khóa được logic nội tại, nguồn lực, chi phí, giới hạn, actor hoặc hậu quả.`,
     prompt: JSON.stringify({
-      task: 'Chọn đúng hai concept mạnh nhất. Ưu tiên theo thứ tự: title+premise nói thẳng reader fantasy; chương 1 có cheat/payoff thật; sảng điểm và escalation 3-5 chương; cuối cùng mới đến độ dài 800-1.200 chương. Loại concept chỉ “hay nghề”, cozy hoặc hợp lý nhưng thiếu cú móc và thiếu biến đổi vị thế.',
+      task: 'Chọn đúng hai concept mạnh nhất. Ưu tiên theo thứ tự: đề tài rộng + cú ghép mới; thế giới tự sinh cạnh tranh; lợi thế có thể biểu diễn và tiến hóa; năm payoff đầu đổi vị thế; scale ladder thay lớp đối thủ thật; cuối cùng mới đến độ dài 800-1.200 chương. Loại concept chỉ “hay nghề”, cozy, chỉ thắng một phản diện, hoặc hợp lý nhưng thiếu cỗ máy thế giới.',
       realityPolicy: groundedRealityPolicy,
       commission,
       groundedDomainResearch: domainResearch.value,
@@ -613,7 +709,7 @@ Grounded Domain Research là ràng buộc theo realityPolicy. Áp dụng reality
     model: input.routes.openingSimulator,
     system: `Bạn là Opening Simulator độc lập và không thay đổi concept.
 Với mỗi concept, viết actual opening sample tiếng Việt đủ dài để đánh giá như chương 1 của một sảng văn thương mại: vào áp lực/cơ hội ngay, main hành động, lợi thế độc nhất kích hoạt và tạo một payoff hữu hình trước khi sample kết thúc. Có đối thoại tự nhiên, đối lực có agenda riêng và một thay đổi vị thế cụ thể; không dùng phong cảnh, hồi tưởng hoặc hướng dẫn thao tác để trì hoãn premise. Không kéo dài để đạt số từ. Đây là mẫu để chọn concept, không phải canon và không được đưa vào Kernel.
-Sau sample, mô tả hướng chương 2 phải mở rộng tác dụng/người chứng kiến, chương 3 phải mở đối thủ/đấu trường/mục tiêu lớn hơn; đồng thời audit chemistry, agency, seriality và nhân quả.
+Sample và hướng chương 2-3 phải thực sự kiểm chứng marketBlueprint, không cứu concept bằng ý mới. Chương 1 trả đúng earlyPayoff mốc 1; chương 2 mở rộng tác dụng/người có lợi ích trực tiếp; chương 3 trả mốc 3 và mở đối thủ/đấu trường/mục tiêu lớn hơn. Audit xem comparisonEngine có truyền thông tin nhân quả và worldConflictEngine có tự sinh phản ứng hay chỉ dựa vào một phản diện ngu.
 Đánh domainFeasibility=reject nếu ba chương đầu đòi hạ tầng, vốn, thời gian, năng lượng, kỹ năng hoặc mức an toàn không thực tế. Không được coi kiến thức tương lai là vật tư hay thời gian miễn phí.
 Phải áp dụng realityPolicy: grounded dùng chuẩn thực tế ngoài đời; speculative chấp nhận tiên đề siêu nhiên nhưng vẫn reject nếu thiếu nguồn năng lượng/vật tư, actor có quyền, chi phí, giới hạn, thời gian hoặc hậu quả nhất quán trong chính thế giới đó.
 Đánh longRunFeasibility=reject nếu concept có thể kết thúc ở arc đầu, chỉ lặp một vòng kiếm tiền/sức mạnh, hoặc không có đủ arena, xung đột và progression cho 800-1.200 chương.`,
@@ -657,6 +753,7 @@ Phải áp dụng realityPolicy: grounded dùng chuẩn thực tế ngoài đờ
       system: `Bạn chịu trách nhiệm chọn concept và khóa bản sắc truyện. Trả đúng structured-output schema, không markdown.
 Chọn dựa trên chất lượng actual opening sample, chemistry nhân vật, agency của đối lực và khả năng biến hóa; không chỉ dựa vào metadata cơ chế. Opening sample chỉ là bằng chứng lựa chọn: tuyệt đối không chép câu, cử chỉ hoặc thoại từ sample vào Kernel.
 Giữ packaging sảng văn trực diện: kernel.title dài 7-26 từ, nêu đề tài/thân phận cùng lợi thế hoặc payoff cụ thể; ưu tiên dấu hai chấm. kernel.description là văn án bán truyện, phải nói ngay hoàn cảnh main, lợi thế, payoff đầu và nấc leo thang — không viết như tóm tắt văn học. readerFantasy và pleasureLoop phải nhấn vào quyền chủ động, thắng lợi nhìn thấy được và vị thế mở rộng; comfort chỉ là lớp phụ.
+Identity phải giữ nguyên hạt nhân marketBlueprint của concept: main bắt đầu đúng đáy đã khóa, coreAdvantage là năng lực trung tâm chứ không bị thay bằng nghề nghiệp phụ, cast phải đại diện ít nhất opposition địa phương và một quan hệ/gatekeeper khiến comparisonEngine hoạt động. Không biến noveltyCollision thành background rồi kể một truyện nghề nghiệp quen thuộc.
 VoiceContract chỉ được dùng thuộc tính trung tính register, sentenceRhythm, directness, addressRules, vocabulary, reasoningStyle, emotionDisplay và humorStyle. Không chứa câu thoại, cử chỉ, phản ứng mẫu, stressResponse hoặc avoidances.
 sentenceRhythm chỉ mô tả độ dài, nhịp và cấu trúc câu; không mô tả âm lượng, động tác phát ngôn hoặc thói quen như cười, nhếch, quát, gằn giọng, lẩm bẩm.
 Xuất đúng một protagonist, ít nhất một opposition có agenda độc lập thật sự và ít nhất một supporting character. Không dùng supporting character làm đối thủ giả.
@@ -724,6 +821,10 @@ Chỉ được chọn concept có domainFeasibility=pass và longRunFeasibility=
       model: input.routes.launchArchitect,
       system: `Bạn khóa world canon riêng của truyện đã chọn. Trả đúng structured-output schema, không markdown.
 WorldModel phải khóa thời đại, địa lý, tổ chức, hệ thống vận hành, giới hạn và chi phí. Mọi geography.role là mô tả có nghĩa.
+Thế giới phải vận hành như một cỗ máy tạo cạnh tranh, không phải bách khoa trang trí. Dựa sát marketBlueprint: có ít nhất bốn geography đại diện các nấc arena sớm, bốn institution gồm phe main/đối thủ địa phương/gatekeeper trung lập/lớp quyền lực kế tiếp, và hai system trở lên gồm hệ tạo giá trị cùng hệ phân phối-so sánh-tranh đoạt. Mỗi entity phải tạo một quyền, nguồn lực, cánh cửa hoặc xung đột mà Planner có thể diễn thành cảnh.
+comparisonEngine phải có vật mang thông tin và người có quyền phản ứng: bảng xếp hạng, phiên đấu giá, kỳ thi, chiến báo, giá công khai, hợp đồng, quyền lãnh thổ hoặc cơ chế tương đương. Không cho đám đông tự biết thành tựu từ xa và không tạo nhân chứng chỉ để kinh ngạc.
+worldConflictEngine phải tiếp tục sinh đối thủ sau khi opposition đầu tiên thất bại. Khóa tầng quyền lực, tài nguyên khan hiếm, luật tiếp cận và cái giá để main bước sang arena kế tiếp; không dùng một phản diện địa phương kéo dài hàng trăm chương.
+coreAdvantage phải có ba tầng: thao tác mở đầu, biến thể khi đổi arena và giới hạn/counterplay khiến đối thủ có thể đổi chiến thuật. Không để cơ chế chỉ làm đúng một quy trình với số lượng lớn dần.
 travelRules là đồ thị có hướng: từ vị trí mở đầu dự kiến phải đi được tới mọi location và có đường quay về. Không biến kiến thức thành vật tư, thời gian hoặc năng lượng miễn phí.
 Mỗi resource bắt buộc khóa ownerEntityId: dùng character/institution ID thực sự sở hữu ledger đó; chỉ dùng null cho đại lượng môi trường hoặc tài nguyên chung thực sự không có chủ. Numeric resource phải có unit vật lý hoặc tiền tệ rõ ràng như VND, kg, lít, chiếc, điểm; không dùng một con số vô đơn vị. Mọi direction increase/decrease là theo số dư của ownerEntityId, không theo người đang thực hiện capability. Nếu owner trả tiền thì delta phải decrease; nếu owner nhận tiền thì delta phải increase.
 Trả mechanics trong đúng ba mảng conversions, capabilities và constraints; mỗi mảng có ít nhất một phần tử đúng kind. Conversion chỉ ghi tổng input bị tiêu thụ và output tạo ra theo mỗi batch; tỷ lệ hao hụt nằm trong chênh lệch lượng input/output, còn phụ phẩm cần theo dõi là một output riêng.
@@ -769,7 +870,10 @@ World rules, resource và tổ chức phải phản ánh requiredInfrastructure,
     model: input.routes.launchArchitect,
     system: `Bạn khóa đại cương dài hạn của đúng truyện và world canon đã chọn. Trả đúng structured-output schema, không markdown.
 seriesSpine có 8-15 stage liên tục, tổng target 800-1.200 chương; mỗi stage phải đổi arena, conflict economy hoặc reward-loop variant và có entry/exit cụ thể.
-progressionTracks có ít nhất hai trục, milestone dùng stable stage ID. longPromises có ít nhất bốn promise phân bổ nhiều stage.
+seriesSpine phải triển khai marketBlueprint.scaleLadder: mỗi lần lên bậc phải đổi phần thưởng vị thế, lớp opposition và cách dùng coreAdvantage, không chỉ tăng con số sản lượng. Stage sau stage đầu phải có ít nhất hai expansionSeeds cụ thể để mở character/location/promise/world rule/world mechanic mới.
+Không kéo một phản diện hoặc một nghề qua toàn bộ stage. Sau mỗi thắng lợi lớn, lợi ích bị đụng chạm phải gọi ra gatekeeper hay opposition class cấp cao hơn từ chính worldConflictEngine; đối thủ cũ có thể tiến hóa hoặc rời sân nhưng không được đổi tên rồi làm lại cùng thủ đoạn.
+progressionTracks có ít nhất ba trục độc lập: năng lực/cơ chế, quyền lực-vị thế-tài sản, và quan hệ-tổ chức-bản sắc thế giới. Milestone dùng stable stage ID. longPromises có ít nhất sáu promise phân bổ nhiều stage, gồm cả payoff gần, trung và cuối truyện.
+Stage đầu không được dùng hàng chục chương chỉ để chứng minh cơ chế. Nó phải chứa đủ năm earlyPayoffs ở chương 1/3/5/7/10, rồi tiếp tục đổi loại thử thách; rewardLoopVariant mô tả một vòng sảng có kết quả nhìn thấy, không phải danh sách công đoạn.
 Mọi longPromises.promiseId, stages[].longPromiseIds và endingDirection.promisesToResolve phải tham chiếu ID trong promises. longPromises chỉ lập lịch mở/đến hạn, không thay thế định nghĩa promise.`,
     prompt: JSON.stringify({
       task: 'Xuất progression, series spine, promise ledger và ending direction.',
@@ -797,6 +901,9 @@ Mọi longPromises.promiseId, stages[].longPromiseIds và endingDirection.promis
     model: input.routes.launchArchitect,
     system: `Bạn chỉ tạo Arc đầu 20-30 chương và StoryState chương 0 từ canon đã khóa. Trả đúng structured-output schema, không markdown.
 Arc gắn stage đầu; mọi active ID phải có trong Kernel. State không ghi trước kết quả tương lai.
+Arc đầu phải trả đúng title promise và marketBlueprint.earlyPayoffs: progression có ít nhất năm mốc, khóa rõ kết quả ở/chậm nhất chương 1,3,5,7,10; terminalChanges có ít nhất ba thay đổi vị thế/tài sản/quyền lựa chọn thật; activeConflicts có ít nhất hai nguồn áp lực độc lập từ worldConflictEngine.
+Chia 20-30 chương thành nhiều mini-cycle, mỗi cycle có cơ hội hoặc áp lực → main dùng coreAdvantage → người có lợi ích trực tiếp chứng kiến/đáp trả → payoff → áp lực cấp cao hơn. Không dành trọn arc để sửa máy, thử nghiệm, gom nguyên liệu, làm quen thế giới hoặc đánh một phản diện bằng cùng một thủ đoạn.
+Mốc chương 10 phải làm main bước sang một vị thế hoặc arena mới đủ rõ, không chỉ giàu/mạnh hơn theo số. Những chương sau mở biến thể lợi thế, institution hoặc opposition class kế tiếp đã có trong Kernel.
 Arc.activeMechanicIds là working set của Planner trong arc đầu: chỉ chứa mechanic mà các beat của arc đầu thật sự dùng, tối đa ${ARC_ACTIVE_MECHANIC_BUDGET}. Mechanic không chọn vẫn nằm nguyên trong Kernel và arc sau kích hoạt được. Mọi requiredFacts của capability/constraint đang active phải có fact và expected value tương ứng trong initialState.
 Mọi đầu vào và resource điều kiện của activeMechanicIds phải có đường nhân quả từ initialState: số dư dương có nguồn gốc hợp lý hoặc output của active conversion bắt đầu từ tài nguyên đang có. activeResourceIds có thể chứa tài nguyên chỉ để theo dõi về sau, nhưng Planner không được thay đổi nó trước khi có mechanic hợp lệ. Nếu cần mua vật tư để dùng ngay, phải kích hoạt conversion thu mua tương ứng; không đặt vật tư bằng 0 rồi trông chờ Planner tự bịa nguồn.
 initialState.schemaVersion=2, chapterNumber=0, recentOutcomes=[] và usedExpansionSeedIds=[].
@@ -823,7 +930,7 @@ State có đúng một entry cho mọi character, resource và promise trong Ker
     initialState: launchState.value.initialState,
     coverPrompt: launchIdentity.value.coverPrompt,
   });
-  assertLaunchSemantics(launch, commission);
+  assertLaunchSemantics(launch, commission, selectedConcept);
   assertPortfolioDiversity(selectedConcept, input.existingSignatures ?? []);
   if (launch.initialState.chapterNumber !== 0
     || launch.initialState.storyTimeMinutes !== 0

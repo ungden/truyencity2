@@ -35,7 +35,7 @@ import {
   STORY_FACTORY_RELEASE,
   STORY_FACTORY_REVISION,
 } from './release';
-import { runConceptLab } from './setup';
+import { MarketBlueprintSchema, runConceptLab } from './setup';
 import type { SetupCheckpoint } from './setup';
 
 interface FactoryJobRow {
@@ -68,6 +68,7 @@ interface FactoryProjectRow {
   story_kernel: unknown;
   arc_plan: unknown;
   story_state: unknown;
+  market_blueprint: unknown | null;
   engine_release: string;
   model_routes: unknown;
   // Free-text author steering for the running novel (nullable). Read by the
@@ -333,6 +334,7 @@ async function runSetup(db: SupabaseClient, job: FactoryJobRow, project: Factory
       story_kernel: pack.kernel,
       arc_plan: pack.arc,
       story_state: pack.initialState,
+      market_blueprint: result.selectedConcept.marketBlueprint,
       current_chapter: 0,
       updated_at: now,
     }).eq('id', project.id).eq('engine_release', STORY_FACTORY_RELEASE);
@@ -439,6 +441,9 @@ async function runPlan(db: SupabaseClient, job: FactoryJobRow, project: FactoryP
     const arc = ArcPlanSchema.parse(project.arc_plan);
     const state = StoryStateSchema.parse(project.story_state);
     const routes = ModelRoutesSchema.parse(project.model_routes);
+    const marketBlueprint = project.market_blueprint == null
+      ? null
+      : MarketBlueprintSchema.parse(project.market_blueprint);
     const continuityPacket = await loadContinuityPacket({
       db,
       projectId: project.id,
@@ -466,6 +471,7 @@ async function runPlan(db: SupabaseClient, job: FactoryJobRow, project: FactoryP
       // the next window plans fresh from committed state.
       requiredWindowSize: job.plan_feedback || job.retry_count >= 2 ? 1 : undefined,
       authorDirective: project.author_directive,
+      marketBlueprint,
       provider,
       resume,
       onCheckpoint: async checkpoint => {
@@ -917,8 +923,11 @@ async function runArc(db: SupabaseClient, job: FactoryJobRow, project: FactoryPr
     const arc = ArcPlanSchema.parse(project.arc_plan);
     const state = StoryStateSchema.parse(project.story_state);
     const routes = ModelRoutesSchema.parse(project.model_routes);
+    const marketBlueprint = project.market_blueprint == null
+      ? null
+      : MarketBlueprintSchema.parse(project.market_blueprint);
     const result = await planArcLifecycle({
-      kernel, arc, state, routes, provider,
+      kernel, arc, state, routes, provider, marketBlueprint,
       minimumCompletionChapter: Math.max(
         job.minimum_chapters,
         kernel.seriesSpine.targetEndingRange.minimumChapter,
