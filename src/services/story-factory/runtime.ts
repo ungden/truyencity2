@@ -457,7 +457,14 @@ async function runPlan(db: SupabaseClient, job: FactoryJobRow, project: FactoryP
       // lãnh-chúa canary mis-chained stamina/corpse/fertility twice in a row).
       // One chapter cuts the chained bookkeeping to a third; the next window is
       // planned fresh from committed state.
-      requiredWindowSize: job.plan_feedback ? 1 : undefined,
+      //
+      // The same degradation applies when the stage keeps dying on the wall
+      // clock: two or more burned retries mean the full window did not fit the
+      // 300s route ceiling (Đại Địa planned ch 40-42 for 4 hours of stale
+      // leases on 2026-08-13), so the code shrinks the ask instead of letting
+      // the fifth retry park the job. A one-chapter window is always legal and
+      // the next window plans fresh from committed state.
+      requiredWindowSize: job.plan_feedback || job.retry_count >= 2 ? 1 : undefined,
       authorDirective: project.author_directive,
       provider,
       resume,
