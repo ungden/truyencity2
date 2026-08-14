@@ -164,6 +164,10 @@ describe('Story Factory architecture boundary', () => {
     const runtime = read('src/services/story-factory/runtime.ts');
     const smoke = read('scripts/factory-writing-smoke.ts');
     expect(runtime).toContain("if (job.stage !== 'setup') requireMarketBlueprint(project.market_blueprint)");
+    expect(runtime).toContain('routes, marketBlueprint, provider');
+    expect(read('src/services/story-factory/planner.ts')).toContain('dueMarketPayoffs');
+    expect(read('src/services/story-factory/planner.ts')).toContain('marketBlueprintWindowContract');
+    expect(read('src/services/story-factory/prompts.ts')).toContain('Một thắng lợi khác dù vẫn sảng không được thay thế deadline đã khóa');
     expect(smoke).toContain('marketBlueprint = MarketBlueprintSchema.parse(setup.selectedConcept.marketBlueprint)');
     expect(smoke).toContain('marketBlueprintDigest: digestArtifact(marketBlueprint)');
     expect(read('src/services/story-factory/setup.ts')).toContain("schemaComplexity: 'omit_array_max'");

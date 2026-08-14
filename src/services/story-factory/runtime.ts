@@ -815,6 +815,7 @@ async function runWindowReview(db: SupabaseClient, job: FactoryJobRow, project: 
     const arc = ArcPlanSchema.parse(project.arc_plan);
     const state = StoryStateSchema.parse(project.story_state);
     const routes = ModelRoutesSchema.parse(project.model_routes);
+    const marketBlueprint = requireMarketBlueprint(project.market_blueprint);
     const { data: chapters, error } = await db.from('chapters').select('chapter_number,title,content')
       .eq('novel_id', job.novel_id).gte('chapter_number', job.current_chapter - 4).lte('chapter_number', job.current_chapter)
       .order('chapter_number');
@@ -839,7 +840,7 @@ async function runWindowReview(db: SupabaseClient, job: FactoryJobRow, project: 
         after: event.after_value,
         source: event.source,
       })),
-      routes, provider,
+      routes, marketBlueprint, provider,
     });
     if (reviewed.review.status === 'block') {
       // Hidden chapters are still drafts: park so the operator can repair the

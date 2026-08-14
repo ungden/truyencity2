@@ -56,6 +56,7 @@ import {
   bookSetupCheckpointCost,
   createLaunchWorldWireSchema,
   digestArtifact,
+  earlyPayoffsForChapterRange,
   prepareDiscoveryResume,
   isStoryFactoryEnabled,
   shouldStartAnotherStage,
@@ -4913,6 +4914,36 @@ describe('canonical Story Factory', () => {
       ...initialState,
       recentOutcomes: [phantomOutcome],
     })).toThrow('ahead of StoryState chapter 0');
+  });
+
+  test('market payoff deadlines are selected by code for the exact rolling window', () => {
+    const blueprint = MarketBlueprintSchema.parse({
+      familiarArena: 'Một đấu trường thức tỉnh nghề nghiệp quen thuộc với cạnh tranh công khai.',
+      noveltyCollision: 'Một nghề hành chính bị coi thường va vào quyền năng chiến đấu có thể định giá.',
+      protagonistStartingPosition: 'Nhân vật chính đứng ở đáy bảng xếp hạng và bị đội mạnh dùng làm mồi nhử.',
+      coreAdvantage: 'Nhân vật chính áp một quy tắc độc nhất có chi phí để đổi đòn đánh của địch thành tài sản.',
+      comparisonEngine: 'Bảng xếp hạng, tài sản tịch thu và người chứng kiến khiến mỗi chiến thắng được so sánh công khai.',
+      worldConflictEngine: 'Công hội, hiệp hội và tài phiệt phản ứng vì quyền kiểm soát bí cảnh cùng dòng tài nguyên bị đe dọa.',
+      earlyPayoffs: [1, 3, 5, 7, 10].map(byChapter => ({
+        byChapter,
+        payoff: `Payoff hữu hình bắt buộc phải hoàn tất đúng ở chương ${byChapter}, không được thay thế.`,
+        visibleTo: `Nhóm người có quyền lợi trực tiếp chứng kiến chương ${byChapter}.`,
+        positionChange: `Vị thế của main đổi thật và được ledger ghi nhận tại chương ${byChapter}.`,
+        nextPressure: `Một lớp đối lực mới phản ứng bằng hành động ngay sau chương ${byChapter}.`,
+      })),
+      scaleLadder: Array.from({ length: 6 }, (_, index) => ({
+        scope: `Bậc ${index + 1}`,
+        arena: `Đấu trường bậc ${index + 1} thay đổi quyền kiểm soát và loại tài nguyên tranh chấp.`,
+        statusPrize: `Phần thưởng vị thế bậc ${index + 1} làm tăng quyền lựa chọn nhìn thấy được.`,
+        oppositionClass: `Lớp đối thủ bậc ${index + 1} có agenda và công cụ phản chế độc lập.`,
+        advantageEvolution: `Lợi thế tiến hóa ở bậc ${index + 1} bằng một cách dùng mới chứ không chỉ tăng số.`,
+      })),
+    });
+
+    expect(earlyPayoffsForChapterRange(blueprint, 2, 4).map(item => item.byChapter)).toEqual([3]);
+    expect(earlyPayoffsForChapterRange(blueprint, 5, 7).map(item => item.byChapter)).toEqual([5, 7]);
+    expect(earlyPayoffsForChapterRange(blueprint, 11, 13)).toEqual([]);
+    expect(earlyPayoffsForChapterRange(null, 1, 10)).toEqual([]);
   });
 
   test('Concept Lab grounds all concepts before blind ranking and validates the launch pack', async () => {

@@ -22,7 +22,7 @@ import type { MarketBlueprint } from './setup';
 
 // Defined here, not in release.ts: release → benchmark → planner already exists, so a
 // planner → release import closes a cycle and breaks the production bundle (TDZ at init).
-export const FACTORY_PLANNER_VERSION = 'story-factory-planner-73-causal-shape-guard';
+export const FACTORY_PLANNER_VERSION = 'story-factory-planner-74-early-payoff-fidelity';
 import { EDITOR_SYSTEM_PROMPT, PLANNER_SYSTEM_PROMPT, PLAN_JUDGE_SYSTEM_PROMPT } from './prompts';
 import {
   ARC_ACTIVE_MECHANIC_BUDGET,
@@ -36,6 +36,23 @@ import {
 } from './validation';
 
 type PlanRevisionIssues = Extract<PlanAssessment, { status: 'revise' }>['issues'];
+
+/**
+ * Resolve the market promises whose hard deadlines fall inside a concrete
+ * chapter range. The descriptions stay semantic (the Judge/Reviewer reads
+ * them), while code owns the deadline selection so a model cannot silently
+ * omit the chapter-3 promise and substitute an unrelated flashy scene.
+ */
+export function earlyPayoffsForChapterRange(
+  blueprint: MarketBlueprint | null | undefined,
+  startChapter: number,
+  endChapter: number,
+): MarketBlueprint['earlyPayoffs'] {
+  if (!blueprint || endChapter < startChapter) return [];
+  return blueprint.earlyPayoffs.filter(payoff => (
+    payoff.byChapter >= startChapter && payoff.byChapter <= endChapter
+  ));
+}
 
 export type PlannerAttemptTelemetry = {
   attempt: 'initial' | 'mechanical_repair' | 'judge_replan' | 'judge_replan_mechanical_repair';
@@ -1431,6 +1448,13 @@ export async function assessRollingPlan(input: {
   repairIssues?: PlanRevisionIssues;
   advisories?: PlanAdvisory[];
 }): Promise<{ assessment: PlanAssessment; usage: ProviderUsage }> {
+  const windowStart = input.rollingPlan.startChapter;
+  const windowEnd = input.rollingPlan.plans.at(-1)?.chapterNumber ?? windowStart;
+  const dueMarketPayoffs = earlyPayoffsForChapterRange(
+    input.marketBlueprint,
+    windowStart,
+    windowEnd,
+  );
   const auditSignals = input.rollingPlan.plans.map(chapter => ({
     chapterNumber: chapter.chapterNumber,
     scenes: chapter.scenes.map(scene => ({
@@ -1451,6 +1475,7 @@ export async function assessRollingPlan(input: {
         ? input.authorDirective.trim().slice(0, 1_500)
         : null,
       marketBlueprint: input.marketBlueprint ?? null,
+      dueMarketPayoffs,
       kernel: {
         protagonistId: input.kernel.protagonistId,
         realityMode: input.kernel.realityMode,
@@ -1486,7 +1511,7 @@ export async function assessRollingPlan(input: {
         domainPlausibility: 'Grounded phải khả thi về công cụ, dung sai, thời gian, lao động và kết quả ngoài đời; speculative phải nhất quán nguồn lực, chi phí và giới hạn nội tại.',
         oppositionAgenda: 'Đối lực phải có lựa chọn, đối sách và hậu quả theo agenda riêng; chỉ gây hấn rồi kinh ngạc/thua/chạy không đạt.',
         sceneVariety: 'Window không được lặp công thức giải thích cơ chế → biểu diễn thành công → người khác kinh ngạc/tôn sùng → nhận thưởng.',
-        stageAlignment: 'Xung đột và reward loop phải phục vụ stage hiện tại đồng thời tuân thủ authorDirective và tiến ít nhất một trục của marketBlueprint; không được hợp thức hóa vòng lặp đã bị cấm bằng cùng đối thủ hoặc một biến thể địa hình nhỏ.',
+        stageAlignment: 'Xung đột và reward loop phải phục vụ stage hiện tại đồng thời tuân thủ authorDirective và tiến ít nhất một trục của marketBlueprint. Với từng dueMarketPayoffs, đúng payoff, người chứng kiến, đổi vị thế và áp lực kế tiếp phải được tạo bởi scene + delta chậm nhất ở byChapter; một cảnh sảng khác không được tính thay. Không được hợp thức hóa vòng lặp đã bị cấm bằng cùng đối thủ hoặc một biến thể địa hình nhỏ.',
         outcomeWeight: 'Kết quả phải có trọng lượng tương xứng chuẩn bị và phản lực. Quyết định, phân tích, ký hợp tác hoặc mua đầu vào chỉ là setup; không được commit fact tuyên bố đã hết lỗ, có lãi, thành công hay giải quyết xung đột trước khi hành động tạo kết quả thực sự xảy ra.',
         stateTransitionOwnership: 'Mỗi relationship delta phải cập nhật đúng người thực sự đổi thái độ: characterId/target là chủ thể của thái độ, counterpartId là người thái độ hướng tới. “A thuyết phục được B” không phải trạng thái quan hệ của A; nếu B chuyển từ nghi ngờ sang tin thì B phải là target. Hai phía cùng đổi cần hai delta.',
       },
@@ -1676,6 +1701,11 @@ export async function planRollingWindow(input: {
     validationIssues?: unknown;
     temperature: number;
   }) => {
+    const nextChapter = input.state.chapterNumber + 1;
+    const requestedEndChapter = Math.min(
+      input.arc.plannedEndChapter,
+      nextChapter + (input.requiredWindowSize ?? 3) - 1,
+    );
     const result = await provider.json({
       model: input.routes.planner,
       reasoningEffort: 'high',
@@ -1760,7 +1790,15 @@ export async function planRollingWindow(input: {
           ? input.authorDirective.trim().slice(0, 1_500)
           : null,
         marketBlueprint: input.marketBlueprint ?? null,
-        nextChapter: input.state.chapterNumber + 1,
+        marketBlueprintWindowContract: input.marketBlueprint ? {
+          duePayoffs: earlyPayoffsForChapterRange(
+            input.marketBlueprint,
+            nextChapter,
+            requestedEndChapter,
+          ),
+          rule: 'Nếu window chứa byChapter của một payoff, chương đó phải hoàn tất đúng payoff, cho đúng nhóm visibleTo chứng kiến, commit positionChange bằng delta quan sát được và mở nextPressure. Không được thay bằng một thắng lợi khác dù thắng lợi đó vẫn sảng. Nếu window kết thúc trước byChapter thì không diễn payoff sớm bằng cách làm sai canon; chỉ chuẩn bị nhân quả cần thiết.',
+        } : null,
+        nextChapter,
         maximumEndChapter: input.arc.plannedEndChapter,
         compactContract: PLANNER_COMPACT_CONTRACT,
         recoveryEvidence: input.recoveryEvidence,
@@ -2054,9 +2092,17 @@ export async function reviewFiveChapterWindow(input: {
     source: string | null;
   }>;
   routes: ModelRoutes;
+  marketBlueprint?: MarketBlueprint | null;
   provider?: StoryModelProvider;
 }): Promise<{ review: WindowReview; usage: ProviderUsage }> {
   if (input.chapters.length !== 5) throw new Error('Window review requires exactly five committed chapters.');
+  const firstChapter = input.chapters[0]?.chapterNumber ?? 0;
+  const lastChapter = input.chapters.at(-1)?.chapterNumber ?? firstChapter;
+  const dueMarketPayoffs = earlyPayoffsForChapterRange(
+    input.marketBlueprint,
+    firstChapter,
+    lastChapter,
+  );
   const provider = input.provider ?? geminiProvider;
   const result = await provider.json({
     model: input.routes.editor,
@@ -2065,12 +2111,15 @@ export async function reviewFiveChapterWindow(input: {
 Block nếu nhân vật phản ứng như quên sự kiện vừa trải qua, cơ chế vật phẩm/công nghệ đổi cách hoạt động, số tiền/khối lượng/giá trong prose lệch với ledger, hoặc năm chương lặp cùng cấu trúc mà không tạo tiến triển.
 Kiểm số dư theo LỊCH SỬ: resourceTransitions là chuỗi giao dịch đã commit theo thứ tự (before → after tại từng chương). Một câu tổng kết số dư trong chương N phải khớp với after của transition cuối cùng tính đến thời điểm đó trong chương N — KHÔNG so với currentState, vì currentState chỉ là số dư sau chương cuối cửa sổ. Chỉ báo lỗi tiền khi con số lệch với transition lịch sử tương ứng.
 Phải đọc trải nghiệm của cả cửa sổ: bắt lặp chức năng “giải thích cơ chế → biểu diễn → quần chúng kinh ngạc”, stock reaction tương đương dù khác từ, main và đối thủ nói cùng giọng, đối thủ liên tục làm công cụ, hoặc progression tăng mạnh thiếu tích lũy/chi phí.
+Nếu payload có dueMarketPayoffs, đây là deadline sản phẩm chứ không phải gợi ý: block reward_loop/progression nếu tới byChapter mà prose chưa hoàn tất đúng payoff, chưa cho đúng visibleTo chứng kiến, chưa đổi positionChange hoặc chưa mở nextPressure. Một payoff khác dù sảng hơn cũng không được tính thay.
 Không mặc định một thiết kế là tối ưu hoặc một kết quả là tuyệt đối chỉ vì nhân vật giải thích tự tin hay thử thành công một lần. Với realityMode=grounded, kết luận phải tương xứng số lần quan sát và sai số thực tế.
 Lập patterns cho đủ đúng năm chương trước khi kết luận. Mỗi quote trong evidence, patterns và issues phải được sao chép nguyên văn từ content của đúng chapterNumber; mỗi check phải so sánh ít nhất hai chương khác nhau.
 Trạng thái pass cũng phải có bằng chứng cụ thể. Chỉ báo tối đa ba lỗi drift hoặc pattern quan trọng.`,
     prompt: JSON.stringify({
       task: 'Đọc năm chương như một độc giả liên tục, lập pattern map, rồi kiểm tra continuity và trải nghiệm đọc.',
       realityMode: input.kernel.realityMode,
+      marketBlueprint: input.marketBlueprint ?? null,
+      dueMarketPayoffs,
       wireLegend: {
         checks: {
           s: 'structureVariety',
@@ -2125,6 +2174,7 @@ Trạng thái pass cũng phải có bằng chứng cụ thể. Chỉ báo tối 
         'có lặp stock reaction, đám đông kinh ngạc hoặc khoảnh khắc sinh tử cùng chức năng không',
         'main và đối thủ có agenda, giọng nói và cách hành động phân biệt không',
         'mức progression có được tích lũy và trả giá đủ trong năm chương không',
+        'mọi dueMarketPayoffs trong cửa sổ có thực sự xảy ra đúng hạn trên trang, với người chứng kiến, đổi vị thế và áp lực kế tiếp hay không',
       ],
       kernelIdentity: {
         protagonistId: input.kernel.protagonistId,
@@ -2161,6 +2211,8 @@ Bản review trước bị từ chối vì evidence không sao chép NGUYÊN VĂ
         task: 'Chấm lại window sau khi bị từ chối vì evidence không nguyên văn.',
         groundingErrors: { message: error.message, evidence: error.evidence ?? null },
         realityMode: input.kernel.realityMode,
+        marketBlueprint: input.marketBlueprint ?? null,
+        dueMarketPayoffs,
         chapters: input.chapters,
         kernelIdentity: {
           protagonistId: input.kernel.protagonistId,
