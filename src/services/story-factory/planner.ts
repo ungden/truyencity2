@@ -22,7 +22,7 @@ import type { MarketBlueprint } from './setup';
 
 // Defined here, not in release.ts: release → benchmark → planner already exists, so a
 // planner → release import closes a cycle and breaks the production bundle (TDZ at init).
-export const FACTORY_PLANNER_VERSION = 'story-factory-planner-75-payoff-evidence';
+export const FACTORY_PLANNER_VERSION = 'story-factory-planner-76-payoff-window-evidence';
 import { EDITOR_SYSTEM_PROMPT, PLANNER_SYSTEM_PROMPT, PLAN_JUDGE_SYSTEM_PROMPT } from './prompts';
 import {
   ARC_ACTIVE_MECHANIC_BUDGET,
@@ -1556,9 +1556,12 @@ export async function assessRollingPlan(input: {
       throw new StoryFactoryError('infra_blocked', 'Plan Judge early-payoff check referenced an unknown or late scene.', check);
     }
     for (const deltaId of check.deltaIds) {
-      if (!scene.requiredDeltaIds.includes(deltaId)
-        || !sceneChapter.requiredDeltas.some(delta => delta.id === deltaId)) {
-        throw new StoryFactoryError('infra_blocked', 'Plan Judge early-payoff check referenced a delta outside its evidence scene.', {
+      const deltaChapter = input.rollingPlan.plans.find(chapter => (
+        chapter.chapterNumber <= check.byChapter
+        && chapter.requiredDeltas.some(delta => delta.id === deltaId)
+      ));
+      if (!deltaChapter) {
+        throw new StoryFactoryError('infra_blocked', 'Plan Judge early-payoff check referenced an unknown or late delta.', {
           ...check,
           deltaId,
         });

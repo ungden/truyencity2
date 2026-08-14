@@ -4269,13 +4269,22 @@ describe('canonical Story Factory', () => {
         visibleToMatched: true,
         positionChangeMatched: false,
         nextPressureMatched: true,
-        sceneId: 'scene_1',
+        sceneId: 'scene_payoff_1',
         deltaIds: ['delta_1'],
         evidence: 'scene_1 chỉ có setup và delta_1 không tạo tài sản hay vị thế đã hứa.',
       }],
       issues: [],
     };
-    const provider = new QueueProvider([plannerWire(), failedPayoff, plannerWire(), failedPayoff]);
+    const crossSceneWire = plannerWire();
+    crossSceneWire.chapters[0].scenes[0].dur = 59;
+    crossSceneWire.chapters[0].scenes.push({
+      id: 'scene_payoff_1', pov: 'main', people: ['main', 'mother'], loc: 'home', dur: 1, travel: 0,
+      goal: 'Đối chiếu kết quả của hành động.', block: 'Kết quả chưa đủ vật chất.',
+      act: 'Hải và mẹ kiểm lại những gì đã thật sự thay đổi.', deltaIds: [],
+    });
+    const provider = new QueueProvider([
+      crossSceneWire, failedPayoff, structuredClone(crossSceneWire), failedPayoff,
+    ]);
 
     await expect(planRollingWindow({
       kernel, arc, state: initialState, routes, provider, marketBlueprint,
