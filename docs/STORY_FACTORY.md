@@ -94,12 +94,20 @@ npm run factory:writing-smoke -- --apply
 
 # 2. Seed a hidden canary. Fails fast if step 1 has not passed for this release.
 npm run factory:operator -- seed \
-  --commission=factory/canary/commission.json \
-  --research=factory/canary/research.json --apply
+  --commission=factory/fresh-canary-hx03/commission.json \
+  --research=factory/fresh-canary-hx03/research.json --apply
 
 # 3. Watch. The cron does the rest.
 npm run factory:operator -- status
 ```
+
+The production acceptance target is always a **fresh story starting at chapter 0**.
+Existing novels are compatibility canaries only; backfilling their blueprint does not prove
+that title, topic, world and opening setup are correct. Seed validates the commission and
+research snapshot before inserting anything, setup must persist a valid market blueprint,
+and every later runtime stage fails closed if that blueprint is absent. Writing smoke also
+passes the selected blueprint into Planner/Plan Judge and records its digest; old saved smoke
+packs without a blueprint must be rebuilt with one full smoke before they can be reused.
 
 The smoke authorization is **latest-wins**: the most recent smoke for this release and
 route must have passed. A failing smoke therefore *revokes* a stale approval — rerun

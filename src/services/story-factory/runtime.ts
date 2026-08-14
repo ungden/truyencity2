@@ -35,7 +35,8 @@ import {
   STORY_FACTORY_RELEASE,
   STORY_FACTORY_REVISION,
 } from './release';
-import { MarketBlueprintSchema, runConceptLab } from './setup';
+import { requireMarketBlueprint, runConceptLab, StoryCommissionSchema } from './setup';
+import { assertFirst30PortfolioCommission } from './portfolio';
 import type { SetupCheckpoint } from './setup';
 
 interface FactoryJobRow {
@@ -290,6 +291,8 @@ async function runSetup(db: SupabaseClient, job: FactoryJobRow, project: Factory
   try {
     const setupInput = job.setup_input as { commission?: unknown; research?: unknown } | null;
     if (!setupInput?.commission || !setupInput.research) throw new StoryFactoryError('setup_blocked', 'Setup job is missing commission or research snapshot.');
+    const commission = StoryCommissionSchema.parse(setupInput.commission);
+    assertFirst30PortfolioCommission(commission);
     const routes = ModelRoutesSchema.parse(project.model_routes);
     const previousRuns = await db.from('story_factory_runs').select('output_artifact')
       .eq('job_id', job.id).eq('kind', 'setup').eq('engine_release', STORY_FACTORY_RELEASE)
@@ -308,7 +311,7 @@ async function runSetup(db: SupabaseClient, job: FactoryJobRow, project: Factory
       }] : [];
     });
     const result = await runConceptLab({
-      commission: setupInput.commission,
+      commission,
       research: setupInput.research,
       routes,
       existingSignatures,
@@ -441,9 +444,7 @@ async function runPlan(db: SupabaseClient, job: FactoryJobRow, project: FactoryP
     const arc = ArcPlanSchema.parse(project.arc_plan);
     const state = StoryStateSchema.parse(project.story_state);
     const routes = ModelRoutesSchema.parse(project.model_routes);
-    const marketBlueprint = project.market_blueprint == null
-      ? null
-      : MarketBlueprintSchema.parse(project.market_blueprint);
+    const marketBlueprint = requireMarketBlueprint(project.market_blueprint);
     const continuityPacket = await loadContinuityPacket({
       db,
       projectId: project.id,
@@ -923,9 +924,7 @@ async function runArc(db: SupabaseClient, job: FactoryJobRow, project: FactoryPr
     const arc = ArcPlanSchema.parse(project.arc_plan);
     const state = StoryStateSchema.parse(project.story_state);
     const routes = ModelRoutesSchema.parse(project.model_routes);
-    const marketBlueprint = project.market_blueprint == null
-      ? null
-      : MarketBlueprintSchema.parse(project.market_blueprint);
+    const marketBlueprint = requireMarketBlueprint(project.market_blueprint);
     const result = await planArcLifecycle({
       kernel, arc, state, routes, provider, marketBlueprint,
       minimumCompletionChapter: Math.max(
@@ -1051,6 +1050,7 @@ export async function runStoryFactoryTick(options?: {
   let project: FactoryProjectRow;
   try {
     project = await loadProject(db, job.project_id);
+    if (job.stage !== 'setup') requireMarketBlueprint(project.market_blueprint);
   } catch (caught) {
     return blockRun(db, job, null, caught);
   }

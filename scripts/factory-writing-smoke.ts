@@ -23,11 +23,13 @@ import { createClient } from '@supabase/supabase-js';
 import {
   ArcPlanSchema,
   LaunchPackSchema,
+  MarketBlueprintSchema,
   DEFAULT_MODEL_ROUTES,
   ModelRoutesSchema,
   STORY_FACTORY_RELEASE,
   STORY_FACTORY_REVISION,
   StoryFactoryError,
+  digestArtifact,
   assessSequentialContinuity,
   buildContinuityPacketFromEvents,
   memoryEntityIdsForArc,
@@ -37,6 +39,7 @@ import {
   selectPreviousTail,
   writeStoryChapter,
   type ProviderUsage,
+  type MarketBlueprint,
   type StateEvent,
   type StoryState,
 } from '../src/services/story-factory';
@@ -49,8 +52,8 @@ const apply = args.includes('--apply');
 const flag = (name: string, fallback: string) =>
   args.find(entry => entry.startsWith(`--${name}=`))?.split('=').slice(1).join('=') ?? fallback;
 
-const commissionPath = flag('commission', 'factory/canary/commission.json');
-const researchPath = flag('research', 'factory/canary/research.json');
+const commissionPath = flag('commission', 'factory/fresh-canary-hx03/commission.json');
+const researchPath = flag('research', 'factory/fresh-canary-hx03/research.json');
 const routesPath = flag('routes', '');
 const targetChapters = Number(flag('chapters', '5'));
 // Concept Lab is ~80% of a smoke's cost and rolls a fresh concept every run, which
@@ -130,8 +133,17 @@ async function main() {
 
   try {
     let launchPack: { kernel: unknown; arc: unknown; initialState: unknown };
+    let marketBlueprint: MarketBlueprint;
     if (packPath) {
-      launchPack = LaunchPackSchema.parse(readJson(packPath));
+      const saved = readJson(packPath);
+      if (!saved || typeof saved !== 'object' || !('launchPack' in saved) || !('marketBlueprint' in saved)) {
+        throw new StoryFactoryError(
+          'setup_blocked',
+          'Saved smoke pack predates the required market blueprint. Run one full smoke without --pack to rebuild it.',
+        );
+      }
+      launchPack = LaunchPackSchema.parse(saved.launchPack);
+      marketBlueprint = MarketBlueprintSchema.parse(saved.marketBlueprint);
       console.log(`[smoke] reusing launch pack from ${packPath}`);
     } else {
       const setup = await runConceptLab({
@@ -141,7 +153,11 @@ async function main() {
       });
       usages.push(...setup.usages);
       launchPack = setup.launchPack;
-      writeFileSync(path.resolve(savePackPath), `${JSON.stringify(setup.launchPack, null, 2)}\n`);
+      marketBlueprint = MarketBlueprintSchema.parse(setup.selectedConcept.marketBlueprint);
+      writeFileSync(path.resolve(savePackPath), `${JSON.stringify({
+        launchPack: setup.launchPack,
+        marketBlueprint,
+      }, null, 2)}\n`);
       console.log(`[smoke] launch pack saved to ${savePackPath}`);
     }
     const parsedPack = LaunchPackSchema.parse(launchPack);
@@ -163,6 +179,7 @@ async function main() {
         arc,
         state,
         routes,
+        marketBlueprint,
         continuityPacket: buildContinuityPacketFromEvents({
           state,
           entityIds: memoryEntityIdsForArc(kernel, arc, state),
@@ -269,6 +286,7 @@ async function main() {
         criticalContinuityViolations,
         firstPassPublishRate: chapters.length ? firstPassPublishes / chapters.length : 0,
         planRecoveries,
+        marketBlueprintDigest: digestArtifact(marketBlueprint),
         totalCostUsd: cost(usages),
         title: kernel.title,
         chapterTitles: chapters.map(chapter => chapter.title),

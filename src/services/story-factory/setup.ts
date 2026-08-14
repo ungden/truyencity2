@@ -77,6 +77,23 @@ export const MarketBlueprintSchema = z.object({
 });
 export type MarketBlueprint = z.infer<typeof MarketBlueprintSchema>;
 
+/**
+ * Every canonical story must carry its market/world contract after setup. Keeping
+ * this as a named fail-closed parser prevents later stages and operational tools
+ * from quietly treating a missing blueprint as an optional legacy field.
+ */
+export function requireMarketBlueprint(value: unknown): MarketBlueprint {
+  const parsed = MarketBlueprintSchema.safeParse(value);
+  if (!parsed.success) {
+    throw new StoryFactoryError(
+      'setup_blocked',
+      'Market blueprint is required and must be valid before a new story can leave setup.',
+      { issues: parsed.error.issues },
+    );
+  }
+  return parsed.data;
+}
+
 export const ConceptCandidateSchema = z.object({
   id: z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/),
   workingTitle: z.string().trim().min(4).max(180),

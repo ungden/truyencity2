@@ -160,6 +160,14 @@ describe('Story Factory architecture boundary', () => {
     expect(setup).toContain("id: 'character_protagonist_01'");
   });
 
+  test('new stories fail closed when their market blueprint is missing', () => {
+    const runtime = read('src/services/story-factory/runtime.ts');
+    const smoke = read('scripts/factory-writing-smoke.ts');
+    expect(runtime).toContain("if (job.stage !== 'setup') requireMarketBlueprint(project.market_blueprint)");
+    expect(smoke).toContain('marketBlueprint = MarketBlueprintSchema.parse(setup.selectedConcept.marketBlueprint)');
+    expect(smoke).toContain('marketBlueprintDigest: digestArtifact(marketBlueprint)');
+  });
+
   test('the release identity covers artifact compatibility only, not generation quality', () => {
     const release = read('src/services/story-factory/release.ts');
     const compat = release.slice(release.indexOf('const compatibilityIdentity'), release.indexOf('const revisionIdentity'));

@@ -1,0 +1,37 @@
+{
+  "snapshotId": "global-awakening-faloo-2026-08-14",
+  "lane": "xuanhuan_global_awakening",
+  "capturedAt": "2026-08-14T10:15:00.000Z",
+  "signals": [
+    {
+      "id": "direct_premise_packaging",
+      "sourceUrl": "https://advance.faloo.com/",
+      "observation": "Trang giới thiệu chính thức của Faloo hiện đặt các tiêu đề trực tiếp theo cấu trúc đề tài hoặc thân phận cộng biến cố mở màn và lợi thế; bao bì tác phẩm bán ngay cảnh độc giả muốn xem thay vì dùng tên văn học trừu tượng."
+    },
+    {
+      "id": "weak_job_power_reversal",
+      "sourceUrl": "https://wap.faloo.com/tag_86061.html",
+      "observation": "Danh sách toàn dân chuyển chức lặp lại fantasy nghề bị xem nhẹ nhưng lợi thế riêng biến nó thành vùng cấm, quân đoàn hoặc công cụ thống trị; payoff dựa trên so sánh công khai với nghề phổ biến."
+    },
+    {
+      "id": "visible_rank_and_scale",
+      "sourceUrl": "https://wap.faloo.com/tag_86061.html",
+      "observation": "Trang tag hiển thị tuần click, tổng click, số chữ và thứ hạng ngay cạnh premise, cho thấy comparison engine và khả năng chạy dài là một phần quan trọng của cách độc giả đánh giá sản phẩm."
+    },
+    {
+      "id": "opening_collision",
+      "sourceUrl": "https://tongren.faloo.com/l/2/33/1/7/100.html",
+      "observation": "Các listing mới thường dựng ngay va chạm dễ hiểu ở lễ chuyển chức hoặc thời điểm thế giới dữ liệu hóa: người khác theo luật nghề quen thuộc còn main sở hữu một logic phát triển lệch chuẩn tạo cảnh biểu diễn sớm."
+    },
+    {
+      "id": "arena_expansion",
+      "sourceUrl": "https://tongren.faloo.com/r/2/33/8/7/185.html",
+      "observation": "Mô tả tác phẩm nối nghề nghiệp cá nhân với săn bắt, bí cảnh, quân đoàn, dungeon, tài sản và danh tiếng, gợi ý một setup tốt phải mở được nhiều đấu trường và loại quyền lực chứ không mắc kẹt ở luyện cấp đơn tuyến."
+    },
+    {
+      "id": "originality_boundary",
+      "sourceUrl": "https://advance.faloo.com/",
+      "observation": "Tín hiệu thị trường chỉ được dùng để học cách đóng gói, nhịp payoff và quy mô xung đột; Story Factory phải tạo thế giới, nghề nghiệp, cơ chế, tên riêng và chuỗi nhân quả nguyên bản, không sao chép tác phẩm được niêm yết."
+    }
+  ]
+}

@@ -7,6 +7,8 @@ import {
   DEFAULT_MODEL_ROUTES,
   FIRST_30_PORTFOLIO,
   ModelRoutesSchema,
+  ResearchSnapshotSchema,
+  StoryCommissionSchema,
   ArcPlanSchema,
   RollingPlanSchema,
   StoryKernelSchema,
@@ -14,6 +16,7 @@ import {
   STORY_FACTORY_RELEASE,
   runStoryFactoryTick,
   collectPlanAdvisories,
+  assertFirst30PortfolioCommission,
   validateKernelState,
   validateRollingPlan,
 } from '../src/services/story-factory';
@@ -46,8 +49,12 @@ async function seed() {
   const researchPath = value('--research');
   const routesPath = value('--routes');
   if (!commissionPath || !researchPath) throw new Error('seed requires --commission and --research.');
-  const commission = JSON.parse(readFileSync(path.resolve(commissionPath), 'utf8'));
-  const research = JSON.parse(readFileSync(path.resolve(researchPath), 'utf8'));
+  const commission = StoryCommissionSchema.parse(JSON.parse(readFileSync(path.resolve(commissionPath), 'utf8')));
+  const research = ResearchSnapshotSchema.parse(JSON.parse(readFileSync(path.resolve(researchPath), 'utf8')));
+  if (commission.genreLane !== research.lane) {
+    throw new Error(`Research lane ${research.lane} does not match commission lane ${commission.genreLane}.`);
+  }
+  assertFirst30PortfolioCommission(commission);
   const routes = routesPath
     ? ModelRoutesSchema.parse(JSON.parse(readFileSync(path.resolve(routesPath), 'utf8')))
     : DEFAULT_MODEL_ROUTES;

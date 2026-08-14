@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { StoryFactoryError } from './contracts';
 
 const PortfolioSlotSchema = z.object({
   slotKey: z.string().regex(/^(HX|TH|DT)-\d{2}$/),
@@ -43,4 +44,17 @@ export const FIRST_30_PORTFOLIO = z.array(PortfolioSlotSchema).length(30).parse(
 if (new Set(FIRST_30_PORTFOLIO.map(slot => slot.slotKey)).size !== 30
   || new Set(FIRST_30_PORTFOLIO.map(slot => slot.genreLane)).size !== 30) {
   throw new Error('The first-30 allocation must contain unique slots and lanes.');
+}
+
+export function assertFirst30PortfolioCommission(input: { slotKey: string; genreLane: string }): void {
+  const slot = FIRST_30_PORTFOLIO.find(item => item.slotKey === input.slotKey);
+  if (!slot) {
+    throw new StoryFactoryError('setup_blocked', `Unknown first-30 portfolio slot: ${input.slotKey}.`);
+  }
+  if (slot.genreLane !== input.genreLane) {
+    throw new StoryFactoryError(
+      'setup_blocked',
+      `Portfolio slot ${input.slotKey} requires lane ${slot.genreLane}, not ${input.genreLane}.`,
+    );
+  }
 }
