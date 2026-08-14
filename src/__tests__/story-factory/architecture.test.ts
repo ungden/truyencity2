@@ -260,6 +260,7 @@ describe('Story Factory architecture boundary', () => {
       migration.indexOf('FUNCTION public.claim_story_factory_job('),
     );
     expect(body).toContain("smoke.kind = 'smoke'");
+    expect(body).toContain("smoke.status IN ('passed', 'blocked')");
     expect(body).toContain("(smoke.output_artifact->>'chaptersCompleted')::integer, 0) >= 5");
     expect(body).toContain("(smoke.output_artifact->>'criticalContinuityViolations')::integer, -1) = 0");
     // The four-run chain required every run to carry the current release, so any fix
