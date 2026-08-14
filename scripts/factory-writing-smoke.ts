@@ -150,42 +150,74 @@ async function main() {
     let state: StoryState = parsedPack.initialState;
     console.log(`[smoke] launch pack ready: ${kernel.title}`);
 
+    // Mirror production's plan recovery (505fbe8): a plan-scope verdict — from
+    // the Plan Judge or from the chapter Editor — feeds one informed replan of a
+    // single chapter instead of killing the run. Bounded at two recoveries per
+    // smoke so a flapping planner still fails; the counter is reported so a pass
+    // that needed recoveries is visible in the summary.
+    const MAX_PLAN_RECOVERIES = 2;
+    let planRecoveries = 0;
+    const planWindow = async (recovery?: { message: string }) => {
+      const planned = await planRollingWindow({
+        kernel,
+        arc,
+        state,
+        routes,
+        continuityPacket: buildContinuityPacketFromEvents({
+          state,
+          entityIds: memoryEntityIdsForArc(kernel, arc, state),
+          events,
+        }),
+        ...(recovery
+          ? { recoveryEvidence: { source: 'plan_blocked', message: recovery.message }, requiredWindowSize: 1 as const }
+          : {}),
+      });
+      usages.push(...planned.usages);
+      return planned.rollingPlan;
+    };
+    const recoverPlanOrRethrow = async (error: unknown, origin: 'plan' | 'chapter') => {
+      if (!(error instanceof StoryFactoryError) || error.code !== 'plan_blocked' || planRecoveries >= MAX_PLAN_RECOVERIES) {
+        throw error;
+      }
+      planRecoveries += 1;
+      console.log(`[smoke] ${origin} verdict → informed replan (${planRecoveries}/${MAX_PLAN_RECOVERIES}): ${error.message}`);
+      return planWindow({ message: error.message });
+    };
+
     let rolling: Awaited<ReturnType<typeof planRollingWindow>>['rollingPlan'] | null = null;
     while (state.chapterNumber < targetChapters) {
       const nextChapter = state.chapterNumber + 1;
       if (!rolling?.plans.some(plan => plan.chapterNumber === nextChapter)) {
-        const planned = await planRollingWindow({
-          kernel,
-          arc,
-          state,
-          routes,
-          continuityPacket: buildContinuityPacketFromEvents({
-            state,
-            entityIds: memoryEntityIdsForArc(kernel, arc, state),
-            events,
-          }),
-        });
-        usages.push(...planned.usages);
-        rolling = planned.rollingPlan;
+        try {
+          rolling = await planWindow();
+        } catch (error) {
+          rolling = await recoverPlanOrRethrow(error, 'plan');
+        }
       }
       const plan = rolling.plans.find(item => item.chapterNumber === nextChapter);
       if (!plan) throw new StoryFactoryError('plan_blocked', `Rolling plan never covered chapter ${nextChapter}.`);
       const previousContent = chapters[chapters.length - 1]?.content;
       const stateBefore = state;
 
-      const result = await writeStoryChapter({
-        kernel,
-        state,
-        plan,
-        nextPlan: rolling.plans.find(item => item.chapterNumber === nextChapter + 1),
-        previousChapter: previousContent,
-        continuityPacket: buildContinuityPacketFromEvents({
+      let result: Awaited<ReturnType<typeof writeStoryChapter>>;
+      try {
+        result = await writeStoryChapter({
+          kernel,
           state,
-          entityIds: memoryEntityIdsForPlan(kernel, plan),
-          events,
-        }),
-        routes,
-      });
+          plan,
+          nextPlan: rolling.plans.find(item => item.chapterNumber === nextChapter + 1),
+          previousChapter: previousContent,
+          continuityPacket: buildContinuityPacketFromEvents({
+            state,
+            entityIds: memoryEntityIdsForPlan(kernel, plan),
+            events,
+          }),
+          routes,
+        });
+      } catch (error) {
+        rolling = await recoverPlanOrRethrow(error, 'chapter');
+        continue;
+      }
       usages.push(...result.usages);
       if (result.revisionCount === 0) firstPassPublishes += 1;
 
@@ -236,6 +268,7 @@ async function main() {
         chaptersCompleted: chapters.length,
         criticalContinuityViolations,
         firstPassPublishRate: chapters.length ? firstPassPublishes / chapters.length : 0,
+        planRecoveries,
         totalCostUsd: cost(usages),
         title: kernel.title,
         chapterTitles: chapters.map(chapter => chapter.title),
@@ -248,6 +281,7 @@ async function main() {
       runId,
       chaptersCompleted: chapters.length,
       criticalContinuityViolations,
+      planRecoveries,
       totalCostUsd: Number(cost(usages).toFixed(4)),
     }, null, 2));
     if (!passed) process.exitCode = 1;

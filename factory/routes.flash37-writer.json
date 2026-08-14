@@ -1,0 +1,12 @@
+{
+  "setupGeneratorA": "gemini-3.5-flash",
+  "setupGeneratorB": "gemini-2.5-pro",
+  "setupJudge": "gemini-3.1-pro-preview",
+  "openingSimulator": "gemini-3.5-flash",
+  "launchArchitect": "gemini-3.1-pro-preview",
+  "planner": "gemini-3.1-pro-preview",
+  "planJudge": "gemini-2.5-pro",
+  "writer": "gemini-3.7-flash",
+  "editor": "gemini-3.1-pro-preview",
+  "routeVersion": "flash37-writer-experiment-2026-08-13.1"
+}

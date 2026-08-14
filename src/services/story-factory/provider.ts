@@ -25,6 +25,9 @@ const PRICING: Record<string, { input: number; output: number }> = {
   'gemini-3-flash-preview': { input: 0.5, output: 3 },
   'gemini-3.1-pro-preview': { input: 2, output: 12 },
   'gemini-3.6-flash': { input: 1.5, output: 7.5 },
+  // Introductory price through 2026-12-31 (launch email 2026-08-13); reverts to
+  // 3.6-flash-level pricing after — recheck before relying on the margin.
+  'gemini-3.7-flash': { input: 0.75, output: 3.75 },
   // Post-discount pricing announced 2026-07-30.
   'gpt-5.6-luna': { input: 0.2, output: 1.2 },
   'gpt-5.6-terra': { input: 1, output: 6 },
