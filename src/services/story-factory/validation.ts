@@ -11,7 +11,7 @@ import {
   StoryFactoryError,
 } from './contracts';
 
-export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-34-float-epsilon';
+export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-35-material-settlement';
 
 export interface StateEvent {
   chapterNumber: number;
@@ -766,6 +766,22 @@ function validateScenes(kernel: StoryKernel, state: StoryState, plan: ChapterPla
           : []
       )),
     ].join(' ');
+    const explicitMaterialSettlement = hasVietnameseTerm(
+      transactionEvidence,
+      String.raw`giao nộp (?:tiền|vàng|tài sản|bồi thường)|(?:trả|nộp) (?:tiền|vàng|tài sản )?bồi thường|bồi thường (?:bằng )?(?:tiền|vàng|tài sản)`,
+    );
+    const materialGainDelta = sceneDeltas.some(delta => (
+      (delta.kind === 'resource_numeric' && delta.delta > 0)
+      || delta.kind === 'resource_state'
+    ));
+    if (explicitMaterialSettlement && !materialGainDelta) {
+      fail(`Scene ${scene.id} completes material compensation but carries no positive resource delta.`, {
+        action: scene.action,
+        deltaSources: sceneDeltas.flatMap(delta => (
+          'source' in delta && typeof delta.source === 'string' ? [delta.source] : []
+        )),
+      });
+    }
     // Free-form action text is not a transaction ledger. Bare mentions of
     // buying/selling can be reports, negotiations, or counting proceeds already
     // committed in an earlier scene. Only an explicit present settlement is a

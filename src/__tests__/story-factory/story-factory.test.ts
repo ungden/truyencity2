@@ -1342,10 +1342,11 @@ describe('canonical Story Factory', () => {
   });
 
   /**
-   * Two checks read free-form Vietnamese scene text to guess whether value moved.
+   * Ambiguous checks read free-form Vietnamese scene text to guess whether value moved.
    * They cannot block a plan — "chế tạo" reads the same whether a scene completes an
    * asset or only persuades someone to start one, and a wrong block costs a whole job.
    * They now raise advisories the Plan Judge answers with the window in hand.
+   * Explicit completed material compensation is narrower and blocks separately below.
    */
   const validateFor = (chapter: ReturnType<typeof plan>, over = { kernel, state: initialState }) => {
     let error: unknown = null;
@@ -1377,6 +1378,13 @@ describe('canonical Story Factory', () => {
       observation: expect.stringContaining('settlement wording'),
       evidence: { action: chapter.scenes[0].action },
     }]);
+  });
+
+  test('rejects completed material compensation without a positive resource delta', () => {
+    const chapter = plan(1);
+    chapter.scenes[0].action = 'Đám sát thủ giao nộp tài sản bồi thường ngay tại chỗ rồi rút lui.';
+    expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter }))
+      .toThrow('completes material compensation but carries no positive resource delta');
   });
 
   test('does not book a transaction when a scene only analyzes a future purchase', () => {
@@ -4044,6 +4052,7 @@ describe('canonical Story Factory', () => {
         stageAlignment: 'chapter 1 scene_1 delta_1',
         outcomeWeight: 'chapter 1 scene_1 delta_1',
       },
+      earlyPayoffChecks: [],
       issues: [],
     }]);
 
@@ -4189,6 +4198,7 @@ describe('canonical Story Factory', () => {
         stageAlignment: 'chapter 1 scene_1 delta_1',
         outcomeWeight: 'chapter 1 scene_1 delta_1',
       },
+      earlyPayoffChecks: [],
       issues: [],
     }]);
     const result = await planRollingWindow({
@@ -4213,6 +4223,71 @@ describe('canonical Story Factory', () => {
         responseDigest: expect.stringMatching(/^[a-f0-9]{64}$/),
       }),
     ]);
+  });
+
+  test('Plan Judge cannot pass a due market payoff with a missing material result', async () => {
+    const marketBlueprint = MarketBlueprintSchema.parse({
+      familiarArena: 'Một đấu trường thức tỉnh nghề nghiệp quen thuộc với cạnh tranh công khai.',
+      noveltyCollision: 'Một nghề bị coi thường va vào quyền năng chiến đấu có thể định giá và cưỡng chế.',
+      protagonistStartingPosition: 'Nhân vật chính đứng ở đáy bảng xếp hạng và bị đội mạnh dùng làm mồi nhử.',
+      coreAdvantage: 'Nhân vật chính áp một quy tắc độc nhất có chi phí để đổi đòn đánh của địch thành tài sản.',
+      comparisonEngine: 'Bảng xếp hạng, tài sản và nhân chứng khiến mỗi chiến thắng được so sánh công khai.',
+      worldConflictEngine: 'Công hội và tài phiệt phản ứng vì quyền kiểm soát bí cảnh cùng dòng tài nguyên bị đe dọa.',
+      earlyPayoffs: [1, 3, 5, 7, 10].map(byChapter => ({
+        byChapter,
+        payoff: `Payoff hữu hình bắt buộc hoàn tất chậm nhất ở chương ${byChapter}.`,
+        visibleTo: `Người có quyền lợi trực tiếp chứng kiến payoff chương ${byChapter}.`,
+        positionChange: `Vị thế của main đổi thật và được ledger ghi nhận ở chương ${byChapter}.`,
+        nextPressure: `Một lớp đối lực mới phản ứng bằng hành động ngay sau chương ${byChapter}.`,
+      })),
+      scaleLadder: Array.from({ length: 6 }, (_, index) => ({
+        scope: `Bậc ${index + 1}`,
+        arena: `Đấu trường bậc ${index + 1} thay đổi quyền kiểm soát và tài nguyên tranh chấp.`,
+        statusPrize: `Phần thưởng vị thế bậc ${index + 1} làm tăng quyền lựa chọn nhìn thấy được.`,
+        oppositionClass: `Lớp đối thủ bậc ${index + 1} có agenda và công cụ phản chế độc lập.`,
+        advantageEvolution: `Lợi thế tiến hóa ở bậc ${index + 1} bằng một cách dùng mới thay vì chỉ tăng số.`,
+      })),
+    });
+    const failedPayoff = {
+      status: 'pass' as const,
+      checks: {
+        protagonistAgency: true, earnedProgression: true, domainPlausibility: true, oppositionAgenda: true,
+        sceneVariety: true, stageAlignment: true, outcomeWeight: true,
+      },
+      checkEvidence: {
+        protagonistAgency: 'chapter 1 scene_1 delta_1',
+        earnedProgression: 'chapter 1 scene_1 delta_1',
+        domainPlausibility: 'chapter 1 scene_1 delta_1',
+        oppositionAgenda: 'chapter 1 scene_1 delta_1',
+        sceneVariety: 'chapter 1 scene_1 delta_1',
+        stageAlignment: 'chapter 1 scene_1 delta_1',
+        outcomeWeight: 'chapter 1 scene_1 delta_1',
+      },
+      earlyPayoffChecks: [{
+        byChapter: 1 as const,
+        payoffMatched: false,
+        visibleToMatched: true,
+        positionChangeMatched: false,
+        nextPressureMatched: true,
+        sceneId: 'scene_1',
+        deltaIds: ['delta_1'],
+        evidence: 'scene_1 chỉ có setup và delta_1 không tạo tài sản hay vị thế đã hứa.',
+      }],
+      issues: [],
+    };
+    const provider = new QueueProvider([plannerWire(), failedPayoff, plannerWire(), failedPayoff]);
+
+    await expect(planRollingWindow({
+      kernel, arc, state: initialState, routes, provider, marketBlueprint,
+    })).rejects.toMatchObject({
+      code: 'plan_blocked',
+      evidence: expect.objectContaining({
+        firstAssessment: expect.objectContaining({
+          status: 'revise',
+          issues: [expect.objectContaining({ category: 'stage_alignment', chapterNumber: 1 })],
+        }),
+      }),
+    });
   });
 
   test('Plan Judge contract can reject an impossible cross-scene knowledge flow', () => {
@@ -4248,6 +4323,7 @@ describe('canonical Story Factory', () => {
         stageAlignment: 'chapter 1 scene_1 delta_1',
         outcomeWeight: 'chapter 1 scene_1 delta_1',
       },
+      earlyPayoffChecks: [],
       issues: [{
         category: 'earned_progression' as const,
         chapterNumber: 1,
@@ -4272,6 +4348,7 @@ describe('canonical Story Factory', () => {
         stageAlignment: 'chapter 1 scene_1 delta_1',
         outcomeWeight: 'chapter 1 scene_1 delta_1',
       },
+      earlyPayoffChecks: [],
       issues: [],
     }]);
     const result = await planRollingWindow({ kernel, arc, state: initialState, routes, provider });
@@ -4289,6 +4366,7 @@ describe('canonical Story Factory', () => {
       status: 'revise' as const,
       checks: { ...checks, earnedProgression: false },
       checkEvidence,
+      earlyPayoffChecks: [],
       issues: [{
         category: 'earned_progression' as const,
         chapterNumber: 1,
@@ -4298,7 +4376,7 @@ describe('canonical Story Factory', () => {
         instruction: 'Tạo tích lũy và chi phí đủ sức đỡ delta_1.',
       }],
     };
-    const pass = { status: 'pass', checks, checkEvidence, issues: [] };
+    const pass = { status: 'pass', checks, checkEvidence, earlyPayoffChecks: [], issues: [] };
 
     const checkpoints: unknown[] = [];
     const first = new QueueProvider([plannerWire(), revise, plannerWire(), pass]);
@@ -4362,6 +4440,7 @@ describe('canonical Story Factory', () => {
         stageAlignment: 'chapter 1 scene_1 serves stage_1',
         outcomeWeight: 'chapter 1 delta_1 is proportional',
       },
+      earlyPayoffChecks: [],
       issues: [{
         category: 'opposition_agenda' as const,
         chapterNumber: 1,
@@ -4391,6 +4470,7 @@ describe('canonical Story Factory', () => {
         stageAlignment: 'chapter 1 scene_1 serves stage_1',
         outcomeWeight: 'chapter 1 delta_1 is proportional',
       },
+      earlyPayoffChecks: [],
       issues: [],
     };
     const provider = new QueueProvider([
@@ -4454,6 +4534,7 @@ describe('canonical Story Factory', () => {
         stageAlignment: 'chapter 1 scene_1 delta_1',
         outcomeWeight: 'chapter 1 scene_1 delta_1',
       },
+      earlyPayoffChecks: [],
       issues: [{
         category: 'earned_progression' as const,
         chapterNumber: 1,
@@ -4478,6 +4559,7 @@ describe('canonical Story Factory', () => {
         stageAlignment: 'chapter 1 scene_1 delta_1',
         outcomeWeight: 'chapter 1 scene_1 delta_1',
       },
+      earlyPayoffChecks: [],
       issues: [],
     };
     const provider = new QueueProvider([
@@ -4536,6 +4618,7 @@ describe('canonical Story Factory', () => {
         stageAlignment: 'chapter 1 scene_1 delta_1',
         outcomeWeight: 'chapter 1 scene_1 delta_1',
       },
+      earlyPayoffChecks: [],
       issues: [],
     }]);
     const result = await planRollingWindow({
@@ -4632,6 +4715,7 @@ describe('canonical Story Factory', () => {
         stageAlignment: 'chapter 1 scene_1 delta_1',
         outcomeWeight: 'chapter 1 scene_1 delta_1',
       },
+      earlyPayoffChecks: [],
       issues: [{
         category: 'opposition_agenda' as const,
         chapterNumber: 1,

@@ -22,7 +22,7 @@ import type { MarketBlueprint } from './setup';
 
 // Defined here, not in release.ts: release → benchmark → planner already exists, so a
 // planner → release import closes a cycle and breaks the production bundle (TDZ at init).
-export const FACTORY_PLANNER_VERSION = 'story-factory-planner-74-early-payoff-fidelity';
+export const FACTORY_PLANNER_VERSION = 'story-factory-planner-75-payoff-evidence';
 import { EDITOR_SYSTEM_PROMPT, PLANNER_SYSTEM_PROMPT, PLAN_JUDGE_SYSTEM_PROMPT } from './prompts';
 import {
   ARC_ACTIVE_MECHANIC_BUDGET,
@@ -1387,6 +1387,16 @@ const PlanJudgeWireSchema = z.object({
     stageAlignment: z.string().trim().min(3).max(800),
     outcomeWeight: z.string().trim().min(3).max(800),
   }).strict(),
+  earlyPayoffChecks: z.array(z.object({
+    byChapter: z.union([z.literal(1), z.literal(3), z.literal(5), z.literal(7), z.literal(10)]),
+    payoffMatched: z.boolean(),
+    visibleToMatched: z.boolean(),
+    positionChangeMatched: z.boolean(),
+    nextPressureMatched: z.boolean(),
+    sceneId: z.string().trim().min(1).max(160),
+    deltaIds: z.array(z.string().trim().min(1).max(160)).min(1).max(10),
+    evidence: z.string().trim().min(3).max(800),
+  }).strict()).max(3),
   issues: z.array(PlanAssessmentSchema.options[1].shape.issues.element).max(3),
 }).strict();
 
@@ -1522,17 +1532,70 @@ export async function assessRollingPlan(input: {
           }
         : null,
       evidenceRule: 'Với mỗi check, checkEvidence phải chỉ rõ chapterNumber và ít nhất một sceneId hoặc deltaId làm căn cứ; không chấp nhận lời khen chung.',
+      earlyPayoffEvidenceRule: 'Trả đúng một earlyPayoffChecks cho mỗi dueMarketPayoffs và không trả mục nào nếu danh sách deadline rỗng. Mỗi mục phải giữ nguyên byChapter, trỏ tới sceneId cùng các deltaIds thật sự tạo payoff, người chứng kiến, đổi vị thế và áp lực kế tiếp. Chỉ đánh dấu từng trường true khi scene + delta chứng minh trực tiếp; lời hứa, fact tự tuyên bố, hoặc một thắng lợi khác không được tính thay.',
     }),
     schema: PlanJudgeWireSchema,
     temperature: 0.3,
   });
+  const expectedPayoffChapters = dueMarketPayoffs.map(payoff => payoff.byChapter);
+  const returnedPayoffChapters = result.value.earlyPayoffChecks.map(check => check.byChapter);
+  if (returnedPayoffChapters.length !== expectedPayoffChapters.length
+    || returnedPayoffChapters.some((chapter, index) => chapter !== expectedPayoffChapters[index])) {
+    throw new StoryFactoryError('infra_blocked', 'Plan Judge returned a malformed early-payoff check set.', {
+      expectedPayoffChapters,
+      returnedPayoffChapters,
+    });
+  }
+  for (const check of result.value.earlyPayoffChecks) {
+    const sceneChapter = input.rollingPlan.plans.find(chapter => (
+      chapter.chapterNumber <= check.byChapter
+      && chapter.scenes.some(scene => scene.id === check.sceneId)
+    ));
+    const scene = sceneChapter?.scenes.find(item => item.id === check.sceneId);
+    if (!sceneChapter || !scene) {
+      throw new StoryFactoryError('infra_blocked', 'Plan Judge early-payoff check referenced an unknown or late scene.', check);
+    }
+    for (const deltaId of check.deltaIds) {
+      if (!scene.requiredDeltaIds.includes(deltaId)
+        || !sceneChapter.requiredDeltas.some(delta => delta.id === deltaId)) {
+        throw new StoryFactoryError('infra_blocked', 'Plan Judge early-payoff check referenced a delta outside its evidence scene.', {
+          ...check,
+          deltaId,
+        });
+      }
+    }
+  }
   const failedChecks = Object.entries(result.value.checks).filter(([, passed]) => !passed).map(([gate]) => gate);
-  if (failedChecks.length > 0 && result.value.issues.length === 0) {
+  const failedPayoffChecks = result.value.earlyPayoffChecks.filter(check => (
+    !check.payoffMatched
+    || !check.visibleToMatched
+    || !check.positionChangeMatched
+    || !check.nextPressureMatched
+  ));
+  if (failedChecks.length > 0 && result.value.issues.length === 0 && failedPayoffChecks.length === 0) {
     throw new StoryFactoryError('infra_blocked', 'Plan Judge returned a failed gate without evidence.', { failedChecks });
   }
+  const payoffIssues: PlanRevisionIssues = failedPayoffChecks.map(check => {
+    const sceneChapter = input.rollingPlan.plans.find(chapter => chapter.scenes.some(scene => scene.id === check.sceneId))!;
+    const failedParts = [
+      !check.payoffMatched ? 'payoff' : null,
+      !check.visibleToMatched ? 'visibleTo' : null,
+      !check.positionChangeMatched ? 'positionChange' : null,
+      !check.nextPressureMatched ? 'nextPressure' : null,
+    ].filter((part): part is string => Boolean(part));
+    return {
+      category: 'stage_alignment' as const,
+      chapterNumber: sceneChapter.chapterNumber,
+      sceneId: check.sceneId,
+      deltaId: check.deltaIds[0],
+      evidence: `Deadline chapter ${check.byChapter} thiếu: ${failedParts.join(', ')}. ${check.evidence}`,
+      instruction: `Lập lại plan để scene và delta hoàn tất đúng payoff chapter ${check.byChapter}, gồm người chứng kiến, đổi vị thế và áp lực kế tiếp.`,
+    };
+  });
+  const combinedIssues = [...payoffIssues, ...result.value.issues].slice(0, 3);
   const assessment = PlanAssessmentSchema.parse(
-    result.value.issues.length > 0 || failedChecks.length > 0
-      ? { status: 'revise', issues: result.value.issues }
+    combinedIssues.length > 0 || failedChecks.length > 0
+      ? { status: 'revise', issues: combinedIssues }
       : { status: 'pass', issues: [] },
   );
   validatePlanAssessment(input.rollingPlan, assessment);
