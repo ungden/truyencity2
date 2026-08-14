@@ -4515,7 +4515,7 @@ describe('canonical Story Factory', () => {
     ]);
   });
 
-  test('a Plan Judge replan gets one bounded mechanical repair before re-review', async () => {
+  test('a Plan Judge replan gets two bounded sequential mechanical repairs before re-review', async () => {
     const invalidReplan = plannerWire();
     invalidReplan.chapters[0].mechanics = [{
       id: 'invalid_support_after_judge',
@@ -4575,19 +4575,21 @@ describe('canonical Story Factory', () => {
       plannerWire(),
       revise,
       invalidReplan,
+      invalidReplan,
       plannerWire(),
       pass,
     ]);
     const result = await planRollingWindow({ kernel, arc, state: initialState, routes, provider });
     expect(result.assessment.status).toBe('pass');
-    expect(provider.calls).toEqual(['planner', 'plan-judge', 'planner', 'planner', 'plan-judge']);
+    expect(provider.calls).toEqual(['planner', 'plan-judge', 'planner', 'planner', 'planner', 'plan-judge']);
     expect(result.attempts.map(attempt => ({
       attempt: attempt.attempt,
       status: attempt.status,
     }))).toEqual([
       { attempt: 'initial', status: 'validated' },
       { attempt: 'judge_replan', status: 'invalid' },
-      { attempt: 'judge_replan_mechanical_repair', status: 'validated' },
+      { attempt: 'judge_replan_mechanical_repair', status: 'invalid' },
+      { attempt: 'judge_replan_mechanical_repair_2', status: 'validated' },
     ]);
   });
 

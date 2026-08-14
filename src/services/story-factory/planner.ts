@@ -22,7 +22,7 @@ import type { MarketBlueprint } from './setup';
 
 // Defined here, not in release.ts: release → benchmark → planner already exists, so a
 // planner → release import closes a cycle and breaks the production bundle (TDZ at init).
-export const FACTORY_PLANNER_VERSION = 'story-factory-planner-76-payoff-window-evidence';
+export const FACTORY_PLANNER_VERSION = 'story-factory-planner-77-sequential-repair';
 import { EDITOR_SYSTEM_PROMPT, PLANNER_SYSTEM_PROMPT, PLAN_JUDGE_SYSTEM_PROMPT } from './prompts';
 import {
   ARC_ACTIVE_MECHANIC_BUDGET,
@@ -55,7 +55,7 @@ export function earlyPayoffsForChapterRange(
 }
 
 export type PlannerAttemptTelemetry = {
-  attempt: 'initial' | 'mechanical_repair' | 'judge_replan' | 'judge_replan_mechanical_repair';
+  attempt: 'initial' | 'mechanical_repair' | 'judge_replan' | 'judge_replan_mechanical_repair' | 'judge_replan_mechanical_repair_2';
   responseDigest: string;
   status: 'validated' | 'invalid';
   validationMessage: string | null;
@@ -2038,7 +2038,7 @@ export async function planRollingWindow(input: {
       validationIssues: judgedAssessment.issues,
       temperature: 0.1,
     });
-    let repairedPlan: RollingPlan;
+    let repairedPlan: RollingPlan | undefined;
     let repairedRaw: unknown;
     try {
       repairedPlan = materializeAndValidate(judgeRepair.value);
@@ -2064,40 +2064,52 @@ export async function planRollingWindow(input: {
         validationEvidence: normalized.evidence ?? null,
         usage: judgeRepair.usage,
       });
-      const mechanicalRepair = await requestPlan({
-        task: 'Tạo lại toàn bộ rolling window sau Plan Judge và sửa đúng validation issue cơ học; không thay mục tiêu sửa nội dung của Plan Judge, không vá cục bộ.',
-        previousResponse: judgeRepair.value,
-        validationIssues: {
-          message: normalized.message,
-          evidence: normalized.evidence ?? null,
-          judgeIssues: judgedAssessment.issues,
-        },
-        temperature: 0.1,
-      });
-      try {
-        repairedPlan = materializeAndValidate(mechanicalRepair.value);
-        repairedRaw = mechanicalRepair.value;
-        attempts.push({
-          attempt: 'judge_replan_mechanical_repair',
-          responseDigest: digestRollingPlan(repairedPlan),
-          status: 'validated',
-          validationMessage: null,
-          validationEvidence: null,
-          usage: mechanicalRepair.usage,
+      let previousRepairResponse: unknown = judgeRepair.value;
+      let repairFailure = normalized;
+      for (let repairAttempt = 1; repairAttempt <= 2; repairAttempt += 1) {
+        const mechanicalRepair = await requestPlan({
+          task: `Tạo lại toàn bộ rolling window sau Plan Judge và sửa đúng validation issue cơ học; không thay mục tiêu sửa nội dung của Plan Judge, không vá cục bộ.
+  Bắt buộc tự replay từ durable state theo thứ tự chapter -> scene -> mechanicUse: from/value trước của mọi delta phải bằng số dư vừa replay; không được tiêu resource trước scene tạo ra nó. Actor của mechanicUse phải có trong scene.people. Conversion sở hữu đúng delta input/output của nó; capability không được gắn lại cùng delta chỉ để kể thao tác, và mọi mechanicUse phải có ít nhất một delta thật mà mechanic đó sở hữu. Nếu một scene không thể chứa chuỗi hợp lệ thì tách scene và đặt producer trước consumer.`,
+          previousResponse: previousRepairResponse,
+          validationIssues: {
+            message: repairFailure.message,
+            evidence: repairFailure.evidence ?? null,
+            judgeIssues: judgedAssessment.issues,
+          },
+          temperature: 0.1,
         });
-      } catch (repairError) {
-        if (repairError instanceof StoryFactoryError && repairError.code === 'infra_blocked') throw repairError;
-        const repairFailure = normalizePlanError(repairError);
-        attempts.push({
-          attempt: 'judge_replan_mechanical_repair',
-          responseDigest: createHash('sha256')
-            .update(JSON.stringify(mechanicalRepair.value))
-            .digest('hex'),
-          status: 'invalid',
-          validationMessage: repairFailure.message,
-          validationEvidence: repairFailure.evidence ?? null,
-          usage: mechanicalRepair.usage,
-        });
+        const attemptName = repairAttempt === 1
+          ? 'judge_replan_mechanical_repair'
+          : 'judge_replan_mechanical_repair_2';
+        try {
+          repairedPlan = materializeAndValidate(mechanicalRepair.value);
+          repairedRaw = mechanicalRepair.value;
+          attempts.push({
+            attempt: attemptName,
+            responseDigest: digestRollingPlan(repairedPlan),
+            status: 'validated',
+            validationMessage: null,
+            validationEvidence: null,
+            usage: mechanicalRepair.usage,
+          });
+          break;
+        } catch (repairError) {
+          if (repairError instanceof StoryFactoryError && repairError.code === 'infra_blocked') throw repairError;
+          repairFailure = normalizePlanError(repairError);
+          attempts.push({
+            attempt: attemptName,
+            responseDigest: createHash('sha256')
+              .update(JSON.stringify(mechanicalRepair.value))
+              .digest('hex'),
+            status: 'invalid',
+            validationMessage: repairFailure.message,
+            validationEvidence: repairFailure.evidence ?? null,
+            usage: mechanicalRepair.usage,
+          });
+          previousRepairResponse = mechanicalRepair.value;
+        }
+      }
+      if (!repairedPlan || repairedRaw === undefined) {
         throw new StoryFactoryError('plan_blocked', repairFailure.message, {
           validation: repairFailure.evidence ?? null,
           judgeIssues: judgedAssessment.issues,
