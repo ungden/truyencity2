@@ -8,6 +8,7 @@ import {
   StoryFactoryError,
   WorldMechanicSchema,
   type ArcPlan,
+  type ChapterPlan,
   type ModelRoutes,
   type PlanAssessment,
   type RollingPlan,
@@ -21,7 +22,7 @@ import type { MarketBlueprint } from './setup';
 
 // Defined here, not in release.ts: release → benchmark → planner already exists, so a
 // planner → release import closes a cycle and breaks the production bundle (TDZ at init).
-export const FACTORY_PLANNER_VERSION = 'story-factory-planner-72-market-judge';
+export const FACTORY_PLANNER_VERSION = 'story-factory-planner-73-causal-shape-guard';
 import { EDITOR_SYSTEM_PROMPT, PLANNER_SYSTEM_PROMPT, PLAN_JUDGE_SYSTEM_PROMPT } from './prompts';
 import {
   ARC_ACTIVE_MECHANIC_BUDGET,
@@ -1524,6 +1525,83 @@ export async function assessRollingPlan(input: {
  * and is ignored. Provenance is compared field-by-field (never by serialized JSON —
  * Postgres JSONB reorders object keys).
  */
+// ── Causal-shape repetition guard ────────────────────────────────────────────
+
+export interface CausalShape {
+  chapterNumber: number;
+  /** Sorted 'mechanicId bởi actorId' pairs of the chapter's effect uses. */
+  effectChain: string[];
+}
+
+const causalPair = (mechanicId: string, actorId: string) => `${mechanicId} bởi ${actorId}`;
+const shapeSignature = (chain: string[]) => [...chain].sort().join(' + ');
+
+export function committedCausalShapes(packet?: ContinuityPacket): CausalShape[] {
+  if (!packet) return [];
+  const byChapter = new Map<number, string[]>();
+  for (const use of packet.recentMechanicUses) {
+    if (use.kind !== 'mechanic_use') continue;
+    const after = use.after as { actorId?: unknown; role?: unknown } | null;
+    if (!after || after.role !== 'effect' || typeof after.actorId !== 'string') continue;
+    const chain = byChapter.get(use.chapterNumber) ?? [];
+    chain.push(causalPair(use.entityId, after.actorId));
+    byChapter.set(use.chapterNumber, chain);
+  }
+  return [...byChapter.entries()]
+    .sort((a, b) => a[0] - b[0])
+    .map(([chapterNumber, effectChain]) => ({ chapterNumber, effectChain: [...effectChain].sort() }));
+}
+
+export function planCausalShape(plan: ChapterPlan): CausalShape {
+  return {
+    chapterNumber: plan.chapterNumber,
+    effectChain: plan.mechanicUses
+      .filter(use => use.role === 'effect')
+      .map(use => causalPair(use.mechanicId, use.actorId))
+      .sort(),
+  };
+}
+
+/**
+ * "Escalation" that repeats the exact causal shape of a recent chapter — the
+ * same effect mechanics fired by the same actors, only the numbers scaled — is
+ * the most common plan verdict in production (Đại Địa ch38, Bác Sĩ ch62, Ông
+ * Trùm ch55, twice in one smoke on 2026-08-13). The Plan Judge and the chapter
+ * Editor both catch it, but every catch burns a full model call plus a replan
+ * cycle. The shape is exactly computable from the plan and the committed
+ * mechanic_use events, so code rejects it inside the cheap mechanical repair
+ * loop instead. Chains shorter than two effect uses are exempt — connective
+ * single-mechanic chapters legitimately recur.
+ */
+export function assertNoRepeatedCausalShape(input: {
+  plans: ChapterPlan[];
+  packet?: ContinuityPacket;
+  recentChapterWindow?: number;
+}): void {
+  if (!input.plans.length) return;
+  const recentWindow = input.recentChapterWindow ?? 5;
+  const minimumChapter = Math.min(...input.plans.map(plan => plan.chapterNumber));
+  const seen = new Map<string, number>();
+  for (const shape of committedCausalShapes(input.packet)) {
+    if (shape.chapterNumber < minimumChapter - recentWindow) continue;
+    if (shape.effectChain.length >= 2) seen.set(shapeSignature(shape.effectChain), shape.chapterNumber);
+  }
+  for (const plan of input.plans) {
+    const shape = planCausalShape(plan);
+    if (shape.effectChain.length < 2) continue;
+    const signature = shapeSignature(shape.effectChain);
+    const priorChapter = seen.get(signature);
+    if (priorChapter !== undefined && priorChapter !== plan.chapterNumber) {
+      throw new StoryFactoryError(
+        'plan_blocked',
+        `Chương ${plan.chapterNumber} lặp lại y nguyên causal shape của chương ${priorChapter}: cùng chuỗi mechanic do cùng actor thực hiện (${shape.effectChain.join(', ')}). Đổi quy mô con số không phải leo thang — đổi chuỗi mechanic, actor dẫn, đối tượng xung đột hoặc loại rủi ro.`,
+        { chapterNumber: plan.chapterNumber, repeatsChapter: priorChapter, effectChain: shape.effectChain },
+      );
+    }
+    seen.set(signature, plan.chapterNumber);
+  }
+}
+
 export const PlanCheckpointSchema = z.object({
   provenance: z.object({
     nextChapter: z.number().int(),
@@ -1668,6 +1746,13 @@ export async function planRollingWindow(input: {
           sceneRule: 'Theo dõi vị trí từng người qua từng scene. Code tính shortest path có hướng trên travelEdges; scene.travel phải >= thời gian shortest-path lớn nhất của mọi scene.people đi từ vị trí trước đó tới scene.loc. Không cần tạo scene ở mỗi location trung gian.',
         },
         continuityPacket: input.continuityPacket ?? null,
+        // The model repeats what it cannot see clearly (same lesson as the arc
+        // travel graph): show it the causal shape of the chapters it is
+        // extending, computed by code from committed mechanic_use events.
+        recentCausalShapes: {
+          shapes: committedCausalShapes(input.continuityPacket).slice(-6),
+          rule: 'Chương mới không được lặp một effectChain gần đây (cùng mechanic, cùng actor) mà chỉ đổi quy mô con số. Leo thang thật sự đổi ít nhất một trong: chuỗi mechanic, actor dẫn, đối tượng xung đột, loại rủi ro.',
+        },
         // Author steering: a priority direction for upcoming chapters, applied
         // through planning choices. It never overrides canon, the ledger, or
         // validation — when they conflict, canon wins.
@@ -1706,6 +1791,7 @@ export async function planRollingWindow(input: {
       // window is replanned from committed state — so trimming loses nothing.
       parsed = { ...parsed, plans: parsed.plans.slice(0, input.requiredWindowSize) };
     }
+    assertNoRepeatedCausalShape({ plans: parsed.plans, packet: input.continuityPacket });
     const collected = collectPlanAdvisories(() => validateRollingPlan({
       kernel: input.kernel, arc: input.arc, state: input.state, rollingPlan: parsed,
     }));

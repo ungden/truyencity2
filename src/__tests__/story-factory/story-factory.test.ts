@@ -67,6 +67,7 @@ import {
   memoryEntityIdsForPlan,
   narrativelyObservableDeltaIds,
   runConceptLab,
+  assertNoRepeatedCausalShape,
   planArcLifecycle,
   planRollingWindow,
   reviewFiveChapterWindow,
@@ -5155,6 +5156,53 @@ describe('prose-craft gates', () => {
     expect(issue).not.toBeNull();
     expect(moderate).toContain(issue!.evidence);
     expect(detectBlandSensoryCliche(moderate + moderate)).toMatchObject({ severity: 'major' });
+  });
+
+  test('a plan repeating a committed causal shape is rejected deterministically', () => {
+    const mechanicUse = (id: string, mechanicId: string, actorId: string) => ({
+      id, sceneId: 'scene_6', mechanicId, actorId,
+      role: 'effect' as const, quantity: 1, preconditionFactIds: [], deltaIds: ['delta_6'],
+    });
+    const repeatPlan = {
+      ...plan(6),
+      mechanicUses: [mechanicUse('mu_1', 'mech_bay', 'char_tu'), mechanicUse('mu_2', 'mech_ban', 'char_mai')],
+    };
+    const transition = (chapterNumber: number, mechanicId: string, actorId: string) => ({
+      chapterNumber, deltaId: `mechanic_${chapterNumber}_${mechanicId}`, kind: 'mechanic_use',
+      entityId: mechanicId, before: null,
+      after: { sceneId: 's', actorId, role: 'effect', quantity: 1, deltaIds: [] },
+      source: null, relatedEntityIds: [],
+    });
+    const packet = {
+      recentOutcomes: [], firstAndLastRelationships: [], latestEntityTransitions: [],
+      promiseOriginsAndProgress: [],
+      recentMechanicUses: [
+        transition(5, 'mech_bay', 'char_tu'),
+        transition(5, 'mech_ban', 'char_mai'),
+      ],
+    };
+    expect(() => assertNoRepeatedCausalShape({ plans: [repeatPlan], packet }))
+      .toThrow(/lặp lại y nguyên causal shape của chương 5/);
+    // A different actor leading the same mechanics is real escalation, not a repeat.
+    const escalated = {
+      ...repeatPlan,
+      mechanicUses: [mechanicUse('mu_1', 'mech_bay', 'char_mai'), mechanicUse('mu_2', 'mech_ban', 'char_mai')],
+    };
+    expect(() => assertNoRepeatedCausalShape({ plans: [escalated], packet })).not.toThrow();
+    // Single-mechanic connective chapters are exempt.
+    const connective = { ...repeatPlan, mechanicUses: [mechanicUse('mu_1', 'mech_bay', 'char_tu')] };
+    expect(() => assertNoRepeatedCausalShape({ plans: [connective], packet })).not.toThrow();
+    // A committed shape older than the recent window no longer blocks.
+    expect(() => assertNoRepeatedCausalShape({
+      plans: [{ ...repeatPlan, chapterNumber: 20 }], packet,
+    })).not.toThrow();
+    // Two identical shapes inside one window are the same disease.
+    expect(() => assertNoRepeatedCausalShape({
+      plans: [
+        { ...repeatPlan, chapterNumber: 12 },
+        { ...repeatPlan, chapterNumber: 13 },
+      ],
+    })).toThrow(/lặp lại y nguyên causal shape của chương 12/);
   });
 
   test('author directive is trimmed, capped and null when blank', () => {
