@@ -16,7 +16,11 @@ import { ModelRoutesSchema } from './contracts';
  */
 export const DEFAULT_MODEL_ROUTES = ModelRoutesSchema.parse({
   setupGeneratorA: 'gemini-3.5-flash',
-  setupGeneratorB: 'gemini-2.5-pro',
+  // 2.5 Pro cannot reliably serve the nested market-blueprint contract: it
+  // rejects constrained schemas as "too many states" and repeatedly emits
+  // malformed JSON in JSON mode. 3.1 Pro is the independent B generator for
+  // fresh stories; existing projects keep their stored routes.
+  setupGeneratorB: 'gemini-3.1-pro-preview',
   setupJudge: 'gemini-3.1-pro-preview',
   openingSimulator: 'gemini-3.5-flash',
   launchArchitect: 'gemini-3.1-pro-preview',

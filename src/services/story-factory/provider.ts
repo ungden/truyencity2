@@ -127,6 +127,21 @@ function cost(model: string, inputTokens: number, outputTokens: number): number 
   return (inputTokens * price.input + outputTokens * price.output) / 1_000_000;
 }
 
+function mergeUsage(first: ProviderUsage, second: ProviderUsage): ProviderUsage {
+  return {
+    ...second,
+    inputTokens: first.inputTokens + second.inputTokens,
+    outputTokens: first.outputTokens + second.outputTokens,
+    costUsd: first.costUsd + second.costUsd,
+    grounding: first.grounding || second.grounding
+      ? {
+        searchQueries: [...(first.grounding?.searchQueries ?? []), ...(second.grounding?.searchQueries ?? [])],
+        sourceUrls: [...(first.grounding?.sourceUrls ?? []), ...(second.grounding?.sourceUrls ?? [])],
+      }
+      : undefined,
+  };
+}
+
 function retryable(error: unknown): boolean {
   if (error instanceof ProviderHttpError) return TRANSIENT_STATUS.has(error.status) || error.status >= 500;
   if (error instanceof DOMException) return error.name === 'AbortError' || error.name === 'TimeoutError';
@@ -580,19 +595,45 @@ export const geminiProvider: StoryModelProvider = {
       googleSearch: input.grounding === 'google_search',
     });
     let raw: unknown;
+    let usage = response.usage;
     try {
       raw = JSON.parse(response.value);
     } catch {
-      throw new StoryFactoryError('infra_blocked', 'Provider violated the structured-output JSON contract.', {
-        usage: response.usage,
+      if (input.constrainSchema !== false) {
+        throw new StoryFactoryError('infra_blocked', 'Provider violated the structured-output JSON contract.', {
+          usage,
+        });
+      }
+      const jsonCorrection = await generate({
+        ...input,
+        prompt: `${prompt}\n\nBản trả trước không phải JSON hợp lệ. Trả lại đúng một object JSON hoàn chỉnh theo schema, không markdown, không giải thích.`,
+        temperature: input.temperature ?? 0.7,
+        responseSchema: undefined,
+        jsonMode: true,
+        googleSearch: input.grounding === 'google_search',
       });
+      usage = mergeUsage(usage, jsonCorrection.usage);
+      try {
+        raw = JSON.parse(jsonCorrection.value);
+      } catch {
+        throw new StoryFactoryError('infra_blocked', 'Provider violated the structured-output JSON contract after one correction.', {
+          usage,
+        });
+      }
     }
     let parsed = input.schema.safeParse(raw);
-    if (!parsed.success && (input.model.startsWith('gpt-') || input.model.includes('/'))) {
-      // Gemini enforces exact shapes through constrained decoding; OpenAI-compatible
-      // strict mode cannot express array-length constraints, so a wrong-count roll is
-      // an expected failure there. One corrective regeneration on the SAME model —
-      // this is a same-route retry, not substitution.
+    if (!parsed.success && (
+      input.model.startsWith('gpt-')
+      || input.model.includes('/')
+      || input.constrainSchema === false
+      || (input.schemaComplexity !== undefined && input.schemaComplexity !== 'default')
+    )) {
+      // Gemini normally enforces exact shapes through constrained decoding;
+      // OpenAI-compatible strict mode cannot express array-length constraints,
+      // and intentionally unconstrained Gemini calls use JSON mode because an
+      // oversized schema is rejected before generation. A wrong-count roll is
+      // therefore expected on those paths. One corrective regeneration on the
+      // SAME model is a same-route retry, not substitution.
       const corrective = await generate({
         ...input,
         prompt: `${prompt}
@@ -611,12 +652,7 @@ Trả lại đúng một object JSON đã sửa, không giải thích.`,
           usage: corrective.usage,
         });
       }
-      const usageTotal = {
-        ...corrective.usage,
-        inputTokens: response.usage.inputTokens + corrective.usage.inputTokens,
-        outputTokens: response.usage.outputTokens + corrective.usage.outputTokens,
-        costUsd: response.usage.costUsd + corrective.usage.costUsd,
-      };
+      const usageTotal = mergeUsage(usage, corrective.usage);
       parsed = input.schema.safeParse(raw);
       if (!parsed.success) {
         throw new StoryFactoryError('infra_blocked', 'Provider output failed application schema validation after one correction.', {
@@ -629,9 +665,9 @@ Trả lại đúng một object JSON đã sửa, không giải thích.`,
     if (!parsed.success) {
       throw new StoryFactoryError('infra_blocked', 'Provider output failed application schema validation.', {
         issues: parsed.error.issues,
-        usage: response.usage,
+        usage,
       });
     }
-    return { value: parsed.data, usage: response.usage };
+    return { value: parsed.data, usage };
   },
 };

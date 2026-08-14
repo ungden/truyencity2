@@ -255,8 +255,8 @@ export function validateKernelState(kernel: StoryKernel, state: StoryState): voi
  * rolling-plan validator's responsibility.
  */
 /**
- * Every resource an active conversion CONSUMES must be PRODUCED by at least one
- * active mechanic. Opening stock does not count: a finite balance is a countdown,
+ * Every resource an active conversion or capability CONSUMES must be PRODUCED by
+ * at least one active mechanic. Opening stock does not count: a finite balance is a countdown,
  * not an acquisition path. The first production canary passed balance-seeded
  * reachability at setup, spent its opening inventory across three chapters, and
  * dead-ended — its arc could preserve and sell fish but nothing could ever acquire
@@ -264,10 +264,9 @@ export function validateKernelState(kernel: StoryKernel, state: StoryState): voi
  * buys fish, selling fish yields money) that a zero-balance reachability check
  * would wrongly reject.
  */
-export function assertRenewableConversionInputs(kernel: StoryKernel, arc: ArcPlan): void {
-  const activeMechanics = arc.activeMechanicIds.map(id => (
-    kernel.worldMechanics.find(mechanic => mechanic.id === id)
-  )).filter((mechanic): mechanic is StoryKernel['worldMechanics'][number] => Boolean(mechanic));
+export function assertRenewableMechanicSet(
+  activeMechanics: StoryKernel['worldMechanics'],
+): void {
   const produced = new Set<string>();
   const consumed = new Set<string>();
   for (const mechanic of activeMechanics) {
@@ -275,16 +274,26 @@ export function assertRenewableConversionInputs(kernel: StoryKernel, arc: ArcPla
       mechanic.outputsPerBatch.forEach(item => produced.add(item.resourceId));
       mechanic.inputsPerBatch.forEach(item => consumed.add(item.resourceId));
     } else if (mechanic.kind === 'capability') {
-      mechanic.effectResources.forEach(effect => produced.add(effect.resourceId));
+      mechanic.effectResources.forEach(effect => {
+        if (effect.direction === 'increase') produced.add(effect.resourceId);
+        if (effect.direction === 'decrease') consumed.add(effect.resourceId);
+      });
     }
   }
   const sinkOnly = [...consumed].filter(resourceId => !produced.has(resourceId));
   if (sinkOnly.length) {
-    fail('Active conversions consume resources no active mechanic can produce.', {
+    fail('Active mechanics consume resources no active mechanic can produce.', {
       resourceIds: sinkOnly,
       repairRule: 'Add an active acquisition mechanic (purchase, harvest, production) for each listed resource, or deactivate the conversion that consumes it. A finite opening balance is not an acquisition path.',
     });
   }
+}
+
+export function assertRenewableConversionInputs(kernel: StoryKernel, arc: ArcPlan): void {
+  const activeMechanics = arc.activeMechanicIds.map(id => (
+    kernel.worldMechanics.find(mechanic => mechanic.id === id)
+  )).filter((mechanic): mechanic is StoryKernel['worldMechanics'][number] => Boolean(mechanic));
+  assertRenewableMechanicSet(activeMechanics);
 }
 
 export function validateArcResourceReachability(input: {
@@ -692,6 +701,20 @@ function validateScenes(kernel: StoryKernel, state: StoryState, plan: ChapterPla
       referenced.add(deltaId);
     }
     const sceneDeltas = scene.requiredDeltaIds.map(deltaId => plan.requiredDeltas.find(delta => delta.id === deltaId)!);
+    const broadAcquisition = hasVietnameseTerm(
+      `${scene.objective} ${scene.action}`,
+      String.raw`cướp (?:toàn bộ )?(?:trang bị|vũ khí|chiến lợi phẩm|đồ đạc) (?:của )?(?:chúng|địch|đối phương)|thu gom (?:toàn bộ )?(?:trang bị|vũ khí|chiến lợi phẩm)|giữ lại (?:mọi|những|các) (?:trang bị|vũ khí|chiến lợi phẩm|thứ có giá trị)`,
+    );
+    const trackedLoot = sceneDeltas.some(delta => delta.kind === 'resource_numeric'
+      && delta.delta > 0
+      && hasVietnameseTerm(`${delta.source ?? ''} ${delta.sink ?? ''}`, String.raw`cướp|thu gom|chiến lợi phẩm|tịch thu`));
+    if (broadAcquisition && !trackedLoot) {
+      fail(`Scene ${scene.id} claims a broad durable acquisition without a matching resource delta.`, {
+        objective: scene.objective,
+        action: scene.action,
+        instruction: 'Narrow the scene to the exact tracked item/state delta, or add a positive numeric resource delta for the aggregate loot. Do not invite Writer to keep untracked weapons or gear.',
+      });
+    }
     const realizedAction = stripNonActionAssetPhrases(
       stripProhibitedTransactions(stripReportedTransactions(stripFutureIntent(scene.action))),
     );

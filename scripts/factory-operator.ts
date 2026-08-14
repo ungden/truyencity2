@@ -58,6 +58,9 @@ async function seed() {
   const routes = routesPath
     ? ModelRoutesSchema.parse(JSON.parse(readFileSync(path.resolve(routesPath), 'utf8')))
     : DEFAULT_MODEL_ROUTES;
+  if (routes.setupGeneratorB === 'gemini-2.5-pro') {
+    throw new Error('gemini-2.5-pro cannot serve the market-blueprint concept schema; use the current default setupGeneratorB before seeding a fresh story.');
+  }
   // Same condition claim_story_factory_job enforces, surfaced here so seeding fails
   // with a clear message instead of producing a job that silently never gets claimed.
   const smokeResult = await db.from('story_factory_runs')

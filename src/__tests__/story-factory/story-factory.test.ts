@@ -68,6 +68,7 @@ import {
   narrativelyObservableDeltaIds,
   runConceptLab,
   assertNoRepeatedCausalShape,
+  assertRenewableConversionInputs,
   planArcLifecycle,
   planRollingWindow,
   reviewFiveChapterWindow,
@@ -588,6 +589,29 @@ describe('canonical Story Factory', () => {
     })).not.toThrow();
   });
 
+  test('a decreasing capability cannot masquerade as its own renewable source', () => {
+    const drainingKernel = structuredClone(kernel);
+    drainingKernel.worldMechanics.push({
+      id: 'collect_fee',
+      name: 'Thu phí cưỡng chế',
+      kind: 'capability',
+      description: 'Người có quyền lấy tiền từ quỹ hữu hạn của nhân vật chính.',
+      allowedActorIds: ['buyer'],
+      requiredFacts: [],
+      requiredResourceIds: ['money'],
+      effectResources: [{ resourceId: 'money', direction: 'decrease' }],
+      effectFactIds: [],
+      capacityUnit: 'lần',
+      maximumUnitsPerMinute: 1,
+    });
+    const drainingArc = {
+      ...structuredClone(arc),
+      activeMechanicIds: ['collect_fee'],
+    };
+    expect(() => assertRenewableConversionInputs(drainingKernel, drainingArc))
+      .toThrow('consume resources no active mechanic can produce');
+  });
+
   test('does not require provenance for an active resource until a mechanic uses it', () => {
     const trackedKernel = structuredClone(kernel);
     trackedKernel.resources.push({
@@ -613,6 +637,14 @@ describe('canonical Story Factory', () => {
       arc: trackedArc,
       state: trackedState,
     })).not.toThrow();
+  });
+
+  test('blocks a broad loot objective when the ledger tracks no aggregate loot', () => {
+    const chapter = plan(1);
+    chapter.scenes[0].objective = 'Đánh bại đội lính đánh thuê và cướp trang bị của chúng.';
+    chapter.scenes[0].action = 'Main lấy đúng một mảnh giáp đã khóa để sửa khiên.';
+    expect(() => applyChapterPlan({ kernel, state: initialState, plan: chapter }))
+      .toThrow('broad durable acquisition');
   });
 
   test('conversion loss is represented by the input-output ratio, not a second loss ledger', () => {

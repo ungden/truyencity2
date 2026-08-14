@@ -166,6 +166,12 @@ describe('Story Factory architecture boundary', () => {
     expect(runtime).toContain("if (job.stage !== 'setup') requireMarketBlueprint(project.market_blueprint)");
     expect(smoke).toContain('marketBlueprint = MarketBlueprintSchema.parse(setup.selectedConcept.marketBlueprint)');
     expect(smoke).toContain('marketBlueprintDigest: digestArtifact(marketBlueprint)');
+    expect(read('src/services/story-factory/setup.ts')).toContain("schemaComplexity: 'omit_array_max'");
+    expect(read('src/services/story-factory/setup.ts')).toContain('constrainSchema: false');
+    expect(smoke).toContain("factory/smoke-checkpoint.local.json");
+    expect(smoke).toContain('onCheckpoint: async checkpoint =>');
+    expect(read('src/services/story-factory/routes.ts')).toContain("setupGeneratorB: 'gemini-3.1-pro-preview'");
+    expect(read('scripts/factory-operator.ts')).toContain("routes.setupGeneratorB === 'gemini-2.5-pro'");
   });
 
   test('the release identity covers artifact compatibility only, not generation quality', () => {

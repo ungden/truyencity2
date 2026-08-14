@@ -19,6 +19,7 @@ import {
   validateArcActivationBudget,
   validateArcAgainstKernel,
   assertRenewableConversionInputs,
+  assertRenewableMechanicSet,
   validateArcResourceReachability,
   validateKernelState,
 } from './validation';
@@ -58,7 +59,9 @@ export const MarketBlueprintSchema = z.object({
     nextPressure: z.string().trim().min(20).max(800),
   }).strict()).length(5),
   scaleLadder: z.array(z.object({
-    scope: z.string().trim().min(8).max(120),
+    // A scope is a label (e.g. "Đội", "Tỉnh", "Liên minh"), while the
+    // arena/opposition fields carry the substantive detail.
+    scope: z.string().trim().min(3).max(120),
     arena: z.string().trim().min(20).max(800),
     statusPrize: z.string().trim().min(20).max(800),
     oppositionClass: z.string().trim().min(20).max(800),
@@ -114,7 +117,12 @@ export const ConceptCandidateSchema = z.object({
 const ConceptBatchSchema = z.object({ candidates: z.array(ConceptCandidateSchema).length(6) }).strict();
 const ConceptCandidateWireSchema = ConceptCandidateSchema.omit({ id: true });
 const ConceptBatchWireSchema = z.object({
-  candidates: z.array(ConceptCandidateWireSchema).length(6),
+  // Unconstrained Gemini JSON mode can return a complete but short batch. The
+  // generator tops it up on the same route before canonical length-6 parsing.
+  candidates: z.array(ConceptCandidateWireSchema).min(1).max(6),
+}).strict();
+const ConceptTripleBatchWireSchema = z.object({
+  candidates: z.array(ConceptCandidateWireSchema).length(3),
 }).strict();
 const TopTwoSchema = z.object({
   selectedIds: z.array(z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/)).length(2),
@@ -176,7 +184,7 @@ interface SetupStageArtifact {
   usage: ProviderUsage;
 }
 
-export const SETUP_CHECKPOINT_VERSION = 'story-factory-setup-checkpoint-3-market-blueprint';
+export const SETUP_CHECKPOINT_VERSION = 'story-factory-setup-checkpoint-6-market-series-minima';
 
 export interface SetupCheckpointProvenance {
   version: typeof SETUP_CHECKPOINT_VERSION;
@@ -302,15 +310,33 @@ export function createLaunchWorldWireSchema(characterIds: string[]) {
     capabilities: z.array(capability).min(1).max(34),
   }).strict();
 }
+const LaunchSeriesKernelBaseSchema = StoryKernelObjectSchema.pick({
+  progressionTracks: true,
+  seriesSpine: true,
+  longPromises: true,
+  promises: true,
+  endingDirection: true,
+});
 const LaunchSeriesSchema = z.object({
-  kernel: StoryKernelObjectSchema.pick({
-    progressionTracks: true,
-    seriesSpine: true,
-    longPromises: true,
-    promises: true,
-    endingDirection: true,
+  kernel: LaunchSeriesKernelBaseSchema.extend({
+    progressionTracks: LaunchSeriesKernelBaseSchema.shape.progressionTracks.min(3),
+    longPromises: LaunchSeriesKernelBaseSchema.shape.longPromises.min(6),
+    promises: LaunchSeriesKernelBaseSchema.shape.promises.min(6),
   }),
-}).strict();
+}).strict().superRefine((value, ctx) => {
+  value.kernel.seriesSpine.stages.forEach((stage, index) => {
+    if (index > 0 && stage.expansionSeeds.length < 2) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.too_small,
+        minimum: 2,
+        type: 'array',
+        inclusive: true,
+        path: ['kernel', 'seriesSpine', 'stages', index, 'expansionSeeds'],
+        message: 'Later series stages need at least two concrete world expansions.',
+      });
+    }
+  });
+});
 export const LaunchStateSchema = z.object({
   arc: InitialArcPlanSchema,
   initialState: InitialStoryStateSchema,
@@ -326,6 +352,21 @@ async function setupStage<T>(label: string, call: Promise<T>): Promise<T> {
     }
     throw error;
   }
+}
+
+function mergeStageUsage(first: ProviderUsage, second: ProviderUsage): ProviderUsage {
+  return {
+    ...second,
+    inputTokens: first.inputTokens + second.inputTokens,
+    outputTokens: first.outputTokens + second.outputTokens,
+    costUsd: first.costUsd + second.costUsd,
+    grounding: first.grounding || second.grounding
+      ? {
+        searchQueries: [...(first.grounding?.searchQueries ?? []), ...(second.grounding?.searchQueries ?? [])],
+        sourceUrls: [...(first.grounding?.sourceUrls ?? []), ...(second.grounding?.sourceUrls ?? [])],
+      }
+      : undefined,
+  };
 }
 
 function parseSetupArtifact<S extends z.ZodTypeAny>(label: string, schema: S, value: unknown): z.output<S> {
@@ -531,6 +572,46 @@ function assertIdentityOpposition(kernel: Pick<LaunchPack['kernel'], 'protagonis
   }
 }
 
+function assertLaunchWorldReferences(
+  identity: z.infer<typeof LaunchIdentitySchema>['kernel'],
+  world: z.infer<typeof LaunchWorldSchema>['kernel'],
+): void {
+  const resourceIds = new Set(world.resources.map(resource => resource.id));
+  const missingResourceIds = new Set<string>();
+  for (const mechanic of world.worldMechanics) {
+    if (mechanic.kind === 'conversion') {
+      [...mechanic.inputsPerBatch, ...mechanic.outputsPerBatch].forEach(item => {
+        if (!resourceIds.has(item.resourceId)) missingResourceIds.add(item.resourceId);
+      });
+    } else if (mechanic.kind === 'capability') {
+      mechanic.requiredResourceIds.forEach(resourceId => {
+        if (!resourceIds.has(resourceId)) missingResourceIds.add(resourceId);
+      });
+      mechanic.effectResources.forEach(effect => {
+        if (!resourceIds.has(effect.resourceId)) missingResourceIds.add(effect.resourceId);
+      });
+    }
+  }
+  const entityIds = new Set([
+    ...identity.characters.map(character => character.id),
+    ...world.worldModel.institutions.map(institution => institution.id),
+  ]);
+  const unknownOwnerEntityIds = [...new Set(world.resources.flatMap(resource => (
+    resource.ownerEntityId && !entityIds.has(resource.ownerEntityId) ? [resource.ownerEntityId] : []
+  )))];
+  const locationIds = new Set(world.locations.map(location => location.id));
+  const unknownTravelLocationIds = [...new Set(world.travelRules.flatMap(rule => [rule.fromLocationId, rule.toLocationId])
+    .filter(locationId => !locationIds.has(locationId)))];
+  if (missingResourceIds.size || unknownOwnerEntityIds.length || unknownTravelLocationIds.length) {
+    throw new StoryFactoryError('setup_blocked', 'World canon contains dangling stable-ID references.', {
+      missingResourceIds: [...missingResourceIds],
+      unknownOwnerEntityIds,
+      unknownTravelLocationIds,
+      repairRule: 'Return every referenced resource and entity in the world canon, or remove the dangling mechanic/travel reference.',
+    });
+  }
+}
+
 export function assertVoiceSemantics(characters: LaunchPack['kernel']['characters']): void {
   const cannedGesture = /\n|^[—-]\s|(?<!\p{L})(?:cười|nhếch|quát\s+(?:lên|rằng|mắng|thẳng)|gằn\s+(?:giọng|từng)|lẩm bẩm|nói rằng|ánh mắt)(?!\p{L})/iu;
   const containsQuotedSentence = (value: string): boolean => {
@@ -562,9 +643,10 @@ function generatorPrompt(input: {
   commission: z.infer<typeof StoryCommissionSchema>;
   research: z.infer<typeof ResearchSnapshotSchema>;
   generator: 'A' | 'B';
+  targetCount: number;
 }): string {
   return JSON.stringify({
-    task: `Generator ${input.generator}: tạo đúng sáu concept khác nhau về cơ chế, reward loop và conflict economy.`,
+    task: `Generator ${input.generator}: tạo đúng ${input.targetCount} concept khác nhau về cơ chế, reward loop và conflict economy.`,
     requirements: [
       'Không tạo ID; code sẽ gán stable ID bất biến theo generator và vị trí.',
       'Đây là web-serial sảng văn thương mại theo tín hiệu Faloo, nhưng là IP nguyên bản: học cách đóng gói trực diện, não động lớn, nhịp nhanh và sảng điểm dày; tuyệt đối không sao chép nhân vật, thế giới, tên riêng, franchise hoặc tiêu đề đang có.',
@@ -638,23 +720,70 @@ export async function runConceptLab(input: {
   const checkpoint: SetupCheckpoint = structuredClone(input.resume ?? { provenance });
 
   const generateConceptBatch = async (generator: 'A' | 'B') => {
-    const generated = await setupStage(`Concept Generator ${generator}`, provider.json({
-      model: generator === 'A' ? input.routes.setupGeneratorA : input.routes.setupGeneratorB,
-      system: generator === 'A'
-        ? 'Bạn là Concept Generator độc lập. Chỉ dùng research làm tín hiệu thị trường, không sao chép tác phẩm hoặc tên riêng.'
-        : 'Bạn là Concept Generator độc lập. Chủ động tìm hướng khác Generator A có thể nghĩ tới; không sao chép tác phẩm hoặc tên riêng.',
-      prompt: generatorPrompt({ commission, research, generator }),
-      schema: ConceptBatchWireSchema,
-      temperature: 1,
-    }));
+    const model = generator === 'A' ? input.routes.setupGeneratorA : input.routes.setupGeneratorB;
+    const system = generator === 'A'
+      ? 'Bạn là Concept Generator độc lập. Chỉ dùng research làm tín hiệu thị trường, không sao chép tác phẩm hoặc tên riêng.'
+      : 'Bạn là Concept Generator độc lập. Chủ động tìm hướng khác Generator A có thể nghĩ tới; không sao chép tác phẩm hoặc tên riêng.';
+    const candidates: z.infer<typeof ConceptCandidateWireSchema>[] = [];
+    const batchUsages: ProviderUsage[] = [];
+    const splitForGemini = model.startsWith('gemini-');
+    for (let batch = 1; candidates.length < 6 && batch <= 2; batch += 1) {
+      const missing = 6 - candidates.length;
+      const generated = await setupStage(`Concept Generator ${generator}${batch === 1 ? '' : ' top-up'}`, provider.json({
+        model,
+        system,
+        prompt: batch === 1 && !splitForGemini
+          ? generatorPrompt({ commission, research, generator, targetCount: 6 })
+          : `${generatorPrompt({ commission, research, generator, targetCount: splitForGemini ? 3 : missing })}\n\nBatch trước đã có ${candidates.length} concept. Đây là batch BỔ SUNG, phải khác các fingerprint sau: ${JSON.stringify(candidates.map(candidate => ({
+            mechanismFingerprint: candidate.mechanismFingerprint,
+            rewardLoopFingerprint: candidate.rewardLoopFingerprint,
+            conflictEconomyFingerprint: candidate.conflictEconomyFingerprint,
+          })))}.`,
+        schema: splitForGemini ? ConceptTripleBatchWireSchema : ConceptBatchWireSchema,
+        // Six concepts each contain five payoff rows and a 6–8-step scale
+        // ladder. Fixed nested array maxima make Gemini 2.5 Pro reject the
+        // schema before generation as "too many states" even after maxima are
+        // omitted. Use Gemini JSON mode plus the schema in the prompt; provider
+        // code still parses the full Zod contract and permits one same-model
+        // corrective regeneration if needed.
+        constrainSchema: false,
+        schemaComplexity: 'omit_array_max',
+        temperature: 1,
+      }));
+      candidates.push(...generated.value.candidates.slice(0, splitForGemini ? 3 : missing));
+      batchUsages.push(generated.usage);
+      if (!splitForGemini && candidates.length === 6) break;
+    }
+    if (candidates.length !== 6) {
+      throw new StoryFactoryError('setup_blocked', `Concept Generator ${generator} produced ${candidates.length}/6 concepts after one top-up.`);
+    }
+    const generatedUsage = batchUsages.reduce<ProviderUsage>((total, usage, index) => ({
+      model: index === 0 ? usage.model : total.model,
+      inputTokens: total.inputTokens + usage.inputTokens,
+      outputTokens: total.outputTokens + usage.outputTokens,
+      costUsd: total.costUsd + usage.costUsd,
+      finishReason: usage.finishReason,
+      grounding: total.grounding || usage.grounding
+        ? {
+          searchQueries: [...(total.grounding?.searchQueries ?? []), ...(usage.grounding?.searchQueries ?? [])],
+          sourceUrls: [...(total.grounding?.sourceUrls ?? []), ...(usage.grounding?.sourceUrls ?? [])],
+        }
+        : undefined,
+    }), {
+      model,
+      inputTokens: 0,
+      outputTokens: 0,
+      costUsd: 0,
+      finishReason: 'unknown',
+    });
     return {
       value: ConceptBatchSchema.parse({
-        candidates: generated.value.candidates.map((candidate, index) => ({
+        candidates: candidates.map((candidate, index) => ({
           id: `concept_${generator.toLowerCase()}_${String(index + 1).padStart(2, '0')}`,
           ...candidate,
         })),
       }),
-      usage: generated.usage,
+      usage: generatedUsage,
     };
   };
 
@@ -827,6 +956,19 @@ Chỉ được chọn concept có domainFeasibility=pass và longRunFeasibility=
     throw new StoryFactoryError('setup_blocked', 'Launch pack fingerprints drifted from the selected concept.');
   }
 
+  const launchWorldWireSchema = createLaunchWorldWireSchema(
+    launchIdentity.value.kernel.characters.map(character => character.id),
+  );
+  const materializeLaunchWorld = (wire: z.infer<typeof launchWorldWireSchema>) => LaunchWorldSchema.parse({
+    kernel: {
+      ...wire.kernel,
+      worldMechanics: [
+        ...wire.conversions,
+        ...wire.capabilities,
+        ...wire.constraints,
+      ],
+    },
+  });
   let launchWorld: { value: z.infer<typeof LaunchWorldSchema>; usage: ProviderUsage };
   if (checkpoint.launchWorld) {
     launchWorld = {
@@ -859,23 +1001,56 @@ World rules, resource và tổ chức phải phản ánh requiredInfrastructure,
         selectedSimulation,
         identity: launchIdentity.value.kernel,
       }),
-      schema: createLaunchWorldWireSchema(launchIdentity.value.kernel.characters.map(character => character.id)),
+      schema: launchWorldWireSchema,
       schemaComplexity: 'omit_large_array_max',
       temperature: 0.3,
     }));
     launchWorld = {
-      value: LaunchWorldSchema.parse({
-        kernel: {
-          ...launchWorldWire.value.kernel,
-          worldMechanics: [
-            ...launchWorldWire.value.conversions,
-            ...launchWorldWire.value.capabilities,
-            ...launchWorldWire.value.constraints,
-          ],
-        },
-      }),
+      value: materializeLaunchWorld(launchWorldWire.value),
       usage: launchWorldWire.usage,
     };
+  }
+  const worldMechanicErrors: Array<{ message: string; evidence: unknown }> = [];
+  for (let attempt = 0; attempt <= 2; attempt += 1) {
+    try {
+      assertLaunchWorldReferences(launchIdentity.value.kernel, launchWorld.value.kernel);
+      assertRenewableMechanicSet(launchWorld.value.kernel.worldMechanics);
+      break;
+    } catch (error) {
+      if (!(error instanceof StoryFactoryError)) throw error;
+      worldMechanicErrors.push({ message: error.message, evidence: error.evidence ?? null });
+      if (attempt === 2) {
+        throw new StoryFactoryError(
+          'setup_blocked',
+          `World mechanics failed renewable-graph validation after two corrections: ${error.message}`,
+          { ...(error.evidence ?? {}), worldMechanicErrors },
+        );
+      }
+      const correction = await setupStage(`Launch World Architect correction ${attempt + 1}/2`, provider.json({
+        model: input.routes.launchArchitect,
+        system: `Bạn sửa toàn bộ world canon theo lỗi canonical đã chỉ ra. Trả lại đầy đủ structured-output schema, không markdown và không thay identity/cast.
+Mọi resource bị conversion input hoặc capability direction=decrease tiêu hao phải có ít nhất một conversion output hoặc capability direction=increase sản xuất lại trong chính worldMechanics. Kho mở đầu hữu hạn không phải nguồn tái tạo. resources phải khai báo ĐẦY ĐỦ mọi resourceId được mechanics tham chiếu, đúng owner; locations phải khai báo đầy đủ hai đầu của mọi travelRule. Không được giải lỗi bằng cách xóa resource ledger, toàn bộ economy hay coreAdvantage: vẫn phải có conversion, capability và constraint đủ để diễn cơ chế trung tâm, tích lũy, giao dịch/xung đột và giới hạn trong arc đầu. Không coi effect direction=decrease là nguồn sản xuất.`,
+        prompt: JSON.stringify({
+          task: 'Sửa world canon theo toàn bộ chuỗi lỗi renewable graph; giữ nguyên identity và trả lại toàn bộ world.',
+          commission,
+          groundedDomainResearch: domainResearch.value,
+          selectedConcept,
+          selectedSimulation,
+          identity: launchIdentity.value.kernel,
+          worldMechanicErrors,
+          previous: launchWorld.value,
+        }),
+        schema: launchWorldWireSchema,
+        schemaComplexity: 'omit_large_array_max',
+        temperature: 0.2,
+      }));
+      launchWorld = {
+        value: materializeLaunchWorld(correction.value),
+        usage: mergeStageUsage(launchWorld.usage, correction.usage),
+      };
+      delete checkpoint.launchSeries;
+      delete checkpoint.launchState;
+    }
   }
   checkpoint.launchWorld = launchWorld;
   await input.onCheckpoint?.(structuredClone(checkpoint));
@@ -900,6 +1075,10 @@ Mọi longPromises.promiseId, stages[].longPromiseIds và endingDirection.promis
       world: launchWorld.value.kernel,
     }),
     schema: LaunchSeriesSchema,
+    // The explicit 3/6/6 series minima are application invariants. Gemini 3.1
+    // rejects that nested constrained schema before generation, so keep the
+    // complete schema in-prompt and enforce it with Zod after JSON decoding.
+    constrainSchema: false,
     schemaComplexity: 'omit_array_max',
     temperature: 0.3,
     }));
@@ -912,34 +1091,33 @@ Mọi longPromises.promiseId, stages[].longPromiseIds và endingDirection.promis
     ...launchWorld.value.kernel,
     ...launchSeries.value.kernel,
   });
-  const launchState = checkpoint.launchState
-    ? { value: LaunchStateSchema.parse(checkpoint.launchState.value), usage: checkpoint.launchState.usage }
-    : await setupStage('Launch State Architect', provider.json({
-    model: input.routes.launchArchitect,
-    system: `Bạn chỉ tạo Arc đầu 20-30 chương và StoryState chương 0 từ canon đã khóa. Trả đúng structured-output schema, không markdown.
+  const launchStateSystem = `Bạn chỉ tạo Arc đầu 20-30 chương và StoryState chương 0 từ canon đã khóa. Trả đúng structured-output schema, không markdown.
 Arc gắn stage đầu; mọi active ID phải có trong Kernel. State không ghi trước kết quả tương lai.
 Arc đầu phải trả đúng title promise và marketBlueprint.earlyPayoffs: progression có ít nhất năm mốc, khóa rõ kết quả ở/chậm nhất chương 1,3,5,7,10; terminalChanges có ít nhất ba thay đổi vị thế/tài sản/quyền lựa chọn thật; activeConflicts có ít nhất hai nguồn áp lực độc lập từ worldConflictEngine.
 Chia 20-30 chương thành nhiều mini-cycle, mỗi cycle có cơ hội hoặc áp lực → main dùng coreAdvantage → người có lợi ích trực tiếp chứng kiến/đáp trả → payoff → áp lực cấp cao hơn. Không dành trọn arc để sửa máy, thử nghiệm, gom nguyên liệu, làm quen thế giới hoặc đánh một phản diện bằng cùng một thủ đoạn.
 Mốc chương 10 phải làm main bước sang một vị thế hoặc arena mới đủ rõ, không chỉ giàu/mạnh hơn theo số. Những chương sau mở biến thể lợi thế, institution hoặc opposition class kế tiếp đã có trong Kernel.
 Arc.activeMechanicIds là working set của Planner trong arc đầu: chỉ chứa mechanic mà các beat của arc đầu thật sự dùng, tối đa ${ARC_ACTIVE_MECHANIC_BUDGET}. Mechanic không chọn vẫn nằm nguyên trong Kernel và arc sau kích hoạt được. Mọi requiredFacts của capability/constraint đang active phải có fact và expected value tương ứng trong initialState.
 Mọi đầu vào và resource điều kiện của activeMechanicIds phải có đường nhân quả từ initialState: số dư dương có nguồn gốc hợp lý hoặc output của active conversion bắt đầu từ tài nguyên đang có. activeResourceIds có thể chứa tài nguyên chỉ để theo dõi về sau, nhưng Planner không được thay đổi nó trước khi có mechanic hợp lệ. Nếu cần mua vật tư để dùng ngay, phải kích hoạt conversion thu mua tương ứng; không đặt vật tư bằng 0 rồi trông chờ Planner tự bịa nguồn.
+Nếu capability active có effectResources direction=decrease thì số dư dương ban đầu vẫn chỉ là kho hữu hạn, không phải nguồn tái tạo: arc phải kích hoạt thêm conversion/capability direction=increase sản xuất đúng resource đó, hoặc không kích hoạt capability tiêu hao trong arc này.
 initialState.schemaVersion=2, chapterNumber=0, recentOutcomes=[] và usedExpansionSeedIds=[].
 encounteredCharacterIds là nguồn sự thật exact-ID duy nhất về việc hai nhân vật đã từng gặp trực tiếp trước chương 1; phải đối xứng hai chiều. relationshipState chỉ mô tả thái độ hiện tại như tin tưởng, dè chừng, mang ơn hoặc thù địch, không dùng câu "chưa biết/chưa gặp/lần đầu" để mã hóa lịch sử gặp mặt.
-State có đúng một entry cho mọi character, resource và promise trong Kernel; không thiếu, không thêm ID lạ.`,
-    prompt: JSON.stringify({
-      task: 'Xuất Arc đầu và State chương 0.',
-      selectedConcept,
-      kernel,
-    }),
+State có đúng một entry cho mọi character, resource và promise trong Kernel; không thiếu, không thêm ID lạ.`;
+  const launchStatePrompt = {
+    task: 'Xuất Arc đầu và State chương 0.',
+    selectedConcept,
+    kernel,
+  };
+  let launchState = checkpoint.launchState
+    ? { value: LaunchStateSchema.parse(checkpoint.launchState.value), usage: checkpoint.launchState.usage }
+    : await setupStage('Launch State Architect', provider.json({
+    model: input.routes.launchArchitect,
+    system: launchStateSystem,
+    prompt: JSON.stringify(launchStatePrompt),
     schema: LaunchStateSchema,
     schemaComplexity: 'omit_large_array_max',
     temperature: 0.3,
     }));
-  checkpoint.launchState = launchState;
-  await input.onCheckpoint?.(structuredClone(checkpoint));
-  usages.push(launchState.usage);
-
-  const launch = parseSetupArtifact('LaunchPack', LaunchPackSchema, {
+  const buildLaunch = () => parseSetupArtifact('LaunchPack', LaunchPackSchema, {
     schemaVersion: 2,
     selectedConceptId: launchIdentity.value.selectedConceptId,
     kernel,
@@ -947,30 +1125,64 @@ State có đúng một entry cho mọi character, resource và promise trong Ker
     initialState: launchState.value.initialState,
     coverPrompt: launchIdentity.value.coverPrompt,
   });
-  assertLaunchSemantics(launch, commission, selectedConcept);
-  assertPortfolioDiversity(selectedConcept, input.existingSignatures ?? []);
-  if (launch.initialState.chapterNumber !== 0
-    || launch.initialState.storyTimeMinutes !== 0
-    || launch.initialState.recentOutcomes.length
-    || launch.initialState.usedExpansionSeedIds.length
-    || launch.arc.startChapter !== 1) {
-    throw new StoryFactoryError('setup_blocked', 'Launch pack must start before chapter one with no simulated canon or consumed expansion seeds.');
-  }
-  try {
-    validateKernelState(launch.kernel, launch.initialState);
-    validateArcActivationBudget(launch.arc);
-    validateArcAgainstKernel(launch.kernel, ArcPlanSchema.parse(launch.arc));
-    validateArcResourceReachability({
-      kernel: launch.kernel,
-      arc: ArcPlanSchema.parse(launch.arc),
-      state: launch.initialState,
-    });
-    assertRenewableConversionInputs(launch.kernel, ArcPlanSchema.parse(launch.arc));
-  } catch (error) {
-    if (error instanceof StoryFactoryError) {
-      throw new StoryFactoryError('setup_blocked', `Launch pack failed canonical validation: ${error.message}`, error.evidence);
+  const validateStateAndArc = (candidate: LaunchPack) => {
+    assertLaunchSemantics(candidate, commission, selectedConcept);
+    if (candidate.initialState.chapterNumber !== 0
+      || candidate.initialState.storyTimeMinutes !== 0
+      || candidate.initialState.recentOutcomes.length
+      || candidate.initialState.usedExpansionSeedIds.length
+      || candidate.arc.startChapter !== 1) {
+      throw new StoryFactoryError('setup_blocked', 'Launch pack must start before chapter one with no simulated canon or consumed expansion seeds.');
     }
-    throw error;
+    validateKernelState(candidate.kernel, candidate.initialState);
+    validateArcActivationBudget(candidate.arc);
+    validateArcAgainstKernel(candidate.kernel, ArcPlanSchema.parse(candidate.arc));
+    validateArcResourceReachability({
+      kernel: candidate.kernel,
+      arc: ArcPlanSchema.parse(candidate.arc),
+      state: candidate.initialState,
+    });
+    assertRenewableConversionInputs(candidate.kernel, ArcPlanSchema.parse(candidate.arc));
+  };
+  let launch = buildLaunch();
+  const canonicalErrors: Array<{ message: string; evidence: unknown }> = [];
+  for (let attempt = 0; attempt <= 2; attempt += 1) {
+    try {
+      validateStateAndArc(launch);
+      break;
+    } catch (error) {
+      if (!(error instanceof StoryFactoryError)) throw error;
+      canonicalErrors.push({ message: error.message, evidence: error.evidence ?? null });
+      if (attempt === 2) {
+        throw new StoryFactoryError(
+          'setup_blocked',
+          `Launch pack failed canonical validation after two corrections: ${error.message}`,
+          { ...(error.evidence ?? {}), canonicalErrors },
+        );
+      }
+      const correction = await setupStage(`Launch State Architect correction ${attempt + 1}/2`, provider.json({
+        model: input.routes.launchArchitect,
+        system: launchStateSystem,
+        prompt: JSON.stringify({
+          ...launchStatePrompt,
+          task: 'Sửa Arc đầu và State chương 0 theo lỗi canonical; không thay đổi Kernel.',
+          canonicalErrors,
+          previous: launchState.value,
+        }),
+        schema: LaunchStateSchema,
+        schemaComplexity: 'omit_large_array_max',
+        temperature: 0.2,
+      }));
+      launchState = {
+        value: correction.value,
+        usage: mergeStageUsage(launchState.usage, correction.usage),
+      };
+      launch = buildLaunch();
+    }
   }
+  checkpoint.launchState = launchState;
+  await input.onCheckpoint?.(structuredClone(checkpoint));
+  usages.push(launchState.usage);
+  assertPortfolioDiversity(selectedConcept, input.existingSignatures ?? []);
   return { launchPack: launch, selectedConcept, candidates, usages };
 }

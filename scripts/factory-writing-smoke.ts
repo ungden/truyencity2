@@ -17,7 +17,7 @@
  *   npm run factory:writing-smoke -- --apply --chapters=5 --commission=factory/canary/commission.json
  */
 import dotenv from 'dotenv';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { createClient } from '@supabase/supabase-js';
 import {
@@ -40,6 +40,7 @@ import {
   writeStoryChapter,
   type ProviderUsage,
   type MarketBlueprint,
+  type SetupCheckpoint,
   type StateEvent,
   type StoryState,
 } from '../src/services/story-factory';
@@ -62,6 +63,7 @@ const targetChapters = Number(flag('chapters', '5'));
 // Every full run saves its pack here automatically.
 const packPath = flag('pack', '');
 const savePackPath = flag('save-pack', 'factory/smoke-pack.local.json');
+const checkpointPath = flag('checkpoint', 'factory/smoke-checkpoint.local.json');
 
 /** The smoke's independent referee. Fixed on the strongest editor-class model. */
 const SEQUENTIAL_JUDGE_MODEL = 'gemini-3.1-pro-preview';
@@ -146,10 +148,17 @@ async function main() {
       marketBlueprint = MarketBlueprintSchema.parse(saved.marketBlueprint);
       console.log(`[smoke] reusing launch pack from ${packPath}`);
     } else {
+      const resume = existsSync(path.resolve(checkpointPath))
+        ? readJson(checkpointPath) as SetupCheckpoint
+        : undefined;
       const setup = await runConceptLab({
         commission,
         research,
         routes,
+        resume,
+        onCheckpoint: async checkpoint => {
+          writeFileSync(path.resolve(checkpointPath), `${JSON.stringify(checkpoint, null, 2)}\n`);
+        },
       });
       usages.push(...setup.usages);
       launchPack = setup.launchPack;
