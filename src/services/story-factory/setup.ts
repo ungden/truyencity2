@@ -124,6 +124,9 @@ const ConceptBatchWireSchema = z.object({
 const ConceptTripleBatchWireSchema = z.object({
   candidates: z.array(ConceptCandidateWireSchema).length(3),
 }).strict();
+const ConceptPairBatchWireSchema = z.object({
+  candidates: z.array(ConceptCandidateWireSchema).length(2),
+}).strict();
 const TopTwoSchema = z.object({
   selectedIds: z.array(z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/)).length(2),
   reasons: z.array(z.string().trim().min(10).max(4_000)).length(2),
@@ -727,19 +730,28 @@ export async function runConceptLab(input: {
     const candidates: z.infer<typeof ConceptCandidateWireSchema>[] = [];
     const batchUsages: ProviderUsage[] = [];
     const splitForGemini = model.startsWith('gemini-');
-    for (let batch = 1; candidates.length < 6 && batch <= 2; batch += 1) {
+    // 3.5 Flash can finish a syntactically valid three-candidate object while
+    // silently omitting the third candidate's large blueprint tail (~23k output
+    // tokens). Pairs stay comfortably below that practical completeness limit;
+    // Pro-class Gemini routes have proven stable at triples.
+    const geminiBatchSize = model === 'gemini-3.5-flash' ? 2 : 3;
+    const maximumBatches = splitForGemini ? Math.ceil(6 / geminiBatchSize) : 2;
+    for (let batch = 1; candidates.length < 6 && batch <= maximumBatches; batch += 1) {
       const missing = 6 - candidates.length;
+      const targetCount = splitForGemini ? Math.min(geminiBatchSize, missing) : missing;
       const generated = await setupStage(`Concept Generator ${generator}${batch === 1 ? '' : ' top-up'}`, provider.json({
         model,
         system,
         prompt: batch === 1 && !splitForGemini
           ? generatorPrompt({ commission, research, generator, targetCount: 6 })
-          : `${generatorPrompt({ commission, research, generator, targetCount: splitForGemini ? 3 : missing })}\n\nBatch trước đã có ${candidates.length} concept. Đây là batch BỔ SUNG, phải khác các fingerprint sau: ${JSON.stringify(candidates.map(candidate => ({
+          : `${generatorPrompt({ commission, research, generator, targetCount })}\n\nBatch trước đã có ${candidates.length} concept. Đây là batch BỔ SUNG, phải khác các fingerprint sau: ${JSON.stringify(candidates.map(candidate => ({
             mechanismFingerprint: candidate.mechanismFingerprint,
             rewardLoopFingerprint: candidate.rewardLoopFingerprint,
             conflictEconomyFingerprint: candidate.conflictEconomyFingerprint,
           })))}.`,
-        schema: splitForGemini ? ConceptTripleBatchWireSchema : ConceptBatchWireSchema,
+        schema: splitForGemini
+          ? geminiBatchSize === 2 ? ConceptPairBatchWireSchema : ConceptTripleBatchWireSchema
+          : ConceptBatchWireSchema,
         // Six concepts each contain five payoff rows and a 6–8-step scale
         // ladder. Fixed nested array maxima make Gemini 2.5 Pro reject the
         // schema before generation as "too many states" even after maxima are
@@ -750,7 +762,7 @@ export async function runConceptLab(input: {
         schemaComplexity: 'omit_array_max',
         temperature: 1,
       }));
-      candidates.push(...generated.value.candidates.slice(0, splitForGemini ? 3 : missing));
+      candidates.push(...generated.value.candidates.slice(0, targetCount));
       batchUsages.push(generated.usage);
       if (!splitForGemini && candidates.length === 6) break;
     }
