@@ -3,7 +3,10 @@ import { zodToJsonSchema } from 'zod-to-json-schema';
 import { StoryFactoryError } from './contracts';
 
 const API_BASE = 'https://generativelanguage.googleapis.com/v1beta';
-const TRANSIENT_STATUS = new Set([408, 409, 429]);
+// Gemini uses HTTP 499 when an upstream generation operation is cancelled.
+// It is provider-transient just like timeout/rate-limit responses and should be
+// retried on the same routed model before the job consumes its durable retry.
+const TRANSIENT_STATUS = new Set([408, 409, 429, 499]);
 const RETRY_DELAYS_MS = [1_000, 3_000];
 
 /**

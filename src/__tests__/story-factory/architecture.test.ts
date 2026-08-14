@@ -203,6 +203,8 @@ describe('Story Factory architecture boundary', () => {
 
   test('a transient infrastructure failure retries with backoff instead of parking the job', () => {
     const runtime = read('src/services/story-factory/runtime.ts');
+    const provider = read('src/services/story-factory/provider.ts');
+    expect(provider).toContain('408, 409, 429, 499');
     expect(runtime).toContain("factoryError.code === 'infra_blocked' && job.retry_count < INFRA_RETRY_LIMIT");
     // Semantic verdicts about the story are not retried — they need a human or a replan.
     expect(runtime).toContain("status: retryable ? 'ready' : factoryError.code");
