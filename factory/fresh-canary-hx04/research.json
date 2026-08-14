@@ -1,0 +1,42 @@
+{
+  "snapshotId": "civilization-lord-faloo-2026-08-15",
+  "lane": "xuanhuan_civilization_lord",
+  "capturedAt": "2026-08-14T17:05:00.000Z",
+  "signals": [
+    {
+      "id": "title_sells_cheat",
+      "sourceUrl": "https://wap2.faloo.com/1008376.html",
+      "observation": "Faloo đóng gói dòng toàn dân lãnh chúa bằng tiêu đề nêu thẳng arena và lợi thế, còn phần giới thiệu lập tức minh họa cùng một cơ chế trên nhiều cấp binh chủng; tên, premise và reward loop cùng bán một lời hứa thay vì ba ý rời nhau."
+    },
+    {
+      "id": "payoff_in_first_three",
+      "sourceUrl": "https://tongren.faloo.com/book/944718.html",
+      "observation": "Mục lục cho thấy nhịp mở cực nhanh: chương 1 tái sinh, chương 2 kích hoạt lợi thế duy nhất, chương 3 đã nhận lượng tài nguyên lớn; các mốc sau nối ngay binh chủng, Boss, tài nguyên, bảng xếp hạng và giao dịch."
+    },
+    {
+      "id": "visible_comparison_engine",
+      "sourceUrl": "https://wap.faloo.com/new_844363.html",
+      "observation": "Reader fantasy không chỉ là main giàu tài nguyên mà còn là chuỗi first-clear công khai: xây lãnh địa, luyện binh, tuyển anh hùng, chiếm thánh đàn rồi để toàn bộ người chơi nhìn thấy khoảng cách khi họ vào cuộc."
+    },
+    {
+      "id": "economy_can_be_cheat",
+      "sourceUrl": "https://tongren.faloo.com/book/1533810.html",
+      "observation": "Một tác phẩm Faloo cập nhật năm 2026 lấy hiểu luật, định giá và chênh lệch thông tin làm lợi thế thay cho sức mạnh miễn phí; setup vẫn tạo cảnh sảng sớm bằng đấu giá, giao dịch và người khác cùng mắc sai lầm công khai."
+    },
+    {
+      "id": "scale_changes_arena",
+      "sourceUrl": "https://wap2.faloo.com/book/list/1459221_2_1_5.html",
+      "observation": "Mục lục dài chuyển liên tục qua quốc gia, thánh vật, nhiệm vụ thần thoại, thôn tính, thế giới ngầm, thần linh và khai thiên; chạy dài cần đổi loại quyền lực và arena chứ không chỉ tăng quân số trên một bản đồ."
+    },
+    {
+      "id": "current_listing_variety",
+      "sourceUrl": "https://tongren.faloo.com/r/1/28/8/1/9.html",
+      "observation": "Listing mạnh hiện tại cho thấy cùng meta lãnh chúa có thể va với phân thân, hải đảo, nông nghiệp, sinh vật và từ điều; sự mới nằm ở collision cùng chuỗi biến đổi thế giới riêng, không phải đổi tên một hệ thống nhân bội cũ."
+    },
+    {
+      "id": "originality_boundary",
+      "sourceUrl": "https://www.faloo.com/tag/3357.html",
+      "observation": "Nghiên cứu chỉ dùng tín hiệu đóng gói, nhịp payoff, comparison engine và scale; Story Factory phải tạo lãnh địa, cơ chế, văn minh, nhân vật, tài nguyên và chuỗi nhân quả nguyên bản, không sao chép tác phẩm hoặc IP niêm yết."
+    }
+  ]
+}
