@@ -214,6 +214,14 @@ describe('Story Factory architecture boundary', () => {
     expect(runtime).toContain("status: retryable ? 'ready' : factoryError.code");
   });
 
+  test('schema correction is a low-temperature exhaustive repair, not a creative reroll', () => {
+    const provider = read('src/services/story-factory/provider.ts');
+    const setup = read('src/services/story-factory/setup.ts');
+    expect(provider).toContain('rà lại cùng field trên TOÀN BỘ các phần tử');
+    expect(provider).toContain('temperature: Math.min(input.temperature ?? 0.7, 0.2)');
+    expect(setup).toContain('arena, statusPrize, oppositionClass và advantageEvolution đều phải là mô tả cụ thể dài tối thiểu 20 ký tự');
+  });
+
   test('the rewrite path runs in its own tick so no chapter exceeds the route ceiling', () => {
     const pipeline = read('src/services/story-factory/pipeline.ts');
     expect(pipeline).toContain('export async function draftStoryChapter');

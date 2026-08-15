@@ -642,8 +642,12 @@ export const geminiProvider: StoryModelProvider = {
         prompt: `${prompt}
 
 Bản trả trước không hợp lệ theo schema ứng dụng: ${JSON.stringify(parsed.error.issues.slice(0, 5))}
+Sửa mọi path được liệt kê và rà lại cùng field trên TOÀN BỘ các phần tử, không chỉ phần tử đầu tiên. Với lỗi too_small/too_big, đếm độ dài sau khi trim và tuân thủ chính xác minimum/maximum. Không rút ngắn hoặc làm mất các field đang hợp lệ. Trước khi trả lời, tự kiểm tra toàn object theo schema một lần cuối.
 Trả lại đúng một object JSON đã sửa, không giải thích.`,
-        temperature: input.temperature ?? 0.7,
+        // A correction is contract repair, not another creative roll. A low
+        // temperature makes the provider preserve valid material and reliably
+        // repair every repeated field carrying the same length constraint.
+        temperature: Math.min(input.temperature ?? 0.7, 0.2),
         responseSchema: input.constrainSchema === false ? undefined : responseSchema,
         jsonMode: true,
         googleSearch: input.grounding === 'google_search',
