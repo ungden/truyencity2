@@ -44,7 +44,23 @@ export const StoryCommissionSchema = z.object({
   settingBoundary: z.string().trim().min(8).max(800),
 }).strict();
 
-export const MarketBlueprintSchema = z.object({
+export const OpeningPayoffProofSchema = z.object({
+  byChapter: z.union([z.literal(1), z.literal(3)]),
+  steps: z.array(z.object({
+    mechanicId: z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/),
+    actorId: z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/),
+    quantity: z.number().int().min(1).max(1_000_000),
+  }).strict()).min(1).max(24),
+  resourceClaims: z.array(z.object({
+    resourceId: z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/),
+    minimumProduced: z.number().finite().positive().max(1_000_000_000_000),
+  }).strict()).min(1).max(8),
+  witnessCharacterIds: z.array(z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/)).min(1).max(8),
+  pressureCharacterIds: z.array(z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/)).min(1).max(8),
+}).strict();
+export type OpeningPayoffProof = z.infer<typeof OpeningPayoffProofSchema>;
+
+const MarketBlueprintProductSchema = z.object({
   familiarArena: z.string().trim().min(20).max(800),
   noveltyCollision: z.string().trim().min(20).max(800),
   protagonistStartingPosition: z.string().trim().min(20).max(800),
@@ -67,7 +83,12 @@ export const MarketBlueprintSchema = z.object({
     oppositionClass: z.string().trim().min(20).max(800),
     advantageEvolution: z.string().trim().min(20).max(800),
   }).strict()).min(6).max(8),
-}).strict().superRefine((blueprint, ctx) => {
+}).strict();
+
+function validateMarketPayoffSchedule(
+  blueprint: z.infer<typeof MarketBlueprintProductSchema>,
+  ctx: z.RefinementCtx,
+) {
   const requiredChapters = [1, 3, 5, 7, 10];
   const actualChapters = blueprint.earlyPayoffs.map(item => item.byChapter).sort((a, b) => a - b);
   if (actualChapters.some((chapter, index) => chapter !== requiredChapters[index])) {
@@ -77,7 +98,15 @@ export const MarketBlueprintSchema = z.object({
       message: 'Market blueprint must lock one payoff at each chapter 1, 3, 5, 7, and 10.',
     });
   }
-});
+}
+
+const ConceptMarketBlueprintSchema = MarketBlueprintProductSchema.superRefine(validateMarketPayoffSchedule);
+export const MarketBlueprintSchema = MarketBlueprintProductSchema.extend({
+  // Setup proves the opening payoff against the exact canonical mechanic graph.
+  // Persisting that proof keeps Planner from reinventing a different power,
+  // witness, or opposition actor when it turns the product promise into scenes.
+  openingExecutionProofs: z.array(OpeningPayoffProofSchema).length(2).optional(),
+}).strict().superRefine(validateMarketPayoffSchedule);
 export type MarketBlueprint = z.infer<typeof MarketBlueprintSchema>;
 
 /**
@@ -108,7 +137,7 @@ export const ConceptCandidateSchema = z.object({
   mechanismFingerprint: z.string().trim().min(4).max(240),
   rewardLoopFingerprint: z.string().trim().min(4).max(240),
   conflictEconomyFingerprint: z.string().trim().min(4).max(240),
-  marketBlueprint: MarketBlueprintSchema,
+  marketBlueprint: ConceptMarketBlueprintSchema,
   seriality30: z.array(z.string().trim().min(8).max(500)).min(6).max(10),
   seriality1000: z.array(z.string().trim().min(12).max(700)).min(8).max(15),
   earlyEndingRisk: z.string().trim().min(20).max(1_200),
@@ -179,6 +208,7 @@ export interface SetupResult {
   launchPack: LaunchPack;
   selectedConcept: z.infer<typeof ConceptCandidateSchema>;
   candidates: z.infer<typeof ConceptCandidateSchema>[];
+  openingPayoffProofs: OpeningPayoffProof[];
   usages: ProviderUsage[];
 }
 
@@ -340,21 +370,6 @@ const LaunchSeriesSchema = z.object({
     }
   });
 });
-const OpeningPayoffProofSchema = z.object({
-  byChapter: z.union([z.literal(1), z.literal(3)]),
-  steps: z.array(z.object({
-    mechanicId: z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/),
-    actorId: z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/),
-    quantity: z.number().int().min(1).max(1_000_000),
-  }).strict()).min(1).max(24),
-  resourceClaims: z.array(z.object({
-    resourceId: z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/),
-    minimumProduced: z.number().finite().positive().max(1_000_000_000_000),
-  }).strict()).min(1).max(8),
-  witnessCharacterIds: z.array(z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/)).min(1).max(8),
-  pressureCharacterIds: z.array(z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/)).min(1).max(8),
-}).strict();
-
 export const LaunchStateSchema = z.object({
   arc: InitialArcPlanSchema,
   initialState: InitialStoryStateSchema,
@@ -1385,5 +1400,11 @@ State có đúng một entry cho mọi character, resource và promise trong Ker
   await input.onCheckpoint?.(structuredClone(checkpoint));
   usages.push(launchState.usage);
   assertPortfolioDiversity(selectedConcept, input.existingSignatures ?? []);
-  return { launchPack: launch, selectedConcept, candidates, usages };
+  return {
+    launchPack: launch,
+    selectedConcept,
+    candidates,
+    openingPayoffProofs: launchState.value.openingPayoffProofs,
+    usages,
+  };
 }

@@ -22,7 +22,7 @@ import type { MarketBlueprint } from './setup';
 
 // Defined here, not in release.ts: release → benchmark → planner already exists, so a
 // planner → release import closes a cycle and breaks the production bundle (TDZ at init).
-export const FACTORY_PLANNER_VERSION = 'story-factory-planner-78-late-payoff-replan';
+export const FACTORY_PLANNER_VERSION = 'story-factory-planner-79-opening-proof-handoff';
 import { EDITOR_SYSTEM_PROMPT, PLANNER_SYSTEM_PROMPT, PLAN_JUDGE_SYSTEM_PROMPT } from './prompts';
 import {
   ARC_ACTIVE_MECHANIC_BUDGET,
@@ -1882,7 +1882,9 @@ export async function planRollingWindow(input: {
             nextChapter,
             requestedEndChapter,
           ),
-          rule: 'Nếu window chứa byChapter của một payoff, chương đó phải hoàn tất đúng payoff, cho đúng nhóm visibleTo chứng kiến, commit positionChange bằng delta quan sát được và mở nextPressure. Không được thay bằng một thắng lợi khác dù thắng lợi đó vẫn sảng. Nếu window kết thúc trước byChapter thì không diễn payoff sớm bằng cách làm sai canon; chỉ chuẩn bị nhân quả cần thiết.',
+          openingExecutionProofs: input.marketBlueprint.openingExecutionProofs?.filter(proof =>
+            proof.byChapter >= nextChapter && proof.byChapter <= requestedEndChapter) ?? [],
+          rule: 'Nếu window chứa byChapter của một payoff, chương đó phải hoàn tất đúng payoff, cho đúng nhóm visibleTo chứng kiến, commit positionChange bằng delta quan sát được và mở nextPressure. Với openingExecutionProofs, dùng đúng mechanicId, actorId, resourceId và các witness/pressure character ID đã được setup replay; proof chỉ là công thức nhân quả, chưa phải sự kiện đã xảy ra. Không được tự thay bằng năng lực hay nhân chứng ngoài canon. Nếu window kết thúc trước byChapter thì không diễn payoff sớm bằng cách làm sai canon; chỉ chuẩn bị nhân quả cần thiết.',
         } : null,
         nextChapter,
         maximumEndChapter: input.arc.plannedEndChapter,

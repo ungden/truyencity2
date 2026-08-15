@@ -168,7 +168,7 @@ describe('Story Factory architecture boundary', () => {
     expect(read('src/services/story-factory/planner.ts')).toContain('dueMarketPayoffs');
     expect(read('src/services/story-factory/planner.ts')).toContain('marketBlueprintWindowContract');
     expect(read('src/services/story-factory/prompts.ts')).toContain('Một thắng lợi khác dù vẫn sảng không được thay thế deadline đã khóa');
-    expect(smoke).toContain('marketBlueprint = MarketBlueprintSchema.parse(setup.selectedConcept.marketBlueprint)');
+    expect(smoke).toContain('openingExecutionProofs: setup.openingPayoffProofs');
     expect(smoke).toContain('marketBlueprintDigest: digestArtifact(marketBlueprint)');
     expect(read('src/services/story-factory/setup.ts')).toContain("schemaComplexity: 'omit_array_max'");
     expect(read('src/services/story-factory/setup.ts')).toContain('constrainSchema: false');
@@ -272,6 +272,8 @@ describe('Story Factory architecture boundary', () => {
     expect(cover).toContain("stage: 'write'");
     expect(plan).toContain("stage: job.current_chapter === 0 ? 'cover' : 'write'");
     expect(plan).toContain('job.current_chapter === 0 || job.plan_feedback || job.retry_count >= 2 ? 1 : undefined');
+    expect(runtime).toContain('openingExecutionProofs: result.openingPayoffProofs');
+    expect(read('src/services/story-factory/planner.ts')).toContain('openingExecutionProofs: input.marketBlueprint.openingExecutionProofs');
   });
 
   test('the production gate is a mechanical smoke check, not a self-invalidating benchmark chain', () => {

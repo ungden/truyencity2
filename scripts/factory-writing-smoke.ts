@@ -145,7 +145,16 @@ async function main() {
         );
       }
       launchPack = LaunchPackSchema.parse(saved.launchPack);
-      marketBlueprint = MarketBlueprintSchema.parse(saved.marketBlueprint);
+      const savedBlueprint = saved.marketBlueprint as Record<string, unknown>;
+      const checkpoint = existsSync(path.resolve(checkpointPath))
+        ? readJson(checkpointPath) as SetupCheckpoint
+        : undefined;
+      const openingExecutionProofs = savedBlueprint.openingExecutionProofs
+        ?? (checkpoint?.launchState?.value as { openingPayoffProofs?: unknown } | undefined)?.openingPayoffProofs;
+      marketBlueprint = MarketBlueprintSchema.parse({
+        ...savedBlueprint,
+        ...(openingExecutionProofs ? { openingExecutionProofs } : {}),
+      });
       console.log(`[smoke] reusing launch pack from ${packPath}`);
     } else {
       const resume = existsSync(path.resolve(checkpointPath))
@@ -162,7 +171,10 @@ async function main() {
       });
       usages.push(...setup.usages);
       launchPack = setup.launchPack;
-      marketBlueprint = MarketBlueprintSchema.parse(setup.selectedConcept.marketBlueprint);
+      marketBlueprint = MarketBlueprintSchema.parse({
+        ...setup.selectedConcept.marketBlueprint,
+        openingExecutionProofs: setup.openingPayoffProofs,
+      });
       writeFileSync(path.resolve(savePackPath), `${JSON.stringify({
         launchPack: setup.launchPack,
         marketBlueprint,

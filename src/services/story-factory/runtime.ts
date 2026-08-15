@@ -337,7 +337,10 @@ async function runSetup(db: SupabaseClient, job: FactoryJobRow, project: Factory
       story_kernel: pack.kernel,
       arc_plan: pack.arc,
       story_state: pack.initialState,
-      market_blueprint: result.selectedConcept.marketBlueprint,
+      market_blueprint: {
+        ...result.selectedConcept.marketBlueprint,
+        openingExecutionProofs: result.openingPayoffProofs,
+      },
       current_chapter: 0,
       updated_at: now,
     }).eq('id', project.id).eq('engine_release', STORY_FACTORY_RELEASE);
