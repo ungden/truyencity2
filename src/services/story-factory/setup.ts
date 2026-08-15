@@ -179,6 +179,54 @@ const OpeningSimulationSchema = z.object({
   }).strict()).length(2),
 }).strict();
 
+const OpeningPayoffSemanticAuditSchema = z.object({
+  status: z.enum(['pass', 'reject']),
+  checks: z.array(z.object({
+    byChapter: z.union([z.literal(1), z.literal(3)]),
+    payoffSupported: z.boolean(),
+    witnessSupported: z.boolean(),
+    pressureSupported: z.boolean(),
+    evidenceMechanicIds: z.array(z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/)).min(1).max(12),
+    evidenceResourceIds: z.array(z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/)).min(1).max(12),
+    evidenceCharacterIds: z.array(z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/)).min(2).max(12),
+    reason: z.string().trim().min(20).max(2_000),
+  }).strict()).length(2),
+}).strict();
+export type OpeningPayoffSemanticAudit = z.infer<typeof OpeningPayoffSemanticAuditSchema>;
+
+export function validateOpeningPayoffSemanticAudit(input: {
+  audit: OpeningPayoffSemanticAudit;
+  proofs: OpeningPayoffProof[];
+}): { passes: boolean; referenceErrors: Array<{ byChapter: number; field: string; id: string }> } {
+  const orderedChecks = [...input.audit.checks].sort((a, b) => a.byChapter - b.byChapter);
+  const proofByChapter = new Map(input.proofs.map(proof => [proof.byChapter, proof]));
+  const referenceErrors: Array<{ byChapter: number; field: string; id: string }> = [];
+  for (const check of orderedChecks) {
+    const proof = proofByChapter.get(check.byChapter);
+    const proofMechanics = new Set(proof?.steps.map(step => step.mechanicId) ?? []);
+    const proofResources = new Set(proof?.resourceClaims.map(claim => claim.resourceId) ?? []);
+    const proofCharacters = new Set([...(proof?.witnessCharacterIds ?? []), ...(proof?.pressureCharacterIds ?? [])]);
+    check.evidenceMechanicIds.forEach(id => {
+      if (!proofMechanics.has(id)) referenceErrors.push({ byChapter: check.byChapter, field: 'mechanic', id });
+    });
+    check.evidenceResourceIds.forEach(id => {
+      if (!proofResources.has(id)) referenceErrors.push({ byChapter: check.byChapter, field: 'resource', id });
+    });
+    check.evidenceCharacterIds.forEach(id => {
+      if (!proofCharacters.has(id)) referenceErrors.push({ byChapter: check.byChapter, field: 'character', id });
+    });
+  }
+  return {
+    passes: input.audit.status === 'pass'
+      && orderedChecks.length === 2
+      && orderedChecks[0]?.byChapter === 1
+      && orderedChecks[1]?.byChapter === 3
+      && orderedChecks.every(check => check.payoffSupported && check.witnessSupported && check.pressureSupported)
+      && referenceErrors.length === 0,
+    referenceErrors,
+  };
+}
+
 function exactIdSchema(ids: string[]) {
   if (!ids.length) throw new StoryFactoryError('setup_blocked', 'A setup stage has no valid IDs to constrain.');
   return z.enum(ids as [string, ...string[]]);
@@ -217,7 +265,7 @@ interface SetupStageArtifact {
   usage: ProviderUsage;
 }
 
-export const SETUP_CHECKPOINT_VERSION = 'story-factory-setup-checkpoint-7-opening-execution-proof';
+export const SETUP_CHECKPOINT_VERSION = 'story-factory-setup-checkpoint-8-opening-semantic-audit';
 
 export interface SetupCheckpointProvenance {
   version: typeof SETUP_CHECKPOINT_VERSION;
@@ -237,6 +285,7 @@ export interface SetupCheckpoint {
   launchWorld?: SetupStageArtifact;
   launchSeries?: SetupStageArtifact;
   launchState?: SetupStageArtifact;
+  openingPayoffAudit?: SetupStageArtifact;
 }
 
 function sha256(value: unknown): string {
@@ -1188,6 +1237,7 @@ Chỉ được chọn concept có domainFeasibility=pass và longRunFeasibility=
     const launchWorldWire = await setupStage('Launch World Architect', provider.json({
       model: input.routes.launchArchitect,
       system: `Bạn khóa world canon riêng của truyện đã chọn. Trả đúng structured-output schema, không markdown.
+World phải có resource và mechanic cụ thể để tạo ĐÚNG vật phẩm/kết quả được marketBlueprint.earlyPayoffs hứa ở chương 1 và 3. Không dùng một sản phẩm cùng nghề nhưng khác loại làm thay: giáp không phải đao, lõi không phải mô-đun, giấy phép không phải tiền. Tên/description của resource và mechanic phải nhận diện được vật phẩm payoff; artifact phải là output thật, không chỉ được nhắc trong action prose.
 WorldModel phải khóa thời đại, địa lý, tổ chức, hệ thống vận hành, giới hạn và chi phí. Mọi geography.role là mô tả có nghĩa.
 Thế giới phải vận hành như một cỗ máy tạo cạnh tranh, không phải bách khoa trang trí. Dựa sát marketBlueprint: có ít nhất bốn geography đại diện các nấc arena sớm, bốn institution gồm phe main/đối thủ địa phương/gatekeeper trung lập/lớp quyền lực kế tiếp, và hai system trở lên gồm hệ tạo giá trị cùng hệ phân phối-so sánh-tranh đoạt. Mỗi entity phải tạo một quyền, nguồn lực, cánh cửa hoặc xung đột mà Planner có thể diễn thành cảnh.
 comparisonEngine phải có vật mang thông tin và người có quyền phản ứng: bảng xếp hạng, phiên đấu giá, kỳ thi, chiến báo, giá công khai, hợp đồng, quyền lãnh thổ hoặc cơ chế tương đương. Không cho đám đông tự biết thành tựu từ xa và không tạo nhân chứng chỉ để kinh ngạc.
@@ -1304,6 +1354,7 @@ Mọi longPromises.promiseId, stages[].longPromiseIds và endingDirection.promis
 Arc gắn stage đầu; mọi active ID phải có trong Kernel. State không ghi trước kết quả tương lai.
 Arc đầu phải trả đúng title promise và marketBlueprint.earlyPayoffs: progression có ít nhất năm mốc, khóa rõ kết quả ở/chậm nhất chương 1,3,5,7,10; terminalChanges có ít nhất ba thay đổi vị thế/tài sản/quyền lựa chọn thật; activeConflicts có ít nhất hai nguồn áp lực độc lập từ worldConflictEngine.
 openingPayoffProofs phải có đúng hai proof cho chapter 1 và 3. Mỗi proof là chương trình thực thi tích lũy từ State chương 0: steps dùng đúng active conversion/capability, đúng actor và số batch; resourceClaims ghi tổng lượng tài nguyên numeric do chuỗi đã thực sự sản xuất đến deadline. Code sẽ replay theo thứ tự, trừ input trước rồi cộng output, kiểm tra giới hạn batch, fact, quyền actor và số dư; tuyệt đối không tiêu trước khi sản xuất hoặc khai số lượng lớn hơn phép tính. Chapter 3 tiếp tục từ số dư sau proof chapter 1, không reset kho. Ở mỗi deadline phải còn ít nhất một tài nguyên numeric do protagonist sở hữu có số dư tăng ròng so với State chương 0; output trung gian đã tiêu hết hoặc phép đổi làm số dư giảm không được tính là payoff. Mỗi proof cũng phải có một nhân vật ngoài main trực tiếp thấy kết quả và một opposition active tạo áp lực kế tiếp.
+Mỗi proof phải thực sự sản xuất đúng artifact/kết quả được marketBlueprint.earlyPayoffs ở deadline tương ứng và resourceClaims phải chứa resource đại diện trực tiếp cho artifact ấy. Không dùng tiền, nguyên liệu đầu vào hoặc một sản phẩm cùng nghề nhưng khác loại để thay thế payoff. Nếu payoff nói giáp thì proof phải gọi mechanic tạo giáp và claim resource giáp; đao không được tính thay.
 Chia 20-30 chương thành nhiều mini-cycle, mỗi cycle có cơ hội hoặc áp lực → main dùng coreAdvantage → người có lợi ích trực tiếp chứng kiến/đáp trả → payoff → áp lực cấp cao hơn. Không dành trọn arc để sửa máy, thử nghiệm, gom nguyên liệu, làm quen thế giới hoặc đánh một phản diện bằng cùng một thủ đoạn.
 Mốc chương 10 phải làm main bước sang một vị thế hoặc arena mới đủ rõ, không chỉ giàu/mạnh hơn theo số. Những chương sau mở biến thể lợi thế, institution hoặc opposition class kế tiếp đã có trong Kernel.
 Arc.activeMechanicIds là working set của Planner trong arc đầu: chỉ chứa mechanic mà các beat của arc đầu thật sự dùng, tối đa ${ARC_ACTIVE_MECHANIC_BUDGET}. Mechanic không chọn vẫn nằm nguyên trong Kernel và arc sau kích hoạt được. Mọi requiredFacts của capability/constraint đang active phải có fact và expected value tương ứng trong initialState.
@@ -1418,6 +1469,41 @@ State có đúng một entry cho mọi character, resource và promise trong Ker
   checkpoint.launchState = launchState;
   await input.onCheckpoint?.(structuredClone(checkpoint));
   usages.push(launchState.usage);
+
+  const openingPayoffAudit = checkpoint.openingPayoffAudit
+    ? {
+        value: OpeningPayoffSemanticAuditSchema.parse(checkpoint.openingPayoffAudit.value),
+        usage: checkpoint.openingPayoffAudit.usage,
+      }
+    : await setupStage('Opening Payoff Semantic Judge', provider.json({
+        model: input.routes.setupJudge,
+        system: `Bạn là Judge độc lập kiểm toán payoff mở đầu trước khi truyện được phép rời setup. Không viết lại canon và không nương theo ý định.
+Đối chiếu từng market payoff chương 1 và 3 với exact mechanic/resource/character trong proof. payoffSupported chỉ true khi proof tạo đúng loại vật phẩm hoặc kết quả đã hứa; một sản phẩm cùng nghề nhưng khác loại không được thay thế (giáp khác đao, lõi khác mô-đun, tiền khác giấy phép). witnessSupported và pressureSupported chỉ true khi exact character ID trong proof có vai trò phù hợp. Trả reject nếu bất kỳ check nào false.`,
+        prompt: JSON.stringify({
+          task: 'Kiểm toán semantic alignment của opening payoff proof với hợp đồng sản phẩm và world canon.',
+          earlyPayoffs: selectedConcept.marketBlueprint.earlyPayoffs.filter(payoff => payoff.byChapter <= 3),
+          openingPayoffProofs: launchState.value.openingPayoffProofs,
+          activeMechanics: kernel.worldMechanics.filter(mechanic => launch.arc.activeMechanicIds.includes(mechanic.id)),
+          activeResources: kernel.resources.filter(resource => launch.arc.activeResourceIds.includes(resource.id)),
+          activeCharacters: kernel.characters.filter(character => launch.arc.activeCharacterIds.includes(character.id)),
+        }),
+        schema: OpeningPayoffSemanticAuditSchema,
+        temperature: 0.1,
+      }));
+  const semanticAuditValidation = validateOpeningPayoffSemanticAudit({
+    audit: openingPayoffAudit.value,
+    proofs: launchState.value.openingPayoffProofs,
+  });
+  if (!semanticAuditValidation.passes) {
+    throw new StoryFactoryError(
+      'setup_blocked',
+      'Opening payoff semantic audit rejected the launch pack.',
+      { audit: openingPayoffAudit.value, auditReferenceErrors: semanticAuditValidation.referenceErrors },
+    );
+  }
+  checkpoint.openingPayoffAudit = openingPayoffAudit;
+  await input.onCheckpoint?.(structuredClone(checkpoint));
+  usages.push(openingPayoffAudit.usage);
   assertPortfolioDiversity(selectedConcept, input.existingSignatures ?? []);
   return {
     launchPack: launch,

@@ -81,6 +81,7 @@ import {
   validateArcResourceReachability,
   validateKernelState,
   validateOpeningPayoffProofs,
+  validateOpeningPayoffSemanticAudit,
   validationPasses,
   draftStoryChapter,
   readPendingRevision,
@@ -5145,6 +5146,39 @@ describe('canonical Story Factory', () => {
     })).toThrow('consumes a resource before producing enough of it');
   });
 
+  test('opening payoff semantic audit fails closed on a wrong artifact or invented evidence ID', () => {
+    const audit = {
+      status: 'pass' as const,
+      checks: [1, 3].map(byChapter => ({
+        byChapter: byChapter as 1 | 3,
+        payoffSupported: true,
+        witnessSupported: true,
+        pressureSupported: true,
+        evidenceMechanicIds: ['mechanic_opening_catch'],
+        evidenceResourceIds: ['opening_catch'],
+        evidenceCharacterIds: ['mother', 'buyer'],
+        reason: 'Exact mechanic, artifact, witness and pressure IDs support the promised opening payoff.',
+      })),
+    };
+    expect(validateOpeningPayoffSemanticAudit({ audit, proofs: openingPayoffProofs })).toEqual({
+      passes: true,
+      referenceErrors: [],
+    });
+    expect(validateOpeningPayoffSemanticAudit({
+      audit: {
+        ...audit,
+        status: 'reject',
+        checks: audit.checks.map(check => check.byChapter === 3
+          ? { ...check, payoffSupported: false, evidenceResourceIds: ['anti_magic_armor'] }
+          : check),
+      },
+      proofs: openingPayoffProofs,
+    })).toMatchObject({
+      passes: false,
+      referenceErrors: [{ byChapter: 3, field: 'resource', id: 'anti_magic_armor' }],
+    });
+  });
+
   test('market payoff deadlines are selected by code for the exact rolling window', () => {
     const blueprint = MarketBlueprintSchema.parse({
       familiarArena: 'Một đấu trường thức tỉnh nghề nghiệp quen thuộc với cạnh tranh công khai.',
@@ -5398,14 +5432,27 @@ describe('canonical Story Factory', () => {
           pressureCharacterIds: proof.pressureCharacterIds.map(id => characterIdMap[id] ?? id),
         })),
       },
+      {
+        status: 'pass',
+        checks: [1, 3].map(byChapter => ({
+          byChapter,
+          payoffSupported: true,
+          witnessSupported: true,
+          pressureSupported: true,
+          evidenceMechanicIds: ['mechanic_opening_catch'],
+          evidenceResourceIds: ['opening_catch'],
+          evidenceCharacterIds: ['character_supporting_01', 'character_opposition_01'],
+          reason: 'Cơ chế, tài nguyên, nhân chứng và đối lực exact-ID cùng thực hiện đúng payoff đã khóa.',
+        })),
+      },
     ]);
     const result = await runConceptLab({
       commission: { slotKey: 'canary-01', genreLane: 'do-thi-nien-dai', realityMode: 'grounded', audience: 'Độc giả nam nhưng nữ cũng đọc được.', tone: 'Khoái hoạt, chủ động và đời sống ấm.', settingBoundary: 'Việt Nam hư cấu, nghề nghiệp dựa trên thực tế.' },
       research: { snapshotId: 'research-01', lane: 'do-thi-nien-dai', capturedAt: new Date().toISOString(), signals: [1, 2, 3].map(index => ({ id: `signal_${index}`, sourceUrl: `https://example.com/${index}`, observation: 'Một quan sát thị trường đủ chi tiết và không chứa tác phẩm để sao chép.' })) },
       routes, provider,
     });
-    expect(provider.calls).toHaveLength(9);
-    expect(provider.calls).toEqual(['gen-a', 'gen-b', 'sim', 'judge', 'sim', 'launch', 'launch', 'launch', 'launch']);
+    expect(provider.calls).toHaveLength(10);
+    expect(provider.calls).toEqual(['gen-a', 'gen-b', 'sim', 'judge', 'sim', 'launch', 'launch', 'launch', 'launch', 'judge']);
     expect(result.launchPack.selectedConceptId).toBe('concept_a_01');
     expect(result.launchPack.kernel.protagonistId).toBe('character_protagonist_01');
     expect(result.launchPack.kernel.characters.map(character => character.id)).toEqual([
@@ -5413,7 +5460,7 @@ describe('canonical Story Factory', () => {
       'character_opposition_01',
       'character_supporting_01',
     ]);
-    const launchStatePrompt = provider.prompts.at(-1);
+    const launchStatePrompt = provider.prompts.at(-2);
     expect(launchStatePrompt).toBeDefined();
     expect(launchStatePrompt).not.toContain('openingSample');
     expect(launchStatePrompt).not.toContain('selectedSimulation');

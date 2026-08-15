@@ -99,3 +99,5 @@ mobile/expo_output.log
 /scratch/
 factory/smoke-pack.local.json
 factory/smoke-checkpoint.local.json
+factory/*-pack.local.json
+factory/*-checkpoint.local.json
