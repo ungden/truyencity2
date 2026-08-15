@@ -512,6 +512,19 @@ function preflight(
     });
     break;
   }
+  const leakedMachineUnit = kernel.resources.find(resource => (
+    resource.kind === 'numeric'
+    && resource.unit.includes('_')
+    && draft.content.toLocaleLowerCase('vi').includes(resource.unit.toLocaleLowerCase('vi'))
+  ));
+  if (leakedMachineUnit && leakedMachineUnit.kind === 'numeric') {
+    issues.push({
+      kind: 'reading',
+      category: 'expository_prose',
+      evidence: leakedMachineUnit.unit,
+      instruction: 'Diễn tài nguyên kỹ thuật bằng hiện tượng và hậu quả tự nhiên; không để lộ đơn vị máy có dấu gạch dưới hoặc chép before/after như log hệ thống.',
+    });
+  }
   // Prose-craft gates run last so the cap of three prefers the high-precision
   // continuity checks above when a draft trips everything at once.
   for (const gate of PROSE_CRAFT_GATES) {
