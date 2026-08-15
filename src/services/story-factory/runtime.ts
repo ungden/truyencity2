@@ -354,7 +354,7 @@ async function runSetup(db: SupabaseClient, job: FactoryJobRow, project: Factory
     }).eq('id', job.novel_id);
     if (novelUpdate.error) throw novelUpdate.error;
     const jobUpdate = await db.from('story_factory_jobs').update({
-      status: 'ready', stage: 'cover', rolling_plan: null, setup_input: null, retry_count: 0,
+      status: 'ready', stage: 'plan', rolling_plan: null, setup_input: null, retry_count: 0,
       launch_pack_digest: launchPackDigest,
       lease_owner: null, lease_token: null, lease_until: null, next_run_at: now, updated_at: now,
     }).eq('id', job.id).eq('lease_token', job.lease_token);
@@ -388,6 +388,19 @@ async function runSetup(db: SupabaseClient, job: FactoryJobRow, project: Factory
 async function runCover(db: SupabaseClient, job: FactoryJobRow, project: FactoryProjectRow): Promise<FactoryTickResult> {
   const runId = await createRun(db, job, 'cover');
   try {
+    const nextChapter = job.current_chapter + 1;
+    if (!rollingPlanContainsChapter(job.rolling_plan, nextChapter)) {
+      const now = new Date().toISOString();
+      const jobUpdate = await db.from('story_factory_jobs').update({
+        status: 'ready', stage: 'plan', retry_count: 0, lease_owner: null, lease_token: null, lease_until: null, next_run_at: now, updated_at: now,
+      }).eq('id', job.id).eq('lease_token', job.lease_token);
+      if (jobUpdate.error) throw jobUpdate.error;
+      const runUpdate = await db.from('story_factory_runs').update({
+        status: 'passed', output_artifact: { skipped: true, reason: 'cover_requires_validated_plan' }, finished_at: now,
+      }).eq('id', runId);
+      if (runUpdate.error) throw runUpdate.error;
+      return { status: 'completed', jobId: job.id, stage: 'cover', chapterNumber: job.current_chapter };
+    }
     const kernel = StoryKernelSchema.parse(project.story_kernel);
     const { data: novel, error: novelError } = await db.from('novels').select('cover_prompt').eq('id', job.novel_id).single();
     if (novelError) throw novelError;
@@ -397,7 +410,7 @@ async function runCover(db: SupabaseClient, job: FactoryJobRow, project: Factory
     const novelUpdate = await db.from('novels').update({ cover_url: cover.coverUrl, updated_at: now }).eq('id', job.novel_id);
     if (novelUpdate.error) throw novelUpdate.error;
     const jobUpdate = await db.from('story_factory_jobs').update({
-      status: 'ready', stage: 'plan', retry_count: 0, lease_owner: null, lease_token: null, lease_until: null, next_run_at: now, updated_at: now,
+      status: 'ready', stage: 'write', retry_count: 0, lease_owner: null, lease_token: null, lease_until: null, next_run_at: now, updated_at: now,
     }).eq('id', job.id).eq('lease_token', job.lease_token);
     if (jobUpdate.error) throw jobUpdate.error;
     const runUpdate = await db.from('story_factory_runs').update({ status: 'passed', output_artifact: cover, finished_at: now }).eq('id', runId);
@@ -470,7 +483,7 @@ async function runPlan(db: SupabaseClient, job: FactoryJobRow, project: FactoryP
       // leases on 2026-08-13), so the code shrinks the ask instead of letting
       // the fifth retry park the job. A one-chapter window is always legal and
       // the next window plans fresh from committed state.
-      requiredWindowSize: job.plan_feedback || job.retry_count >= 2 ? 1 : undefined,
+      requiredWindowSize: job.current_chapter === 0 || job.plan_feedback || job.retry_count >= 2 ? 1 : undefined,
       authorDirective: project.author_directive,
       marketBlueprint,
       provider,
@@ -484,7 +497,7 @@ async function runPlan(db: SupabaseClient, job: FactoryJobRow, project: FactoryP
     });
     const now = new Date().toISOString();
     const jobUpdate = await db.from('story_factory_jobs').update({
-      rolling_plan: planned.rollingPlan, plan_feedback: null, status: 'ready', stage: 'write', retry_count: 0, lease_owner: null,
+      rolling_plan: planned.rollingPlan, plan_feedback: null, status: 'ready', stage: job.current_chapter === 0 ? 'cover' : 'write', retry_count: 0, lease_owner: null,
       lease_token: null, lease_until: null, next_run_at: now, updated_at: now,
     }).eq('id', job.id).eq('lease_token', job.lease_token);
     if (jobUpdate.error) throw jobUpdate.error;

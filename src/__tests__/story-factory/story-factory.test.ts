@@ -79,6 +79,7 @@ import {
   validateArcActivationBudget,
   validateArcResourceReachability,
   validateKernelState,
+  validateOpeningPayoffProofs,
   validationPasses,
   draftStoryChapter,
   readPendingRevision,
@@ -289,6 +290,23 @@ const arc: ArcPlan = {
   duePromiseIds: ['promise_house'],
   progression: ['Tiền mặt tăng rõ ràng', 'Dụng cụ được nâng cấp', 'Uy tín với đầu ra tăng'],
 };
+
+const openingPayoffProofs = [
+  {
+    byChapter: 1 as const,
+    steps: [{ mechanicId: 'mechanic_opening_catch', actorId: 'main', quantity: 10 }],
+    resourceClaims: [{ resourceId: 'opening_catch', minimumProduced: 20 }],
+    witnessCharacterIds: ['mother'],
+    pressureCharacterIds: ['buyer'],
+  },
+  {
+    byChapter: 3 as const,
+    steps: [{ mechanicId: 'mechanic_opening_catch', actorId: 'main', quantity: 10 }],
+    resourceClaims: [{ resourceId: 'opening_catch', minimumProduced: 40 }],
+    witnessCharacterIds: ['mother'],
+    pressureCharacterIds: ['buyer'],
+  },
+];
 
 const routes: ModelRoutes = {
   setupGeneratorA: 'gen-a', setupGeneratorB: 'gen-b', setupJudge: 'judge',
@@ -5009,6 +5027,56 @@ describe('canonical Story Factory', () => {
     })).toThrow('ahead of StoryState chapter 0');
   });
 
+  test('opening payoff proofs replay material production in chapter order', () => {
+    const payoffResource = {
+      id: 'opening_catch', name: 'Mẻ cá mở màn', kind: 'numeric' as const,
+      unit: 'kg', ownerEntityId: 'main', minimum: 0,
+    };
+    const payoffMechanic = {
+      id: 'mechanic_opening_catch', name: 'Mua nguyên liệu cho mẻ thử', kind: 'conversion' as const,
+      description: 'Một đơn vị vốn đổi thành hai ký nguyên liệu đã kiểm đếm.',
+      inputsPerBatch: [{ resourceId: 'money', amount: 1 }],
+      outputsPerBatch: [{ resourceId: 'opening_catch', amount: 2 }],
+      maximumBatchesPerUse: 100,
+    };
+    const openingKernel = StoryKernelSchema.parse({
+      ...kernel,
+      resources: [...kernel.resources, payoffResource],
+      worldMechanics: [...kernel.worldMechanics, payoffMechanic],
+    });
+    const openingArc = InitialArcPlanSchema.parse({
+      ...arc,
+      activeResourceIds: [...arc.activeResourceIds, payoffResource.id],
+      activeMechanicIds: [...arc.activeMechanicIds, payoffMechanic.id],
+    });
+    const openingState = InitialStoryStateSchema.parse({
+      ...initialState,
+      resources: [...initialState.resources, { resourceId: payoffResource.id, kind: 'numeric', value: 0 }],
+    });
+    expect(() => validateOpeningPayoffProofs({
+      kernel: openingKernel,
+      arc: openingArc,
+      state: openingState,
+      proofs: openingPayoffProofs,
+    })).not.toThrow();
+
+    expect(() => validateOpeningPayoffProofs({
+      kernel: openingKernel,
+      arc: openingArc,
+      state: InitialStoryStateSchema.parse({
+        ...openingState,
+        resources: [{ resourceId: 'money', kind: 'numeric', value: 5 }],
+      }),
+      proofs: [
+        {
+          ...openingPayoffProofs[0],
+          steps: [{ mechanicId: 'mechanic_opening_catch', actorId: 'main', quantity: 10 }],
+        },
+        openingPayoffProofs[1],
+      ],
+    })).toThrow('consumes a resource before producing enough of it');
+  });
+
   test('market payoff deadlines are selected by code for the exact rolling window', () => {
     const blueprint = MarketBlueprintSchema.parse({
       familiarArena: 'Một đấu trường thức tỉnh nghề nghiệp quen thuộc với cạnh tranh công khai.',
@@ -5179,23 +5247,34 @@ describe('canonical Story Factory', () => {
       buyer: 'character_opposition_01',
       mother: 'character_supporting_01',
     };
-    const launchWorldMechanics = worldMechanics.map(mechanic => (
+    const launchWorldMechanics = [...worldMechanics.map(mechanic => (
       mechanic.kind === 'capability'
         ? {
             ...mechanic,
             allowedActorIds: mechanic.allowedActorIds.map(id => characterIdMap[id] ?? id),
           }
         : mechanic
-    ));
-    const launchResources = resources.map(resource => ({
+    )), {
+      id: 'mechanic_opening_catch', name: 'Mua nguyên liệu cho mẻ thử', kind: 'conversion' as const,
+      description: 'Một đơn vị vốn đổi thành hai ký nguyên liệu đã kiểm đếm.',
+      inputsPerBatch: [{ resourceId: 'money', amount: 1 }],
+      outputsPerBatch: [{ resourceId: 'opening_catch', amount: 2 }],
+      maximumBatchesPerUse: 100,
+    }];
+    const launchResources = [...resources.map(resource => ({
       ...resource,
       ownerEntityId: resource.ownerEntityId
         ? (characterIdMap[resource.ownerEntityId] ?? resource.ownerEntityId)
         : null,
-    }));
+    })), {
+      id: 'opening_catch', name: 'Mẻ cá mở màn', kind: 'numeric' as const,
+      unit: 'kg', ownerEntityId: 'character_protagonist_01', minimum: 0,
+    }];
     const launchArc = {
       ...pack.arc,
       activeCharacterIds: pack.arc.activeCharacterIds.map(id => characterIdMap[id] ?? id),
+      activeResourceIds: [...pack.arc.activeResourceIds, 'opening_catch'],
+      activeMechanicIds: [...pack.arc.activeMechanicIds, 'mechanic_opening_catch'],
     };
     const launchState = {
       ...pack.initialState,
@@ -5206,6 +5285,10 @@ describe('canonical Story Factory', () => {
           ([id, state]) => [characterIdMap[id] ?? id, state],
         )),
       })),
+      resources: [
+        ...pack.initialState.resources,
+        { resourceId: 'opening_catch', kind: 'numeric' as const, value: 0 },
+      ],
     };
     const provider = new QueueProvider([
       { candidates: a.map(({ id: _id, ...candidate }) => candidate) },
@@ -5234,7 +5317,19 @@ describe('canonical Story Factory', () => {
         constraints: launchWorldMechanics.filter(mechanic => mechanic.kind === 'constraint'),
       },
       { kernel: { progressionTracks, seriesSpine, longPromises, promises, endingDirection } },
-      { arc: launchArc, initialState: launchState },
+      {
+        arc: launchArc,
+        initialState: launchState,
+        openingPayoffProofs: openingPayoffProofs.map(proof => ({
+          ...proof,
+          steps: proof.steps.map(step => ({
+            ...step,
+            actorId: characterIdMap[step.actorId] ?? step.actorId,
+          })),
+          witnessCharacterIds: proof.witnessCharacterIds.map(id => characterIdMap[id] ?? id),
+          pressureCharacterIds: proof.pressureCharacterIds.map(id => characterIdMap[id] ?? id),
+        })),
+      },
     ]);
     const result = await runConceptLab({
       commission: { slotKey: 'canary-01', genreLane: 'do-thi-nien-dai', realityMode: 'grounded', audience: 'Độc giả nam nhưng nữ cũng đọc được.', tone: 'Khoái hoạt, chủ động và đời sống ấm.', settingBoundary: 'Việt Nam hư cấu, nghề nghiệp dựa trên thực tế.' },

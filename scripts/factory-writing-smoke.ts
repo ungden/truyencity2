@@ -194,6 +194,10 @@ async function main() {
           entityIds: memoryEntityIdsForArc(kernel, arc, state),
           events,
         }),
+        // Production always proves chapter one as a single executable window.
+        // This keeps the title-promise payoff small enough for exact causal
+        // replay and prevents a three-chapter repair payload from timing out.
+        ...(state.chapterNumber === 0 ? { requiredWindowSize: 1 as const } : {}),
         ...(recovery
           ? { recoveryEvidence: { source: 'plan_blocked', message: recovery.message }, requiredWindowSize: 1 as const }
           : {}),

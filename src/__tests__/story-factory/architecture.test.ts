@@ -253,6 +253,19 @@ describe('Story Factory architecture boundary', () => {
     expect(read('src/app/api/cron/story-factory/route.ts')).toContain('runStoryFactoryTicks()');
   });
 
+  test('a new story validates its opening plan before paying for a cover', () => {
+    const runtime = read('src/services/story-factory/runtime.ts');
+    const setup = sliceBetween(runtime, 'async function runSetup', 'async function runCover');
+    const cover = sliceBetween(runtime, 'async function runCover', 'async function loadPlanCheckpoint');
+    const plan = sliceBetween(runtime, 'async function runPlan', 'async function runChapter');
+
+    expect(setup).toContain("stage: 'plan'");
+    expect(cover).toContain('rollingPlanContainsChapter(job.rolling_plan, nextChapter)');
+    expect(cover).toContain("stage: 'write'");
+    expect(plan).toContain("stage: job.current_chapter === 0 ? 'cover' : 'write'");
+    expect(plan).toContain('job.current_chapter === 0 || job.plan_feedback || job.retry_count >= 2 ? 1 : undefined');
+  });
+
   test('the production gate is a mechanical smoke check, not a self-invalidating benchmark chain', () => {
     const migration = read(latestMigrationDefining('public.story_factory_release_is_approved'));
     const body = migration.slice(

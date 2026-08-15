@@ -187,7 +187,7 @@ interface SetupStageArtifact {
   usage: ProviderUsage;
 }
 
-export const SETUP_CHECKPOINT_VERSION = 'story-factory-setup-checkpoint-6-market-series-minima';
+export const SETUP_CHECKPOINT_VERSION = 'story-factory-setup-checkpoint-7-opening-execution-proof';
 
 export interface SetupCheckpointProvenance {
   version: typeof SETUP_CHECKPOINT_VERSION;
@@ -340,10 +340,191 @@ const LaunchSeriesSchema = z.object({
     }
   });
 });
+const OpeningPayoffProofSchema = z.object({
+  byChapter: z.union([z.literal(1), z.literal(3)]),
+  steps: z.array(z.object({
+    mechanicId: z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/),
+    actorId: z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/),
+    quantity: z.number().int().min(1).max(1_000_000),
+  }).strict()).min(1).max(24),
+  resourceClaims: z.array(z.object({
+    resourceId: z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/),
+    minimumProduced: z.number().finite().positive().max(1_000_000_000_000),
+  }).strict()).min(1).max(8),
+  witnessCharacterIds: z.array(z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/)).min(1).max(8),
+  pressureCharacterIds: z.array(z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/)).min(1).max(8),
+}).strict();
+
 export const LaunchStateSchema = z.object({
   arc: InitialArcPlanSchema,
   initialState: InitialStoryStateSchema,
+  openingPayoffProofs: z.array(OpeningPayoffProofSchema).length(2),
 }).strict();
+
+export function validateOpeningPayoffProofs(input: {
+  kernel: z.infer<typeof StoryKernelSchema>;
+  arc: z.infer<typeof InitialArcPlanSchema>;
+  state: z.infer<typeof InitialStoryStateSchema>;
+  proofs: z.infer<typeof OpeningPayoffProofSchema>[];
+}): void {
+  const { kernel, arc, state, proofs } = input;
+  const ordered = [...proofs].sort((a, b) => a.byChapter - b.byChapter);
+  if (ordered.length !== 2 || ordered[0]?.byChapter !== 1 || ordered[1]?.byChapter !== 3) {
+    throw new StoryFactoryError('setup_blocked', 'Opening payoff execution proof must cover chapter 1 and chapter 3 exactly.');
+  }
+  const characters = new Map(kernel.characters.map(character => [character.id, character]));
+  const mechanics = new Map(kernel.worldMechanics.map(mechanic => [mechanic.id, mechanic]));
+  const resources = new Map(kernel.resources.map(resource => [resource.id, resource]));
+  const activeCharacterIds = new Set(arc.activeCharacterIds);
+  const activeMechanicIds = new Set(arc.activeMechanicIds);
+  const balances = new Map(state.resources.flatMap(resource => (
+    resource.kind === 'numeric' ? [[resource.resourceId, resource.value] as const] : []
+  )));
+  const openingBalances = new Map(balances);
+  const facts = new Map(state.facts.map(fact => [fact.id, fact.value]));
+  const produced = new Map<string, number>();
+
+  for (const proof of ordered) {
+    for (const witnessId of proof.witnessCharacterIds) {
+      const witness = characters.get(witnessId);
+      if (!witness || !activeCharacterIds.has(witnessId) || witness.role === 'protagonist') {
+        throw new StoryFactoryError('setup_blocked', 'Opening payoff witness must be an active non-protagonist character.', {
+          byChapter: proof.byChapter,
+          witnessId,
+        });
+      }
+    }
+    for (const pressureId of proof.pressureCharacterIds) {
+      const pressure = characters.get(pressureId);
+      if (!pressure || !activeCharacterIds.has(pressureId) || pressure.role !== 'opposition') {
+        throw new StoryFactoryError('setup_blocked', 'Opening payoff pressure must name an active opposition character.', {
+          byChapter: proof.byChapter,
+          pressureId,
+        });
+      }
+    }
+    for (const [stepIndex, step] of proof.steps.entries()) {
+      const mechanic = mechanics.get(step.mechanicId);
+      const actor = characters.get(step.actorId);
+      if (!mechanic || !activeMechanicIds.has(step.mechanicId)) {
+        throw new StoryFactoryError('setup_blocked', 'Opening payoff proof uses a mechanic outside the initial arc.', {
+          byChapter: proof.byChapter,
+          stepIndex,
+          mechanicId: step.mechanicId,
+        });
+      }
+      if (!actor || !activeCharacterIds.has(step.actorId)) {
+        throw new StoryFactoryError('setup_blocked', 'Opening payoff proof uses an actor outside the initial arc.', {
+          byChapter: proof.byChapter,
+          stepIndex,
+          actorId: step.actorId,
+        });
+      }
+      if (mechanic.kind === 'constraint') {
+        throw new StoryFactoryError('setup_blocked', 'Opening payoff execution steps must create effects, not list a constraint as an action.', {
+          byChapter: proof.byChapter,
+          stepIndex,
+          mechanicId: mechanic.id,
+        });
+      }
+      if (mechanic.kind === 'conversion') {
+        if (mechanic.maximumBatchesPerUse !== null && step.quantity > mechanic.maximumBatchesPerUse) {
+          throw new StoryFactoryError('setup_blocked', 'Opening payoff proof exceeds a conversion batch limit.', {
+            byChapter: proof.byChapter,
+            stepIndex,
+            mechanicId: mechanic.id,
+            quantity: step.quantity,
+            maximumBatchesPerUse: mechanic.maximumBatchesPerUse,
+          });
+        }
+        for (const item of mechanic.inputsPerBatch) {
+          const required = item.amount * step.quantity;
+          const available = balances.get(item.resourceId) ?? 0;
+          if (available + 1e-9 < required) {
+            throw new StoryFactoryError('setup_blocked', 'Opening payoff proof consumes a resource before producing enough of it.', {
+              byChapter: proof.byChapter,
+              stepIndex,
+              mechanicId: mechanic.id,
+              resourceId: item.resourceId,
+              required,
+              available,
+            });
+          }
+        }
+        for (const item of mechanic.inputsPerBatch) {
+          balances.set(item.resourceId, (balances.get(item.resourceId) ?? 0) - item.amount * step.quantity);
+        }
+        for (const item of mechanic.outputsPerBatch) {
+          const amount = item.amount * step.quantity;
+          balances.set(item.resourceId, (balances.get(item.resourceId) ?? 0) + amount);
+          produced.set(item.resourceId, (produced.get(item.resourceId) ?? 0) + amount);
+        }
+      } else {
+        if (mechanic.allowedActorIds.length && !mechanic.allowedActorIds.includes(step.actorId)) {
+          throw new StoryFactoryError('setup_blocked', 'Opening payoff proof assigns a capability to an unauthorized actor.', {
+            byChapter: proof.byChapter,
+            stepIndex,
+            mechanicId: mechanic.id,
+            actorId: step.actorId,
+          });
+        }
+        for (const condition of mechanic.requiredFacts) {
+          const actual = facts.get(condition.factId);
+          if (actual === undefined || String(actual) !== String(condition.expected)) {
+            throw new StoryFactoryError('setup_blocked', 'Opening payoff proof uses a capability before its required fact is true.', {
+              byChapter: proof.byChapter,
+              stepIndex,
+              mechanicId: mechanic.id,
+              factId: condition.factId,
+              expected: condition.expected,
+              actual: actual ?? null,
+            });
+          }
+        }
+        for (const resourceId of mechanic.requiredResourceIds) {
+          if ((balances.get(resourceId) ?? 0) <= 0) {
+            throw new StoryFactoryError('setup_blocked', 'Opening payoff proof uses a capability before its required resource exists.', {
+              byChapter: proof.byChapter,
+              stepIndex,
+              mechanicId: mechanic.id,
+              resourceId,
+            });
+          }
+        }
+        mechanic.effectFactIds.forEach(factId => facts.set(factId, '1'));
+      }
+    }
+    let protagonistMaterialClaim = false;
+    for (const claim of proof.resourceClaims) {
+      const definition = resources.get(claim.resourceId);
+      if (!definition || definition.kind !== 'numeric' || !arc.activeResourceIds.includes(claim.resourceId)) {
+        throw new StoryFactoryError('setup_blocked', 'Opening payoff proof claims a non-numeric or inactive resource.', {
+          byChapter: proof.byChapter,
+          resourceId: claim.resourceId,
+        });
+      }
+      const actual = produced.get(claim.resourceId) ?? 0;
+      if (actual + 1e-9 < claim.minimumProduced) {
+        throw new StoryFactoryError('setup_blocked', 'Opening payoff proof does not actually produce its claimed material result.', {
+          byChapter: proof.byChapter,
+          resourceId: claim.resourceId,
+          minimumProduced: claim.minimumProduced,
+          actualProduced: actual,
+        });
+      }
+      if (
+        definition.ownerEntityId === kernel.protagonistId
+        && (balances.get(claim.resourceId) ?? 0) > (openingBalances.get(claim.resourceId) ?? 0) + 1e-9
+      ) protagonistMaterialClaim = true;
+    }
+    if (!protagonistMaterialClaim) {
+      throw new StoryFactoryError('setup_blocked', 'Opening payoff proof must leave a net increase in a protagonist-owned numeric resource.', {
+        byChapter: proof.byChapter,
+        resourceIds: proof.resourceClaims.map(claim => claim.resourceId),
+      });
+    }
+  }
+}
 
 async function setupStage<T>(label: string, call: Promise<T>): Promise<T> {
   try {
@@ -1106,6 +1287,7 @@ Mọi longPromises.promiseId, stages[].longPromiseIds và endingDirection.promis
   const launchStateSystem = `Bạn chỉ tạo Arc đầu 20-30 chương và StoryState chương 0 từ canon đã khóa. Trả đúng structured-output schema, không markdown.
 Arc gắn stage đầu; mọi active ID phải có trong Kernel. State không ghi trước kết quả tương lai.
 Arc đầu phải trả đúng title promise và marketBlueprint.earlyPayoffs: progression có ít nhất năm mốc, khóa rõ kết quả ở/chậm nhất chương 1,3,5,7,10; terminalChanges có ít nhất ba thay đổi vị thế/tài sản/quyền lựa chọn thật; activeConflicts có ít nhất hai nguồn áp lực độc lập từ worldConflictEngine.
+openingPayoffProofs phải có đúng hai proof cho chapter 1 và 3. Mỗi proof là chương trình thực thi tích lũy từ State chương 0: steps dùng đúng active conversion/capability, đúng actor và số batch; resourceClaims ghi tổng lượng tài nguyên numeric do chuỗi đã thực sự sản xuất đến deadline. Code sẽ replay theo thứ tự, trừ input trước rồi cộng output, kiểm tra giới hạn batch, fact, quyền actor và số dư; tuyệt đối không tiêu trước khi sản xuất hoặc khai số lượng lớn hơn phép tính. Chapter 3 tiếp tục từ số dư sau proof chapter 1, không reset kho. Ở mỗi deadline phải còn ít nhất một tài nguyên numeric do protagonist sở hữu có số dư tăng ròng so với State chương 0; output trung gian đã tiêu hết hoặc phép đổi làm số dư giảm không được tính là payoff. Mỗi proof cũng phải có một nhân vật ngoài main trực tiếp thấy kết quả và một opposition active tạo áp lực kế tiếp.
 Chia 20-30 chương thành nhiều mini-cycle, mỗi cycle có cơ hội hoặc áp lực → main dùng coreAdvantage → người có lợi ích trực tiếp chứng kiến/đáp trả → payoff → áp lực cấp cao hơn. Không dành trọn arc để sửa máy, thử nghiệm, gom nguyên liệu, làm quen thế giới hoặc đánh một phản diện bằng cùng một thủ đoạn.
 Mốc chương 10 phải làm main bước sang một vị thế hoặc arena mới đủ rõ, không chỉ giàu/mạnh hơn theo số. Những chương sau mở biến thể lợi thế, institution hoặc opposition class kế tiếp đã có trong Kernel.
 Arc.activeMechanicIds là working set của Planner trong arc đầu: chỉ chứa mechanic mà các beat của arc đầu thật sự dùng, tối đa ${ARC_ACTIVE_MECHANIC_BUDGET}. Mechanic không chọn vẫn nằm nguyên trong Kernel và arc sau kích hoạt được. Mọi requiredFacts của capability/constraint đang active phải có fact và expected value tương ứng trong initialState.
@@ -1155,6 +1337,12 @@ State có đúng một entry cho mọi character, resource và promise trong Ker
       state: candidate.initialState,
     });
     assertRenewableConversionInputs(candidate.kernel, ArcPlanSchema.parse(candidate.arc));
+    validateOpeningPayoffProofs({
+      kernel: candidate.kernel,
+      arc: candidate.arc,
+      state: candidate.initialState,
+      proofs: launchState.value.openingPayoffProofs,
+    });
   };
   let launch = buildLaunch();
   const canonicalErrors: Array<{ message: string; evidence: unknown }> = [];

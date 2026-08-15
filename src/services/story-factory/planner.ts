@@ -22,7 +22,7 @@ import type { MarketBlueprint } from './setup';
 
 // Defined here, not in release.ts: release → benchmark → planner already exists, so a
 // planner → release import closes a cycle and breaks the production bundle (TDZ at init).
-export const FACTORY_PLANNER_VERSION = 'story-factory-planner-76-payoff-window-evidence';
+export const FACTORY_PLANNER_VERSION = 'story-factory-planner-77-opening-single-window';
 import { EDITOR_SYSTEM_PROMPT, PLANNER_SYSTEM_PROMPT, PLAN_JUDGE_SYSTEM_PROMPT } from './prompts';
 import {
   ARC_ACTIVE_MECHANIC_BUDGET,
@@ -160,6 +160,8 @@ const PLANNER_COMPACT_CONTRACT = {
     'Kiểm công suất capability theo qty <= maximumUnitsPerMinute * availableMinutes. Với role=effect, availableMinutes=scene.dur. Với role=support, availableMinutes=scene.dur+scene.travel vì support có thể vận hành trong chính quãng chuyển cảnh.',
     'Khai báo đầy đủ mechanic tạo fact/resource và mechanic sử dụng nó trong đúng scene; compiler sẽ sắp thứ tự dependency tất định trong scene. Fact ngoại cảnh không có effect mechanic như thời tiết bắt đầu chỉ trở thành khả dụng sau scene ghi fact delta; capability phụ thuộc nó phải ở scene sau.',
     'Conversion là một batch nguyên tử: chỉ commit toàn bộ input và output trong cùng scene khi batch hoàn tất. Chương chuẩn bị chưa hoàn tất batch phải dùng fact hoặc resource_state để ghi tiến độ; không được trừ trước một phần input numeric rồi để output sang chương sau.',
+    'Trước khi trả kết quả, replay đúng thứ tự chapter -> scene -> mechanics từ ledgerSnapshot. Với mỗi conversion, kiểm balance hiện tại đủ input, trừ toàn bộ input rồi mới cộng output. Producer phải ở scene trước consumer nếu consumer không chạy được từ state đầu scene; không được lấy output tương lai làm before hiện tại.',
+    'Actor của mọi mechanics entry phải có trong scene.people. Không gắn cùng resource delta cho cả conversion và capability chỉ để diễn tả thao tác: conversion sở hữu vector input/output; capability chỉ effect khi nó tạo một fact/resource effect riêng đã khai báo, nếu không thì support hoặc bỏ entry.',
     'Giữ goal/block/act ngắn và cơ học; chỉ đưa nhân vật, rule và delta thật sự cần cho chương.',
     'knowledge.after phải là fact ID đã tồn tại trong State. Nếu nhân vật học một fact mới, tạo fact delta khai báo fact đó trước knowledge delta trong cùng chương và gắn cả hai vào scene học biết.',
     'Fact được mechanic khác dùng làm requiredFact là precondition có kiểu và giá trị khóa. Nếu một capability tạo/cập nhật fact đó để mechanic sau sử dụng, fact delta.after phải đúng required expected trong factContracts; không thay marker precondition bằng tên bản vẽ, lời mô tả hoặc kết quả prose.',
