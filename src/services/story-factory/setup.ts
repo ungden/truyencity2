@@ -60,6 +60,19 @@ export const OpeningPayoffProofSchema = z.object({
 }).strict();
 export type OpeningPayoffProof = z.infer<typeof OpeningPayoffProofSchema>;
 
+export function resolveProducedFactValue(
+  mechanics: z.infer<typeof WorldMechanicSchema>[],
+  factId: string,
+): string {
+  const requiredValues = mechanics.flatMap(mechanic => (
+    mechanic.kind === 'conversion'
+      ? []
+      : mechanic.requiredFacts.filter(condition => condition.factId === factId).map(condition => condition.expected)
+  ));
+  const uniqueValues = [...new Map(requiredValues.map(value => [`${typeof value}:${String(value)}`, value])).values()];
+  return uniqueValues.length === 1 ? String(uniqueValues[0]) : '1';
+}
+
 const MarketBlueprintProductSchema = z.object({
   familiarArena: z.string().trim().min(20).max(800),
   noveltyCollision: z.string().trim().min(20).max(800),
@@ -559,7 +572,10 @@ export function validateOpeningPayoffProofs(input: {
             });
           }
         }
-        mechanic.effectFactIds.forEach(factId => facts.set(factId, '1'));
+        mechanic.effectFactIds.forEach(factId => facts.set(
+          factId,
+          resolveProducedFactValue(kernel.worldMechanics, factId),
+        ));
       }
     }
     let protagonistMaterialClaim = false;

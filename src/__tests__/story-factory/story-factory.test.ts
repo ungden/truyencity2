@@ -82,6 +82,7 @@ import {
   validateKernelState,
   validateOpeningPayoffProofs,
   validateOpeningPayoffSemanticAudit,
+  resolveProducedFactValue,
   validationPasses,
   draftStoryChapter,
   readPendingRevision,
@@ -5177,6 +5178,27 @@ describe('canonical Story Factory', () => {
       passes: false,
       referenceErrors: [{ byChapter: 3, field: 'resource', id: 'anti_magic_armor' }],
     });
+  });
+
+  test('opening proof fact production adopts the unique downstream contract value', () => {
+    const mechanics = [
+      {
+        id: 'cap_produce_clearance', name: 'Cấp quyền', kind: 'capability' as const,
+        description: 'Hoàn tất thủ tục và kích hoạt quyền thử nghiệm công khai.',
+        allowedActorIds: ['main'], requiredFacts: [], requiredResourceIds: [],
+        effectResources: [], effectFactIds: ['fact_clearance'],
+        capacityUnit: 'lần', maximumUnitsPerMinute: 1,
+      },
+      {
+        id: 'cap_use_clearance', name: 'Dùng quyền', kind: 'capability' as const,
+        description: 'Dùng quyền đã kích hoạt để thực hiện phép thử kế tiếp.',
+        allowedActorIds: ['main'], requiredFacts: [{ factId: 'fact_clearance', expected: 'true' }],
+        requiredResourceIds: [], effectResources: [], effectFactIds: [],
+        capacityUnit: 'lần', maximumUnitsPerMinute: 1,
+      },
+    ];
+    expect(resolveProducedFactValue(mechanics, 'fact_clearance')).toBe('true');
+    expect(resolveProducedFactValue(mechanics, 'fact_uncontracted')).toBe('1');
   });
 
   test('market payoff deadlines are selected by code for the exact rolling window', () => {
