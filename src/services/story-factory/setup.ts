@@ -205,7 +205,11 @@ export function validateOpeningPayoffSemanticAudit(input: {
     const proof = proofByChapter.get(check.byChapter);
     const proofMechanics = new Set(proof?.steps.map(step => step.mechanicId) ?? []);
     const proofResources = new Set(proof?.resourceClaims.map(claim => claim.resourceId) ?? []);
-    const proofCharacters = new Set([...(proof?.witnessCharacterIds ?? []), ...(proof?.pressureCharacterIds ?? [])]);
+    const proofCharacters = new Set([
+      ...(proof?.steps.map(step => step.actorId) ?? []),
+      ...(proof?.witnessCharacterIds ?? []),
+      ...(proof?.pressureCharacterIds ?? []),
+    ]);
     check.evidenceMechanicIds.forEach(id => {
       if (!proofMechanics.has(id)) referenceErrors.push({ byChapter: check.byChapter, field: 'mechanic', id });
     });
@@ -265,7 +269,7 @@ interface SetupStageArtifact {
   usage: ProviderUsage;
 }
 
-export const SETUP_CHECKPOINT_VERSION = 'story-factory-setup-checkpoint-8-opening-semantic-audit';
+export const SETUP_CHECKPOINT_VERSION = 'story-factory-setup-checkpoint-9-opening-role-alignment';
 
 export interface SetupCheckpointProvenance {
   version: typeof SETUP_CHECKPOINT_VERSION;
@@ -1158,6 +1162,7 @@ Phải áp dụng realityPolicy: grounded dùng chuẩn thực tế ngoài đờ
 Chọn dựa trên chất lượng actual opening sample, chemistry nhân vật, agency của đối lực và khả năng biến hóa; không chỉ dựa vào metadata cơ chế. Opening sample chỉ là bằng chứng lựa chọn: tuyệt đối không chép câu, cử chỉ hoặc thoại từ sample vào Kernel.
 Giữ packaging sảng văn trực diện: kernel.title dài 7-26 từ, nêu đề tài/thân phận cùng lợi thế hoặc payoff cụ thể; ưu tiên dấu hai chấm. kernel.description là văn án bán truyện, phải nói ngay hoàn cảnh main, lợi thế, payoff đầu và nấc leo thang — không viết như tóm tắt văn học. readerFantasy và pleasureLoop phải nhấn vào quyền chủ động, thắng lợi nhìn thấy được và vị thế mở rộng; comfort chỉ là lớp phụ.
 Identity phải giữ nguyên hạt nhân marketBlueprint của concept: main bắt đầu đúng đáy đã khóa, coreAdvantage là năng lực trung tâm chứ không bị thay bằng nghề nghiệp phụ, cast phải đại diện ít nhất opposition địa phương và một quan hệ/gatekeeper khiến comparisonEngine hoạt động. Không biến noveltyCollision thành background rồi kể một truyện nghề nghiệp quen thuộc.
+Cast phải có nhân vật cụ thể đủ thẩm quyền thực hiện đúng visibleTo và nextPressure của từng earlyPayoff chương 1 và 3. Nếu payoff nói một quản đốc chứng kiến rồi một thương hội khác phong tỏa nguồn cung, phải có đúng hai tác nhân phù hợp; không được dùng quản đốc địa phương thay cho thương hội chỉ vì cùng role opposition. Các nhân vật này phải có agenda/công cụ hợp lý, không phải vai quần chúng chỉ để kinh ngạc.
 VoiceContract chỉ được dùng thuộc tính trung tính register, sentenceRhythm, directness, addressRules, vocabulary, reasoningStyle, emotionDisplay và humorStyle. Không chứa câu thoại, cử chỉ, phản ứng mẫu, stressResponse hoặc avoidances.
 sentenceRhythm chỉ mô tả độ dài, nhịp và cấu trúc câu; không mô tả âm lượng, động tác phát ngôn hoặc thói quen như cười, nhếch, quát, gằn giọng, lẩm bẩm.
 Xuất đúng một protagonist, ít nhất một opposition có agenda độc lập thật sự và ít nhất một supporting character. Không dùng supporting character làm đối thủ giả.
@@ -1354,7 +1359,7 @@ Mọi longPromises.promiseId, stages[].longPromiseIds và endingDirection.promis
 Arc gắn stage đầu; mọi active ID phải có trong Kernel. State không ghi trước kết quả tương lai.
 Arc đầu phải trả đúng title promise và marketBlueprint.earlyPayoffs: progression có ít nhất năm mốc, khóa rõ kết quả ở/chậm nhất chương 1,3,5,7,10; terminalChanges có ít nhất ba thay đổi vị thế/tài sản/quyền lựa chọn thật; activeConflicts có ít nhất hai nguồn áp lực độc lập từ worldConflictEngine.
 openingPayoffProofs phải có đúng hai proof cho chapter 1 và 3. Mỗi proof là chương trình thực thi tích lũy từ State chương 0: steps dùng đúng active conversion/capability, đúng actor và số batch; resourceClaims ghi tổng lượng tài nguyên numeric do chuỗi đã thực sự sản xuất đến deadline. Code sẽ replay theo thứ tự, trừ input trước rồi cộng output, kiểm tra giới hạn batch, fact, quyền actor và số dư; tuyệt đối không tiêu trước khi sản xuất hoặc khai số lượng lớn hơn phép tính. Chapter 3 tiếp tục từ số dư sau proof chapter 1, không reset kho. Ở mỗi deadline phải còn ít nhất một tài nguyên numeric do protagonist sở hữu có số dư tăng ròng so với State chương 0; output trung gian đã tiêu hết hoặc phép đổi làm số dư giảm không được tính là payoff. Mỗi proof cũng phải có một nhân vật ngoài main trực tiếp thấy kết quả và một opposition active tạo áp lực kế tiếp.
-Mỗi proof phải thực sự sản xuất đúng artifact/kết quả được marketBlueprint.earlyPayoffs ở deadline tương ứng và resourceClaims phải chứa resource đại diện trực tiếp cho artifact ấy. Không dùng tiền, nguyên liệu đầu vào hoặc một sản phẩm cùng nghề nhưng khác loại để thay thế payoff. Nếu payoff nói giáp thì proof phải gọi mechanic tạo giáp và claim resource giáp; đao không được tính thay.
+Mỗi proof phải thực hiện mọi mệnh đề vật chất của marketBlueprint.earlyPayoffs ở deadline tương ứng: tạo đúng artifact, đủ số lượng, và gọi cả mechanic giao dịch/đổi vị thế nếu payoff hứa lợi nhuận, đơn hàng, trả nợ hoặc giấy phép. resourceClaims phải chứa resource đại diện trực tiếp cho artifact; không dùng tiền, nguyên liệu đầu vào hoặc một sản phẩm cùng nghề nhưng khác loại để thay artifact. Nếu payoff nói giáp thì proof phải gọi mechanic tạo giáp và claim resource giáp; đao không được tính thay. witnessCharacterIds phải đúng tác nhân visibleTo; pressureCharacterIds phải đúng tác nhân có agenda và thẩm quyền thực hiện nextPressure, không được chọn một opposition khác chỉ vì cùng role.
 Chia 20-30 chương thành nhiều mini-cycle, mỗi cycle có cơ hội hoặc áp lực → main dùng coreAdvantage → người có lợi ích trực tiếp chứng kiến/đáp trả → payoff → áp lực cấp cao hơn. Không dành trọn arc để sửa máy, thử nghiệm, gom nguyên liệu, làm quen thế giới hoặc đánh một phản diện bằng cùng một thủ đoạn.
 Mốc chương 10 phải làm main bước sang một vị thế hoặc arena mới đủ rõ, không chỉ giàu/mạnh hơn theo số. Những chương sau mở biến thể lợi thế, institution hoặc opposition class kế tiếp đã có trong Kernel.
 Arc.activeMechanicIds là working set của Planner trong arc đầu: chỉ chứa mechanic mà các beat của arc đầu thật sự dùng, tối đa ${ARC_ACTIVE_MECHANIC_BUDGET}. Mechanic không chọn vẫn nằm nguyên trong Kernel và arc sau kích hoạt được. Mọi requiredFacts của capability/constraint đang active phải có fact và expected value tương ứng trong initialState.
@@ -1468,17 +1473,10 @@ State có đúng một entry cho mọi character, resource và promise trong Ker
   }
   checkpoint.launchState = launchState;
   await input.onCheckpoint?.(structuredClone(checkpoint));
-  usages.push(launchState.usage);
-
-  const openingPayoffAudit = checkpoint.openingPayoffAudit
-    ? {
-        value: OpeningPayoffSemanticAuditSchema.parse(checkpoint.openingPayoffAudit.value),
-        usage: checkpoint.openingPayoffAudit.usage,
-      }
-    : await setupStage('Opening Payoff Semantic Judge', provider.json({
+  const runOpeningPayoffAudit = () => setupStage('Opening Payoff Semantic Judge', provider.json({
         model: input.routes.setupJudge,
         system: `Bạn là Judge độc lập kiểm toán payoff mở đầu trước khi truyện được phép rời setup. Không viết lại canon và không nương theo ý định.
-Đối chiếu từng market payoff chương 1 và 3 với exact mechanic/resource/character trong proof. payoffSupported chỉ true khi proof tạo đúng loại vật phẩm hoặc kết quả đã hứa; một sản phẩm cùng nghề nhưng khác loại không được thay thế (giáp khác đao, lõi khác mô-đun, tiền khác giấy phép). witnessSupported và pressureSupported chỉ true khi exact character ID trong proof có vai trò phù hợp. Trả reject nếu bất kỳ check nào false.`,
+Đối chiếu từng market payoff chương 1 và 3 với exact mechanic/resource/character trong proof. payoffSupported chỉ true khi proof thực hiện mọi mệnh đề vật chất đã hứa: đúng artifact, số lượng và mechanic giao dịch/đổi vị thế nếu có; một sản phẩm cùng nghề nhưng khác loại không được thay thế (giáp khác đao, lõi khác mô-đun, tiền khác giấy phép). witnessSupported chỉ true khi witnessCharacterIds đúng tác nhân visibleTo. pressureSupported chỉ true khi pressureCharacterIds có đúng agenda và thẩm quyền thực hiện nextPressure; một opposition khác cùng role không được tính thay. evidenceCharacterIds chỉ được dẫn exact actorId, witnessCharacterIds hoặc pressureCharacterIds thật sự có trong proof. Trả reject nếu bất kỳ check nào false.`,
         prompt: JSON.stringify({
           task: 'Kiểm toán semantic alignment của opening payoff proof với hợp đồng sản phẩm và world canon.',
           earlyPayoffs: selectedConcept.marketBlueprint.earlyPayoffs.filter(payoff => payoff.byChapter <= 3),
@@ -1490,19 +1488,64 @@ State có đúng một entry cho mọi character, resource và promise trong Ker
         schema: OpeningPayoffSemanticAuditSchema,
         temperature: 0.1,
       }));
-  const semanticAuditValidation = validateOpeningPayoffSemanticAudit({
+  let openingPayoffAudit = checkpoint.openingPayoffAudit
+    ? {
+        value: OpeningPayoffSemanticAuditSchema.parse(checkpoint.openingPayoffAudit.value),
+        usage: checkpoint.openingPayoffAudit.usage,
+      }
+    : await runOpeningPayoffAudit();
+  let semanticAuditValidation = validateOpeningPayoffSemanticAudit({
     audit: openingPayoffAudit.value,
     proofs: launchState.value.openingPayoffProofs,
   });
+  const firstSemanticAudit = openingPayoffAudit.value;
+  if (!semanticAuditValidation.passes && !checkpoint.openingPayoffAudit) {
+    const correction = await setupStage('Launch State Architect semantic correction 1/1', provider.json({
+      model: input.routes.launchArchitect,
+      system: `${launchStateSystem}\nBạn đang sửa riêng semantic alignment đã bị Judge độc lập từ chối. Giữ nguyên Kernel. Chọn đúng exact witness/pressure actor theo market payoff và thêm mọi mechanic còn thiếu vào proof; không chỉ đổi câu mô tả progression.`,
+      prompt: JSON.stringify({
+        ...launchStatePrompt,
+        task: 'Sửa Arc, State và openingPayoffProofs theo semantic audit; không thay đổi Kernel.',
+        semanticAudit: openingPayoffAudit.value,
+        auditReferenceErrors: semanticAuditValidation.referenceErrors,
+        previous: launchState.value,
+      }),
+      schema: LaunchStateSchema,
+      schemaComplexity: 'omit_large_array_max',
+      temperature: 0.15,
+    }));
+    launchState = {
+      value: correction.value,
+      usage: mergeStageUsage(launchState.usage, correction.usage),
+    };
+    launch = buildLaunch();
+    validateStateAndArc(launch);
+    checkpoint.launchState = launchState;
+    await input.onCheckpoint?.(structuredClone(checkpoint));
+    const secondAudit = await runOpeningPayoffAudit();
+    openingPayoffAudit = {
+      value: secondAudit.value,
+      usage: mergeStageUsage(openingPayoffAudit.usage, secondAudit.usage),
+    };
+    semanticAuditValidation = validateOpeningPayoffSemanticAudit({
+      audit: openingPayoffAudit.value,
+      proofs: launchState.value.openingPayoffProofs,
+    });
+  }
   if (!semanticAuditValidation.passes) {
     throw new StoryFactoryError(
       'setup_blocked',
-      'Opening payoff semantic audit rejected the launch pack.',
-      { audit: openingPayoffAudit.value, auditReferenceErrors: semanticAuditValidation.referenceErrors },
+      'Opening payoff semantic audit rejected the launch pack after one bounded correction.',
+      {
+        firstAudit: firstSemanticAudit,
+        finalAudit: openingPayoffAudit.value,
+        auditReferenceErrors: semanticAuditValidation.referenceErrors,
+      },
     );
   }
   checkpoint.openingPayoffAudit = openingPayoffAudit;
   await input.onCheckpoint?.(structuredClone(checkpoint));
+  usages.push(launchState.usage);
   usages.push(openingPayoffAudit.usage);
   assertPortfolioDiversity(selectedConcept, input.existingSignatures ?? []);
   return {

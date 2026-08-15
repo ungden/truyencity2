@@ -279,7 +279,8 @@ describe('Story Factory architecture boundary', () => {
     expect(runtime).toContain('openingExecutionProofs: result.openingPayoffProofs');
     expect(read('src/services/story-factory/planner.ts')).toContain('openingExecutionProofs: input.marketBlueprint.openingExecutionProofs');
     expect(read('src/services/story-factory/setup.ts')).toContain("setupStage('Opening Payoff Semantic Judge'");
-    expect(read('src/services/story-factory/setup.ts')).toContain('Opening payoff semantic audit rejected the launch pack.');
+    expect(read('src/services/story-factory/setup.ts')).toContain("setupStage('Launch State Architect semantic correction 1/1'");
+    expect(read('src/services/story-factory/setup.ts')).toContain('Opening payoff semantic audit rejected the launch pack after one bounded correction.');
   });
 
   test('the production gate is a mechanical smoke check, not a self-invalidating benchmark chain', () => {
