@@ -220,6 +220,8 @@ describe('Story Factory architecture boundary', () => {
     expect(provider).toContain('rà lại cùng field trên TOÀN BỘ các phần tử');
     expect(provider).toContain('temperature: Math.min(input.temperature ?? 0.7, 0.2)');
     expect(setup).toContain('arena, statusPrize, oppositionClass và advantageEvolution đều phải là mô tả cụ thể dài tối thiểu 20 ký tự');
+    expect(setup).toContain('Launch pack has ${failures.length} canonical validation failure(s).');
+    expect(setup).toContain('check(() => validateOpeningPayoffProofs({');
   });
 
   test('the rewrite path runs in its own tick so no chapter exceeds the route ceiling', () => {

@@ -1336,29 +1336,48 @@ State có đúng một entry cho mọi character, resource và promise trong Ker
     coverPrompt: launchIdentity.value.coverPrompt,
   });
   const validateStateAndArc = (candidate: LaunchPack) => {
-    assertLaunchSemantics(candidate, commission, selectedConcept);
+    const failures: Array<{ message: string; evidence: unknown }> = [];
+    const check = (validation: () => void) => {
+      try {
+        validation();
+      } catch (error) {
+        if (!(error instanceof StoryFactoryError)) throw error;
+        failures.push({ message: error.message, evidence: error.evidence ?? null });
+      }
+    };
+    check(() => assertLaunchSemantics(candidate, commission, selectedConcept));
     if (candidate.initialState.chapterNumber !== 0
       || candidate.initialState.storyTimeMinutes !== 0
       || candidate.initialState.recentOutcomes.length
       || candidate.initialState.usedExpansionSeedIds.length
       || candidate.arc.startChapter !== 1) {
-      throw new StoryFactoryError('setup_blocked', 'Launch pack must start before chapter one with no simulated canon or consumed expansion seeds.');
+      failures.push({
+        message: 'Launch pack must start before chapter one with no simulated canon or consumed expansion seeds.',
+        evidence: null,
+      });
     }
-    validateKernelState(candidate.kernel, candidate.initialState);
-    validateArcActivationBudget(candidate.arc);
-    validateArcAgainstKernel(candidate.kernel, ArcPlanSchema.parse(candidate.arc));
-    validateArcResourceReachability({
+    check(() => validateKernelState(candidate.kernel, candidate.initialState));
+    check(() => validateArcActivationBudget(candidate.arc));
+    check(() => validateArcAgainstKernel(candidate.kernel, ArcPlanSchema.parse(candidate.arc)));
+    check(() => validateArcResourceReachability({
       kernel: candidate.kernel,
       arc: ArcPlanSchema.parse(candidate.arc),
       state: candidate.initialState,
-    });
-    assertRenewableConversionInputs(candidate.kernel, ArcPlanSchema.parse(candidate.arc));
-    validateOpeningPayoffProofs({
+    }));
+    check(() => assertRenewableConversionInputs(candidate.kernel, ArcPlanSchema.parse(candidate.arc)));
+    check(() => validateOpeningPayoffProofs({
       kernel: candidate.kernel,
       arc: candidate.arc,
       state: candidate.initialState,
       proofs: launchState.value.openingPayoffProofs,
-    });
+    }));
+    if (failures.length) {
+      throw new StoryFactoryError(
+        'setup_blocked',
+        `Launch pack has ${failures.length} canonical validation failure(s).`,
+        { failures },
+      );
+    }
   };
   let launch = buildLaunch();
   const canonicalErrors: Array<{ message: string; evidence: unknown }> = [];
