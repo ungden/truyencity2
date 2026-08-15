@@ -115,9 +115,11 @@ until green. It binds the four generation routes plus `routeVersion`, and delibe
 not the engine revision: a prompt fix must never stall the fleet behind a re-smoke.
 
 The novel writes chapters 1–10 with `novels.hidden = true`. Window reviews run at 5 and 10;
-passing chapter 10 with a cover present auto-calls `promote_story_factory_canary`, which
-publishes it. That is the quality gate: real chapters on real accumulating state, and the
-output is saleable rather than discarded.
+passing chapter 10 parks the job as `completed` while the novel remains hidden. An operator
+must inspect the persisted title, setup and actual prose before running
+`factory:operator -- release --job-id=<id> --apply`; only that explicit action calls
+`promote_story_factory_canary` and publishes it. That is the quality gate: real chapters on
+real accumulating state, followed by a human public/private decision.
 
 ## Operating
 

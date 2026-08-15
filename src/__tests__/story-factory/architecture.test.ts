@@ -299,7 +299,10 @@ describe('Story Factory architecture boundary', () => {
   });
 
   test('canary promotion requires the latest chapter-10 review on the exact release', () => {
+    const runtime = read('src/services/story-factory/runtime.ts');
     const migration = read(latestMigrationDefining('public.promote_story_factory_canary'));
+    expect(runtime).not.toContain("db.rpc('promote_story_factory_canary'");
+    expect(runtime).toContain("canaryReadyForHumanReview ? 'completed' : 'ready'");
     expect(migration).toContain('ORDER BY finished_at DESC NULLS LAST, started_at DESC');
     expect(migration).toContain("latest_review_status IS DISTINCT FROM 'passed'");
     expect(migration).toContain('latest_review_release IS DISTINCT FROM p_engine_release');

@@ -896,6 +896,7 @@ async function runWindowReview(db: SupabaseClient, job: FactoryJobRow, project: 
       });
     }
     const now = new Date().toISOString();
+    const canaryReadyForHumanReview = job.current_chapter >= 10 && job.execution_mode === 'hidden_canary';
     const nextRunAt = nextRunAfterNonChapterStage(job, new Date(now));
     const nextStage = state.chapterNumber >= arc.plannedEndChapter ? 'arc' : 'write';
     const runUpdate = await db.from('story_factory_runs').update({
@@ -904,27 +905,12 @@ async function runWindowReview(db: SupabaseClient, job: FactoryJobRow, project: 
     }).eq('id', runId);
     if (runUpdate.error) throw runUpdate.error;
     const jobUpdate = await db.from('story_factory_jobs').update({
-      status: 'ready', stage: nextStage, retry_count: 0, lease_owner: null, lease_token: null, lease_until: null,
+      status: canaryReadyForHumanReview ? 'completed' : 'ready', stage: nextStage, retry_count: 0,
+      lease_owner: null, lease_token: null, lease_until: null,
       next_run_at: nextRunAt, updated_at: now,
+      ...(canaryReadyForHumanReview ? { completed_at: now } : {}),
     }).eq('id', job.id).eq('lease_token', job.lease_token);
     if (jobUpdate.error) throw jobUpdate.error;
-    // >= 10, not === 10: a promotion that fails once (missing cover, digest mismatch)
-    // must get another chance at the next window review — with strict equality the
-    // novel kept writing chapters forever with hidden = true and no reader. Promotion
-    // failure is also non-fatal by design: the review itself passed and the job should
-    // keep writing; blockRun here would be wrong twice over (the review run is already
-    // 'passed', so its error write would no-op, and an infra retry would re-run a
-    // review that already succeeded).
-    if (job.current_chapter >= 10 && job.execution_mode === 'hidden_canary') {
-      const promoted = await db.rpc('promote_story_factory_canary', { p_job_id: job.id, p_engine_release: STORY_FACTORY_RELEASE });
-      if (promoted.error) {
-        console.warn('[story-factory] canary promotion deferred:', promoted.error.message);
-        const noted = await db.from('story_factory_jobs')
-          .update({ last_error: `promotion deferred: ${promoted.error.message}`, updated_at: new Date().toISOString() })
-          .eq('id', job.id);
-        if (noted.error) console.warn('[story-factory] could not record promotion failure:', noted.error.message);
-      }
-    }
     return { status: 'completed', jobId: job.id, stage: 'window_review', chapterNumber: job.current_chapter };
   } catch (error) {
     return blockRun(db, job, runId, error);
