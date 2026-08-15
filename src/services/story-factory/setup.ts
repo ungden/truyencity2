@@ -1502,7 +1502,7 @@ State có đúng một entry cho mọi character, resource và promise trong Ker
   if (!semanticAuditValidation.passes && !checkpoint.openingPayoffAudit) {
     const correction = await setupStage('Launch State Architect semantic correction 1/1', provider.json({
       model: input.routes.launchArchitect,
-      system: `${launchStateSystem}\nBạn đang sửa riêng semantic alignment đã bị Judge độc lập từ chối. Giữ nguyên Kernel. Chọn đúng exact witness/pressure actor theo market payoff và thêm mọi mechanic còn thiếu vào proof; không chỉ đổi câu mô tả progression.`,
+      system: `${launchStateSystem}\nBạn đang sửa riêng semantic alignment đã bị Judge độc lập từ chối. Giữ nguyên Kernel. Bảo toàn arc và initialState nếu các exact ID cần thiết đã active; ưu tiên chỉ sửa openingPayoffProofs. Chọn đúng exact witness/pressure actor theo market payoff và thêm mechanic còn thiếu vào proof chỉ khi mechanic ấy đã active và mọi precondition/resource của nó đã tồn tại. Không tự thêm mechanic, xóa đường acquisition hoặc đổi số dư để làm proof dễ hơn; không chỉ đổi câu mô tả progression.`,
       prompt: JSON.stringify({
         ...launchStatePrompt,
         task: 'Sửa Arc, State và openingPayoffProofs theo semantic audit; không thay đổi Kernel.',
@@ -1519,7 +1519,31 @@ State có đúng một entry cho mọi character, resource và promise trong Ker
       usage: mergeStageUsage(launchState.usage, correction.usage),
     };
     launch = buildLaunch();
-    validateStateAndArc(launch);
+    try {
+      validateStateAndArc(launch);
+    } catch (error) {
+      if (!(error instanceof StoryFactoryError)) throw error;
+      const canonicalCleanup = await setupStage('Launch State Architect semantic canonical cleanup 1/1', provider.json({
+        model: input.routes.launchArchitect,
+        system: `${launchStateSystem}\nGiữ nguyên các sửa semantic đúng từ lần trước, nhưng sửa toàn bộ lỗi canonical được cung cấp. Không thay đổi Kernel, không thêm mechanic ngoài active set, không xóa acquisition path và không dùng resource trước khi nó tồn tại.`,
+        prompt: JSON.stringify({
+          ...launchStatePrompt,
+          task: 'Sửa lỗi canonical do semantic correction gây ra, vẫn phải đáp ứng semantic audit; không thay đổi Kernel.',
+          semanticAudit: openingPayoffAudit.value,
+          canonicalError: { message: error.message, evidence: error.evidence ?? null },
+          previous: launchState.value,
+        }),
+        schema: LaunchStateSchema,
+        schemaComplexity: 'omit_large_array_max',
+        temperature: 0.1,
+      }));
+      launchState = {
+        value: canonicalCleanup.value,
+        usage: mergeStageUsage(launchState.usage, canonicalCleanup.usage),
+      };
+      launch = buildLaunch();
+      validateStateAndArc(launch);
+    }
     checkpoint.launchState = launchState;
     await input.onCheckpoint?.(structuredClone(checkpoint));
     const secondAudit = await runOpeningPayoffAudit();
