@@ -1,0 +1,47 @@
+{
+  "snapshotId": "crafting-multiplier-faloo-2026-08-15",
+  "lane": "xuanhuan_crafting_multiplier",
+  "capturedAt": "2026-08-15T08:05:00.000Z",
+  "signals": [
+    {
+      "id": "title_identity_mechanic_scale",
+      "sourceUrl": "https://wap.faloo.com/1501092.html",
+      "observation": "Một truyện Faloo còn có tín hiệu đọc lớn đóng gói ngay trong tên ba lớp: arena toàn dân, thân phận đúc kiếm và thước đo triệu kiếm; giới thiệu biến nghề sinh hoạt thành progression dài hạn thay vì chỉ cho một món thần khí đầu truyện."
+    },
+    {
+      "id": "low_status_workplace_baseline",
+      "sourceUrl": "https://wap.faloo.com/new_1227866_1.html",
+      "observation": "Mở đầu thợ rèn đặt main ngay trong xưởng quân bị, cho thấy vị thế nghề thấp, công việc thật, khoáng vật hiếm và đường tiến cấp; baseline nghề nghiệp cụ thể giúp cú lật vị thế có vật để so sánh."
+    },
+    {
+      "id": "first_three_payoff_density",
+      "sourceUrl": "https://wap.faloo.com/1477068.html",
+      "observation": "Mục lục khóa nhịp rất sớm: chương 1 nêu cơ chế hợp thành, chương 2 tạo trang bị có tính gợi hình, chương 3 dùng thành quả quét một điểm tài nguyên; title promise được thực thi trước khi mở rộng lore."
+    },
+    {
+      "id": "recipe_arithmetic_and_price_comparison",
+      "sourceUrl": "https://wap.faloo.com/1268414_6.html",
+      "observation": "Cảnh hợp thành hấp dẫn nhờ đầu vào ba-một, cấp bậc, số món, giá vốn và giá trị sau chế tạo đều nhìn thấy; comparison engine vật chất mạnh hơn lời kể chung rằng trang bị rất quý."
+    },
+    {
+      "id": "avoid_delayed_first_product",
+      "sourceUrl": "https://wap.faloo.com/booklist/1276044.html",
+      "observation": "Một mục lục khác dành các chương 2-4 cho mục tiêu, túi chứa và vấn đề chế tạo rồi mới xác nhận phẩm chất ở chương 5. Canary mới phải nén chuỗi này: setup và sản phẩm dùng được cùng xuất hiện trong chương 1, còn chương 3 dành cho so sánh và phản lực."
+    },
+    {
+      "id": "long_run_needs_more_than_one_weapon",
+      "sourceUrl": "https://wap.faloo.com/booklist_1279904.html",
+      "observation": "Một series nghề rèn có thể chạy hơn hai nghìn chương bằng cách chuyển qua kỹ năng, trang bị, dã ngoại, phi thuyền, quái cấp cao và vật liệu thần thoại. Bài học dùng cho world scale, không sao chép vật phẩm: phải đổi loại sản phẩm, khách hàng, tiêu chuẩn và arena."
+    },
+    {
+      "id": "institution_reacts_to_crafting_value",
+      "sourceUrl": "https://wap.faloo.com/1317816_1.html",
+      "observation": "Setup xưởng gia đình và tổ chức quốc gia cho phép sản phẩm chế tạo kéo theo khách hàng, đào tạo, giấy phép và lợi ích tổ chức. Opposition của truyện mới cần tranh quyền kiểm định, vật liệu và hợp đồng thay vì chỉ cử người tới khiêu khích."
+    },
+    {
+      "id": "originality_boundary",
+      "sourceUrl": "https://b.faloo.com/",
+      "observation": "Nghiên cứu chỉ lấy tín hiệu đóng gói, tốc độ payoff, phép tính đầu vào-đầu ra, comparison engine và thang mở rộng. Story Factory phải tạo nghề, cơ chế sai số, nhân vật, vật liệu, tổ chức và chuỗi nhân quả nguyên bản; không sao chép tên, vật phẩm, hệ thống hoặc IP đang niêm yết."
+    }
+  ]
+}

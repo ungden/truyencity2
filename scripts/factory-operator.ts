@@ -32,7 +32,9 @@ const command = args[0];
 const apply = args.includes('--apply');
 const value = (flag: string) => {
   const index = args.indexOf(flag);
-  return index >= 0 ? args[index + 1] : undefined;
+  if (index >= 0) return args[index + 1];
+  const inline = args.find(argument => argument.startsWith(`${flag}=`));
+  return inline?.slice(flag.length + 1) || undefined;
 };
 
 async function status() {
@@ -303,4 +305,12 @@ async function main() {
   throw new Error('Usage: factory-operator.ts status|portfolio|seed|restage|revive|tick|start|stop|release [options] [--apply]');
 }
 
-main().catch(error => { console.error(error); process.exitCode = 1; });
+main().catch(error => {
+  const message = error instanceof Error
+    ? `${error.name}: ${error.message}`
+    : typeof error === 'object' && error !== null && 'message' in error
+      ? `Error: ${String(error.message)}`
+      : `Error: ${String(error)}`;
+  console.error(message);
+  process.exitCode = 1;
+});

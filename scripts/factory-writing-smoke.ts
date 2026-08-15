@@ -182,6 +182,7 @@ async function main() {
     // that needed recoveries is visible in the summary.
     const MAX_PLAN_RECOVERIES = 2;
     let planRecoveries = 0;
+    let currentChapterRecoveries = 0;
     const planWindow = async (recovery?: { message: string }) => {
       const planned = await planRollingWindow({
         kernel,
@@ -206,11 +207,12 @@ async function main() {
       return planned.rollingPlan;
     };
     const recoverPlanOrRethrow = async (error: unknown, origin: 'plan' | 'chapter') => {
-      if (!(error instanceof StoryFactoryError) || error.code !== 'plan_blocked' || planRecoveries >= MAX_PLAN_RECOVERIES) {
+      if (!(error instanceof StoryFactoryError) || error.code !== 'plan_blocked' || currentChapterRecoveries >= MAX_PLAN_RECOVERIES) {
         throw error;
       }
       planRecoveries += 1;
-      console.log(`[smoke] ${origin} verdict → informed replan (${planRecoveries}/${MAX_PLAN_RECOVERIES}): ${error.message}`);
+      currentChapterRecoveries += 1;
+      console.log(`[smoke] ${origin} verdict → informed replan (${currentChapterRecoveries}/${MAX_PLAN_RECOVERIES} for chapter ${state.chapterNumber + 1}): ${error.message}`);
       return planWindow({ message: error.message });
     };
 
@@ -277,6 +279,7 @@ async function main() {
       }
 
       state = result.stateAfter;
+      currentChapterRecoveries = 0;
       events.push(...result.stateEvents);
       chapters.push({ chapterNumber: nextChapter, title: result.draft.title, content: result.draft.content });
       console.log(`[smoke] chapter ${nextChapter} published (${result.wordCount} words, revisions ${result.revisionCount}, $${cost(usages).toFixed(4)} cumulative)`);
