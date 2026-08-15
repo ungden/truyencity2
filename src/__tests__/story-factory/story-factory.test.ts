@@ -5435,6 +5435,16 @@ describe('canonical Story Factory', () => {
           .map(({ id: _id, ...character }) => character),
       },
       {
+        status: 'pass',
+        checks: [1, 3].map(byChapter => ({
+          byChapter,
+          visibleActorSupported: true,
+          pressureActorSupported: true,
+          evidenceCharacterIds: ['character_supporting_01', 'character_opposition_01'],
+          reason: 'Cast có exact nhân vật đủ thân phận, quyền lợi và thẩm quyền cho payoff mở đầu.',
+        })),
+      },
+      {
         kernel: { worldModel, worldRules, locations, travelRules, resources: launchResources },
         conversions: launchWorldMechanics.filter(mechanic => mechanic.kind === 'conversion'),
         capabilities: launchWorldMechanics.filter(mechanic => mechanic.kind === 'capability'),
@@ -5473,8 +5483,8 @@ describe('canonical Story Factory', () => {
       research: { snapshotId: 'research-01', lane: 'do-thi-nien-dai', capturedAt: new Date().toISOString(), signals: [1, 2, 3].map(index => ({ id: `signal_${index}`, sourceUrl: `https://example.com/${index}`, observation: 'Một quan sát thị trường đủ chi tiết và không chứa tác phẩm để sao chép.' })) },
       routes, provider,
     });
-    expect(provider.calls).toHaveLength(10);
-    expect(provider.calls).toEqual(['gen-a', 'gen-b', 'sim', 'judge', 'sim', 'launch', 'launch', 'launch', 'launch', 'judge']);
+    expect(provider.calls).toHaveLength(11);
+    expect(provider.calls).toEqual(['gen-a', 'gen-b', 'sim', 'judge', 'sim', 'launch', 'judge', 'launch', 'launch', 'launch', 'judge']);
     expect(result.launchPack.selectedConceptId).toBe('concept_a_01');
     expect(result.launchPack.kernel.protagonistId).toBe('character_protagonist_01');
     expect(result.launchPack.kernel.characters.map(character => character.id)).toEqual([

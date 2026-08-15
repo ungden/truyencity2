@@ -279,6 +279,8 @@ describe('Story Factory architecture boundary', () => {
     expect(runtime).toContain('openingExecutionProofs: result.openingPayoffProofs');
     expect(read('src/services/story-factory/planner.ts')).toContain('openingExecutionProofs: input.marketBlueprint.openingExecutionProofs');
     expect(read('src/services/story-factory/setup.ts')).toContain("setupStage('Opening Payoff Semantic Judge'");
+    expect(read('src/services/story-factory/setup.ts')).toContain("setupStage('Opening Payoff Role Judge'");
+    expect(read('src/services/story-factory/setup.ts')).toContain("setupStage('Launch Identity Architect role correction 1/1'");
     expect(read('src/services/story-factory/setup.ts')).toContain("setupStage('Launch State Architect semantic correction 1/1'");
     expect(read('src/services/story-factory/setup.ts')).toContain("setupStage('Launch State Architect semantic canonical cleanup 1/1'");
     expect(read('src/services/story-factory/setup.ts')).toContain('Opening payoff semantic audit rejected the launch pack after one bounded correction.');

@@ -207,6 +207,17 @@ const OpeningPayoffSemanticAuditSchema = z.object({
 }).strict();
 export type OpeningPayoffSemanticAudit = z.infer<typeof OpeningPayoffSemanticAuditSchema>;
 
+const OpeningRoleAuditSchema = z.object({
+  status: z.enum(['pass', 'reject']),
+  checks: z.array(z.object({
+    byChapter: z.union([z.literal(1), z.literal(3)]),
+    visibleActorSupported: z.boolean(),
+    pressureActorSupported: z.boolean(),
+    evidenceCharacterIds: z.array(z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/)).min(1).max(12),
+    reason: z.string().trim().min(20).max(2_000),
+  }).strict()).length(2),
+}).strict();
+
 export function validateOpeningPayoffSemanticAudit(input: {
   audit: OpeningPayoffSemanticAudit;
   proofs: OpeningPayoffProof[];
@@ -299,6 +310,7 @@ export interface SetupCheckpoint {
   domainResearch?: SetupStageArtifact;
   simulation?: SetupStageArtifact;
   launchIdentity?: SetupStageArtifact;
+  openingRoleAudit?: SetupStageArtifact;
   launchWorld?: SetupStageArtifact;
   launchSeries?: SetupStageArtifact;
   launchState?: SetupStageArtifact;
@@ -1216,7 +1228,6 @@ Chỉ được chọn concept có domainFeasibility=pass và longRunFeasibility=
   }
   checkpoint.launchIdentity = launchIdentity;
   await input.onCheckpoint?.(structuredClone(checkpoint));
-  usages.push(launchIdentity.usage);
   assertVoiceSemantics(launchIdentity.value.kernel.characters);
   assertIdentityOpposition(launchIdentity.value.kernel);
   if (!ranking.value.selectedIds.includes(launchIdentity.value.selectedConceptId)) {
@@ -1234,6 +1245,107 @@ Chỉ được chọn concept có domainFeasibility=pass và longRunFeasibility=
     || launchIdentity.value.kernel.conflictEconomyFingerprint !== selectedConcept.conflictEconomyFingerprint) {
     throw new StoryFactoryError('setup_blocked', 'Launch pack fingerprints drifted from the selected concept.');
   }
+
+  const runOpeningRoleAudit = () => setupStage('Opening Payoff Role Judge', provider.json({
+    model: input.routes.setupJudge,
+    system: `Bạn là Judge độc lập kiểm tra cast trước khi dựng World. Không sửa truyện và không nương theo role chung chung.
+Với payoff chương 1 và 3, visibleActorSupported chỉ true khi cast có exact nhân vật với thân phận/quyền lợi phù hợp để làm người visibleTo. pressureActorSupported chỉ true khi cast có exact nhân vật với agenda và thẩm quyền thực hiện nextPressure. Một quản đốc địa phương không thay được thương hội; chủ xưởng đối địch không thay được đoàn trưởng thợ săn; người lính thường không tự động là đội trưởng. evidenceCharacterIds chỉ dẫn ID thật trong cast. Trả reject nếu bất kỳ check nào false.`,
+    prompt: JSON.stringify({
+      task: 'Kiểm tra cast có đủ exact actor cho visibleTo và nextPressure chương 1/3.',
+      earlyPayoffs: selectedConcept.marketBlueprint.earlyPayoffs.filter(payoff => payoff.byChapter <= 3),
+      characters: launchIdentity.value.kernel.characters,
+    }),
+    schema: OpeningRoleAuditSchema,
+    temperature: 0.1,
+  }));
+  const validateRoleAudit = (audit: z.infer<typeof OpeningRoleAuditSchema>) => {
+    const ordered = [...audit.checks].sort((a, b) => a.byChapter - b.byChapter);
+    const characterIds = new Set(launchIdentity.value.kernel.characters.map(character => character.id));
+    const invalidIds = ordered.flatMap(check => check.evidenceCharacterIds
+      .filter(id => !characterIds.has(id))
+      .map(id => ({ byChapter: check.byChapter, id })));
+    return {
+      passes: audit.status === 'pass'
+        && ordered.length === 2
+        && ordered[0]?.byChapter === 1
+        && ordered[1]?.byChapter === 3
+        && ordered.every(check => check.visibleActorSupported && check.pressureActorSupported)
+        && invalidIds.length === 0,
+      invalidIds,
+    };
+  };
+  let openingRoleAudit = checkpoint.openingRoleAudit
+    ? {
+        value: OpeningRoleAuditSchema.parse(checkpoint.openingRoleAudit.value),
+        usage: checkpoint.openingRoleAudit.usage,
+      }
+    : await runOpeningRoleAudit();
+  let roleAuditValidation = validateRoleAudit(openingRoleAudit.value);
+  const firstRoleAudit = openingRoleAudit.value;
+  if (!roleAuditValidation.passes && !checkpoint.openingRoleAudit) {
+    const previousSelectedConceptId = launchIdentity.value.selectedConceptId;
+    const correctionWire = await setupStage('Launch Identity Architect role correction 1/1', provider.json({
+      model: input.routes.launchArchitect,
+      system: `Bạn sửa cast của identity đã khóa theo Role Judge. Trả đúng structured-output schema, không markdown.
+Giữ nguyên selectedConceptId, title, description, fingerprints, protagonist và bản sắc cốt lõi. Thêm hoặc sửa opposition/supporting character để từng visibleTo và nextPressure chương 1/3 có exact actor đúng thân phận, agenda và thẩm quyền. Không dùng một nhân vật khác cùng role để thay. Không tạo ID; code sẽ gán stable ID.`,
+      prompt: JSON.stringify({
+        task: 'Sửa identity cast theo role audit trước khi dựng lại World.',
+        selectedConcept,
+        earlyPayoffs: selectedConcept.marketBlueprint.earlyPayoffs.filter(payoff => payoff.byChapter <= 3),
+        roleAudit: openingRoleAudit.value,
+        previous: launchIdentity.value,
+      }),
+      schema: launchIdentityWireSchema,
+      schemaComplexity: 'omit_large_array_max',
+      temperature: 0.15,
+    }));
+    if (correctionWire.value.selectedConceptId !== previousSelectedConceptId) {
+      throw new StoryFactoryError('setup_blocked', 'Identity role correction changed the selected concept.');
+    }
+    const characters = materializeLaunchCharacters(correctionWire.value);
+    launchIdentity = {
+      value: LaunchIdentitySchema.parse({
+        selectedConceptId: correctionWire.value.selectedConceptId,
+        coverPrompt: correctionWire.value.coverPrompt,
+        kernel: {
+          ...correctionWire.value.kernel,
+          realityMode: commission.realityMode,
+          protagonistId: characters.protagonist.id,
+          characters: [characters.protagonist, ...characters.oppositionCharacters, ...characters.supportingCharacters],
+        },
+      }),
+      usage: mergeStageUsage(launchIdentity.usage, correctionWire.usage),
+    };
+    delete checkpoint.launchWorld;
+    delete checkpoint.launchSeries;
+    delete checkpoint.launchState;
+    delete checkpoint.openingPayoffAudit;
+    const secondAudit = await runOpeningRoleAudit();
+    openingRoleAudit = {
+      value: secondAudit.value,
+      usage: mergeStageUsage(openingRoleAudit.usage, secondAudit.usage),
+    };
+    roleAuditValidation = validateRoleAudit(openingRoleAudit.value);
+  }
+  if (!roleAuditValidation.passes) {
+    throw new StoryFactoryError('setup_blocked', 'Opening payoff role audit rejected the identity after one bounded correction.', {
+      firstAudit: firstRoleAudit,
+      finalAudit: openingRoleAudit.value,
+      invalidIds: roleAuditValidation.invalidIds,
+    });
+  }
+  assertVoiceSemantics(launchIdentity.value.kernel.characters);
+  assertIdentityOpposition(launchIdentity.value.kernel);
+  assertMarketableSerialTitle(launchIdentity.value.kernel.title);
+  if (launchIdentity.value.kernel.mechanismFingerprint !== selectedConcept.mechanismFingerprint
+    || launchIdentity.value.kernel.rewardLoopFingerprint !== selectedConcept.rewardLoopFingerprint
+    || launchIdentity.value.kernel.conflictEconomyFingerprint !== selectedConcept.conflictEconomyFingerprint) {
+    throw new StoryFactoryError('setup_blocked', 'Identity role correction drifted from the selected concept.');
+  }
+  checkpoint.launchIdentity = launchIdentity;
+  checkpoint.openingRoleAudit = openingRoleAudit;
+  await input.onCheckpoint?.(structuredClone(checkpoint));
+  usages.push(launchIdentity.usage, openingRoleAudit.usage);
 
   const launchWorldWireSchema = createLaunchWorldWireSchema(
     launchIdentity.value.kernel.characters.map(character => character.id),
