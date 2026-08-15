@@ -282,6 +282,7 @@ describe('Story Factory architecture boundary', () => {
     expect(read('src/services/story-factory/setup.ts')).toContain("setupStage('Launch State Architect semantic correction 1/1'");
     expect(read('src/services/story-factory/setup.ts')).toContain("setupStage('Launch State Architect semantic canonical cleanup 1/1'");
     expect(read('src/services/story-factory/setup.ts')).toContain('Opening payoff semantic audit rejected the launch pack after one bounded correction.');
+    expect(read('src/services/story-factory/setup.ts')).toContain('Giao dịch có số tiền cụ thể phải là conversion');
   });
 
   test('the production gate is a mechanical smoke check, not a self-invalidating benchmark chain', () => {
