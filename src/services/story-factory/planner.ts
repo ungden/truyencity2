@@ -1548,26 +1548,44 @@ export async function assessRollingPlan(input: {
       returnedPayoffChapters,
     });
   }
+  const latePayoffEvidenceIssues: PlanRevisionIssues = [];
   for (const check of result.value.earlyPayoffChecks) {
-    const sceneChapter = input.rollingPlan.plans.find(chapter => (
-      chapter.chapterNumber <= check.byChapter
-      && chapter.scenes.some(scene => scene.id === check.sceneId)
+    const referencedSceneChapter = input.rollingPlan.plans.find(chapter => (
+      chapter.scenes.some(scene => scene.id === check.sceneId)
     ));
-    const scene = sceneChapter?.scenes.find(item => item.id === check.sceneId);
-    if (!sceneChapter || !scene) {
-      throw new StoryFactoryError('infra_blocked', 'Plan Judge early-payoff check referenced an unknown or late scene.', check);
+    if (!referencedSceneChapter) {
+      throw new StoryFactoryError('infra_blocked', 'Plan Judge early-payoff check referenced an unknown scene.', check);
     }
+    const lateIds: string[] = referencedSceneChapter.chapterNumber > check.byChapter ? [check.sceneId] : [];
     for (const deltaId of check.deltaIds) {
-      const deltaChapter = input.rollingPlan.plans.find(chapter => (
-        chapter.chapterNumber <= check.byChapter
-        && chapter.requiredDeltas.some(delta => delta.id === deltaId)
+      const referencedDeltaChapter = input.rollingPlan.plans.find(chapter => (
+        chapter.requiredDeltas.some(delta => delta.id === deltaId)
       ));
-      if (!deltaChapter) {
-        throw new StoryFactoryError('infra_blocked', 'Plan Judge early-payoff check referenced an unknown or late delta.', {
+      if (!referencedDeltaChapter) {
+        throw new StoryFactoryError('infra_blocked', 'Plan Judge early-payoff check referenced an unknown delta.', {
           ...check,
           deltaId,
         });
       }
+      if (referencedDeltaChapter.chapterNumber > check.byChapter) lateIds.push(deltaId);
+    }
+    if (lateIds.length) {
+      const deadlineChapter = input.rollingPlan.plans.find(chapter => chapter.chapterNumber === check.byChapter)
+        ?? input.rollingPlan.plans.filter(chapter => chapter.chapterNumber <= check.byChapter).at(-1)!;
+      const fallbackScene = referencedSceneChapter.chapterNumber <= check.byChapter
+        ? referencedSceneChapter.scenes.find(scene => scene.id === check.sceneId)!
+        : deadlineChapter.scenes.at(-1)!;
+      const fallbackDeltaId = check.deltaIds.find(deltaId => deadlineChapter.requiredDeltas.some(delta => delta.id === deltaId))
+        ?? fallbackScene.requiredDeltaIds.find(deltaId => deadlineChapter.requiredDeltas.some(delta => delta.id === deltaId))
+        ?? null;
+      latePayoffEvidenceIssues.push({
+        category: 'stage_alignment',
+        chapterNumber: deadlineChapter.chapterNumber,
+        sceneId: fallbackScene.id,
+        deltaId: fallbackDeltaId,
+        evidence: `Plan Judge chỉ chứng minh deadline chapter ${check.byChapter} bằng evidence xuất hiện muộn: ${lateIds.join(', ')}.`,
+        instruction: `Lập lại plan để toàn bộ payoff, người chứng kiến, đổi vị thế và áp lực kế tiếp có scene/delta thật chậm nhất ở chapter ${check.byChapter}.`,
+      });
     }
   }
   const failedChecks = Object.entries(result.value.checks).filter(([, passed]) => !passed).map(([gate]) => gate);
@@ -1597,7 +1615,7 @@ export async function assessRollingPlan(input: {
       instruction: `Lập lại plan để scene và delta hoàn tất đúng payoff chapter ${check.byChapter}, gồm người chứng kiến, đổi vị thế và áp lực kế tiếp.`,
     };
   });
-  const combinedIssues = [...payoffIssues, ...result.value.issues].slice(0, 3);
+  const combinedIssues = [...latePayoffEvidenceIssues, ...payoffIssues, ...result.value.issues].slice(0, 3);
   const assessment = PlanAssessmentSchema.parse(
     combinedIssues.length > 0 || failedChecks.length > 0
       ? { status: 'revise', issues: combinedIssues }

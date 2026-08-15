@@ -36,6 +36,7 @@ import {
   appendAcceptedOutcome,
   applyCanonExtension,
   applyChapterPlan,
+  assessRollingPlan,
   collectPlanAdvisories,
   assessStoryDraft,
   assertVoiceSemantics,
@@ -4315,6 +4316,73 @@ describe('canonical Story Factory', () => {
         }),
       }),
     });
+  });
+
+  test('Plan Judge evidence after the payoff deadline becomes a revision issue', async () => {
+    const marketBlueprint = MarketBlueprintSchema.parse({
+      familiarArena: 'Một đấu trường nghề nghiệp có cạnh tranh công khai.',
+      noveltyCollision: 'Một nghề bị coi thường va vào quyền năng có thể định giá.',
+      protagonistStartingPosition: 'Nhân vật chính đứng ở đáy bảng xếp hạng.',
+      coreAdvantage: 'Nhân vật chính dùng một quy tắc độc nhất có chi phí.',
+      comparisonEngine: 'Bảng xếp hạng và nhân chứng công khai kết quả.',
+      worldConflictEngine: 'Công hội phản ứng khi dòng tài nguyên bị đe dọa.',
+      earlyPayoffs: [1, 3, 5, 7, 10].map(byChapter => ({
+        byChapter,
+        payoff: `Payoff hữu hình bắt buộc hoàn tất ở chương ${byChapter}.`,
+        visibleTo: `Nhân chứng có quyền lợi trực tiếp nhìn thấy kết quả chương ${byChapter}.`,
+        positionChange: `Vị thế nhân vật chính thay đổi thật ở chương ${byChapter}.`,
+        nextPressure: `Một lớp đối lực mới phản ứng bằng hành động ở chương ${byChapter}.`,
+      })),
+      scaleLadder: Array.from({ length: 6 }, (_, index) => ({
+        scope: `Bậc ${index + 1}`,
+        arena: `Arena bậc ${index + 1} mở một địa bàn tranh chấp mới.`,
+        statusPrize: `Vị thế bậc ${index + 1} tăng quyền lựa chọn công khai.`,
+        oppositionClass: `Đối lực bậc ${index + 1} có agenda và công cụ phản chế riêng.`,
+        advantageEvolution: `Lợi thế bậc ${index + 1} mở cách dùng mới thay vì chỉ tăng số.`,
+      })),
+    });
+    const first = structuredClone(plannerWire(1).chapters[0]);
+    const second = structuredClone(plannerWire(2).chapters[0]);
+    const twoChapterWire = { v: 2 as const, start: 1, chapters: [first, second] };
+    const checks = {
+      protagonistAgency: true, earnedProgression: true, domainPlausibility: true, oppositionAgenda: true,
+      sceneVariety: true, stageAlignment: true, outcomeWeight: true,
+    };
+    const lateEvidence = {
+      status: 'pass' as const,
+      checks,
+      checkEvidence: Object.fromEntries(Object.keys(checks).map(key => [key, 'chapter 1 scene_1 delta_1'])),
+      earlyPayoffChecks: [{
+        byChapter: 1 as const,
+        payoffMatched: true,
+        visibleToMatched: true,
+        positionChangeMatched: true,
+        nextPressureMatched: true,
+        sceneId: 'scene_1',
+        deltaIds: ['delta_1', 'delta_2'],
+        evidence: 'Payoff chương 1 chỉ được nối với áp lực bằng delta_2 ở chương 2.',
+      }],
+      issues: [],
+    };
+    const provider = new QueueProvider([lateEvidence]);
+    const result = await assessRollingPlan({
+      provider,
+      kernel,
+      arc,
+      state: initialState,
+      rollingPlan: materializePlannerRollingPlan(twoChapterWire, initialState),
+      model: routes.planJudge,
+      marketBlueprint,
+    });
+    expect(result.assessment).toMatchObject({
+      status: 'revise',
+      issues: [expect.objectContaining({
+        category: 'stage_alignment',
+        chapterNumber: 1,
+        evidence: expect.stringContaining('delta_2'),
+      })],
+    });
+    expect(provider.calls).toEqual(['plan-judge']);
   });
 
   test('Plan Judge contract can reject an impossible cross-scene knowledge flow', () => {
