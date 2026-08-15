@@ -243,6 +243,8 @@ describe('Story Factory architecture boundary', () => {
     // All four chapter-tick call sites (Writer, Rewrite, shared Editor and its
     // grounding-corrective re-roll) opt in.
     expect(pipeline.match(/timeoutMs: CHAPTER_CALL_TIMEOUT_MS/g)?.length).toBe(4);
+    expect(read('src/services/story-factory/prompts.ts')).toContain('Mỗi scene phải diễn hoàn toàn tại đúng locationId/locationName');
+    expect(read('src/services/story-factory/prompts.ts')).toContain('không được giả định phần Editor chưa nêu là đã đúng');
   });
 
   test('prose heuristics can advise but never block a job', () => {
