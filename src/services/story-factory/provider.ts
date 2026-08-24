@@ -151,6 +151,31 @@ function retryable(error: unknown): boolean {
   return error instanceof TypeError;
 }
 
+/**
+ * Node's fetch occasionally leaves a TLS request pending after AbortSignal.timeout
+ * fires. The signal alone therefore did not guarantee that a factory stage returned
+ * to its retry/lease logic. Race the request with an explicit rejection as well as
+ * aborting its socket so callers always regain control at the configured deadline.
+ */
+async function fetchWithHardTimeout(url: string, init: RequestInit, timeoutMs: number): Promise<Response> {
+  const controller = new AbortController();
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timedOut = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => {
+      controller.abort();
+      reject(new DOMException(`Provider request exceeded ${timeoutMs}ms.`, 'TimeoutError'));
+    }, timeoutMs);
+  });
+  try {
+    return await Promise.race([
+      fetch(url, { ...init, signal: controller.signal }),
+      timedOut,
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
+
 export function toGeminiResponseSchema<T>(
   schema: z.ZodType<T, z.ZodTypeDef, unknown>,
   options: { complexity?: 'default' | 'omit_large_array_max' | 'omit_array_max' } = {},
@@ -286,12 +311,11 @@ async function openaiGenerate(input: {
   for (let attempt = 0; attempt <= RETRY_DELAYS_MS.length; attempt += 1) {
     try {
       if (attempt > 0) await new Promise(resolve => setTimeout(resolve, RETRY_DELAYS_MS[attempt - 1]));
-      const response = await fetch('https://api.openai.com/v1/responses', {
+      const response = await fetchWithHardTimeout('https://api.openai.com/v1/responses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
         body: JSON.stringify(body),
-        signal: AbortSignal.timeout(input.timeoutMs ?? DEFAULT_TIMEOUT_MS),
-      });
+      }, input.timeoutMs ?? DEFAULT_TIMEOUT_MS);
       if (!response.ok) {
         const detail = await response.text().catch(() => '');
         throw new ProviderHttpError(response.status, `OpenAI ${input.model} ${response.status}: ${detail.slice(0, 500)}`);
@@ -392,7 +416,7 @@ async function openrouterGenerate(input: {
   for (let attempt = 0; attempt <= RETRY_DELAYS_MS.length; attempt += 1) {
     try {
       if (attempt > 0) await new Promise(resolve => setTimeout(resolve, RETRY_DELAYS_MS[attempt - 1]));
-      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      const response = await fetchWithHardTimeout('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -401,8 +425,7 @@ async function openrouterGenerate(input: {
           'X-Title': 'TruyenCity Story Factory',
         },
         body: JSON.stringify(body),
-        signal: AbortSignal.timeout(input.timeoutMs ?? DEFAULT_TIMEOUT_MS),
-      });
+      }, input.timeoutMs ?? DEFAULT_TIMEOUT_MS);
       if (!response.ok) {
         const detail = await response.text().catch(() => '');
         // A vendor that has not enabled json_schema yet (DeepSeek v4-pro on its
@@ -510,12 +533,11 @@ async function generate(input: {
   for (let attempt = 0; attempt <= RETRY_DELAYS_MS.length; attempt += 1) {
     try {
       if (attempt > 0) await new Promise(resolve => setTimeout(resolve, RETRY_DELAYS_MS[attempt - 1]));
-      const response = await fetch(`${API_BASE}/models/${input.model}:generateContent`, {
+      const response = await fetchWithHardTimeout(`${API_BASE}/models/${input.model}:generateContent`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
         body: JSON.stringify(body),
-        signal: AbortSignal.timeout(input.timeoutMs ?? DEFAULT_TIMEOUT_MS),
-      });
+      }, input.timeoutMs ?? DEFAULT_TIMEOUT_MS);
       if (!response.ok) {
         const detail = await response.text().catch(() => '');
         throw new ProviderHttpError(response.status, `Gemini ${input.model} ${response.status}: ${detail.slice(0, 500)}`);
