@@ -1,8 +1,13 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "crons": [
     {
       "path": "/api/cron/story-factory",
       "schedule": "*/2 * * * *"
+    },
+    {
+      "path": "/api/cron/health-check",
+      "schedule": "*/15 * * * *"
     }
   ],
   "headers": [
