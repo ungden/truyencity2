@@ -14,6 +14,7 @@ import {
   type RollingPlan,
 } from './contracts';
 import { generateFactoryCover } from './cover';
+import { extractCraftGuidance, type CraftGuidance } from './craft';
 import {
   loadContinuityPacket,
   memoryEntityIdsForArc,
@@ -128,6 +129,29 @@ export function nextRunAfterNonChapterStage(job: Pick<FactoryJobRow, 'daily_targ
 
 function usageCost(usages: ProviderUsage[]): number {
   return usages.reduce((total, usage) => total + usage.costUsd, 0);
+}
+
+/**
+ * Reuse already-paid literary findings as forward steering. No prose, grounded
+ * quote or model-written instruction is forwarded; extractCraftGuidance reduces
+ * durable verdicts to allow-listed categories and code-owned rules.
+ */
+async function loadCraftGuidance(
+  db: SupabaseClient,
+  job: Pick<FactoryJobRow, 'id' | 'current_chapter'>,
+): Promise<CraftGuidance[]> {
+  if (job.current_chapter < 1) return [];
+  const result = await db.from('story_factory_runs')
+    .select('kind,chapter_number,editor_assessment,output_artifact')
+    .eq('job_id', job.id)
+    .in('kind', ['chapter', 'window_review'])
+    .in('status', ['published', 'passed'])
+    .gte('chapter_number', Math.max(1, job.current_chapter - 5))
+    .lte('chapter_number', job.current_chapter)
+    .order('chapter_number', { ascending: true })
+    .order('finished_at', { ascending: true });
+  if (result.error) throw result.error;
+  return extractCraftGuidance(result.data ?? [], job.current_chapter);
 }
 
 function pipelineTelemetryFromError(error: StoryFactoryError): ChapterAttemptTelemetry | undefined {
@@ -470,6 +494,7 @@ async function runPlan(db: SupabaseClient, job: FactoryJobRow, project: FactoryP
     const state = StoryStateSchema.parse(project.story_state);
     const routes = ModelRoutesSchema.parse(project.model_routes);
     const marketBlueprint = requireMarketBlueprint(project.market_blueprint);
+    const craftGuidance = await loadCraftGuidance(db, job);
     const continuityPacket = await loadContinuityPacket({
       db,
       projectId: project.id,
@@ -495,6 +520,7 @@ async function runPlan(db: SupabaseClient, job: FactoryJobRow, project: FactoryP
       // one-chapter window is always legal and the next window plans fresh.
       requiredWindowSize: job.current_chapter === 0 || job.plan_feedback || job.retry_count >= 1 ? 1 : undefined,
       authorDirective: project.author_directive,
+      craftGuidance,
       marketBlueprint,
       provider,
       resume,
@@ -597,7 +623,7 @@ async function runChapter(db: SupabaseClient, job: FactoryJobRow, project: Facto
       nextPlan,
       previousChapter,
       continuityPacket,
-      authorDirective: project.author_directive,
+      craftGuidance: await loadCraftGuidance(db, job),
       routes,
       provider,
     });
@@ -772,7 +798,7 @@ async function runRevision(db: SupabaseClient, job: FactoryJobRow, project: Fact
       nextPlan,
       previousChapter,
       continuityPacket,
-      authorDirective: project.author_directive,
+      craftGuidance: await loadCraftGuidance(db, job),
       routes: routesResult.data,
       provider,
       pending,

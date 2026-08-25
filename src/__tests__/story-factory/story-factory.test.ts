@@ -58,6 +58,7 @@ import {
   createLaunchWorldWireSchema,
   digestArtifact,
   earlyPayoffsForChapterRange,
+  extractCraftGuidance,
   prepareDiscoveryResume,
   isStoryFactoryEnabled,
   shouldStartAnotherStage,
@@ -5649,19 +5650,60 @@ describe('prose-craft gates', () => {
     })).toThrow(/lặp lại y nguyên causal shape của chương 12/);
   });
 
-  test('author directive is trimmed, capped and null when blank', () => {
+  test('keeps raw plot steering out of the Writer and projects bounded craft history', () => {
+    const state = {
+      ...initialState,
+      chapterNumber: 1,
+      recentOutcomes: [{
+        chapterNumber: 1,
+        title: 'Chương 1: Cái Giá Ngoài Bến',
+        event: 'Một biến cố đã xảy ra.',
+        result: 'Trạng thái đã đổi.',
+        method: 'Một lựa chọn có giá.',
+        endingSituation: 'Áp lực mới mở ra.',
+        evidenceSpans: ['Một biến cố đã xảy ra'],
+      }],
+    };
     const brief = buildWriterBrief({
       kernel,
-      state: initialState,
-      plan: plan(1),
-      authorDirective: `  ${'x'.repeat(2_000)}  `,
+      state,
+      plan: plan(2),
+      craftGuidance: [{
+        category: 'narrative_repetition', severity: 'major', sourceChapters: [1], rule: 'Đổi biến cố.',
+      }],
     });
-    expect(brief.authorDirective).toHaveLength(1_500);
-    expect(buildWriterBrief({
-      kernel, state: initialState, plan: plan(1), authorDirective: '   ',
-    }).authorDirective).toBeNull();
-    expect(buildWriterBrief({
-      kernel, state: initialState, plan: plan(1),
-    }).authorDirective).toBeNull();
+    expect(brief).not.toHaveProperty('authorDirective');
+    expect(brief.recentTitles).toEqual(['Chương 1: Cái Giá Ngoài Bến']);
+    expect(brief.recentTitleStems).toEqual(['Cái Giá']);
+    expect(brief.craftGuidance).toHaveLength(1);
+  });
+
+  test('extracts only allow-listed, code-owned craft steering from durable verdicts', () => {
+    const guidance = extractCraftGuidance([
+      {
+        kind: 'chapter', chapter_number: 34,
+        editor_assessment: { readingAdvisories: [{
+          category: 'narrative_repetition', severity: 'major',
+          instruction: 'MODEL-WRITTEN TEXT MUST NOT BE FORWARDED', evidence: 'Cái giá',
+        }] },
+      },
+      {
+        kind: 'chapter', chapter_number: 37,
+        editor_assessment: { readingAdvisories: [{
+          category: 'narrative_repetition', severity: 'moderate',
+          instruction: 'ANOTHER RAW INSTRUCTION', evidence: 'bao tiêu',
+        }] },
+      },
+      {
+        kind: 'chapter', chapter_number: 37,
+        editor_assessment: { readingAdvisories: [{ category: 'unknown_category' }] },
+      },
+    ], 37);
+    expect(guidance).toEqual([expect.objectContaining({
+      category: 'narrative_repetition',
+      severity: 'major',
+      sourceChapters: [34, 37],
+    })]);
+    expect(JSON.stringify(guidance)).not.toContain('MODEL-WRITTEN');
   });
 });

@@ -16,13 +16,14 @@ import {
   type StoryState,
 } from './contracts';
 import type { ContinuityPacket } from './memory';
+import type { CraftGuidance } from './craft';
 import type { ProviderUsage, StoryModelProvider } from './provider';
 import { geminiProvider } from './provider';
 import type { MarketBlueprint } from './setup';
 
 // Defined here, not in release.ts: release → benchmark → planner already exists, so a
 // planner → release import closes a cycle and breaks the production bundle (TDZ at init).
-export const FACTORY_PLANNER_VERSION = 'story-factory-planner-82-fail-fast-forward';
+export const FACTORY_PLANNER_VERSION = 'story-factory-planner-83-craft-forward';
 import { EDITOR_SYSTEM_PROMPT, PLANNER_SYSTEM_PROMPT, PLAN_JUDGE_SYSTEM_PROMPT } from './prompts';
 import {
   ARC_ACTIVE_MECHANIC_BUDGET,
@@ -1720,6 +1721,7 @@ export const PlanCheckpointSchema = z.object({
     plannerVersion: z.string(),
     routeVersion: z.string(),
     recoveryDigest: z.string().nullable(),
+    guidanceDigest: z.string().nullable(),
   }),
   mechanicalResponse: z.unknown(),
   judgeAssessment: PlanAssessmentSchema.optional(),
@@ -1736,6 +1738,7 @@ export async function planRollingWindow(input: {
   recoveryEvidence?: unknown;
   continuityPacket?: ContinuityPacket;
   authorDirective?: string | null;
+  craftGuidance?: CraftGuidance[];
   marketBlueprint?: MarketBlueprint | null;
   provider?: StoryModelProvider;
   /** Independent qualitative judging is an offline research tool, never a live gate. */
@@ -1767,6 +1770,9 @@ export async function planRollingWindow(input: {
     recoveryDigest: input.recoveryEvidence === undefined
       ? null
       : createHash('sha256').update(JSON.stringify(input.recoveryEvidence)).digest('hex'),
+    guidanceDigest: input.craftGuidance?.length
+      ? createHash('sha256').update(JSON.stringify(input.craftGuidance)).digest('hex')
+      : null,
   };
   const resumeParsed = input.resume === undefined ? undefined : PlanCheckpointSchema.safeParse(input.resume);
   const resume = resumeParsed?.success
@@ -1774,6 +1780,7 @@ export async function planRollingWindow(input: {
     && resumeParsed.data.provenance.plannerVersion === provenance.plannerVersion
     && resumeParsed.data.provenance.routeVersion === provenance.routeVersion
     && resumeParsed.data.provenance.recoveryDigest === provenance.recoveryDigest
+    && resumeParsed.data.provenance.guidanceDigest === provenance.guidanceDigest
     ? resumeParsed.data
     : undefined;
   const saveCheckpoint = async (checkpoint: Omit<PlanCheckpoint, 'provenance'>) => {
@@ -1878,6 +1885,10 @@ export async function planRollingWindow(input: {
         authorDirective: input.authorDirective?.trim()
           ? input.authorDirective.trim().slice(0, 1_500)
           : null,
+        craftGuidance: input.craftGuidance?.length ? {
+          signals: input.craftGuidance.slice(0, 4),
+          rule: 'Đây là lỗi đọc đã được Editor/window review xác nhận ở chương đã đăng. Không sửa lại chương cũ. Với sourceChapters, tìm đúng recentOutcomes trong currentState rồi đổi event, method hoặc result của plan mới; đổi tên hợp đồng, giá, địa điểm hay quy mô không được tính là đổi. Category narrative_repetition là ràng buộc bắt buộc cho cửa sổ kế tiếp.',
+        } : null,
         marketBlueprint: input.marketBlueprint ?? null,
         marketBlueprintWindowContract: input.marketBlueprint ? {
           duePayoffs: earlyPayoffsForChapterRange(

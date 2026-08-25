@@ -104,7 +104,7 @@ describe('Story Factory architecture boundary', () => {
     expect(provider).not.toMatch(/catch[\s\S]{0,200}?(openaiGenerate|openrouterGenerate)\(/);
   });
 
-  test('the Writer never sees plan internals or narrative outcomes', () => {
+  test('the Writer never sees plan internals or narrative outcome bodies', () => {
     // The Writer owns prose; the Planner owns causality. Leaking deltas, mechanics or
     // prior outcomes into the brief turns the Writer into a summariser of its own plan.
     const context = read('src/services/story-factory/context.ts');
@@ -117,7 +117,6 @@ describe('Story Factory architecture boundary', () => {
     // (prose contradicting a rule the Writer had never seen) that only the
     // independent continuity judge caught.
     for (const leak of [
-      'recentOutcomes',
       'scene.action',
       'requiredDeltaIds:',
       'deltaId:',
@@ -131,6 +130,9 @@ describe('Story Factory architecture boundary', () => {
       expect(brief).not.toContain(leak);
     }
     expect(brief).toContain('physicalLaws');
+    expect(brief).toContain('recentTitles');
+    expect(brief).toContain('craftGuidance');
+    expect(brief).not.toContain('authorDirective');
     // The Editor and Planner do receive them.
     expect(context).toContain('recentOutcomes: input.state.recentOutcomes');
   });

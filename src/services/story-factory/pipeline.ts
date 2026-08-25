@@ -13,6 +13,7 @@ import {
   type StoryState,
 } from './contracts';
 import { buildChapterContexts, buildRevisionContext, type ContextManifestEntry } from './context';
+import type { CraftGuidance } from './craft';
 import type { ContinuityPacket } from './memory';
 import type { ProviderUsage, StoryModelProvider } from './provider';
 import { CHAPTER_CALL_TIMEOUT_MS, geminiProvider } from './provider';
@@ -905,7 +906,7 @@ export interface ChapterStageInput {
   nextPlan?: ChapterPlan;
   previousChapter?: string;
   continuityPacket?: ContinuityPacket;
-  authorDirective?: string | null;
+  craftGuidance?: CraftGuidance[];
   routes: ModelRoutes;
   provider?: StoryModelProvider;
 }
@@ -1017,7 +1018,6 @@ export async function draftStoryChapter(input: ChapterStageInput): Promise<Chapt
       state: contexts.editorState,
       plan: input.plan,
       draft: initial.value,
-      authorDirective: contexts.brief.authorDirective,
     });
     initialAssessment = firstAssessment.assessment;
     usages.push(firstAssessment.usage);
@@ -1115,7 +1115,6 @@ export async function reviseStoryChapter(
       state: contexts.editorState,
       plan: input.plan,
       draft: revision.value,
-      authorDirective: contexts.brief.authorDirective,
     });
     finalAssessment = secondAssessment.assessment;
     usages.push(secondAssessment.usage);

@@ -12,6 +12,7 @@ import {
   type ContinuityPacket,
   type RelevantStoryTransition,
 } from './memory';
+import type { CraftGuidance } from './craft';
 
 export interface ContextManifestEntry {
   role: 'writer' | 'editor' | 'revision' | 'planner';
@@ -23,10 +24,13 @@ export interface ContextManifestEntry {
 export interface WriterBrief {
   story: { title: string };
   chapterNumber: number;
-  // Free-text steering from the author for the running novel, applied from the
-  // next chapter on. Data in the brief, never concatenated into the system
-  // prompt. Null when the author has nothing queued.
-  authorDirective: string | null;
+  // Plot steering belongs to the Planner. Forwarding the raw directive to the
+  // Writer made stale numbers override committed canon ("four lures" after the
+  // story had seven), buying avoidable rewrites. The Writer receives only the
+  // resolved plan plus bounded, code-owned craft steering.
+  recentTitles: string[];
+  recentTitleStems: string[];
+  craftGuidance: CraftGuidance[];
   cast: unknown[];
   canonicalUnits: string[];
   physicalLaws: string[];
@@ -198,7 +202,7 @@ export function buildWriterBrief(input: {
   stateAfter?: StoryState;
   nextPlan?: ChapterPlan;
   continuityPacket?: ContinuityPacket;
-  authorDirective?: string | null;
+  craftGuidance?: CraftGuidance[];
 }): WriterBrief {
   const ids = relevantIds(input.plan);
   ids.characters.add(input.kernel.protagonistId);
@@ -262,13 +266,20 @@ export function buildWriterBrief(input: {
         })),
     }
     : null;
+  const recentTitles = input.state.recentOutcomes.slice(-5).map(outcome => outcome.title);
+  const recentTitleStems = recentTitles.map(title => title
+    .replace(/^\s*Chương\s+\d+\s*:\s*/iu, '')
+    .trim()
+    .split(/\s+/u)
+    .slice(0, 2)
+    .join(' '))
+    .filter(Boolean);
   return {
     story: { title: input.kernel.title },
     chapterNumber: input.plan.chapterNumber,
-    // Code owns the cap: 1500 chars, whitespace-only collapses to null.
-    authorDirective: input.authorDirective?.trim()
-      ? input.authorDirective.trim().slice(0, 1_500)
-      : null,
+    recentTitles,
+    recentTitleStems,
+    craftGuidance: (input.craftGuidance ?? []).slice(0, 4),
     canonicalUnits: [...new Set(input.kernel.resources.flatMap(resource =>
       resource.kind === 'numeric' ? [resource.unit] : []))],
     // Canon laws governing this chapter, verbatim. The Writer used to be denied all
@@ -362,7 +373,7 @@ export function buildChapterContexts(input: {
   nextPlan?: ChapterPlan;
   previousChapter?: string;
   continuityPacket?: ContinuityPacket;
-  authorDirective?: string | null;
+  craftGuidance?: CraftGuidance[];
 }) {
   const brief = buildWriterBrief(input);
   const previousTail = input.previousChapter ? selectPreviousTail(input.previousChapter) : '';
