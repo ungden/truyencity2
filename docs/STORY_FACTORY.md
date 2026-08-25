@@ -207,6 +207,7 @@ None of these gate production. They exist for model selection and forensic audit
 | `factory:smoke` | SQL/RPC transaction smoke against live Supabase (commit atomicity, sequence guards). Distinct from `factory:writing-smoke`, which exercises the writing pipeline. |
 | `factory:writer-discovery` / `factory:benchmark:build` | Build writer-comparison corpora (frozen plans, sequential chapters). |
 | `factory:model-bakeoff` | Pairwise writer comparison over a frozen corpus. |
+| `factory:literary-ab` | Blind reader-only comparison of two equal sequential windows from one production novel; persists randomized judgments and cost. |
 | `factory:benchmark` | The retired four-run validation chain, kept for offline A/B analysis only. |
 | `factory-golden-audit.ts` / `factory-audit-export.ts` | Re-assess published output; gzip audit export. |
 | `set-author-directive.ts` | Author steering: set/get/clear/list chỉ đạo free-text cho một bộ đang chạy (`ai_story_projects.author_directive`, cap 1.500 ký tự). Planner và Writer brief đọc nó từ chương kế tiếp; Editor chấm mức tuân thủ. Không bao giờ thắng canon/validator. |

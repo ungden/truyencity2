@@ -15,6 +15,7 @@
     "factory:benchmark:build": "node --import tsx scripts/factory-benchmark-build.ts",
     "factory:writer-discovery": "node --import tsx scripts/factory-benchmark-build.ts --discovery-only",
     "factory:benchmark": "node --import tsx scripts/factory-benchmark.ts",
+    "factory:literary-ab": "node --import tsx scripts/factory-live-literary-ab.ts",
     "factory:model-bakeoff": "node --import tsx scripts/factory-model-bakeoff.ts",
     "factory:smoke": "node --import tsx scripts/factory-smoke.ts",
     "factory:writing-smoke": "node --import tsx scripts/factory-writing-smoke.ts",
