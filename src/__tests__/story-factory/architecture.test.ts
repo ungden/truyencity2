@@ -78,6 +78,7 @@ describe('Story Factory architecture boundary', () => {
     const writingCrons = files('src/app/api/cron')
       .filter(file => file.endsWith('route.ts') && /story-factory|write-chapters|flagship-factory/.test(file));
     expect(writingCrons).toEqual(['src/app/api/cron/story-factory/route.ts']);
+    expect(read(writingCrons[0])).toContain(".lte('next_run_at', checkedAt)");
     const source = files('src')
       .filter(file => /\.tsx?$/.test(file) && !file.includes('/__tests__/'))
       .map(read).join('\n');

@@ -9,9 +9,13 @@ export const dynamic = 'force-dynamic';
 async function recordFactoryHeartbeat(result: Awaited<ReturnType<typeof runStoryFactoryTicks>>) {
   try {
     const db = getSupabaseAdmin();
+    const checkedAt = new Date().toISOString();
     const { count, error } = await db.from('story_factory_jobs')
       .select('*', { count: 'exact', head: true })
-      .in('status', ['setup', 'ready', 'writing', 'revise', 'plan', 'arc', 'cover', 'window_review']);
+      .in('status', ['setup', 'ready', 'writing', 'revise', 'plan', 'arc', 'cover', 'window_review'])
+      // A ready job waiting for its quota reset is scheduled, not runnable. Counting
+      // it here made every healthy idle cron write a false critical heartbeat.
+      .lte('next_run_at', checkedAt);
     if (error) throw error;
     const enabled = isStoryFactoryEnabled();
     const runnableJobs = count ?? 0;
