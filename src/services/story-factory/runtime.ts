@@ -505,7 +505,7 @@ async function runPlan(db: SupabaseClient, job: FactoryJobRow, project: FactoryP
     }).eq('id', job.id).eq('lease_token', job.lease_token);
     if (jobUpdate.error) throw jobUpdate.error;
     const runUpdate = await db.from('story_factory_runs').update({
-      status: 'passed', model_routes: { planner: routes.planner, planJudge: routes.planJudge },
+      status: 'passed', model_routes: { planner: routes.planner },
       input_artifact: { plannerRevision: FACTORY_PLANNER_VERSION },
       output_artifact: {
         ...planned.rollingPlan,
@@ -518,15 +518,10 @@ async function runPlan(db: SupabaseClient, job: FactoryJobRow, project: FactoryP
     if (runUpdate.error) throw runUpdate.error;
     return { status: 'completed', jobId: job.id, stage: 'plan', chapterNumber: job.current_chapter };
   } catch (error) {
-    // A semantic plan verdict must become plan_feedback before the job parks:
-    // the next attempt then plans against the failure evidence, and the changed
-    // recovery digest invalidates the dead chain's checkpoint — a blind revive
-    // would otherwise resume the stored chain and reproduce the same verdict
-    // forever. Best-effort: a failed write still parks the job normally.
+    // Mechanical planning already owns one bounded repair inside the same run.
+    // Persist the evidence for an operator or future revive, but do not launch
+    // another generative retry automatically.
     if (error instanceof StoryFactoryError && error.code === 'plan_blocked') {
-      // Did THIS attempt already plan against a previous verdict's feedback?
-      // job.plan_feedback is the claim-time snapshot, so it answers exactly that.
-      const alreadyFed = (job.plan_feedback as { source?: string } | null)?.source === 'plan_blocked';
       const evidence = (error.evidence ?? {}) as Record<string, unknown>;
       const fed = await db.from('story_factory_jobs').update({
         plan_feedback: {
@@ -538,9 +533,7 @@ async function runPlan(db: SupabaseClient, job: FactoryJobRow, project: FactoryP
         updated_at: new Date().toISOString(),
       }).eq('id', job.id).eq('lease_token', job.lease_token);
       if (fed.error) console.warn('[story-factory] plan_blocked feedback write failed:', fed.error.message);
-      // First verdict of a chain retries once automatically with the feedback in
-      // hand; a second consecutive verdict parks for an operator.
-      return blockRun(db, job, runId, error, { retryOnce: !fed.error && !alreadyFed });
+      return blockRun(db, job, runId, error);
     }
     return blockRun(db, job, runId, error);
   }
@@ -806,19 +799,11 @@ async function runRevision(db: SupabaseClient, job: FactoryJobRow, project: Fact
       if (held.error) console.warn('[story-factory] could not hold revision for retry:', held.error.message);
       return { status: 'completed', jobId: job.id, stage: 'revise', chapterNumber: job.current_chapter, error: infra.message };
     }
-    // A draft that fails its one rewrite parks — but a FRESH draft usually passes
-    // (every manual revive of this state has), so the first such park per chapter
-    // earns one automatic restart. The run history is the counter: a second
-    // quality park on the same chapter parks for the operator. Uses retry backoff,
-    // and the next tick's restartDraft redrafts from committed state.
+    // A chapter that still has a hard continuity failure after its one rewrite
+    // parks. Redrafting from scratch automatically used to double spend and could
+    // reproduce the same failure indefinitely.
     if (error instanceof StoryFactoryError && error.code === 'quality_blocked') {
-      const chapterNumber = job.current_chapter + 1;
-      const prior = await db.from('story_factory_runs')
-        .select('id', { count: 'exact', head: true })
-        .eq('job_id', job.id).eq('kind', 'chapter').eq('chapter_number', chapterNumber)
-        .eq('error_code', 'quality_blocked').neq('id', runRow.data.id);
-      const retryOnce = !prior.error && (prior.count ?? 0) === 0;
-      return blockRun(db, job, runRow.data.id, error, { retryOnce });
+      return blockRun(db, job, runRow.data.id, error);
     }
     return blockRun(db, job, runRow.data.id, error);
   }

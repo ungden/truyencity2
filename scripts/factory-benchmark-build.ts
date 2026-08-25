@@ -404,6 +404,7 @@ async function main() {
             state: setup.launchPack.initialState,
             routes: candidateRoutes,
             requiredWindowSize: 3,
+            reviewMode: 'offline_judge',
           });
           planned = generatedPlan;
           planCost = usageCost(generatedPlan.usages);
@@ -622,6 +623,7 @@ async function main() {
           }),
           routes: candidateRoutes,
           requiredWindowSize: 2,
+          reviewMode: 'offline_judge',
         });
         const followupPlanCost = usageCost(followupPlan.usages);
         progress.buildCostUsd += followupPlanCost;

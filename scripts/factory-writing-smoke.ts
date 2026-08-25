@@ -1,7 +1,7 @@
 /**
  * Writing smoke: the mechanical gate that authorizes the production line.
  *
- * It answers one question — does Concept Lab → Planner → Plan Judge → Writer → Editor
+ * It answers one question — does Concept Lab → bounded Planner → Writer → Editor
  * → state transition survive N sequential chapters on this release with these routes?
  * It deliberately does NOT judge whether the prose is good. Editorial quality is decided
  * by window review on the hidden canary, using real accumulating chapters.
@@ -187,12 +187,12 @@ async function main() {
     let state: StoryState = parsedPack.initialState;
     console.log(`[smoke] launch pack ready: ${kernel.title}`);
 
-    // Mirror production's plan recovery (505fbe8): a plan-scope verdict — from
-    // the Plan Judge or from the chapter Editor — feeds one informed replan of a
-    // single chapter instead of killing the run. Bounded at two recoveries per
-    // smoke so a flapping planner still fails; the counter is reported so a pass
+    // Mirror production's plan recovery: an artifact-scoped verdict from the
+    // chapter Editor may feed one informed replan of a single uncommitted chapter.
+    // The Planner itself already owns one bounded mechanical repair. A second
+    // artifact verdict parks; the counter is reported so a pass
     // that needed recoveries is visible in the summary.
-    const MAX_PLAN_RECOVERIES = 2;
+    const MAX_PLAN_RECOVERIES = 1;
     let planRecoveries = 0;
     let currentChapterRecoveries = 0;
     const planWindow = async (recovery?: { message: string }) => {
@@ -218,13 +218,13 @@ async function main() {
       usages.push(...planned.usages);
       return planned.rollingPlan;
     };
-    const recoverPlanOrRethrow = async (error: unknown, origin: 'plan' | 'chapter') => {
+    const recoverChapterPlanOrRethrow = async (error: unknown) => {
       if (!(error instanceof StoryFactoryError) || error.code !== 'plan_blocked' || currentChapterRecoveries >= MAX_PLAN_RECOVERIES) {
         throw error;
       }
       planRecoveries += 1;
       currentChapterRecoveries += 1;
-      console.log(`[smoke] ${origin} verdict → informed replan (${currentChapterRecoveries}/${MAX_PLAN_RECOVERIES} for chapter ${state.chapterNumber + 1}): ${error.message}`);
+      console.log(`[smoke] chapter artifact verdict → informed replan (${currentChapterRecoveries}/${MAX_PLAN_RECOVERIES} for chapter ${state.chapterNumber + 1}): ${error.message}`);
       return planWindow({ message: error.message });
     };
 
@@ -232,11 +232,9 @@ async function main() {
     while (state.chapterNumber < targetChapters) {
       const nextChapter = state.chapterNumber + 1;
       if (!rolling?.plans.some(plan => plan.chapterNumber === nextChapter)) {
-        try {
-          rolling = await planWindow();
-        } catch (error) {
-          rolling = await recoverPlanOrRethrow(error, 'plan');
-        }
+        // planRollingWindow already owns its one mechanical repair. A planning
+        // failure exits the smoke instead of buying another higher-level replan.
+        rolling = await planWindow();
       }
       const plan = rolling.plans.find(item => item.chapterNumber === nextChapter);
       if (!plan) throw new StoryFactoryError('plan_blocked', `Rolling plan never covered chapter ${nextChapter}.`);
@@ -259,7 +257,7 @@ async function main() {
           routes,
         });
       } catch (error) {
-        rolling = await recoverPlanOrRethrow(error, 'chapter');
+        rolling = await recoverChapterPlanOrRethrow(error);
         continue;
       }
       usages.push(...result.usages);

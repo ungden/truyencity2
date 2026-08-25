@@ -147,11 +147,15 @@ export function materializeEditorAssessment(value: unknown): EditorAssessment {
       evidence: finding.evidence,
       instruction: finding.instruction,
     }));
+  const outcome = wire.outcome === null
+    ? undefined
+    : ChapterOutcomeContentSchema.parse(wire.outcome);
   return EditorAssessmentSchema.parse({
     status: 'revise',
     continuityIssues,
     readingIssues,
     deltaChecks: wire.deltaChecks,
+    outcome,
   });
 }
 
@@ -569,7 +573,7 @@ function editorPrompt(input: {
       historicalMoney: 'Phân biệt tổng giá trị với mệnh giá: “cọc/xấp tiền trị giá năm trăm ngàn” không có nghĩa là một tờ tiền mệnh giá 500.000. Chỉ báo lỗi mệnh giá khi prose nói rõ một tờ hoặc đồng tiền có mệnh giá lịch sử không tồn tại.',
       temporalArithmetic: 'Đối chiếu mọi cụm thời lượng trong prose với durationMinutes, travelMinutesFromPrevious và storyTimeAfterMinutes. Cộng thời gian diễn ra trong từng cảnh; báo timeline/travel nếu prose vượt ngân sách hoặc di chuyển nhanh hơn plan.',
       clean: 'findings=[] chỉ khi mọi delta realized=true; khi đó outcome bắt buộc.',
-      issues: 'Có finding hoặc delta chưa realized thì outcome=null.',
+      issues: 'Nếu chỉ có reading finding và mọi delta đều realized thì outcome vẫn bắt buộc để code ghi nhận chương và đẩy advisory về sau. Chỉ để outcome=null khi có continuity finding hoặc delta chưa realized.',
     },
     decisionRule: 'Không tự quyết định pass/revise và không chấm điểm. Code sẽ suy ra quyết định từ issues và deltaChecks.',
   });
@@ -628,6 +632,7 @@ function mergePreflight(assessment: EditorAssessment, deterministic: PreflightIs
     continuityIssues: combined.filter(item => item.kind === 'continuity').map(item => item.issue),
     readingIssues: combined.filter(item => item.kind === 'reading').map(item => item.issue),
     deltaChecks: assessment.deltaChecks,
+    outcome: assessment.outcome,
   });
 }
 
@@ -815,6 +820,18 @@ export async function assessStoryDraft(input: {
         plan: input.plan,
         state: input.state,
       });
+      if (assessment.outcome) {
+        const evidenceSpans = assessment.outcome.evidenceSpans.map(span => groundEvidenceSpan(input.draft.content, span));
+        if (evidenceSpans.some(span => span === null)) {
+          throw new StoryFactoryError('infra_blocked', 'Editor advisory outcome contains an evidence anchor that code cannot ground in prose.', {
+            outcomeSpans: assessment.outcome.evidenceSpans.filter((_, index) => evidenceSpans[index] === null),
+          });
+        }
+        assessment = EditorAssessmentSchema.parse({
+          ...assessment,
+          outcome: { ...assessment.outcome, evidenceSpans: evidenceSpans as string[] },
+        });
+      }
     }
     assertDeltaCoverage(input.kernel, input.plan, assessment);
     return assessment;
@@ -856,6 +873,29 @@ GROUNDING_ERRORS: ${JSON.stringify({ message: error.message, evidence: error.evi
     };
     return { assessment: mergePreflight(materialize(corrective.value), deterministicIssues), usage: usageTotal };
   }
+}
+
+/**
+ * Literary findings remain visible in telemetry but do not buy another draft.
+ * The periodic window reviewer checks the trend independently. Canon/causal
+ * findings and missing required deltas retain the one grounded rewrite budget.
+ */
+export function acceptReadingAdvisories(assessment: EditorAssessment): EditorAssessment {
+  if (assessment.status === 'pass') return assessment;
+  if (assessment.continuityIssues.length > 0
+    || assessment.readingIssues.length === 0
+    || assessment.deltaChecks.some(check => !check.realized)
+    || !assessment.outcome) {
+    return assessment;
+  }
+  return EditorAssessmentSchema.parse({
+    status: 'pass',
+    continuityIssues: [],
+    readingIssues: [],
+    readingAdvisories: assessment.readingIssues,
+    deltaChecks: assessment.deltaChecks.map(check => ({ ...check, realized: true as const })),
+    outcome: assessment.outcome,
+  });
 }
 
 export interface ChapterStageInput {
@@ -981,8 +1021,9 @@ export async function draftStoryChapter(input: ChapterStageInput): Promise<Chapt
     });
     initialAssessment = firstAssessment.assessment;
     usages.push(firstAssessment.usage);
+    const acceptedAssessment = acceptReadingAdvisories(firstAssessment.assessment);
 
-    if (firstAssessment.assessment.status === 'pass') {
+    if (acceptedAssessment.status === 'pass') {
       return {
         decision: 'publish',
         result: publishResult({
@@ -990,7 +1031,7 @@ export async function draftStoryChapter(input: ChapterStageInput): Promise<Chapt
           transition,
           contexts,
           draft: initial.value,
-          assessment: firstAssessment.assessment,
+          assessment: acceptedAssessment,
           usages,
           revisionCount: 0,
           telemetry: telemetry(),
@@ -1078,19 +1119,20 @@ export async function reviseStoryChapter(
     });
     finalAssessment = secondAssessment.assessment;
     usages.push(secondAssessment.usage);
-    if (secondAssessment.assessment.status !== 'pass') {
-      const artifact = secondAssessment.assessment.continuityIssues.find(issue => issue.scope !== 'prose');
+    const acceptedAssessment = acceptReadingAdvisories(secondAssessment.assessment);
+    if (acceptedAssessment.status !== 'pass') {
+      const artifact = acceptedAssessment.continuityIssues.find(issue => issue.scope !== 'prose');
       if (artifact) {
-        throw new StoryFactoryError(artifact.scope === 'kernel' ? 'setup_blocked' : 'plan_blocked', artifact.instruction, secondAssessment.assessment);
+        throw new StoryFactoryError(artifact.scope === 'kernel' ? 'setup_blocked' : 'plan_blocked', artifact.instruction, acceptedAssessment);
       }
-      throw new StoryFactoryError('quality_blocked', 'Chapter still fails after one evidence-based full rewrite.', secondAssessment.assessment);
+      throw new StoryFactoryError('quality_blocked', 'Chapter still has a hard continuity failure after one evidence-based full rewrite.', acceptedAssessment);
     }
     return publishResult({
       stage: input,
       transition,
       contexts,
       draft: revision.value,
-      assessment: secondAssessment.assessment,
+      assessment: acceptedAssessment,
       usages,
       revisionCount: 1,
       telemetry: telemetry(),

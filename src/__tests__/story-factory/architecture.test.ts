@@ -134,12 +134,19 @@ describe('Story Factory architecture boundary', () => {
     expect(context).toContain('recentOutcomes: input.state.recentOutcomes');
   });
 
-  test('the Plan Judge is independent and is never called per chapter', () => {
+  test('the Plan Judge is offline-only and the live planner is bounded', () => {
     const planner = read('src/services/story-factory/planner.ts');
+    const runtime = read('src/services/story-factory/runtime.ts');
     expect(planner).toContain('model: input.routes.planJudge');
     expect(planner).toContain('const rejudged = await assessRollingPlan({');
-    // Bounded repair: two mechanical attempts, then exactly one judge-driven replan.
+    expect(planner).toContain("if (input.reviewMode !== 'offline_judge')");
+    // Live planning buys an initial plan and at most one low-temperature mechanical repair.
     expect(planner).toContain('for (let mechanicalAttempt = 1; !currentPlan && mechanicalAttempt <= 2; mechanicalAttempt += 1)');
+    expect(runtime).not.toContain('planJudge: routes.planJudge');
+    expect(runtime).not.toContain('retryOnce: !fed.error');
+    const smoke = read('scripts/factory-writing-smoke.ts');
+    expect(smoke).not.toContain("recoverPlanOrRethrow(error, 'plan')");
+    expect(smoke).toContain('rolling = await planWindow();');
     // A judge in the chapter path would grade the plan it just wrote.
     expect(read('src/services/story-factory/pipeline.ts')).not.toContain('planJudge');
     // release → benchmark → planner already exists; planner importing release closes a
@@ -254,8 +261,11 @@ describe('Story Factory architecture boundary', () => {
     const proseChecks = validation.slice(validation.indexOf('function describesCompletedDurableAsset'));
     expect(proseChecks).toContain('advisory({');
     expect(validation).toContain('export function collectPlanAdvisories');
-    // The Plan Judge answers them with the whole window in hand.
+    // Offline tooling may inspect them, but the live planner returns before this block.
     expect(read('src/services/story-factory/planner.ts')).toContain('advisorySignals');
+    const prompts = read('src/services/story-factory/prompts.ts');
+    expect(prompts).toContain('narrative_repetition luôn là reading category');
+    expect(prompts).toContain('không retry');
   });
 
   test('one invocation drains the queue without starting work it cannot finish', () => {

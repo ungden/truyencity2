@@ -26,7 +26,7 @@ off by the 300s route ceiling.
 |---|---|
 | `runtime.ts` | The state machine. One stage per tick, lease-guarded, commits through RPCs. |
 | `pipeline.ts` | Writer and Editor. `draftStoryChapter` → `reviseStoryChapter`. |
-| `planner.ts` | Planner, Plan Judge, arc lifecycle, five-chapter window review. |
+| `planner.ts` | Bounded live Planner, offline-only Plan Judge, arc lifecycle, five-chapter window review. |
 | `validation.ts` | The causal engine. Deterministic state transitions and 108 hard checks. |
 | `setup.ts` | Concept Lab: 9 calls from commission to launch pack. |
 | `contracts.ts` | Every schema. The source of truth for artifact shape. |
@@ -42,13 +42,17 @@ off by the 300s route ceiling.
 |---|---|---|
 | `setup` | 9 (+resumable checkpoints) | `cover` |
 | `cover` | 1 image | `plan` |
-| `plan` | 1–6 (planner ×2 mechanical, judge, replan, repair, re-judge; checkpointed) | `write` |
-| `write` | 2 (Writer, Editor) | commit, or `revise` |
-| `revise` | 2 (Rewrite, Editor) | commit |
+| `plan` | 1–2 (Planner, then at most one low-temperature mechanical repair) | `write` |
+| `write` | 2 (Writer, Editor) | commit, or `revise` only for a hard finding |
+| `revise` | 2 (Rewrite, Editor) | commit or park |
 | `window_review` | 1, every 5th chapter | `write` or `arc` |
 | `arc` | 1, at arc boundary | `plan` |
 
-Steady state is roughly 2.9 provider calls per published chapter.
+With full three-chapter rolling windows, no hard rewrite and a 20–30 chapter arc, steady
+state is roughly 2.57 provider calls per published chapter: Writer + Editor every chapter,
+one Planner per three chapters, one window review per five chapters and one arc call per
+arc. A literary finding adds zero calls. A grounded hard continuity/canon/delta failure gets
+one Rewrite + Editor pair, then parks instead of redrafting again.
 
 ## Two identities
 
@@ -75,8 +79,8 @@ existence, the travel graph, scene capacity, chapter sequence, schema shape, evi
 grounding. 108 of the 110 checks are in this class and they block.
 
 Two checks read free-form Vietnamese scene text to guess whether value moved. Those raise
-a `PlanAdvisory` instead — an observation plus the question to answer — which is handed to
-the Plan Judge with the full window. They can cause a revise; they cannot end a job.
+a `PlanAdvisory` instead — an observation plus the question to answer — which is recorded
+with plan telemetry. It does not buy a live Judge call, cause a replan, or end a job.
 `describesCompletedDurableAsset` matching "chế tạo" in a scene that only *agreed* to build
 something is exactly why: the fix for a false positive of that kind is another regex, and
 that loop does not terminate.
@@ -106,7 +110,7 @@ Existing novels are compatibility canaries only; backfilling their blueprint doe
 that title, topic, world and opening setup are correct. Seed validates the commission and
 research snapshot before inserting anything, setup must persist a valid market blueprint,
 and every later runtime stage fails closed if that blueprint is absent. Writing smoke also
-passes the selected blueprint into Planner/Plan Judge and records its digest; old saved smoke
+passes the selected blueprint into Planner and records its digest; old saved smoke
 packs without a blueprint must be rebuilt with one full smoke before they can be reused.
 
 The smoke authorization is **latest-wins**: the most recent smoke for this release and
@@ -151,8 +155,8 @@ page warn when a revived job still needs restage.
 | Status | Meaning | Retried? |
 |---|---|---|
 | `infra_blocked` | Provider or transport failure | Yes — backoff 5,10,20,40,80 min, then parks |
-| `plan_blocked` | Planner or Plan Judge could not produce a valid window | One replan, then parks |
-| `quality_blocked` | Editor still failing after one rewrite, or window review found drift | No |
+| `plan_blocked` | Planner still violates the mechanical contract after one repair | No automatic generative retry |
+| `quality_blocked` | Hard continuity/canon/delta failure remains after one rewrite, or a hidden-canary window has hard drift | No |
 | `setup_blocked` | Artifacts do not match the running release, or the launch pack is invalid | No |
 
 The retry budget counts **consecutive** failures: any successfully completed stage — a
@@ -208,7 +212,7 @@ to match, so corpora from different engine generations are never compared head-t
 
 ```bash
 npm run typecheck
-npm test                    # 202
+npm test
 npm run security:secrets
 ```
 
@@ -301,9 +305,11 @@ word-count comparison.
 
 **Editor** — receives the relevant canon, recent accepted outcomes, the plan and the draft.
 Reports only issues it can evidence verbatim in the prose, plus any unrealized delta. It
-also extracts the accepted `ChapterOutcome`. **Code decides publication, not the model**: a
-pass requires zero findings and every delta realized, and every evidence span must ground in
-the draft or the run fails as `infra_blocked` rather than shipping.
+also extracts the accepted `ChapterOutcome`. **Code decides publication, not the model**:
+every required delta and outcome evidence must ground in the draft. A reading-only finding
+is preserved as `readingAdvisories` and publishes without a rewrite; a continuity/canon or
+missing-delta finding receives the single rewrite budget. Invalid evidence fails as
+`infra_blocked` rather than shipping.
 
 If the Editor proves the *plan* repeats a recently completed problem/method or contradicts
 canon, the Writer is not asked to repair an artifact it does not own. The uncommitted window
@@ -322,11 +328,12 @@ setup telemetry and never enter Writer context.
 Setup is checkpointed per stage and resumable, bound to one commission, research snapshot
 and setup route.
 
-The plan stage is checkpointed the same way: a judge-replan chain can run six calls of
-100–250s each against the 300s ceiling, so every stable intermediate (validated mechanical
-plan, first judge verdict, validated replan) is saved into the run row. A killed invocation
-resumes mid-chain; the checkpoint stores raw planner responses and re-validates them against
-current durable state, so a stale checkpoint is ignored rather than trusted.
+The live plan stage checkpoints its raw Planner response and, when necessary, the single
+mechanical repair. A killed invocation resumes from that stable intermediate and re-validates
+it against current durable state, so a stale checkpoint is ignored rather than trusted.
+Plan Judge and judge-driven replan remain available only through the explicit
+`reviewMode: 'offline_judge'` used by frozen-corpus benchmark tooling; they never gate live
+publication.
 
 ## Time and cadence
 
@@ -336,7 +343,7 @@ minutes.
 
 | Cadence | What is checked |
 |---|---|
-| Every chapter | canon, timeline, location, resources, knowledge, authority, POV, causal transition, required deltas, voice, natural prose, prompt leak, repetition of recent beats |
+| Every chapter | hard canon, timeline, location, resources, knowledge, authority, POV, causal transition, required deltas and prompt leak; voice/natural-prose findings are advisories |
 | Every 5 chapters | progression, reward-loop variation, unresolved-thread movement, voice drift — steers the next rolling plan, does not rewrite canon |
 | Every arc | terminal change, promise ledger, progression, ending feasibility |
 | Every release | the writing smoke, then a hidden canary through chapter 10 |

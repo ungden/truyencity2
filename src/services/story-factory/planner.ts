@@ -22,7 +22,7 @@ import type { MarketBlueprint } from './setup';
 
 // Defined here, not in release.ts: release → benchmark → planner already exists, so a
 // planner → release import closes a cycle and breaks the production bundle (TDZ at init).
-export const FACTORY_PLANNER_VERSION = 'story-factory-planner-80-opening-proof-full-launch-errors';
+export const FACTORY_PLANNER_VERSION = 'story-factory-planner-81-bounded-forward';
 import { EDITOR_SYSTEM_PROMPT, PLANNER_SYSTEM_PROMPT, PLAN_JUDGE_SYSTEM_PROMPT } from './prompts';
 import {
   ARC_ACTIVE_MECHANIC_BUDGET,
@@ -153,6 +153,7 @@ const PLANNER_COMPACT_CONTRACT = {
     'Mỗi delta phải được ít nhất một scene.deltaIds tham chiếu.',
     'rules chỉ chứa world-rule thực sự được thi hành trong chương. Nếu chương mới quyết định hoặc hứa sẽ dùng cơ chế ở tương lai thì chưa đưa rule đó vào rules.',
     'Mọi chuyển đổi/công suất/quyền hạn/constraint thực sự dùng phải có một mechanics entry tham chiếu worldMechanics ID. Mỗi entry bắt buộc gắn ít nhất một delta bằng primaryDeltaId; các delta còn lại nằm trong additionalDeltaIds. role=effect nghĩa mechanic trực tiếp tạo delta; role=support nghĩa mechanic chỉ cấp quyền hoặc điều kiện cho delta do mechanic effect khác tạo. Mỗi resource delta dương và mọi resource_state phải có đúng một effect owner nhưng có thể có nhiều support. Resource delta âm được phép không có mechanic chỉ khi đó là khoản thanh toán/tiêu hao ra bên ngoài, sink ghi rõ đích không phải mechanic ID và đúng ownerEntityId của resource có mặt trong scene.people. Input của conversion vẫn phải thuộc conversion effect. Conversion luôn effect; constraint luôn support. Conversion phải gắn đủ delta đầu vào và đầu ra. Capability là effect chỉ khi nó trực tiếp tạo resource/fact đúng resourceId và direction đã khai báo trong effectResources hoặc effectFactIds; nếu chỉ cho phép conversion/mechanic khác thì dùng support. Không tạo mechanics entry nếu cơ chế không liên quan state transition trong chương.',
+    'activeMechanicIds là working set có thể dùng, không phải checklist bắt mọi mechanic xuất hiện. Với constraint/capability, requiredFacts và forbiddenFacts có cấu trúc là quyền quyết định cao hơn description tự nhiên: chỉ dùng tại thời điểm mọi requiredFacts khớp và không forbiddenFact nào khớp. Nếu một delta trong scene/chương vừa chuyển fact sang giá trị forbidden thì không gắn mechanic bị khóa vào delta đó hay scene sau; hãy bỏ mechanics entry không cần thiết thay vì cố dùng cho đủ working set.',
     'Với conversion, primaryDeltaId phải là một resource_numeric delta thuộc input/output của conversion trong cùng scene; code sẽ tự suy ra toàn bộ numeric delta mà conversion sở hữu và không bao giờ cho conversion sở hữu fact hoặc resource_state. Với capability effect, chỉ gắn resource delta đúng direction hoặc fact thuộc effectFactIds.',
     'Nếu quên conversion use nhưng toàn bộ vector input/output và quantity khớp duy nhất với một worldMechanic trong cùng scene, compiler có thể khôi phục use tất định. Nếu có từ hai mechanic/vector cùng khớp, plan vẫn bị block; vì vậy vẫn phải khai báo mechanic khi ý nghĩa giao dịch có thể mơ hồ.',
     'Nếu quên capability effect nhưng delta, direction và đúng một allowed actor đang có mặt cùng khớp duy nhất, compiler có thể khôi phục use tất định. Hai capability cùng có thể tạo delta hoặc một conversion cạnh tranh vẫn làm plan bị block.',
@@ -255,7 +256,7 @@ export function buildPlannerMechanicGuide(input: {
   );
 
   return {
-    planningRule: 'Nếu availableAtWindowStart=false, phải dùng một producerMechanicId hợp lệ ở scene/chương trước rồi mới dùng mechanic bị khóa. Nếu producerMechanicIds rỗng thì không được dùng mechanic đó trong window.',
+    planningRule: 'activeMechanicIds là working set, không phải checklist. Nếu availableAtWindowStart=false, phải dùng một producerMechanicId hợp lệ ở scene/chương trước rồi mới dùng mechanic bị khóa. Nếu producerMechanicIds rỗng thì không được dùng mechanic đó trong window. Với constraint/capability, requiredFacts và forbiddenFacts có cấu trúc thắng description; replay lại điều kiện tại đúng scene và bỏ mechanic nếu một fact vừa chuyển sang giá trị forbidden.',
     mechanics: activeMechanics.map(mechanic => {
       const requiredFacts = mechanic.kind === 'conversion' ? [] : mechanic.requiredFacts;
       const requiredResources = mechanic.kind === 'conversion'
@@ -1737,6 +1738,8 @@ export async function planRollingWindow(input: {
   authorDirective?: string | null;
   marketBlueprint?: MarketBlueprint | null;
   provider?: StoryModelProvider;
+  /** Independent qualitative judging is an offline research tool, never a live gate. */
+  reviewMode?: 'offline_judge';
   /** Raw candidate checkpoint (from a prior run row); validated and matched internally. */
   resume?: unknown;
   /** Persist a checkpoint; failures are logged and never abort the chain. */
@@ -1969,8 +1972,8 @@ export async function planRollingWindow(input: {
         evidence: mechanicalError?.evidence ?? null,
       },
       // Mechanical planning is a constrained compiler input, not a prose
-      // diversity task. Keep it reproducible; the independent Plan Judge still
-      // owns the qualitative reading check.
+      // diversity task. Keep it reproducible; live qualitative drift belongs
+      // to the periodic window review, while Plan Judge is offline-only.
       temperature: mechanicalAttempt === 1 ? 0.2 : 0.1,
     });
     currentResponse = result.value;
@@ -2010,6 +2013,21 @@ export async function planRollingWindow(input: {
   }
   if (!resumedMechanical) {
     await saveCheckpoint({ mechanicalResponse: currentResponse });
+  }
+
+  // Production writes forward after code has validated schema, state, causal
+  // transitions and recent-shape repetition. A model judging another model's
+  // taste is useful for offline bake-offs, but putting that debate in the live
+  // path created up to four additional calls and parked otherwise executable
+  // chapters. Literary drift is reviewed over the five-chapter window instead.
+  if (input.reviewMode !== 'offline_judge') {
+    return {
+      rollingPlan: currentPlan,
+      assessment: PlanAssessmentSchema.parse({ status: 'pass', issues: [] }),
+      usages,
+      attempts,
+      advisories,
+    };
   }
 
   let judgedAssessment: PlanAssessment;

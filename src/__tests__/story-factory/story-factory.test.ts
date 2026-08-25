@@ -2546,6 +2546,38 @@ describe('canonical Story Factory', () => {
     expect(result.wordCount).toBeLessThan(100);
   });
 
+  test('a grounded literary finding is advisory and does not buy a rewrite', async () => {
+    const draft = {
+      title: 'Mẻ hàng đầu tiên',
+      content: 'Hải đặt rổ xuống giữa nhà. Cả làng bàng hoàng reo hò. Anh chia việc với mẹ rồi bắt tay làm ngay trong buổi sáng.',
+    };
+    const readingOnly = {
+      v: 3 as const,
+      findings: [{
+        category: 'stock_reaction' as const,
+        severity: 'moderate' as const,
+        scope: 'prose' as const,
+        evidence: 'Cả làng bàng hoàng reo hò',
+        referenceId: 'prose',
+        instruction: 'Thay phản ứng đám đông bằng phản ứng riêng có lợi ích và giọng nói cụ thể.',
+      }],
+      deltaChecks: [{ deltaId: 'delta_1', realized: true, evidence: 'chia việc với mẹ' }],
+      outcome: acceptedOutcome('chia việc với mẹ'),
+    };
+    const provider = new QueueProvider([draft, readingOnly]);
+    const outcome = await draftStoryChapter({
+      kernel, state: initialState, plan: plan(1), routes, provider,
+    });
+    expect(outcome.decision).toBe('publish');
+    if (outcome.decision !== 'publish') throw new Error('unreachable');
+    expect(provider.calls).toEqual(['writer', 'editor']);
+    expect(outcome.result.revisionCount).toBe(0);
+    expect(outcome.result.assessment).toMatchObject({
+      status: 'pass',
+      readingAdvisories: [{ category: 'stock_reaction' }],
+    });
+  });
+
   test('one corrective pass recovers an editor assessment with a paraphrased anchor', async () => {
     // Two production novels parked over a weekend on the loop: paraphrased anchor →
     // infra → full editor re-roll → paraphrased anchor again, until retries drained.
@@ -4085,6 +4117,7 @@ describe('canonical Story Factory', () => {
       };
     };
     expect(prompt.mechanicDependencyGuide.planningRule).toContain('producerMechanicId');
+    expect(prompt.mechanicDependencyGuide.planningRule).toContain('forbiddenFacts');
     expect(prompt.mechanicDependencyGuide.mechanics.map(item => item.mechanicId))
       .toEqual(expect.arrayContaining(arc.activeMechanicIds));
   });
@@ -4228,6 +4261,7 @@ describe('canonical Story Factory', () => {
       state: initialState,
       routes,
       provider,
+      reviewMode: 'offline_judge',
       authorDirective: 'Không dùng lại đối thủ địa phương; chuyển sang cổng thị trường cấp vùng.',
     });
     expect(result.assessment.status).toBe('pass');
@@ -4309,6 +4343,7 @@ describe('canonical Story Factory', () => {
 
     await expect(planRollingWindow({
       kernel, arc, state: initialState, routes, provider, marketBlueprint,
+      reviewMode: 'offline_judge',
     })).rejects.toMatchObject({
       code: 'plan_blocked',
       evidence: expect.objectContaining({
@@ -4448,7 +4483,9 @@ describe('canonical Story Factory', () => {
       earlyPayoffChecks: [],
       issues: [],
     }]);
-    const result = await planRollingWindow({ kernel, arc, state: initialState, routes, provider });
+    const result = await planRollingWindow({
+      kernel, arc, state: initialState, routes, provider, reviewMode: 'offline_judge',
+    });
     expect(result.assessment.status).toBe('pass');
     expect(provider.calls).toEqual(['planner', 'plan-judge', 'planner', 'plan-judge']);
   });
@@ -4479,6 +4516,7 @@ describe('canonical Story Factory', () => {
     const first = new QueueProvider([plannerWire(), revise, plannerWire(), pass]);
     await planRollingWindow({
       kernel, arc, state: initialState, routes, provider: first,
+      reviewMode: 'offline_judge',
       onCheckpoint: async checkpoint => { checkpoints.push(checkpoint); },
     });
     // One checkpoint per stable intermediate: mechanical plan, judge verdict, replan.
@@ -4489,6 +4527,7 @@ describe('canonical Story Factory', () => {
     const resumed = new QueueProvider([pass]);
     const result = await planRollingWindow({
       kernel, arc, state: initialState, routes, provider: resumed, resume: stored,
+      reviewMode: 'offline_judge',
     });
     expect(result.assessment.status).toBe('pass');
     expect(resumed.calls).toEqual(['plan-judge']);
@@ -4499,6 +4538,7 @@ describe('canonical Story Factory', () => {
     const cold = new QueueProvider([plannerWire(), pass]);
     const coldResult = await planRollingWindow({
       kernel, arc, state: initialState, routes, provider: cold, resume: stale,
+      reviewMode: 'offline_judge',
     });
     expect(coldResult.assessment.status).toBe('pass');
     expect(cold.calls).toEqual(['planner', 'plan-judge']);
@@ -4583,6 +4623,7 @@ describe('canonical Story Factory', () => {
       state: initialState,
       routes,
       provider,
+      reviewMode: 'offline_judge',
     });
     expect(result.assessment.status).toBe('pass');
     expect(provider.calls).toEqual([
@@ -4666,7 +4707,9 @@ describe('canonical Story Factory', () => {
       plannerWire(),
       pass,
     ]);
-    const result = await planRollingWindow({ kernel, arc, state: initialState, routes, provider });
+    const result = await planRollingWindow({
+      kernel, arc, state: initialState, routes, provider, reviewMode: 'offline_judge',
+    });
     expect(result.assessment.status).toBe('pass');
     expect(provider.calls).toEqual(['planner', 'plan-judge', 'planner', 'planner', 'plan-judge']);
     expect(result.attempts.map(attempt => ({
@@ -4720,6 +4763,7 @@ describe('canonical Story Factory', () => {
     }]);
     const result = await planRollingWindow({
       kernel, arc, state: initialState, routes, provider, requiredWindowSize: 1,
+      reviewMode: 'offline_judge',
     });
     expect(result.rollingPlan.plans).toHaveLength(1);
     expect(result.rollingPlan.plans[0].chapterNumber).toBe(1);
@@ -4823,7 +4867,9 @@ describe('canonical Story Factory', () => {
       }],
     };
     const provider = new QueueProvider([plannerWire(), revise, plannerWire(), revise]);
-    await expect(planRollingWindow({ kernel, arc, state: initialState, routes, provider }))
+    await expect(planRollingWindow({
+      kernel, arc, state: initialState, routes, provider, reviewMode: 'offline_judge',
+    }))
       .rejects.toMatchObject({
         code: 'plan_blocked',
         evidence: expect.objectContaining({

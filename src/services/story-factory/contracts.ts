@@ -616,6 +616,11 @@ export const EditorAssessmentSchema = z.union([
     status: z.literal('pass'),
     continuityIssues: z.array(EditorContinuityIssueSchema).length(0),
     readingIssues: z.array(ReadingIssueSchema).length(0),
+    // Reading craft is steering, not a publication lock. When an otherwise
+    // mechanically sound chapter ships with grounded literary findings, keep
+    // them on the accepted assessment for telemetry; the five-chapter reviewer
+    // then checks the prose trend independently.
+    readingAdvisories: z.array(ReadingIssueSchema).max(3).optional(),
     deltaChecks: z.array(deltaCheck.extend({ realized: z.literal(true) })).min(1).max(30),
     outcome: ChapterOutcomeContentSchema,
   }).strict(),
@@ -624,6 +629,9 @@ export const EditorAssessmentSchema = z.union([
     continuityIssues: z.array(EditorContinuityIssueSchema).max(3),
     readingIssues: z.array(ReadingIssueSchema).max(3),
     deltaChecks: z.array(deltaCheck).min(1).max(30),
+    // The Editor still extracts a grounded outcome when only reading craft is
+    // weak. That lets code publish forward without another generative retry.
+    outcome: ChapterOutcomeContentSchema.optional(),
   }).strict(),
 ]).superRefine((assessment, ctx) => {
   if (assessment.status !== 'revise') return;
