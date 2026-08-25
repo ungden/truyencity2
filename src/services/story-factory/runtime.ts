@@ -87,6 +87,8 @@ export interface FactoryTickResult {
 
 /** Consecutive transient failures a job absorbs before it parks for an operator. */
 export const INFRA_RETRY_LIMIT = 5;
+/** Planner gets one delayed infrastructure retry, then parks instead of burning calls. */
+export const PLANNER_INFRA_RETRY_LIMIT = 1;
 
 /**
  * 5, 10, 20, 40, 80 minutes. The 5-minute floor is deliberately above TICK_BUDGET_MS:
@@ -150,7 +152,13 @@ async function createRun(db: SupabaseClient, job: FactoryJobRow, kind: string, c
   return data.id as string;
 }
 
-async function blockRun(db: SupabaseClient, job: FactoryJobRow, runId: string | null, error: unknown, options?: { retryOnce?: boolean }): Promise<FactoryTickResult> {
+async function blockRun(
+  db: SupabaseClient,
+  job: FactoryJobRow,
+  runId: string | null,
+  error: unknown,
+  options?: { retryOnce?: boolean; infraRetryLimit?: number },
+): Promise<FactoryTickResult> {
   const factoryError = error instanceof StoryFactoryError
     ? error
     : new StoryFactoryError('infra_blocked', error instanceof Error ? error.message : String(error));
@@ -196,7 +204,8 @@ async function blockRun(db: SupabaseClient, job: FactoryJobRow, runId: string | 
   // the story itself and park for an operator — except when the caller knows the next
   // attempt materially differs (retryOnce: a first plan verdict whose evidence just
   // became plan_feedback), which earns exactly one automatic retry before parking.
-  const retryable = (factoryError.code === 'infra_blocked' && job.retry_count < INFRA_RETRY_LIMIT)
+  const infraRetryLimit = options?.infraRetryLimit ?? INFRA_RETRY_LIMIT;
+  const retryable = (factoryError.code === 'infra_blocked' && job.retry_count < infraRetryLimit)
     || options?.retryOnce === true;
   const now = new Date();
   const jobUpdate = await db.from('story_factory_jobs').update({
@@ -480,13 +489,11 @@ async function runPlan(db: SupabaseClient, job: FactoryJobRow, project: FactoryP
       // One chapter cuts the chained bookkeeping to a third; the next window is
       // planned fresh from committed state.
       //
-      // The same degradation applies when the stage keeps dying on the wall
-      // clock: two or more burned retries mean the full window did not fit the
-      // 300s route ceiling (Đại Địa planned ch 40-42 for 4 hours of stale
-      // leases on 2026-08-13), so the code shrinks the ask instead of letting
-      // the fifth retry park the job. A one-chapter window is always legal and
-      // the next window plans fresh from committed state.
-      requiredWindowSize: job.current_chapter === 0 || job.plan_feedback || job.retry_count >= 2 ? 1 : undefined,
+      // The single delayed Planner infrastructure retry degrades immediately:
+      // if a full window did not fit or the provider timed out, ask for one
+      // chapter instead of paying for the same large request again. A
+      // one-chapter window is always legal and the next window plans fresh.
+      requiredWindowSize: job.current_chapter === 0 || job.plan_feedback || job.retry_count >= 1 ? 1 : undefined,
       authorDirective: project.author_directive,
       marketBlueprint,
       provider,
@@ -535,7 +542,7 @@ async function runPlan(db: SupabaseClient, job: FactoryJobRow, project: FactoryP
       if (fed.error) console.warn('[story-factory] plan_blocked feedback write failed:', fed.error.message);
       return blockRun(db, job, runId, error);
     }
-    return blockRun(db, job, runId, error);
+    return blockRun(db, job, runId, error, { infraRetryLimit: PLANNER_INFRA_RETRY_LIMIT });
   }
 }
 

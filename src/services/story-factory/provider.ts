@@ -8,6 +8,11 @@ const API_BASE = 'https://generativelanguage.googleapis.com/v1beta';
 // retried on the same routed model before the job consumes its durable retry.
 const TRANSIENT_STATUS = new Set([408, 409, 429, 499]);
 const RETRY_DELAYS_MS = [1_000, 3_000];
+type TransportRetryLimit = 0 | 1 | 2;
+
+function retryDelays(limit: TransportRetryLimit | undefined): number[] {
+  return RETRY_DELAYS_MS.slice(0, limit ?? RETRY_DELAYS_MS.length);
+}
 
 /**
  * Default per-request timeout. Setup and planner calls legitimately run long — a
@@ -99,6 +104,7 @@ export interface StoryModelProvider {
     thinkingBudget?: number;
     grounding?: 'google_search';
     timeoutMs?: number;
+    transportRetryLimit?: TransportRetryLimit;
     reasoningEffort?: 'none' | 'low' | 'medium' | 'high' | 'xhigh' | 'max';
     verbosity?: 'low' | 'medium' | 'high';
   }): Promise<ProviderResult<string>>;
@@ -114,6 +120,9 @@ export interface StoryModelProvider {
     thinkingBudget?: number;
     grounding?: 'google_search';
     timeoutMs?: number;
+    transportRetryLimit?: TransportRetryLimit;
+    /** Return parsed JSON for stage-owned validation instead of buying a hidden correction call. */
+    deferApplicationSchemaValidation?: boolean;
     reasoningEffort?: 'none' | 'low' | 'medium' | 'high' | 'xhigh' | 'max';
     verbosity?: 'low' | 'medium' | 'high';
   }): Promise<ProviderResult<T>>;
@@ -257,6 +266,7 @@ async function openaiGenerate(input: {
   responseSchema?: Record<string, unknown>;
   jsonMode?: boolean;
   timeoutMs?: number;
+  transportRetryLimit?: TransportRetryLimit;
   reasoningEffort?: 'none' | 'low' | 'medium' | 'high' | 'xhigh' | 'max';
   verbosity?: 'low' | 'medium' | 'high';
 }): Promise<ProviderResult<string>> {
@@ -308,9 +318,10 @@ async function openaiGenerate(input: {
     reasoning: { effort: input.reasoningEffort ?? 'medium' },
     ...(Object.keys(text).length ? { text } : {}),
   };
-  for (let attempt = 0; attempt <= RETRY_DELAYS_MS.length; attempt += 1) {
+  const delays = retryDelays(input.transportRetryLimit);
+  for (let attempt = 0; attempt <= delays.length; attempt += 1) {
     try {
-      if (attempt > 0) await new Promise(resolve => setTimeout(resolve, RETRY_DELAYS_MS[attempt - 1]));
+      if (attempt > 0) await new Promise(resolve => setTimeout(resolve, delays[attempt - 1]));
       const response = await fetchWithHardTimeout('https://api.openai.com/v1/responses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
@@ -348,7 +359,7 @@ async function openaiGenerate(input: {
       };
     } catch (error) {
       if (error instanceof StoryFactoryError) throw error;
-      if (!retryable(error) || attempt === RETRY_DELAYS_MS.length) {
+      if (!retryable(error) || attempt === delays.length) {
         throw new StoryFactoryError('infra_blocked', error instanceof Error ? error.message : String(error));
       }
     }
@@ -371,6 +382,7 @@ async function openrouterGenerate(input: {
   responseSchema?: Record<string, unknown>;
   jsonMode?: boolean;
   timeoutMs?: number;
+  transportRetryLimit?: TransportRetryLimit;
 }): Promise<ProviderResult<string>> {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) throw new StoryFactoryError('infra_blocked', 'OPENROUTER_API_KEY is not configured for a slash-vendor route.');
@@ -413,9 +425,10 @@ async function openrouterGenerate(input: {
     ...(OPENROUTER_MODEL_PARAMS[input.model] ?? {}),
   };
   let formatDowngraded = false;
-  for (let attempt = 0; attempt <= RETRY_DELAYS_MS.length; attempt += 1) {
+  const delays = retryDelays(input.transportRetryLimit);
+  for (let attempt = 0; attempt <= delays.length; attempt += 1) {
     try {
-      if (attempt > 0) await new Promise(resolve => setTimeout(resolve, RETRY_DELAYS_MS[attempt - 1]));
+      if (attempt > 0) await new Promise(resolve => setTimeout(resolve, delays[attempt - 1]));
       const response = await fetchWithHardTimeout('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -464,7 +477,7 @@ async function openrouterGenerate(input: {
       };
     } catch (error) {
       if (error instanceof StoryFactoryError) throw error;
-      if (!retryable(error) || attempt === RETRY_DELAYS_MS.length) {
+      if (!retryable(error) || attempt === delays.length) {
         throw new StoryFactoryError('infra_blocked', error instanceof Error ? error.message : String(error));
       }
     }
@@ -483,6 +496,7 @@ async function generate(input: {
   thinkingLevel?: 'minimal' | 'low' | 'medium' | 'high';
   thinkingBudget?: number;
   timeoutMs?: number;
+  transportRetryLimit?: TransportRetryLimit;
 }): Promise<ProviderResult<string>> {
   // Dispatch by the routed model's vendor prefix — a deliberate route selection;
   // on failure the stage throws and retries on the SAME route, never another model.
@@ -530,9 +544,10 @@ async function generate(input: {
   };
   if (input.googleSearch) body.tools = [{ googleSearch: {} }];
 
-  for (let attempt = 0; attempt <= RETRY_DELAYS_MS.length; attempt += 1) {
+  const delays = retryDelays(input.transportRetryLimit);
+  for (let attempt = 0; attempt <= delays.length; attempt += 1) {
     try {
-      if (attempt > 0) await new Promise(resolve => setTimeout(resolve, RETRY_DELAYS_MS[attempt - 1]));
+      if (attempt > 0) await new Promise(resolve => setTimeout(resolve, delays[attempt - 1]));
       const response = await fetchWithHardTimeout(`${API_BASE}/models/${input.model}:generateContent`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
@@ -576,7 +591,7 @@ async function generate(input: {
       };
     } catch (error) {
       if (error instanceof StoryFactoryError) throw error;
-      if (!retryable(error) || attempt === RETRY_DELAYS_MS.length) {
+      if (!retryable(error) || attempt === delays.length) {
         throw new StoryFactoryError('infra_blocked', error instanceof Error ? error.message : String(error));
       }
     }
@@ -604,6 +619,8 @@ export const geminiProvider: StoryModelProvider = {
     thinkingBudget?: number;
     grounding?: 'google_search';
     timeoutMs?: number;
+    transportRetryLimit?: TransportRetryLimit;
+    deferApplicationSchemaValidation?: boolean;
   }): Promise<ProviderResult<T>> {
     const responseSchema = toGeminiResponseSchema(input.schema, {
       complexity: input.schemaComplexity ?? 'default',
@@ -645,6 +662,12 @@ export const geminiProvider: StoryModelProvider = {
           usage,
         });
       }
+    }
+    if (input.deferApplicationSchemaValidation) {
+      // Some stages (notably Planner) already own a bounded mechanical-repair
+      // loop. Returning the raw JSON lets that visible loop account for the
+      // repair instead of provider.json silently buying another model call.
+      return { value: raw as T, usage };
     }
     let parsed = input.schema.safeParse(raw);
     if (!parsed.success && (

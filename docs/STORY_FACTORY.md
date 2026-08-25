@@ -32,7 +32,7 @@ off by the 300s route ceiling.
 | `contracts.ts` | Every schema. The source of truth for artifact shape. |
 | `context.ts` | What the Writer and Editor are allowed to see. |
 | `memory.ts` | Bounded continuity reads over `story_state_events`. No embeddings, no model calls. |
-| `provider.ts` | Gemini REST. No SDK, no fallback provider, 120s per call. |
+| `provider.ts` | Routed REST providers. No SDK, no fallback provider; chapter calls cap at 120s, Planner at 140s. |
 | `benchmark.ts`, `benchmark-resume.ts` | Offline model evaluation. Not a gate. |
 | `cover.ts`, `portfolio.ts`, `prompts.ts`, `release.ts`, `routes.ts`, `index.ts` | Support. `portfolio.ts` giữ slate 20 high-concept fantasy / 10 urban-era thay vì nghiêng sang nghề nghiệp-cozy. |
 
@@ -42,7 +42,7 @@ off by the 300s route ceiling.
 |---|---|---|
 | `setup` | 9 (+resumable checkpoints) | `cover` |
 | `cover` | 1 image | `plan` |
-| `plan` | 1–2 (Planner, then at most one low-temperature mechanical repair) | `write` |
+| `plan` | 1–2 visible calls (Planner, then at most one low-temperature mechanical repair) | `write` |
 | `write` | 2 (Writer, Editor) | commit, or `revise` only for a hard finding |
 | `revise` | 2 (Rewrite, Editor) | commit or park |
 | `window_review` | 1, every 5th chapter | `write` or `arc` |
@@ -53,6 +53,12 @@ state is roughly 2.57 provider calls per published chapter: Writer + Editor ever
 one Planner per three chapters, one window review per five chapters and one arc call per
 arc. A literary finding adds zero calls. A grounded hard continuity/canon/delta failure gets
 one Rewrite + Editor pair, then parks instead of redrafting again.
+
+Planner additionally disables provider-level HTTP retries and provider-owned schema
+corrections. Each visible attempt is exactly one request capped at 140 seconds, so the
+two-attempt worst case fits the 300-second cron wall. A transport failure gets one delayed
+job-level retry (the smaller one-chapter window), then parks; it cannot silently expand
+into a chain of paid requests.
 
 ## Two identities
 
@@ -154,7 +160,7 @@ page warn when a revived job still needs restage.
 
 | Status | Meaning | Retried? |
 |---|---|---|
-| `infra_blocked` | Provider or transport failure | Yes — backoff 5,10,20,40,80 min, then parks |
+| `infra_blocked` | Provider or transport failure | Usually backoff 5,10,20,40,80 min; Planner gets one delayed retry only |
 | `plan_blocked` | Planner still violates the mechanical contract after one repair | No automatic generative retry |
 | `quality_blocked` | Hard continuity/canon/delta failure remains after one rewrite, or a hidden-canary window has hard drift | No |
 | `setup_blocked` | Artifacts do not match the running release, or the launch pack is invalid | No |

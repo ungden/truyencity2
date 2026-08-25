@@ -217,9 +217,21 @@ describe('Story Factory architecture boundary', () => {
     const runtime = read('src/services/story-factory/runtime.ts');
     const provider = read('src/services/story-factory/provider.ts');
     expect(provider).toContain('408, 409, 429, 499');
-    expect(runtime).toContain("factoryError.code === 'infra_blocked' && job.retry_count < INFRA_RETRY_LIMIT");
+    expect(runtime).toContain('const infraRetryLimit = options?.infraRetryLimit ?? INFRA_RETRY_LIMIT');
+    expect(runtime).toContain("factoryError.code === 'infra_blocked' && job.retry_count < infraRetryLimit");
     // Semantic verdicts about the story are not retried — they need a human or a replan.
     expect(runtime).toContain("status: retryable ? 'ready' : factoryError.code");
+  });
+
+  test('live planning has no hidden provider retry or schema-correction calls', () => {
+    const planner = read('src/services/story-factory/planner.ts');
+    const runtime = read('src/services/story-factory/runtime.ts');
+    expect(planner).toContain('timeoutMs: 140_000');
+    expect(planner).toContain('transportRetryLimit: 0');
+    expect(planner).toContain('deferApplicationSchemaValidation: true');
+    expect(runtime).toContain('PLANNER_INFRA_RETRY_LIMIT = 1');
+    expect(runtime).toContain('{ infraRetryLimit: PLANNER_INFRA_RETRY_LIMIT }');
+    expect(runtime).toContain('job.retry_count >= 1 ? 1 : undefined');
   });
 
   test('schema correction is a low-temperature exhaustive repair, not a creative reroll', () => {
@@ -286,7 +298,7 @@ describe('Story Factory architecture boundary', () => {
     expect(cover).toContain('rollingPlanContainsChapter(job.rolling_plan, nextChapter)');
     expect(cover).toContain("stage: 'write'");
     expect(plan).toContain("stage: job.current_chapter === 0 ? 'cover' : 'write'");
-    expect(plan).toContain('job.current_chapter === 0 || job.plan_feedback || job.retry_count >= 2 ? 1 : undefined');
+    expect(plan).toContain('job.current_chapter === 0 || job.plan_feedback || job.retry_count >= 1 ? 1 : undefined');
     expect(runtime).toContain('openingExecutionProofs: result.openingPayoffProofs');
     expect(read('src/services/story-factory/planner.ts')).toContain('openingExecutionProofs: input.marketBlueprint.openingExecutionProofs');
     expect(read('src/services/story-factory/setup.ts')).toContain("setupStage('Opening Payoff Semantic Judge'");

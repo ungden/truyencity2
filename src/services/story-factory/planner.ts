@@ -22,7 +22,7 @@ import type { MarketBlueprint } from './setup';
 
 // Defined here, not in release.ts: release → benchmark → planner already exists, so a
 // planner → release import closes a cycle and breaks the production bundle (TDZ at init).
-export const FACTORY_PLANNER_VERSION = 'story-factory-planner-81-bounded-forward';
+export const FACTORY_PLANNER_VERSION = 'story-factory-planner-82-fail-fast-forward';
 import { EDITOR_SYSTEM_PROMPT, PLANNER_SYSTEM_PROMPT, PLAN_JUDGE_SYSTEM_PROMPT } from './prompts';
 import {
   ARC_ACTIVE_MECHANIC_BUDGET,
@@ -1899,6 +1899,12 @@ export async function planRollingWindow(input: {
       schema: PlannerRollingPlanResponseSchema,
       schemaComplexity: 'omit_array_max',
       temperature: inputForAttempt.temperature,
+      // The cron has a 300s wall. One 140s request plus at most one visible
+      // mechanical repair fits; provider-level retries or schema corrections
+      // would multiply calls invisibly and can leave the durable run stale.
+      timeoutMs: 140_000,
+      transportRetryLimit: 0,
+      deferApplicationSchemaValidation: true,
     });
     usages.push(result.usage);
     return result;
