@@ -23,7 +23,7 @@ import type { MarketBlueprint } from './setup';
 
 // Defined here, not in release.ts: release → benchmark → planner already exists, so a
 // planner → release import closes a cycle and breaks the production bundle (TDZ at init).
-export const FACTORY_PLANNER_VERSION = 'story-factory-planner-84-low-thinking-projection';
+export const FACTORY_PLANNER_VERSION = 'story-factory-planner-85-compiled-time-projection';
 import { EDITOR_SYSTEM_PROMPT, PLANNER_SYSTEM_PROMPT, PLAN_JUDGE_SYSTEM_PROMPT } from './prompts';
 import {
   ARC_ACTIVE_MECHANIC_BUDGET,
@@ -33,6 +33,7 @@ import {
   validateArcAgainstKernel,
   validateArcResourceReachability,
   validateRollingPlan,
+  travelMinimum,
   type PlanAdvisory,
 } from './validation';
 
@@ -1058,6 +1059,37 @@ export function materializePlannerRollingPlan(
       };
     }),
   });
+  // Travel duration and the chapter clock are graph arithmetic, not creative
+  // decisions. Clamp undershoots deterministically so a valid scene does not buy
+  // an entire mechanical-repair call just because the model wrote 60 instead of
+  // the graph minimum 75, or missed five minutes in a chapter total. Overshoots
+  // remain intact because they can represent intentional off-page waiting.
+  if (kernel) {
+    const timelineLocations = new Map(initialState.characters.map(character => (
+      [character.characterId, character.locationId] as const
+    )));
+    let storyTime = initialState.storyTimeMinutes;
+    for (const plan of rolling.plans) {
+      for (const scene of plan.scenes) {
+        let minimumTravel = 0;
+        for (const participantId of scene.participantIds) {
+          const previousLocation = timelineLocations.get(participantId);
+          if (previousLocation && previousLocation !== scene.locationId) {
+            const minimum = travelMinimum(kernel, previousLocation, scene.locationId);
+            if (minimum !== null) minimumTravel = Math.max(minimumTravel, minimum);
+          }
+          timelineLocations.set(participantId, scene.locationId);
+        }
+        scene.travelMinutesFromPrevious = Math.max(scene.travelMinutesFromPrevious, minimumTravel);
+      }
+      const minimumElapsed = plan.scenes.reduce(
+        (total, scene) => total + scene.durationMinutes + scene.travelMinutesFromPrevious,
+        0,
+      );
+      plan.storyTimeAfterMinutes = Math.max(plan.storyTimeAfterMinutes, storyTime + minimumElapsed);
+      storyTime = plan.storyTimeAfterMinutes;
+    }
+  }
   for (const plan of rolling.plans) {
     for (const characterId of characterLocations.keys()) {
       const beforeLocationId = characterLocations.get(characterId)!;

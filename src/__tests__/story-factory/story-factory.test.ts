@@ -4180,6 +4180,23 @@ describe('canonical Story Factory', () => {
     expect(rolling.plans[0].scenes[0].requiredDeltaIds).toContain(locationDelta?.id);
   });
 
+  test('compiler clamps travel and chapter time instead of buying an arithmetic retry', () => {
+    const wire = plannerWire();
+    const chapter = structuredClone(wire.chapters[0]);
+    chapter.time = 30;
+    chapter.scenes[0] = {
+      ...chapter.scenes[0],
+      people: ['main', 'buyer'],
+      loc: 'beach',
+      travel: 1,
+    };
+    wire.chapters[0] = chapter;
+    const rolling = materializePlannerRollingPlan(wire, initialState, kernel);
+    expect(rolling.plans[0].scenes[0].travelMinutesFromPrevious).toBe(20);
+    expect(rolling.plans[0].storyTimeAfterMinutes).toBe(80);
+    expect(() => applyChapterPlan({ kernel, state: initialState, plan: rolling.plans[0] })).not.toThrow();
+  });
+
   test('Planner wire cannot duplicate compiler-owned location deltas', () => {
     const wire = plannerWire() as unknown as {
       chapters: Array<{ deltas: Array<Record<string, unknown>> }>;

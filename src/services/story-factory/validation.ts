@@ -476,7 +476,7 @@ function checkPreconditions(state: StoryState, plan: ChapterPlan): void {
   }
 }
 
-function travelMinimum(kernel: StoryKernel, from: string, to: string): number | null {
+export function travelMinimum(kernel: StoryKernel, from: string, to: string): number | null {
   if (from === to) return 0;
   const distances = new Map<string, number>([[from, 0]]);
   const visited = new Set<string>();
