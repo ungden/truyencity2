@@ -23,7 +23,7 @@ import type { MarketBlueprint } from './setup';
 
 // Defined here, not in release.ts: release → benchmark → planner already exists, so a
 // planner → release import closes a cycle and breaks the production bundle (TDZ at init).
-export const FACTORY_PLANNER_VERSION = 'story-factory-planner-83-craft-forward';
+export const FACTORY_PLANNER_VERSION = 'story-factory-planner-84-low-thinking-projection';
 import { EDITOR_SYSTEM_PROMPT, PLANNER_SYSTEM_PROMPT, PLAN_JUDGE_SYSTEM_PROMPT } from './prompts';
 import {
   ARC_ACTIVE_MECHANIC_BUDGET,
@@ -37,6 +37,87 @@ import {
 } from './validation';
 
 type PlanRevisionIssues = Extract<PlanAssessment, { status: 'revise' }>['issues'];
+
+/**
+ * Keep the live Planner focused on the current arc without weakening code-owned
+ * validation. The full Kernel and State still drive materialization and every
+ * deterministic validator below; only the provider payload is projected.
+ *
+ * The old request repeated an 800-1,200 chapter spine, inactive mechanics and
+ * character voice contracts on every three-chapter plan. Gemini 3.1 Pro then
+ * spent most of the 140s request budget reasoning over material it was not
+ * allowed to use. This projection preserves every active ID and exact ledger
+ * value while removing that inert context.
+ */
+export function projectKernelForRollingPlanner(kernel: StoryKernel, arc: ArcPlan) {
+  const activeCharacterIds = new Set([kernel.protagonistId, ...arc.activeCharacterIds]);
+  const activeMechanicIds = new Set(arc.activeMechanicIds);
+  const activeLocationIds = new Set(arc.activeLocationIds);
+  const activeWorldRuleIds = new Set(arc.activeWorldRuleIds);
+  const activeResourceIds = new Set(arc.activeResourceIds);
+  const activeMechanics = kernel.worldMechanics.filter(mechanic => activeMechanicIds.has(mechanic.id));
+
+  for (const mechanic of activeMechanics) {
+    if (mechanic.kind === 'conversion') {
+      mechanic.inputsPerBatch.forEach(item => activeResourceIds.add(item.resourceId));
+      mechanic.outputsPerBatch.forEach(item => activeResourceIds.add(item.resourceId));
+    } else if (mechanic.kind === 'capability') {
+      mechanic.allowedActorIds.forEach(id => activeCharacterIds.add(id));
+      mechanic.requiredResourceIds.forEach(id => activeResourceIds.add(id));
+      mechanic.effectResources.forEach(item => activeResourceIds.add(item.resourceId));
+    }
+  }
+
+  return {
+    schemaVersion: kernel.schemaVersion,
+    title: kernel.title,
+    description: kernel.description,
+    genreLane: kernel.genreLane,
+    realityMode: kernel.realityMode,
+    readerFantasy: kernel.readerFantasy,
+    uniqueMechanism: kernel.uniqueMechanism,
+    mechanismFingerprint: kernel.mechanismFingerprint,
+    rewardLoopFingerprint: kernel.rewardLoopFingerprint,
+    conflictEconomyFingerprint: kernel.conflictEconomyFingerprint,
+    protagonistId: kernel.protagonistId,
+    characters: kernel.characters
+      .filter(character => activeCharacterIds.has(character.id))
+      .map(({ voice: _voice, aliases: _aliases, ...character }) => character),
+    worldModel: kernel.worldModel,
+    progressionTracks: kernel.progressionTracks.map(track => ({
+      id: track.id,
+      name: track.name,
+      initialState: track.initialState,
+      terminalState: track.terminalState,
+      milestones: track.milestones.filter(milestone => milestone.stageId === arc.stageId),
+    })),
+    seriesSpine: {
+      targetEndingRange: kernel.seriesSpine.targetEndingRange,
+      activeStage: kernel.seriesSpine.stages.find(stage => stage.id === arc.stageId) ?? null,
+    },
+    longPromises: kernel.longPromises,
+    worldMechanics: activeMechanics,
+    worldRules: kernel.worldRules.filter(rule => activeWorldRuleIds.has(rule.id)),
+    locations: kernel.locations.filter(location => activeLocationIds.has(location.id)),
+    travelRules: kernel.travelRules.filter(rule => (
+      activeLocationIds.has(rule.fromLocationId) && activeLocationIds.has(rule.toLocationId)
+    )),
+    resources: kernel.resources.filter(resource => activeResourceIds.has(resource.id)),
+    promises: kernel.promises,
+    pleasureLoop: kernel.pleasureLoop,
+    endingDirection: kernel.endingDirection,
+    projectionRule: 'Đây là working set đầy đủ của arc hiện tại. Không phát minh ID ngoài payload và không rời activeStage; phần spine/mechanic/voice không liên quan đã được code lược bỏ, không phải khoảng trống để tự bịa canon.',
+  };
+}
+
+export function projectStateForRollingPlanner(state: StoryState): StoryState {
+  return {
+    ...state,
+    // Six chapters feed causal-shape comparison; eight outcomes leave extra
+    // semantic runway without resending the schema maximum of twelve.
+    recentOutcomes: state.recentOutcomes.slice(-8),
+  };
+}
 
 /**
  * Resolve the market promises whose hard deadlines fall inside a concrete
@@ -1802,15 +1883,20 @@ export async function planRollingWindow(input: {
       input.arc.plannedEndChapter,
       nextChapter + (input.requiredWindowSize ?? 3) - 1,
     );
+    const plannerKernel = projectKernelForRollingPlanner(input.kernel, input.arc);
+    const plannerState = projectStateForRollingPlanner(input.state);
     const result = await provider.json({
       model: input.routes.planner,
-      reasoningEffort: 'high',
+      // Gemini 3.1 Pro defaults to high thinking. Planning is already bounded by
+      // schemas, a compiled dependency guide and deterministic validators, so low
+      // thinking removes latency/cost without removing any correctness gate.
+      thinkingLevel: 'low',
       system: PLANNER_SYSTEM_PROMPT,
       prompt: JSON.stringify({
         task: inputForAttempt.task,
-        kernel: input.kernel,
+        kernel: plannerKernel,
         arc: input.arc,
-        state: input.state,
+        state: plannerState,
         ledgerSnapshot: {
           facts: Object.fromEntries(input.state.facts.map(item => [item.id, item.value])),
           resources: Object.fromEntries(input.state.resources.map(item => {
@@ -1841,14 +1927,14 @@ export async function planRollingWindow(input: {
           fact.id,
           {
             current: fact.value,
-            requiredExpectedValues: [...new Set(input.kernel.worldMechanics.flatMap(mechanic => (
+            requiredExpectedValues: [...new Set(plannerKernel.worldMechanics.flatMap(mechanic => (
               mechanic.kind === 'capability' || mechanic.kind === 'constraint'
                 ? mechanic.requiredFacts
                   .filter(required => required.factId === fact.id)
                   .map(required => required.expected)
                 : []
             )))],
-            producedByMechanicIds: input.kernel.worldMechanics.flatMap(mechanic => (
+            producedByMechanicIds: plannerKernel.worldMechanics.flatMap(mechanic => (
               mechanic.kind === 'capability' && mechanic.effectFactIds.includes(fact.id)
                 ? [mechanic.id]
                 : []
@@ -1864,7 +1950,7 @@ export async function planRollingWindow(input: {
           initialLocationsByCharacter: Object.fromEntries(
             input.state.characters.map(item => [item.characterId, item.locationId]),
           ),
-          travelEdges: input.kernel.travelRules.map(rule => ({
+          travelEdges: plannerKernel.travelRules.map(rule => ({
             fromLocationId: rule.fromLocationId,
             toLocationId: rule.toLocationId,
             minimumMinutes: rule.minimumMinutes,

@@ -74,6 +74,8 @@ import {
   assertRenewableConversionInputs,
   planArcLifecycle,
   planRollingWindow,
+  projectKernelForRollingPlanner,
+  projectStateForRollingPlanner,
   reviewFiveChapterWindow,
   rollingPlanContainsChapter,
   toGeminiResponseSchema,
@@ -84,6 +86,7 @@ import {
   validateOpeningPayoffProofs,
   validateOpeningPayoffSemanticAudit,
   resolveProducedFactValue,
+  scenePacing,
   validationPasses,
   draftStoryChapter,
   readPendingRevision,
@@ -425,6 +428,7 @@ function windowReviewWirePass(chapterOffset = 0): z.input<typeof WindowReviewWir
 class QueueProvider implements StoryModelProvider {
   calls: string[] = [];
   temperatures: Array<number | undefined> = [];
+  thinkingLevels: Array<string | undefined> = [];
   prompts: string[] = [];
   constructor(private readonly values: unknown[]) {}
   async text(input: { model: string }): Promise<ProviderResult<string>> {
@@ -436,9 +440,11 @@ class QueueProvider implements StoryModelProvider {
     prompt: string;
     schema: z.ZodType<T, z.ZodTypeDef, unknown>;
     temperature?: number;
+    thinkingLevel?: 'minimal' | 'low' | 'medium' | 'high';
   }): Promise<ProviderResult<T>> {
     this.calls.push(input.model);
     this.temperatures.push(input.temperature);
+    this.thinkingLevels.push(input.thinkingLevel);
     this.prompts.push(input.prompt);
     const value = this.values.shift();
     return { value: input.schema.parse(value), usage };
@@ -5676,6 +5682,86 @@ describe('prose-craft gates', () => {
     expect(brief.recentTitles).toEqual(['Chương 1: Cái Giá Ngoài Bến']);
     expect(brief.recentTitleStems).toEqual(['Cái Giá']);
     expect(brief.craftGuidance).toHaveLength(1);
+  });
+
+  test('marks only long time-cycle bookkeeping scenes for compression', () => {
+    const pacingKernel: StoryKernel = {
+      ...structuredClone(kernel),
+      resources: [
+        ...kernel.resources,
+        { id: 'night_cycle', name: 'Chu kỳ qua đêm', kind: 'numeric', unit: 'chu kỳ', ownerEntityId: null, minimum: 0 },
+      ],
+      worldMechanics: [
+        ...kernel.worldMechanics,
+        {
+          id: 'mechanic_overnight', name: 'Qua một đêm', kind: 'conversion',
+          description: 'Tiêu một chu kỳ qua đêm để hồi lại nguồn lực vận hành định kỳ.',
+          inputsPerBatch: [{ resourceId: 'night_cycle', amount: 1 }],
+          outputsPerBatch: [{ resourceId: 'money', amount: 1 }],
+          maximumBatchesPerUse: 1,
+        },
+      ],
+    };
+    const overnight = plan(2);
+    overnight.scenes[0] = {
+      ...overnight.scenes[0], durationMinutes: 480,
+      requiredDeltaIds: ['cycle_spent', 'routine_refresh'],
+    };
+    overnight.requiredDeltas = [
+      { id: 'cycle_spent', kind: 'resource_numeric', resourceId: 'night_cycle', before: 1, delta: -1, after: 0, source: null, sink: 'mechanic_overnight' },
+      { id: 'routine_refresh', kind: 'resource_numeric', resourceId: 'money', before: 100, delta: 1, after: 101, source: 'mechanic_overnight', sink: null },
+    ];
+    overnight.mechanicUses = [{
+      id: 'overnight_use', sceneId: overnight.scenes[0].id, mechanicId: 'mechanic_overnight',
+      role: 'effect', actorId: 'main', quantity: 1, preconditionFactIds: [],
+      deltaIds: ['cycle_spent', 'routine_refresh'],
+    }];
+    expect(scenePacing(pacingKernel, overnight, overnight.scenes[0].id)).toBe('compress_transition');
+    expect(buildWriterBrief({ kernel: pacingKernel, state: initialState, plan: overnight }).scenes[0].pacing)
+      .toBe('compress_transition');
+
+    const consequential = structuredClone(overnight);
+    consequential.requiredDeltas.push({
+      id: 'new_fact', kind: 'fact', factId: 'fact_day', before: 'ngay_0', after: 'ngay_1',
+    });
+    consequential.scenes[0].requiredDeltaIds.push('new_fact');
+    expect(scenePacing(pacingKernel, consequential, consequential.scenes[0].id)).toBe('full_scene');
+  });
+
+  test('projects inactive long-series context out of live planning and requests low thinking', async () => {
+    const stateWithHistory: StoryState = {
+      ...initialState,
+      recentOutcomes: Array.from({ length: 12 }, (_, index) => ({
+        chapterNumber: index + 1,
+        title: `Chương ${index + 1}`,
+        event: `Biến cố cụ thể của chương ${index + 1}.`,
+        result: `Kết quả cụ thể của chương ${index + 1}.`,
+        method: `Cách xử lý ${index + 1}.`,
+        endingSituation: `Tình thế cuối chương ${index + 1}.`,
+        evidenceSpans: [`Bằng chứng chương ${index + 1}.`],
+      })),
+    };
+    const projectedKernel = projectKernelForRollingPlanner(kernel, arc);
+    const projectedState = projectStateForRollingPlanner(stateWithHistory);
+    expect(projectedKernel.seriesSpine.activeStage?.id).toBe(arc.stageId);
+    expect(projectedKernel.seriesSpine).not.toHaveProperty('stages');
+    expect(projectedKernel.characters.every(character => !('voice' in character))).toBe(true);
+    expect(projectedKernel.worldMechanics.map(mechanic => mechanic.id).sort())
+      .toEqual([...arc.activeMechanicIds].sort());
+    expect(projectedState.recentOutcomes.map(outcome => outcome.chapterNumber))
+      .toEqual([5, 6, 7, 8, 9, 10, 11, 12]);
+    expect(JSON.stringify(projectedKernel).length).toBeLessThan(JSON.stringify(kernel).length);
+
+    const provider = new QueueProvider([plannerWire()]);
+    await planRollingWindow({
+      kernel, arc, state: initialState, routes, provider, requiredWindowSize: 1,
+    });
+    expect(provider.thinkingLevels).toEqual(['low']);
+    const prompt = JSON.parse(provider.prompts[0]) as {
+      kernel: { seriesSpine: unknown; characters: unknown[] };
+    };
+    expect(prompt.kernel.seriesSpine).not.toHaveProperty('stages');
+    expect(prompt.kernel.characters).not.toEqual(kernel.characters);
   });
 
   test('extracts only allow-listed, code-owned craft steering from durable verdicts', () => {

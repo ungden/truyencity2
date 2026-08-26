@@ -35,7 +35,17 @@ export interface WriterBrief {
   canonicalUnits: string[];
   physicalLaws: string[];
   openingState: unknown[];
-  scenes: unknown[];
+  scenes: Array<{
+    pov: string;
+    participants: string[];
+    location: string;
+    pacing: 'compress_transition' | 'full_scene';
+    timeBudgetMinutes: number;
+    travelFromPreviousMinutes: number;
+    objective: string;
+    obstacle: string;
+    requiredChanges: unknown[];
+  }>;
   operationalConstraints: string[];
   relevantConversionRates: unknown[];
   continuity: unknown[];
@@ -195,6 +205,50 @@ function readableTransition(event: RelevantStoryTransition, name: (id: string) =
   };
 }
 
+function normalizedPacingText(value: string): string {
+  return value.normalize('NFD').replace(/[\u0300-\u036f]/gu, '').toLowerCase();
+}
+
+function isTimeCycleResource(kernel: StoryKernel, resourceId: string): boolean {
+  const resource = kernel.resources.find(item => item.id === resourceId);
+  if (!resource) return false;
+  const text = normalizedPacingText(`${resource.name} ${resource.kind === 'numeric' ? resource.unit : ''}`);
+  return /(^|\s)(chu ky|cycle|ca nghi|ngay dem|thoi gian)(\s|$)/u.test(text);
+}
+
+/**
+ * A long rest/overnight conversion is mechanically necessary but is not a
+ * dramatic scene by itself. Mark only the strict case: at least four hours, a
+ * declared time-cycle conversion, and no fact/knowledge/relationship/promise
+ * or state-resource change. Real conflicts and durable consequences stay full.
+ */
+export function scenePacing(
+  kernel: StoryKernel,
+  plan: ChapterPlan,
+  sceneId: string,
+): 'compress_transition' | 'full_scene' {
+  const scene = plan.scenes.find(item => item.id === sceneId);
+  if (!scene || scene.durationMinutes < 240) return 'full_scene';
+  const sceneDeltas = plan.requiredDeltas.filter(delta => scene.requiredDeltaIds.includes(delta.id));
+  if (sceneDeltas.some(delta => (
+    delta.kind === 'fact'
+    || delta.kind === 'knowledge'
+    || delta.kind === 'relationship'
+    || delta.kind === 'promise'
+    || delta.kind === 'resource_state'
+  ))) return 'full_scene';
+  const hasTimeCycleConversion = plan.mechanicUses
+    .filter(use => use.sceneId === sceneId && use.role === 'effect')
+    .some(use => {
+      const mechanic = kernel.worldMechanics.find(item => item.id === use.mechanicId);
+      return mechanic?.kind === 'conversion' && [
+        ...mechanic.inputsPerBatch,
+        ...mechanic.outputsPerBatch,
+      ].some(resource => isTimeCycleResource(kernel, resource.resourceId));
+    });
+  return hasTimeCycleConversion ? 'compress_transition' : 'full_scene';
+}
+
 export function buildWriterBrief(input: {
   kernel: StoryKernel;
   state: StoryState;
@@ -332,6 +386,7 @@ export function buildWriterBrief(input: {
       pov: name(scene.povCharacterId),
       participants: scene.participantIds.map(name),
       location: name(scene.locationId),
+      pacing: scenePacing(input.kernel, input.plan, scene.id),
       timeBudgetMinutes: scene.durationMinutes,
       travelFromPreviousMinutes: scene.travelMinutesFromPrevious,
       objective: scene.objective,
