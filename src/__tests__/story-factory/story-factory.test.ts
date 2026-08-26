@@ -487,6 +487,48 @@ describe('canonical Story Factory', () => {
     expect(result.state.resources[0]).toEqual({ resourceId: 'money', kind: 'numeric', value: 30 });
   });
 
+  test('conversion recovery saturates independently at a numeric resource ceiling', () => {
+    const cappedKernel: StoryKernel = structuredClone(kernel);
+    cappedKernel.resources.push(
+      { id: 'night_cycle', name: 'Chu kỳ đêm', kind: 'numeric', unit: 'chu kỳ', ownerEntityId: 'main', minimum: 0 },
+      { id: 'stamina', name: 'Sức lực', kind: 'numeric', unit: 'điểm', ownerEntityId: 'main', minimum: 0, maximum: 100 },
+    );
+    cappedKernel.worldMechanics.push({
+      id: 'rest_cycle', name: 'Nghỉ qua đêm', kind: 'conversion',
+      description: 'Một chu kỳ đêm hồi tối đa năm mươi điểm sức lực nhưng dừng ở trần.',
+      inputsPerBatch: [{ resourceId: 'night_cycle', amount: 1 }],
+      outputsPerBatch: [{ resourceId: 'stamina', amount: 50 }],
+      maximumBatchesPerUse: 1,
+    });
+    const cappedState: StoryState = structuredClone(initialState);
+    cappedState.resources.push(
+      { resourceId: 'night_cycle', kind: 'numeric', value: 1 },
+      { resourceId: 'stamina', kind: 'numeric', value: 90 },
+    );
+    const chapter = plan(1);
+    chapter.requiredDeltas = [
+      { id: 'night_spent', kind: 'resource_numeric', resourceId: 'night_cycle', before: 1, delta: -1, after: 0, source: null, sink: 'rest_cycle' },
+      { id: 'stamina_recovered', kind: 'resource_numeric', resourceId: 'stamina', before: 90, delta: 10, after: 100, source: 'rest_cycle', sink: null },
+      { id: 'delta_1', kind: 'fact', factId: 'fact_day', before: 'ngay_0', after: 'ngay_1' },
+    ];
+    chapter.scenes[0].requiredDeltaIds = ['night_spent', 'stamina_recovered', 'delta_1'];
+    chapter.mechanicUses = [{
+      id: 'use_rest', sceneId: 'scene_1', mechanicId: 'rest_cycle', role: 'effect', actorId: 'main',
+      quantity: 1, preconditionFactIds: [], deltaIds: ['night_spent', 'stamina_recovered'],
+    }];
+    const result = applyChapterPlan({ kernel: cappedKernel, state: cappedState, plan: chapter });
+    expect(result.state.resources.find(resource => resource.resourceId === 'stamina'))
+      .toEqual({ resourceId: 'stamina', kind: 'numeric', value: 100 });
+
+    const overflow = structuredClone(chapter);
+    overflow.requiredDeltas[1] = {
+      id: 'stamina_recovered', kind: 'resource_numeric', resourceId: 'stamina',
+      before: 90, delta: 11, after: 101, source: 'rest_cycle', sink: null,
+    };
+    expect(() => applyChapterPlan({ kernel: cappedKernel, state: cappedState, plan: overflow }))
+      .toThrow('invalid stamina balance');
+  });
+
   test('blocks an arc whose active resources have no causal acquisition path before calling Planner', async () => {
     const blockedKernel = structuredClone(kernel);
     blockedKernel.resources.push(
@@ -3699,6 +3741,61 @@ describe('canonical Story Factory', () => {
       state: initialState,
       plan: rolling.plans[0],
     })).not.toThrow();
+  });
+
+  test('compiler completes omitted conversion legs and infers an exact provenance conversion', () => {
+    const purchaseKernel: StoryKernel = structuredClone(kernel);
+    purchaseKernel.resources.push({
+      id: 'ice_box', name: 'Thùng đá', kind: 'numeric', unit: 'chiếc', ownerEntityId: 'main', minimum: 0,
+    });
+    purchaseKernel.worldMechanics.push({
+      id: 'buy_ice_box', name: 'Mua thùng đá', kind: 'conversion',
+      description: 'Mười đồng đổi lấy một thùng đá.',
+      inputsPerBatch: [{ resourceId: 'money', amount: 10 }],
+      outputsPerBatch: [{ resourceId: 'ice_box', amount: 1 }],
+      maximumBatchesPerUse: 2,
+    });
+    const purchaseState: StoryState = structuredClone(initialState);
+    purchaseState.resources.push({ resourceId: 'ice_box', kind: 'numeric', value: 0 });
+
+    const explicitWire = plannerWire();
+    explicitWire.chapters[0].scenes[0].deltaIds = ['delta_1', 'pay_for_box'];
+    explicitWire.chapters[0].deltas.push({
+      id: 'pay_for_box', k: 'resource_numeric', target: 'money', counterpart: null,
+      before: null, change: -10, after: null, source: null, sink: 'buy_ice_box',
+    });
+    explicitWire.chapters[0].mechanics = [{
+      id: 'use_buy_box', scene: 'scene_1', mechanic: 'buy_ice_box', role: 'effect', actor: 'main',
+      qty: 1, facts: [], primaryDeltaId: 'pay_for_box', additionalDeltaIds: [],
+    }];
+    const explicit = materializePlannerRollingPlan(explicitWire, purchaseState, purchaseKernel);
+    const compiledOutput = explicit.plans[0].requiredDeltas.find(delta => (
+      delta.kind === 'resource_numeric' && delta.resourceId === 'ice_box'
+    ));
+    expect(compiledOutput).toMatchObject({ delta: 1, before: 0, after: 1, source: 'buy_ice_box' });
+    expect(explicit.plans[0].mechanicUses[0].deltaIds)
+      .toEqual(expect.arrayContaining(['pay_for_box', compiledOutput?.id]));
+    expect(() => applyChapterPlan({ kernel: purchaseKernel, state: purchaseState, plan: explicit.plans[0] }))
+      .not.toThrow();
+
+    const inferredWire = plannerWire();
+    inferredWire.chapters[0].scenes[0].deltaIds = ['delta_1', 'receive_box'];
+    inferredWire.chapters[0].deltas.push({
+      id: 'receive_box', k: 'resource_numeric', target: 'ice_box', counterpart: null,
+      before: null, change: 1, after: null, source: 'buy_ice_box', sink: null,
+    });
+    const inferred = materializePlannerRollingPlan(inferredWire, purchaseState, purchaseKernel);
+    expect(inferred.plans[0].mechanicUses).toEqual(expect.arrayContaining([
+      expect.objectContaining({ mechanicId: 'buy_ice_box', quantity: 1 }),
+    ]));
+    expect(inferred.plans[0].requiredDeltas).toEqual(expect.arrayContaining([
+      expect.objectContaining({ kind: 'resource_numeric', resourceId: 'money', delta: -10, sink: 'buy_ice_box' }),
+    ]));
+    const inferredResult = applyChapterPlan({ kernel: purchaseKernel, state: purchaseState, plan: inferred.plans[0] });
+    expect(inferredResult.state.resources.find(resource => resource.resourceId === 'money'))
+      .toMatchObject({ value: 90 });
+    expect(inferredResult.state.resources.find(resource => resource.resourceId === 'ice_box'))
+      .toMatchObject({ value: 1 });
   });
 
   test('compiler preserves separate input and recovered-output legs for one resource', () => {

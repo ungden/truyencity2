@@ -924,12 +924,31 @@ export function validateCausalMechanics(input: {
           maximum: mechanic.maximumBatchesPerUse,
         });
       }
+      const inputs = new Map<string, number>();
+      const outputs = new Map<string, number>();
+      mechanic.inputsPerBatch.forEach(item => {
+        inputs.set(item.resourceId, (inputs.get(item.resourceId) ?? 0) + item.amount * use.quantity);
+      });
+      mechanic.outputsPerBatch.forEach(item => {
+        outputs.set(item.resourceId, (outputs.get(item.resourceId) ?? 0) + item.amount * use.quantity);
+      });
       const expected = new Map<string, number>();
-      const addExpected = (resourceId: string, amount: number) => {
-        expected.set(resourceId, (expected.get(resourceId) ?? 0) + amount);
-      };
-      mechanic.inputsPerBatch.forEach(item => addExpected(item.resourceId, -item.amount * use.quantity));
-      mechanic.outputsPerBatch.forEach(item => addExpected(item.resourceId, item.amount * use.quantity));
+      for (const resourceId of new Set([...inputs.keys(), ...outputs.keys()])) {
+        const consumed = inputs.get(resourceId) ?? 0;
+        const rawProduced = outputs.get(resourceId) ?? 0;
+        const definition = resourceDefinitions.get(resourceId);
+        const current = simulatedResources.get(resourceId);
+        // Regeneration/refresh conversions saturate at the resource ceiling.
+        // A full night can restore Phan by 50 and Minh by only 10 when Minh is
+        // already at 90/100; forcing both outputs to +50 made a correct capped
+        // ledger buy an unnecessary Planner repair. Inputs remain fully paid.
+        const produced = definition?.kind === 'numeric'
+          && definition.maximum !== undefined
+          && typeof current === 'number'
+          ? Math.min(rawProduced, Math.max(0, definition.maximum - (current - consumed)))
+          : rawProduced;
+        expected.set(resourceId, -consumed + produced);
+      }
       const actual = new Map<string, number>();
       for (const deltaId of use.deltaIds) {
         const delta = deltas.get(deltaId)!;

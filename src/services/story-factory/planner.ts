@@ -23,7 +23,7 @@ import type { MarketBlueprint } from './setup';
 
 // Defined here, not in release.ts: release → benchmark → planner already exists, so a
 // planner → release import closes a cycle and breaks the production bundle (TDZ at init).
-export const FACTORY_PLANNER_VERSION = 'story-factory-planner-85-compiled-time-projection';
+export const FACTORY_PLANNER_VERSION = 'story-factory-planner-87-complete-conversion-projection';
 import { EDITOR_SYSTEM_PROMPT, PLANNER_SYSTEM_PROMPT, PLAN_JUDGE_SYSTEM_PROMPT } from './prompts';
 import {
   ARC_ACTIVE_MECHANIC_BUDGET,
@@ -664,6 +664,179 @@ function inferExactConversionUses(
   return augmented;
 }
 
+function inferProvenanceConversionUses(
+  chapter: z.infer<typeof PlannerCompactChapterSchema>,
+  kernel: StoryKernel | undefined,
+): z.infer<typeof PlannerCompactChapterSchema> {
+  if (!kernel) return chapter;
+  const augmented = {
+    ...chapter,
+    mechanics: [...chapter.mechanics],
+  };
+  const conversions = new Map(kernel.worldMechanics
+    .filter(mechanic => mechanic.kind === 'conversion')
+    .map(mechanic => [mechanic.id, mechanic]));
+  const existingKeys = new Set(augmented.mechanics.map(use => `${use.scene}\u0000${use.mechanic}`));
+
+  for (const scene of chapter.scenes) {
+    const groups = new Map<string, Array<{
+      deltaId: string;
+      quantity: number;
+    }>>();
+    for (const delta of chapter.deltas.filter(item => (
+      scene.deltaIds.includes(item.id) && item.k === 'resource_numeric' && item.change !== null
+    ))) {
+      const provenanceId = delta.change! > 0 ? delta.source : delta.sink;
+      if (!provenanceId) continue;
+      const mechanic = conversions.get(provenanceId);
+      if (!mechanic) continue;
+      const leg = signedConversionVector(mechanic).find(item => (
+        item.resourceId === delta.target && Math.sign(item.amount) === Math.sign(delta.change!)
+      ));
+      if (!leg) continue;
+      const quantity = delta.change! / leg.amount;
+      if (!Number.isFinite(quantity) || quantity <= 0) continue;
+      groups.set(mechanic.id, [
+        ...(groups.get(mechanic.id) ?? []),
+        { deltaId: delta.id, quantity },
+      ]);
+    }
+    for (const [mechanicId, candidates] of groups) {
+      if (existingKeys.has(`${scene.id}\u0000${mechanicId}`)) continue;
+      const quantities = candidates.map(candidate => candidate.quantity);
+      if (quantities.some(quantity => Math.abs(quantity - quantities[0]) > 1e-9)) continue;
+      const mechanic = conversions.get(mechanicId)!;
+      const quantity = quantities[0];
+      if (mechanic.maximumBatchesPerUse !== null && quantity > mechanic.maximumBatchesPerUse + 1e-9) continue;
+      const deltaIds = candidates.map(candidate => candidate.deltaId);
+      const digest = createHash('sha256')
+        .update(`${scene.id}\u0000${mechanicId}\u0000${quantity}\u0000provenance`)
+        .digest('hex')
+        .slice(0, 12);
+      augmented.mechanics.push({
+        id: `inferred_${digest}`,
+        scene: scene.id,
+        mechanic: mechanicId,
+        role: 'effect',
+        actor: scene.pov,
+        qty: quantity,
+        facts: [],
+        primaryDeltaId: deltaIds[0],
+        additionalDeltaIds: deltaIds.slice(1),
+      });
+      existingKeys.add(`${scene.id}\u0000${mechanicId}`);
+    }
+  }
+  return augmented;
+}
+
+/**
+ * Once the Planner selects a conversion, its complete resource vector is code,
+ * not prose. Fill any omitted input/output leg from the Kernel contract so an
+ * otherwise sound plan cannot spend a second model call merely to copy the
+ * other side of a transaction into JSON.
+ */
+function completeDeclaredConversions(
+  chapter: z.infer<typeof PlannerCompactChapterSchema>,
+  kernel: StoryKernel | undefined,
+  openingBalances: Map<string, number>,
+): z.infer<typeof PlannerCompactChapterSchema> {
+  if (!kernel) return chapter;
+  const completed = {
+    ...chapter,
+    scenes: chapter.scenes.map(scene => ({ ...scene, deltaIds: [...scene.deltaIds] })),
+    deltas: chapter.deltas.map(delta => ({ ...delta })),
+    mechanics: chapter.mechanics.map(use => ({
+      ...use,
+      facts: [...use.facts],
+      additionalDeltaIds: [...use.additionalDeltaIds],
+    })),
+  };
+  const mechanics = new Map(kernel.worldMechanics.map(mechanic => [mechanic.id, mechanic]));
+  const ownership = deriveEffectOwnership(completed, kernel);
+  const deltas = new Map(completed.deltas.map(delta => [delta.id, delta]));
+
+  for (const use of completed.mechanics) {
+    const mechanic = mechanics.get(use.mechanic);
+    if (mechanic?.kind !== 'conversion') continue;
+    const scene = completed.scenes.find(item => item.id === use.scene);
+    if (!scene) continue;
+    const ownedIds = ownership.get(use.id) ?? [];
+    const inputTotals = new Map<string, number>();
+    mechanic.inputsPerBatch.forEach(input => {
+      inputTotals.set(input.resourceId, (inputTotals.get(input.resourceId) ?? 0) + input.amount * use.qty);
+    });
+    for (const leg of signedConversionVector(mechanic)) {
+      const rawChange = leg.amount * use.qty;
+      const ownedForResource = ownedIds
+        .map(deltaId => deltas.get(deltaId))
+        .filter((delta): delta is NonNullable<typeof delta> => (
+          delta?.k === 'resource_numeric' && delta.target === leg.resourceId && delta.change !== null
+        ));
+      const expectedNet = signedConversionVector(mechanic)
+        .filter(item => item.resourceId === leg.resourceId)
+        .reduce((total, item) => total + item.amount * use.qty, 0);
+      const ownedNet = ownedForResource.reduce((total, delta) => total + delta.change!, 0);
+      // A single net delta is the canonical compact form for a conversion that
+      // consumes and returns the same resource (for example -10 + 9 = -1).
+      if (ownedForResource.length && Math.abs(ownedNet - expectedNet) <= 1e-9) continue;
+      const alreadyOwned = ownedIds.some(deltaId => {
+        const delta = deltas.get(deltaId);
+        return delta?.k === 'resource_numeric'
+          && delta.target === leg.resourceId
+          && Math.sign(delta.change ?? 0) === Math.sign(rawChange);
+      });
+      if (alreadyOwned) continue;
+      const definition = kernel.resources.find(resource => resource.id === leg.resourceId);
+      const current = openingBalances.get(leg.resourceId);
+      const consumedFirst = inputTotals.get(leg.resourceId) ?? 0;
+      const change = rawChange > 0
+        && definition?.kind === 'numeric'
+        && definition.maximum !== undefined
+        && current !== undefined
+        ? Math.min(rawChange, Math.max(0, definition.maximum - (current - consumedFirst)))
+        : rawChange;
+      // A saturated output contributes zero to the net vector and therefore
+      // needs no zero-valued delta (numeric deltas are intentionally non-zero).
+      if (Math.abs(change) <= 1e-9) continue;
+      const direction = change < 0 ? 'input' : 'output';
+      const digest = createHash('sha256')
+        .update(`${chapter.n}\u0000${use.id}\u0000${leg.resourceId}\u0000${direction}`)
+        .digest('hex')
+        .slice(0, 12);
+      const id = `compiled_${digest}`;
+      if (!deltas.has(id)) {
+        const compiledDelta = {
+          id,
+          k: 'resource_numeric' as const,
+          target: leg.resourceId,
+          counterpart: null,
+          before: null,
+          change,
+          after: null,
+          source: change > 0 ? mechanic.id : null,
+          sink: change < 0 ? mechanic.id : null,
+        };
+        completed.deltas.push(compiledDelta);
+        deltas.set(id, compiledDelta);
+        scene.deltaIds.push(id);
+      }
+    }
+  }
+  return completed;
+}
+
+function compilePlannerMechanics(
+  chapter: z.infer<typeof PlannerCompactChapterSchema>,
+  kernel: StoryKernel | undefined,
+  openingBalances: Map<string, number>,
+): z.infer<typeof PlannerCompactChapterSchema> {
+  const exactConversions = inferExactConversionUses(chapter, kernel);
+  const provenanceConversions = inferProvenanceConversionUses(exactConversions, kernel);
+  const completedConversions = completeDeclaredConversions(provenanceConversions, kernel, openingBalances);
+  return inferExactCapabilityUses(completedConversions, kernel);
+}
+
 function inferExactCapabilityUses(
   chapter: z.infer<typeof PlannerCompactChapterSchema>,
   kernel: StoryKernel | undefined,
@@ -864,11 +1037,11 @@ export function materializePlannerRollingPlan(
 ): RollingPlan {
   const compact = PlannerRollingPlanResponseSchema.parse(value);
   const chapters = compact.chapters;
+  const initialNumericBalances = new Map(initialState.resources.flatMap(resource => (
+    resource.kind === 'numeric' ? [[resource.resourceId, resource.value] as const] : []
+  )));
   const compactIssues = chapters.flatMap(chapter => {
-    const augmented = inferExactCapabilityUses(
-      inferExactConversionUses(chapter, kernel),
-      kernel,
-    );
+    const augmented = compilePlannerMechanics(chapter, kernel, initialNumericBalances);
     const ownership = deriveEffectOwnership(augmented, kernel);
     const ownedDeltaIds = new Set([...ownership.values()].flat());
     return augmented.deltas.flatMap(delta => {
@@ -931,10 +1104,7 @@ export function materializePlannerRollingPlan(
     schemaVersion: compact.v,
     startChapter: compact.start,
     plans: chapters.map(chapter => {
-      const augmentedChapter = inferExactCapabilityUses(
-        inferExactConversionUses(chapter, kernel),
-        kernel,
-      );
+      const augmentedChapter = compilePlannerMechanics(chapter, kernel, resourceBalances);
       const effectOwnership = deriveEffectOwnership(augmentedChapter, kernel);
       const orderedMechanicUses = orderMechanicUsesByDependency(
         augmentedChapter,
@@ -946,9 +1116,9 @@ export function materializePlannerRollingPlan(
       chapterNumber: chapter.n,
       arcNumber: chapter.arc,
       storyTimeAfterMinutes: chapter.time,
-      preconditions: chapter.pre.map(item => ({ kind: item.k, entityId: item.id, expected: item.value })),
-      requiredWorldRuleIds: chapter.rules,
-      scenes: chapter.scenes.map(scene => ({
+      preconditions: augmentedChapter.pre.map(item => ({ kind: item.k, entityId: item.id, expected: item.value })),
+      requiredWorldRuleIds: augmentedChapter.rules,
+      scenes: augmentedChapter.scenes.map(scene => ({
         id: scene.id,
         povCharacterId: scene.pov,
         participantIds: scene.people,
@@ -960,7 +1130,7 @@ export function materializePlannerRollingPlan(
         action: scene.act,
         requiredDeltaIds: scene.deltaIds,
       })),
-      requiredDeltas: chapter.deltas.map(delta => {
+      requiredDeltas: augmentedChapter.deltas.map(delta => {
         if (delta.k === 'fact') {
           const before = factValues.get(delta.target) ?? null;
           const after = delta.after === null ? null : String(delta.after);
@@ -1038,7 +1208,7 @@ export function materializePlannerRollingPlan(
           : [];
         const modelDeltaIds = [use.primaryDeltaId, ...use.additionalDeltaIds];
         const sceneDeltaIds = new Set(
-          chapter.scenes.find(scene => scene.id === use.scene)?.deltaIds ?? [],
+          augmentedChapter.scenes.find(scene => scene.id === use.scene)?.deltaIds ?? [],
         );
         const deltaIds = effectOwnership.get(use.id) ?? modelDeltaIds;
         return {
