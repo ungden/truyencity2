@@ -24,6 +24,7 @@ export interface ContextManifestEntry {
 export interface WriterBrief {
   story: { title: string };
   chapterNumber: number;
+  chapterPacing: 'compressed_bridge' | 'standard';
   // Plot steering belongs to the Planner. Forwarding the raw directive to the
   // Writer made stale numbers override committed canon ("four lures" after the
   // story had seven), buying avoidable rewrites. The Writer receives only the
@@ -217,10 +218,11 @@ function isTimeCycleResource(kernel: StoryKernel, resourceId: string): boolean {
 }
 
 /**
- * A long rest/overnight conversion is mechanically necessary but is not a
- * dramatic scene by itself. Mark only the strict case: at least four hours, a
- * declared time-cycle conversion, and no fact/knowledge/relationship/promise
- * or state-resource change. Real conflicts and durable consequences stay full.
+ * Rest/overnight bookkeeping is mechanically necessary but is not a dramatic
+ * scene by itself. Require a declared time-cycle conversion and no durable
+ * fact/knowledge/relationship/promise/state change. Long elapsed transitions
+ * compress automatically; short active budgets compress only when the scene
+ * explicitly says it is routine rest/waiting. Real conflicts stay full.
  */
 export function scenePacing(
   kernel: StoryKernel,
@@ -228,7 +230,7 @@ export function scenePacing(
   sceneId: string,
 ): 'compress_transition' | 'full_scene' {
   const scene = plan.scenes.find(item => item.id === sceneId);
-  if (!scene || scene.durationMinutes < 240) return 'full_scene';
+  if (!scene) return 'full_scene';
   const sceneDeltas = plan.requiredDeltas.filter(delta => scene.requiredDeltaIds.includes(delta.id));
   if (sceneDeltas.some(delta => (
     delta.kind === 'fact'
@@ -246,7 +248,25 @@ export function scenePacing(
         ...mechanic.outputsPerBatch,
       ].some(resource => isTimeCycleResource(kernel, resource.resourceId));
     });
-  return hasTimeCycleConversion ? 'compress_transition' : 'full_scene';
+  if (!hasTimeCycleConversion) return 'full_scene';
+
+  // Planner duration is the active on-page time budget, not necessarily the
+  // elapsed duration represented by a cycle conversion. A live overnight plan
+  // declared dur=60 while consuming the exact night->day conversion; the old
+  // four-hour threshold mislabeled it as a full scene and Writer padded sleep
+  // into an entire chapter. Keep genuinely dramatic short scenes full, but
+  // recognize explicit rest/wait transitions even when their active duration is
+  // compact.
+  const routineTransition = normalizedPacingText([
+    scene.objective,
+    scene.action,
+    scene.obstacle,
+  ].join(' '));
+  const explicitlyRoutine = /(^|\s)(?:ngu|nghi ngoi|hoi phuc|qua dem|cho doi|doi den|sang hom sau|chuyen thoi gian)(\s|$)/u
+    .test(routineTransition);
+  return scene.durationMinutes >= 240 || explicitlyRoutine
+    ? 'compress_transition'
+    : 'full_scene';
 }
 
 export function buildWriterBrief(input: {
@@ -328,9 +348,13 @@ export function buildWriterBrief(input: {
     .slice(0, 2)
     .join(' '))
     .filter(Boolean);
+  const scenePacings = input.plan.scenes.map(scene => scenePacing(input.kernel, input.plan, scene.id));
   return {
     story: { title: input.kernel.title },
     chapterNumber: input.plan.chapterNumber,
+    chapterPacing: scenePacings.every(pacing => pacing === 'compress_transition')
+      ? 'compressed_bridge'
+      : 'standard',
     recentTitles,
     recentTitleStems,
     craftGuidance: (input.craftGuidance ?? []).slice(0, 4),
@@ -382,11 +406,11 @@ export function buildWriterBrief(input: {
         status: promise.status,
       })),
     ],
-    scenes: input.plan.scenes.map(scene => ({
+    scenes: input.plan.scenes.map((scene, index) => ({
       pov: name(scene.povCharacterId),
       participants: scene.participantIds.map(name),
       location: name(scene.locationId),
-      pacing: scenePacing(input.kernel, input.plan, scene.id),
+      pacing: scenePacings[index],
       timeBudgetMinutes: scene.durationMinutes,
       travelFromPreviousMinutes: scene.travelMinutesFromPrevious,
       objective: scene.objective,

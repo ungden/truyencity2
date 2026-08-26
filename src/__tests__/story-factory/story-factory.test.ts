@@ -5833,6 +5833,30 @@ describe('prose-craft gates', () => {
     expect(scenePacing(pacingKernel, overnight, overnight.scenes[0].id)).toBe('compress_transition');
     expect(buildWriterBrief({ kernel: pacingKernel, state: initialState, plan: overnight }).scenes[0].pacing)
       .toBe('compress_transition');
+    expect(buildWriterBrief({ kernel: pacingKernel, state: initialState, plan: overnight }).chapterPacing)
+      .toBe('compressed_bridge');
+
+    const compactOvernight = structuredClone(overnight);
+    compactOvernight.scenes[0] = {
+      ...compactOvernight.scenes[0],
+      durationMinutes: 60,
+      objective: 'Nghỉ ngơi qua đêm để hồi phục thể lực.',
+      action: 'Hai người ngủ một giấc dài rồi chuyển sang sáng hôm sau.',
+    };
+    expect(scenePacing(pacingKernel, compactOvernight, compactOvernight.scenes[0].id))
+      .toBe('compress_transition');
+
+    const dramaticShortCycle = structuredClone(compactOvernight);
+    dramaticShortCycle.scenes[0] = {
+      ...dramaticShortCycle.scenes[0],
+      objective: 'Giữ cửa kho trước đợt đột kích lúc đổi ca.',
+      action: 'Hai người đối đầu kẻ phá kho trong lúc chu kỳ đổi.',
+      obstacle: 'Đối phương đang cắt khóa và buộc họ phải chọn cứu hàng hay cứu người.',
+    };
+    expect(scenePacing(pacingKernel, dramaticShortCycle, dramaticShortCycle.scenes[0].id))
+      .toBe('full_scene');
+    expect(buildWriterBrief({ kernel: pacingKernel, state: initialState, plan: dramaticShortCycle }).chapterPacing)
+      .toBe('standard');
 
     const consequential = structuredClone(overnight);
     consequential.requiredDeltas.push({

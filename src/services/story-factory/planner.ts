@@ -23,7 +23,7 @@ import type { MarketBlueprint } from './setup';
 
 // Defined here, not in release.ts: release → benchmark → planner already exists, so a
 // planner → release import closes a cycle and breaks the production bundle (TDZ at init).
-export const FACTORY_PLANNER_VERSION = 'story-factory-planner-87-complete-conversion-projection';
+export const FACTORY_PLANNER_VERSION = 'story-factory-planner-88-no-transition-only-chapter';
 import { EDITOR_SYSTEM_PROMPT, PLANNER_SYSTEM_PROMPT, PLAN_JUDGE_SYSTEM_PROMPT } from './prompts';
 import {
   ARC_ACTIVE_MECHANIC_BUDGET,
@@ -252,6 +252,7 @@ const PLANNER_COMPACT_CONTRACT = {
     'Với fact, resource_state, promise và relationship, luôn gửi before=null; compiler tự lấy before thật và cập nhật tuần tự qua cả window. Không chép lại ledger bằng model.',
     'Relationship delta có hướng: target là chính nhân vật đổi thái độ, counterpart là người được hướng tới. Không ghi thành tích “đã thuyết phục được người khác” vào relationship của target; nếu người bị thuyết phục đổi niềm tin thì chính người đó phải là target. Nếu prose cần cả hai người đổi thái độ, tạo hai delta riêng.',
     'Không tạo location delta. Chỉ khai báo đúng scene.people, scene.loc và scene.travel; compiler là nguồn duy nhất tự sinh location delta từ vị trí đầu chương tới scene cuối của từng nhân vật.',
+    'Không tạo chương chỉ gồm ngủ, nghỉ, hồi thể lực, chờ đợi, di chuyển, đổi ngày/đêm hoặc cộng tài nguyên định kỳ. Nếu conversion thời gian bắt buộc chạy, ghép nó thành nhịp chuyển tiếp ngắn của cùng chương rồi thêm ít nhất một scene có lựa chọn, đối lực hoặc hệ quả mới được khóa bằng delta; đối thoại/suy nghĩ chỉ nói về việc sẽ làm sau không đủ.',
   ],
 } as const;
 
