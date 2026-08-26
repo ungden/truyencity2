@@ -995,13 +995,19 @@ export async function draftStoryChapter(input: ChapterStageInput): Promise<Chapt
   });
 
   try {
+    const compressedBridge = contexts.brief.chapterPacing === 'compressed_bridge';
     const initial = await provider.json({
       model: input.routes.writer,
       timeoutMs: CHAPTER_CALL_TIMEOUT_MS,
-      verbosity: 'high',
+      // This is a provider-level output control, not a second-pass length gate.
+      // Transition-only recovery briefs get one short generation instead of a
+      // normal high-verbosity chapter that must later be rewritten or padded.
+      verbosity: compressedBridge ? 'low' : 'high',
       system: WRITER_SYSTEM_PROMPT,
       prompt: JSON.stringify({
-        task: 'Viết chương truyện hoàn chỉnh.',
+        task: compressedBridge
+          ? 'Viết nhịp cầu chuyển tiếp ngắn dưới 600 từ; không độn thành chương thường.'
+          : 'Viết chương truyện hoàn chỉnh.',
         chapterNumber: input.plan.chapterNumber,
         writerBrief: contexts.brief,
         previousChapterTail: contexts.previousTail || null,
@@ -1092,10 +1098,11 @@ export async function reviseStoryChapter(
     // chapter attempt that already spent two provider calls.
     const transition = applyChapterPlan({ kernel: input.kernel, state: input.state, plan: input.plan });
     const contexts = buildChapterContexts({ ...input, stateAfter: transition.state });
+    const compressedBridge = contexts.brief.chapterPacing === 'compressed_bridge';
     const revision = await provider.json({
       model: input.routes.writer,
       timeoutMs: CHAPTER_CALL_TIMEOUT_MS,
-      verbosity: 'high',
+      verbosity: compressedBridge ? 'low' : 'high',
       system: REVISION_SYSTEM_PROMPT,
       prompt: JSON.stringify(buildRevisionContext({
         brief: contexts.brief,

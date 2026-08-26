@@ -429,6 +429,7 @@ class QueueProvider implements StoryModelProvider {
   calls: string[] = [];
   temperatures: Array<number | undefined> = [];
   thinkingLevels: Array<string | undefined> = [];
+  verbosities: Array<string | undefined> = [];
   prompts: string[] = [];
   constructor(private readonly values: unknown[]) {}
   async text(input: { model: string }): Promise<ProviderResult<string>> {
@@ -441,10 +442,12 @@ class QueueProvider implements StoryModelProvider {
     schema: z.ZodType<T, z.ZodTypeDef, unknown>;
     temperature?: number;
     thinkingLevel?: 'minimal' | 'low' | 'medium' | 'high';
+    verbosity?: 'low' | 'medium' | 'high';
   }): Promise<ProviderResult<T>> {
     this.calls.push(input.model);
     this.temperatures.push(input.temperature);
     this.thinkingLevels.push(input.thinkingLevel);
+    this.verbosities.push(input.verbosity);
     this.prompts.push(input.prompt);
     const value = this.values.shift();
     return { value: input.schema.parse(value), usage };
@@ -2590,9 +2593,74 @@ describe('canonical Story Factory', () => {
     const provider = new QueueProvider([draft, pass]);
     const result = await writeStoryChapter({ kernel, state: initialState, plan: plan(1), routes, provider });
     expect(provider.calls).toEqual(['writer', 'editor']);
+    expect(provider.verbosities[0]).toBe('high');
     expect(result.decision).toBe('publish');
     expect(result.stateAfter.recentOutcomes[0]).toMatchObject({ chapterNumber: 1, method: 'chia việc và kiểm tra nguồn lực' });
     expect(result.wordCount).toBeLessThan(100);
+  });
+
+  test('transition-only recovery uses one low-verbosity Writer call instead of a length retry', async () => {
+    const bridgeKernel: StoryKernel = structuredClone(kernel);
+    bridgeKernel.resources.push({
+      id: 'night_cycle', name: 'Chu kỳ qua đêm', kind: 'numeric', unit: 'chu kỳ', ownerEntityId: 'main', minimum: 0,
+    });
+    bridgeKernel.worldMechanics.push({
+      id: 'overnight', name: 'Qua một đêm', kind: 'conversion',
+      description: 'Tiêu một chu kỳ đêm để nhận một đồng thu định kỳ.',
+      inputsPerBatch: [{ resourceId: 'night_cycle', amount: 1 }],
+      outputsPerBatch: [{ resourceId: 'money', amount: 1 }],
+      maximumBatchesPerUse: 1,
+    });
+    const bridgeState: StoryState = {
+      ...structuredClone(initialState),
+      resources: [...initialState.resources, { resourceId: 'night_cycle', kind: 'numeric', value: 1 }],
+    };
+    const bridgePlan: ChapterPlan = {
+      schemaVersion: 2,
+      chapterNumber: 1,
+      arcNumber: 1,
+      storyTimeAfterMinutes: 60,
+      preconditions: [
+        { kind: 'resource', entityId: 'night_cycle', expected: 1 },
+        { kind: 'resource', entityId: 'money', expected: 100 },
+      ],
+      requiredWorldRuleIds: [],
+      scenes: [{
+        id: 'bridge_scene', povCharacterId: 'main', participantIds: ['main'], locationId: 'home',
+        durationMinutes: 60, travelMinutesFromPrevious: 0,
+        objective: 'Nghỉ ngơi qua đêm để hồi phục.',
+        obstacle: 'Cơ thể đã mệt sau ngày dài.',
+        action: 'Hải ngủ qua đêm rồi tỉnh dậy vào sáng hôm sau.',
+        requiredDeltaIds: ['night_spent', 'routine_income'],
+      }],
+      requiredDeltas: [
+        { id: 'night_spent', kind: 'resource_numeric', resourceId: 'night_cycle', before: 1, delta: -1, after: 0, source: null, sink: 'overnight' },
+        { id: 'routine_income', kind: 'resource_numeric', resourceId: 'money', before: 100, delta: 1, after: 101, source: 'overnight', sink: null },
+      ],
+      mechanicUses: [{
+        id: 'overnight_use', sceneId: 'bridge_scene', mechanicId: 'overnight', role: 'effect', actorId: 'main',
+        quantity: 1, preconditionFactIds: [], deltaIds: ['night_spent', 'routine_income'],
+      }],
+    };
+    const draft = { title: 'Sáng Sau Một Giấc Ngủ', content: 'Hải ngủ một giấc rồi tỉnh dậy. Khoản thu định kỳ thêm một đồng đã được cất gọn trước khi anh bước ra cửa.' };
+    const provider = new QueueProvider([draft, {
+      v: 3 as const,
+      findings: [],
+      deltaChecks: [
+        { deltaId: 'night_spent', realized: true, evidence: 'ngủ một giấc' },
+        { deltaId: 'routine_income', realized: true, evidence: 'thêm một đồng' },
+      ],
+      outcome: acceptedOutcome('Hải ngủ một giấc rồi tỉnh dậy'),
+    }]);
+
+    const result = await writeStoryChapter({
+      kernel: bridgeKernel, state: bridgeState, plan: bridgePlan, routes, provider,
+    });
+
+    expect(result.decision).toBe('publish');
+    expect(provider.calls).toEqual(['writer', 'editor']);
+    expect(provider.verbosities[0]).toBe('low');
+    expect(provider.prompts[0]).toContain('nhịp cầu chuyển tiếp ngắn dưới 600 từ');
   });
 
   test('a grounded literary finding is advisory and does not buy a rewrite', async () => {
