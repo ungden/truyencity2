@@ -23,11 +23,12 @@ import type { MarketBlueprint } from './setup';
 
 // Defined here, not in release.ts: release → benchmark → planner already exists, so a
 // planner → release import closes a cycle and breaks the production bundle (TDZ at init).
-export const FACTORY_PLANNER_VERSION = 'story-factory-planner-88-no-transition-only-chapter';
+export const FACTORY_PLANNER_VERSION = 'story-factory-planner-89-location-path-narrative-repeat-guard';
 import { EDITOR_SYSTEM_PROMPT, PLANNER_SYSTEM_PROMPT, PLAN_JUDGE_SYSTEM_PROMPT } from './prompts';
 import {
   ARC_ACTIVE_MECHANIC_BUDGET,
   applyCanonExtension,
+  activateUnambiguousAcquisitionMechanics,
   collectPlanAdvisories,
   validateArcActivationBudget,
   validateArcAgainstKernel,
@@ -251,7 +252,7 @@ const PLANNER_COMPACT_CONTRACT = {
     'Fact được mechanic khác dùng làm requiredFact là precondition có kiểu và giá trị khóa. Nếu một capability tạo/cập nhật fact đó để mechanic sau sử dụng, fact delta.after phải đúng required expected trong factContracts; không thay marker precondition bằng tên bản vẽ, lời mô tả hoặc kết quả prose.',
     'Với fact, resource_state, promise và relationship, luôn gửi before=null; compiler tự lấy before thật và cập nhật tuần tự qua cả window. Không chép lại ledger bằng model.',
     'Relationship delta có hướng: target là chính nhân vật đổi thái độ, counterpart là người được hướng tới. Không ghi thành tích “đã thuyết phục được người khác” vào relationship của target; nếu người bị thuyết phục đổi niềm tin thì chính người đó phải là target. Nếu prose cần cả hai người đổi thái độ, tạo hai delta riêng.',
-    'Không tạo location delta. Chỉ khai báo đúng scene.people, scene.loc và scene.travel; compiler là nguồn duy nhất tự sinh location delta từ vị trí đầu chương tới scene cuối của từng nhân vật.',
+    'Không tạo location delta. Chỉ khai báo đúng scene.people, scene.loc và scene.travel; compiler là nguồn duy nhất tự sinh từng location delta theo mỗi chặng di chuyển thực giữa các scene của từng nhân vật.',
     'Không tạo chương chỉ gồm ngủ, nghỉ, hồi thể lực, chờ đợi, di chuyển, đổi ngày/đêm hoặc cộng tài nguyên định kỳ. Nếu conversion thời gian bắt buộc chạy, ghép nó thành nhịp chuyển tiếp ngắn của cùng chương rồi thêm ít nhất một scene có lựa chọn, đối lực hoặc hệ quả mới được khóa bằng delta; đối thoại/suy nghĩ chỉ nói về việc sẽ làm sau không đủ.',
   ],
 } as const;
@@ -1263,27 +1264,25 @@ export function materializePlannerRollingPlan(
   }
   for (const plan of rolling.plans) {
     for (const characterId of characterLocations.keys()) {
-      const beforeLocationId = characterLocations.get(characterId)!;
-      const appearances = plan.scenes.filter(scene => scene.participantIds.includes(characterId));
-      const afterLocationId = appearances.at(-1)?.locationId ?? beforeLocationId;
-      if (afterLocationId === beforeLocationId) continue;
-      const existing = plan.requiredDeltas.filter(delta =>
-        delta.kind === 'location' && delta.characterId === characterId);
-      if (existing.length === 0) {
-        const id = `loc_${plan.chapterNumber}_${createHash('sha256').update(characterId).digest('hex').slice(0, 12)}`;
+      let previousLocationId = characterLocations.get(characterId)!;
+      for (const scene of plan.scenes) {
+        if (!scene.participantIds.includes(characterId) || scene.locationId === previousLocationId) continue;
+        // Writer briefs are scene-scoped. A single terminal delta made a
+        // protagonist who visited market → reef look as if they teleported
+        // directly to the reef before the market scene, then burned an Editor
+        // revision. Materialize the exact sequence instead.
+        const id = `loc_${plan.chapterNumber}_${createHash('sha256').update(`${characterId}\u0000${scene.id}`).digest('hex').slice(0, 12)}`;
         plan.requiredDeltas.push({
           id,
           kind: 'location',
           characterId,
-          beforeLocationId,
-          afterLocationId,
+          beforeLocationId: previousLocationId,
+          afterLocationId: scene.locationId,
         });
-        const firstMovement = appearances.find(scene => scene.locationId !== beforeLocationId);
-        if (firstMovement && !firstMovement.requiredDeltaIds.includes(id)) {
-          firstMovement.requiredDeltaIds.push(id);
-        }
+        scene.requiredDeltaIds.push(id);
+        previousLocationId = scene.locationId;
       }
-      characterLocations.set(characterId, afterLocationId);
+      characterLocations.set(characterId, previousLocationId);
     }
   }
   return RollingPlanSchema.parse(rolling);
@@ -1930,6 +1929,13 @@ export interface CausalShape {
   effectChain: string[];
 }
 
+type NarrativeTradeoffKind = 'quality_restraint_partner_conflict';
+
+export interface NarrativeTradeoff {
+  chapterNumber: number;
+  kind: NarrativeTradeoffKind;
+}
+
 const causalPair = (mechanicId: string, actorId: string) => `${mechanicId} bởi ${actorId}`;
 const shapeSignature = (chain: string[]) => [...chain].sort().join(' + ');
 
@@ -1959,6 +1965,63 @@ export function planCausalShape(plan: ChapterPlan): CausalShape {
   };
 }
 
+function normalizedNarrativeText(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/\p{M}+/gu, '')
+    .toLowerCase()
+    .replace(/đ/gu, 'd')
+    .replace(/[^\p{L}\p{N}]+/gu, ' ')
+    .trim();
+}
+
+function includesNarrativeSignal(value: string, signals: string[]): boolean {
+  return signals.some(signal => value.includes(signal));
+}
+
+/**
+ * This is intentionally much narrower than a generic keyword quality check.
+ * It flags the exact stale beat that readers feel as repetition: protagonist
+ * sacrifices immediate yield to protect quality/reputation, while a partner
+ * resists because of the lost gain. Adjacent chapters must change the type of
+ * risk or payoff; they cannot simply change why the goods became bad.
+ */
+function hasQualityRestraintPartnerConflict(value: string): boolean {
+  const normalized = normalizedNarrativeText(value);
+  const quality = includesNarrativeSignal(normalized, [
+    'chat luong', 'tieu chuan', 'uy tin', 'bao quan', 'hang kem', 'hang hong', 'do tuoi',
+  ]);
+  const restraint = includesNarrativeSignal(normalized, [
+    'dung lai', 'ngung lai', 'bo lo', 'bo qua', 'vut bo', 'quay ve',
+    'khong lay them', 'khong cau them', 'chap nhan thiet hai', 'giu lai',
+  ]);
+  const conflict = includesNarrativeSignal(normalized, [
+    'buc tuc', 'tuc gian', 'noi gian', 'xot cua', 'phan doi', 'cung nhac', 'bat dong',
+  ]);
+  return quality && restraint && conflict;
+}
+
+export function committedNarrativeTradeoffs(state?: Pick<StoryState, 'recentOutcomes'>): NarrativeTradeoff[] {
+  if (!state) return [];
+  return state.recentOutcomes.flatMap(outcome => {
+    const text = [outcome.event, outcome.method, outcome.result, outcome.endingSituation]
+      .filter((value): value is string => Boolean(value))
+      .join(' ');
+    return hasQualityRestraintPartnerConflict(text)
+      ? [{ chapterNumber: outcome.chapterNumber, kind: 'quality_restraint_partner_conflict' as const }]
+      : [];
+  });
+}
+
+function planNarrativeTradeoffs(plan: ChapterPlan): NarrativeTradeoff[] {
+  const text = plan.scenes
+    .flatMap(scene => [scene.objective, scene.obstacle, scene.action])
+    .join(' ');
+  return hasQualityRestraintPartnerConflict(text)
+    ? [{ chapterNumber: plan.chapterNumber, kind: 'quality_restraint_partner_conflict' }]
+    : [];
+}
+
 /**
  * "Escalation" that repeats the exact causal shape of a recent chapter — the
  * same effect mechanics fired by the same actors, only the numbers scaled — is
@@ -1973,6 +2036,7 @@ export function planCausalShape(plan: ChapterPlan): CausalShape {
 export function assertNoRepeatedCausalShape(input: {
   plans: ChapterPlan[];
   packet?: ContinuityPacket;
+  state?: Pick<StoryState, 'recentOutcomes'>;
   recentChapterWindow?: number;
 }): void {
   if (!input.plans.length) return;
@@ -1996,6 +2060,31 @@ export function assertNoRepeatedCausalShape(input: {
       );
     }
     seen.set(signature, plan.chapterNumber);
+  }
+
+  // Mechanic IDs alone cannot see a narrative restatement where a chapter
+  // swaps a sale for a discard but repeats the same quality-vs-yield argument
+  // with the same partner conflict. Keep the window deliberately short so a
+  // later, materially changed return to the theme remains available.
+  const recentNarrativeWindow = 2;
+  const narrativeSeen = new Map<NarrativeTradeoffKind, number>();
+  for (const tradeoff of committedNarrativeTradeoffs(input.state)) {
+    if (tradeoff.chapterNumber >= minimumChapter - recentNarrativeWindow) {
+      narrativeSeen.set(tradeoff.kind, tradeoff.chapterNumber);
+    }
+  }
+  for (const plan of input.plans) {
+    for (const tradeoff of planNarrativeTradeoffs(plan)) {
+      const priorChapter = narrativeSeen.get(tradeoff.kind);
+      if (priorChapter !== undefined && priorChapter !== plan.chapterNumber) {
+        throw new StoryFactoryError(
+          'plan_blocked',
+          `Chương ${plan.chapterNumber} lặp lại payoff chất lượng-đổi-sản lượng có xung đột đồng đội của chương ${priorChapter}. Đổi loại rủi ro, đối tượng xung đột hoặc payoff kế tiếp thay vì lại để main hy sinh hàng ngắn hạn để giữ chất lượng/uy tín.`,
+          { chapterNumber: plan.chapterNumber, repeatsChapter: priorChapter, narrativeTradeoff: tradeoff.kind },
+        );
+      }
+      narrativeSeen.set(tradeoff.kind, plan.chapterNumber);
+    }
   }
 }
 
@@ -2168,6 +2257,10 @@ export async function planRollingWindow(input: {
           shapes: committedCausalShapes(input.continuityPacket).slice(-6),
           rule: 'Chương mới không được lặp một effectChain gần đây (cùng mechanic, cùng actor) mà chỉ đổi quy mô con số. Leo thang thật sự đổi ít nhất một trong: chuỗi mechanic, actor dẫn, đối tượng xung đột, loại rủi ro.',
         },
+        recentNarrativeTradeoffs: {
+          shapes: committedNarrativeTradeoffs(input.state),
+          rule: 'Nếu chapter gần nhất đã có beat main hy sinh sản lượng ngắn hạn để giữ chất lượng/uy tín và đồng đội phản đối, chapter mới phải đổi loại rủi ro hoặc payoff. Không thay đá xấu bằng hầm chật hay đổi “dừng câu” thành “vứt hàng” rồi lặp lại cùng beat.',
+        },
         // Author steering: a priority direction for upcoming chapters, applied
         // through planning choices. It never overrides canon, the ledger, or
         // validation — when they conflict, canon wins.
@@ -2226,7 +2319,7 @@ export async function planRollingWindow(input: {
       // window is replanned from committed state — so trimming loses nothing.
       parsed = { ...parsed, plans: parsed.plans.slice(0, input.requiredWindowSize) };
     }
-    assertNoRepeatedCausalShape({ plans: parsed.plans, packet: input.continuityPacket });
+    assertNoRepeatedCausalShape({ plans: parsed.plans, packet: input.continuityPacket, state: input.state });
     const collected = collectPlanAdvisories(() => validateRollingPlan({
       kernel: input.kernel, arc: input.arc, state: input.state, rollingPlan: parsed,
     }));
@@ -2806,9 +2899,16 @@ fromLocationId/toLocationId chỉ được là ID có thật trong existingLocat
       state: input.state,
       extension: result.value.canonExtension,
     });
-    validateArcAgainstKernel(extended.kernel, next);
+    const completedArc = activateUnambiguousAcquisitionMechanics({
+      kernel: extended.kernel,
+      arc: next,
+      state: extended.state,
+    });
+    validateArcActivationBudget(completedArc.arc);
+    validateArcAgainstKernel(extended.kernel, completedArc.arc);
+    validateArcResourceReachability({ kernel: extended.kernel, arc: completedArc.arc, state: extended.state });
     return {
-      lifecycle: result.value,
+      lifecycle: { ...result.value, nextArc: completedArc.arc },
       kernelAfter: extended.kernel,
       stateAfter: extended.state,
       usage: result.usage,

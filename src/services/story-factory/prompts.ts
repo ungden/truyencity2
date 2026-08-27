@@ -1,4 +1,4 @@
-export const FACTORY_PROMPT_VERSION = 'story-factory-2026-08-26.58-low-verbosity-bridge';
+export const FACTORY_PROMPT_VERSION = 'story-factory-2026-08-27.59-scene-location-path';
 
 export const WRITER_SYSTEM_PROMPT = `Bạn là tiểu thuyết gia web-serial tiếng Việt.
 Hãy tiếp nối tự nhiên đoạn cuối chương trước, thực hiện đầy đủ chapter brief và giữ đúng canon, ký ức liên quan, tài nguyên, tri thức, quan hệ cùng vị trí nhân vật.
@@ -111,7 +111,7 @@ Số tiền và khối lượng trong delta phải giao dịch được trong đ
 Tài nguyên có trần (maximum) như thể lực, giờ lao động, mana: trước mỗi delta hồi phục/tái tạo phải tính khoảng trống còn lại (maximum trừ số dư hiện tại) và cắt quantity của mechanic — kể cả quantity lẻ — sao cho after đúng bằng hoặc dưới trần. Hồi tới đầy thì dừng; tuyệt đối không để after vượt maximum dù chỉ một đơn vị.
 Trong scene, participantIds/people chỉ là nhân vật có mặt vật lý tại scene.loc. Nếu chỉ được nhớ tới, nhắc tới hoặc là mục tiêu cảm xúc ở nơi khác, không đưa vào people.
 Thời gian cuối chương là mốc tuyệt đối và phải được cộng tuần tự từ State: ít nhất bằng thời gian đầu chương cộng toàn bộ duration và travel của các cảnh trong chương.
-Mọi nhân vật kết thúc chương ở địa điểm khác state đầu chương phải có location delta khớp vị trí đầu và scene cuối.
+Mỗi lần nhân vật chuyển sang location khác ở một scene phải có location delta đúng từ vị trí trước scene đó tới location của scene; không chỉ ghi một delta vị trí cuối chương.
 Một nhân vật chỉ được hành động dựa trên kết quả của scene trước khi họ đã chứng kiến scene đó hoặc đã nhận thông tin qua một scene có mặt người biết, kèm fact/knowledge delta khi kết quả trở thành tri thức bền vững. Không cho nhân vật ở địa điểm khác tự biết doanh thu, giao dịch, bí mật, quyết định hoặc kết quả vừa xảy ra.
 Mọi phương tiện, dịch vụ, lao động hoặc quyền tiếp cận cần thiết để scene xảy ra phải đã tồn tại trong State/precondition, hoặc được nhận/thuê/trao đổi bằng required delta có nguồn, chi phí và chủ thể rõ ràng. Không để Writer tự bịa tài xế, chủ xe, khoản nợ, vật tư hay đặc quyền để lấp lỗ hổng của plan.
 Objective và action không được nói rộng kiểu “cướp trang bị của chúng”, “thu gom chiến lợi phẩm”, “giữ mọi thứ có giá trị” nếu delta chỉ theo dõi một mảnh/vật cụ thể. Hoặc gọi đúng chính xác vật có delta, hoặc thêm resource delta dương cho toàn bộ loot; không mở phạm vi để Writer tự nhặt súng, giáp hay bộ phận ngoài ledger.

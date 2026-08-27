@@ -15,8 +15,11 @@ import {
   StoryStateSchema,
   STORY_FACTORY_RELEASE,
   runStoryFactoryTick,
+  activateUnambiguousAcquisitionMechanics,
   collectPlanAdvisories,
   assertFirst30PortfolioCommission,
+  validateArcActivationBudget,
+  validateArcResourceReachability,
   validateKernelState,
   validateRollingPlan,
 } from '../src/services/story-factory';
@@ -284,6 +287,55 @@ async function revive() {
   console.log(JSON.stringify({ revived: jobs.length, needingRestage: staleCount }, null, 2));
 }
 
+/**
+ * Repair only the narrowly safe form of a parked resource-path error: an active
+ * consumer has exactly one inactive conversion that can acquire its missing
+ * input from balances already present in the canonical state. Ambiguity stays
+ * blocked for a human/story decision; this command never chooses a supplier.
+ */
+async function repairReachability() {
+  const jobId = value('--job-id');
+  if (!jobId) throw new Error('repair-reachability requires --job-id.');
+  const lookup = await db.from('story_factory_jobs')
+    .select('id,project_id,status,stage,current_chapter,ai_story_projects!story_factory_jobs_project_id_fkey(id,story_kernel,arc_plan,story_state)')
+    .eq('id', jobId)
+    .single();
+  if (lookup.error) throw lookup.error;
+  const project = lookup.data.ai_story_projects as unknown as {
+    id: string;
+    story_kernel: unknown;
+    arc_plan: unknown;
+    story_state: unknown;
+  } | null;
+  if (!project) throw new Error(`Job ${jobId} has no Story Factory project.`);
+  const kernel = StoryKernelSchema.parse(project.story_kernel);
+  const arc = ArcPlanSchema.parse(project.arc_plan);
+  const state = StoryStateSchema.parse(project.story_state);
+  validateKernelState(kernel, state);
+  const repaired = activateUnambiguousAcquisitionMechanics({ kernel, arc, state });
+  validateArcActivationBudget(repaired.arc);
+  validateArcResourceReachability({ kernel, arc: repaired.arc, state });
+  console.log(JSON.stringify({
+    dryRun: !apply,
+    command,
+    jobId,
+    projectId: project.id,
+    status: lookup.data.status,
+    chapter: lookup.data.current_chapter,
+    activatedMechanicIds: repaired.activatedMechanicIds,
+    activeMechanicIdsBefore: arc.activeMechanicIds,
+    activeMechanicIdsAfter: repaired.arc.activeMechanicIds,
+  }, null, 2));
+  if (!repaired.activatedMechanicIds.length) {
+    throw new Error('No unambiguous funded acquisition mechanism was available; preserve the block for a story decision.');
+  }
+  if (!apply) return;
+  const updated = await db.from('ai_story_projects')
+    .update({ arc_plan: repaired.arc, updated_at: new Date().toISOString() })
+    .eq('id', project.id);
+  if (updated.error) throw updated.error;
+}
+
 async function main() {
   if (command === 'status') return status();
   if (command === 'portfolio') {
@@ -293,6 +345,7 @@ async function main() {
   if (command === 'seed') return seed();
   if (command === 'restage') return restage();
   if (command === 'revive') return revive();
+  if (command === 'repair-reachability') return repairReachability();
   if (command === 'tick') {
     console.log(JSON.stringify({ dryRun: !apply, command, release: STORY_FACTORY_RELEASE }, null, 2));
     if (!apply) return;
@@ -302,7 +355,7 @@ async function main() {
     return;
   }
   if (['start', 'stop', 'release'].includes(command)) return mutate();
-  throw new Error('Usage: factory-operator.ts status|portfolio|seed|restage|revive|tick|start|stop|release [options] [--apply]');
+  throw new Error('Usage: factory-operator.ts status|portfolio|seed|restage|revive|repair-reachability|tick|start|stop|release [options] [--apply]');
 }
 
 main().catch(error => {

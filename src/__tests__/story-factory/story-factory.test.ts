@@ -72,6 +72,7 @@ import {
   runConceptLab,
   assertNoRepeatedCausalShape,
   assertRenewableConversionInputs,
+  activateUnambiguousAcquisitionMechanics,
   planArcLifecycle,
   planRollingWindow,
   projectKernelForRollingPlanner,
@@ -613,6 +614,55 @@ describe('canonical Story Factory', () => {
       kernel: reachableKernel,
       arc: reachableArc,
       state: reachableState,
+    })).not.toThrow();
+  });
+
+  test('activates one unambiguous funded acquisition conversion omitted from an arc working set', () => {
+    const repairKernel = structuredClone(kernel);
+    repairKernel.resources.push(
+      { id: 'broken_engine', name: 'Động cơ hỏng', kind: 'numeric', unit: 'chiếc', ownerEntityId: 'main', minimum: 0 },
+      { id: 'working_engine', name: 'Động cơ hoạt động', kind: 'numeric', unit: 'chiếc', ownerEntityId: 'main', minimum: 0 },
+    );
+    repairKernel.worldMechanics.push(
+      {
+        id: 'buy_engine', name: 'Mua động cơ hỏng', kind: 'conversion',
+        description: 'Dùng tiền mặt mua một động cơ hỏng đã có nguồn gốc.',
+        inputsPerBatch: [{ resourceId: 'money', amount: 50 }],
+        outputsPerBatch: [{ resourceId: 'broken_engine', amount: 1 }],
+        maximumBatchesPerUse: 1,
+      },
+      {
+        id: 'repair_engine', name: 'Sửa động cơ', kind: 'conversion',
+        description: 'Sửa một động cơ hỏng thành một động cơ hoạt động.',
+        inputsPerBatch: [{ resourceId: 'broken_engine', amount: 1 }],
+        outputsPerBatch: [{ resourceId: 'working_engine', amount: 1 }],
+        maximumBatchesPerUse: 1,
+      },
+    );
+    const repairState: StoryState = {
+      ...initialState,
+      resources: [
+        ...initialState.resources,
+        { resourceId: 'broken_engine', kind: 'numeric', value: 0 },
+        { resourceId: 'working_engine', kind: 'numeric', value: 0 },
+      ],
+    };
+    const incompleteArc: ArcPlan = {
+      ...structuredClone(arc),
+      activeResourceIds: ['money', 'broken_engine', 'working_engine'],
+      activeMechanicIds: ['repair_engine'],
+    };
+    const completed = activateUnambiguousAcquisitionMechanics({
+      kernel: repairKernel,
+      arc: incompleteArc,
+      state: repairState,
+    });
+    expect(completed.activatedMechanicIds).toEqual(['buy_engine']);
+    expect(completed.arc.activeMechanicIds).toEqual(['repair_engine', 'buy_engine']);
+    expect(() => validateArcResourceReachability({
+      kernel: repairKernel,
+      arc: completed.arc,
+      state: repairState,
     })).not.toThrow();
   });
 
@@ -1440,11 +1490,14 @@ describe('canonical Story Factory', () => {
   test('flags a planned transaction that has no resource delta as an advisory', () => {
     const chapter = plan(1);
     chapter.scenes[0].action = 'Hải trả tiền mặt để thu mua toàn bộ mẻ cá.';
-    chapter.requiredDeltas = [{ id: 'move', kind: 'location', characterId: 'main', beforeLocationId: 'home', afterLocationId: 'beach' }];
+    chapter.requiredDeltas = [
+      { id: 'move', kind: 'location', characterId: 'main', beforeLocationId: 'home', afterLocationId: 'beach' },
+      { id: 'move_mother', kind: 'location', characterId: 'mother', beforeLocationId: 'home', afterLocationId: 'beach' },
+    ];
     chapter.scenes[0].locationId = 'beach';
     chapter.scenes[0].travelMinutesFromPrevious = 20;
     chapter.storyTimeAfterMinutes = 80;
-    chapter.scenes[0].requiredDeltaIds = ['move'];
+    chapter.scenes[0].requiredDeltaIds = ['move', 'move_mother'];
     expect(advisoriesFor(chapter)).toMatchObject([{
       chapterNumber: 1,
       sceneId: 'scene_1',
@@ -1857,7 +1910,7 @@ describe('canonical Story Factory', () => {
         objective: 'Ra bãi kiểm tra ghe.',
         obstacle: 'Đường xa.',
         action: 'Hải ra bãi kiểm tra ghe.',
-        requiredDeltaIds: [],
+        requiredDeltaIds: ['move_home_to_beach'],
       },
       {
         id: 'return_to_buy',
@@ -1869,7 +1922,7 @@ describe('canonical Story Factory', () => {
         objective: 'Quay về mua đá.',
         obstacle: 'Phải đi lại.',
         action: 'Hải quay về mua một ký đá.',
-        requiredDeltaIds: ['spend_money', 'gain_ice'],
+        requiredDeltaIds: ['spend_money', 'gain_ice', 'move_beach_to_home'],
       },
       {
         id: 'depart_again',
@@ -1881,7 +1934,7 @@ describe('canonical Story Factory', () => {
         objective: 'Mang đá ra ghe.',
         obstacle: 'Đá dễ tan.',
         action: 'Hải lại mang đá ra bãi.',
-        requiredDeltaIds: ['finish_at_beach'],
+        requiredDeltaIds: ['move_home_to_beach_again'],
       },
     ];
     routePlan.requiredDeltas = [
@@ -1906,7 +1959,21 @@ describe('canonical Story Factory', () => {
         sink: null,
       },
       {
-        id: 'finish_at_beach',
+        id: 'move_home_to_beach',
+        kind: 'location',
+        characterId: 'main',
+        beforeLocationId: 'home',
+        afterLocationId: 'beach',
+      },
+      {
+        id: 'move_beach_to_home',
+        kind: 'location',
+        characterId: 'main',
+        beforeLocationId: 'beach',
+        afterLocationId: 'home',
+      },
+      {
+        id: 'move_home_to_beach_again',
         kind: 'location',
         characterId: 'main',
         beforeLocationId: 'home',
@@ -4345,6 +4412,39 @@ describe('canonical Story Factory', () => {
     expect(rolling.plans[0].scenes[0].requiredDeltaIds).toContain(locationDelta?.id);
   });
 
+  test('compiler materializes every intermediate location transition for a participant', () => {
+    const travelKernel = structuredClone(kernel);
+    travelKernel.locations.push({ id: 'market', name: 'Chợ huyện' });
+    travelKernel.travelRules.push(
+      { fromLocationId: 'home', toLocationId: 'market', minimumMinutes: 10 },
+      { fromLocationId: 'market', toLocationId: 'home', minimumMinutes: 10 },
+      { fromLocationId: 'market', toLocationId: 'beach', minimumMinutes: 10 },
+      { fromLocationId: 'beach', toLocationId: 'market', minimumMinutes: 10 },
+    );
+    const wire = plannerWire();
+    wire.chapters[0].scenes = [
+      {
+        id: 'shop_first', pov: 'main', people: ['main'], loc: 'market', dur: 20, travel: 10,
+        goal: 'Mua đúng vật tư đã khóa.', block: 'Giá vật tư đang tăng.',
+        act: 'Hải kiểm hàng rồi tiếp tục ra bãi.', deltaIds: ['delta_1'],
+      },
+      {
+        id: 'reach_beach', pov: 'main', people: ['main'], loc: 'beach', dur: 20, travel: 10,
+        goal: 'Giao vật tư cho người chờ ở bãi.', block: 'Thời gian đang gấp.',
+        act: 'Hải mang vật tư đến bãi đúng hẹn.', deltaIds: [],
+      },
+    ];
+    const rolling = materializePlannerRollingPlan(wire, initialState, travelKernel);
+    const moves = rolling.plans[0].requiredDeltas.filter(delta => delta.kind === 'location' && delta.characterId === 'main');
+    expect(moves).toMatchObject([
+      { beforeLocationId: 'home', afterLocationId: 'market' },
+      { beforeLocationId: 'market', afterLocationId: 'beach' },
+    ]);
+    expect(rolling.plans[0].scenes[0].requiredDeltaIds).toContain(moves[0]?.id);
+    expect(rolling.plans[0].scenes[1].requiredDeltaIds).toContain(moves[1]?.id);
+    expect(() => applyChapterPlan({ kernel: travelKernel, state: initialState, plan: rolling.plans[0] })).not.toThrow();
+  });
+
   test('compiler clamps travel and chapter time instead of buying an arithmetic retry', () => {
     const wire = plannerWire();
     const chapter = structuredClone(wire.chapters[0]);
@@ -5836,6 +5936,30 @@ describe('prose-craft gates', () => {
         { ...repeatPlan, chapterNumber: 13 },
       ],
     })).toThrow(/lặp lại y nguyên causal shape của chương 12/);
+
+    const qualityTradeoffHistory: StoryState = {
+      ...initialState,
+      chapterNumber: 46,
+      recentOutcomes: [{
+        chapterNumber: 46,
+        title: 'Chỗ Trống Cuối Cùng',
+        event: 'Phan dừng lại giữa luồng hàng để bảo vệ chất lượng.',
+        method: 'Phan chấp nhận bỏ lỡ sản lượng vì tiêu chuẩn bảo quản.',
+        result: 'Minh bực tức và xót của trước quyết định đó.',
+        endingSituation: 'Uy tín được giữ nhưng đồng đội vẫn phản đối.',
+        evidenceSpans: ['Phan dừng lại'],
+      }],
+    };
+    const repeatedQualityTradeoff = plan(47);
+    repeatedQualityTradeoff.scenes[0] = {
+      ...repeatedQualityTradeoff.scenes[0],
+      objective: 'Giữ uy tín cho mẻ hàng đang xuống chất lượng.',
+      obstacle: 'Hầm đá quá tải làm hàng nhanh hỏng.',
+      action: 'Phan vứt bỏ phần hàng kém chất lượng, khiến Minh tức giận vì xót của.',
+    };
+    expect(() => assertNoRepeatedCausalShape({
+      plans: [repeatedQualityTradeoff], state: qualityTradeoffHistory,
+    })).toThrow(/lặp lại payoff chất lượng-đổi-sản lượng/);
   });
 
   test('keeps raw plot steering out of the Writer and projects bounded craft history', () => {

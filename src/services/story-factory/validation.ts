@@ -11,7 +11,7 @@ import {
   StoryFactoryError,
 } from './contracts';
 
-export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-35-material-settlement';
+export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-36-location-path-acquisition-bridge';
 
 export interface StateEvent {
   chapterNumber: number;
@@ -366,6 +366,104 @@ export function validateArcResourceReachability(input: {
   }
 }
 
+/**
+ * Complete an arc's working set only when there is one unambiguous, already
+ * funded conversion that acquires a resource an active mechanic needs. This is
+ * deliberately narrower than planning: it never invents a resource, chooses
+ * between competing suppliers, or adds a capability. It merely keeps a
+ * canonical purchase/harvest conversion from being accidentally omitted from
+ * `activeMechanicIds` while its consumer remains active.
+ *
+ * The returned arc is safe to persist. Callers must still run the normal
+ * validators afterwards; an ambiguous or impossible path remains blocked.
+ */
+export function activateUnambiguousAcquisitionMechanics(input: {
+  kernel: StoryKernel;
+  arc: ArcPlan;
+  state: StoryState;
+}): { arc: ArcPlan; activatedMechanicIds: string[] } {
+  const activeMechanicIds = [...input.arc.activeMechanicIds];
+  const active = new Set(activeMechanicIds);
+  const resources = new Map(input.kernel.resources.map(resource => [resource.id, resource]));
+  const reachable = new Set(input.state.resources.flatMap(resource => {
+    if (resource.kind === 'numeric' && resource.value > 0) return [resource.resourceId];
+    if (resource.kind === 'state' && resource.value.trim() && !/^(?:0|false|none|null)$/iu.test(resource.value.trim())) {
+      return [resource.resourceId];
+    }
+    return [];
+  }));
+  const activatedMechanicIds: string[] = [];
+
+  const extendReachable = () => {
+    let changed = true;
+    while (changed) {
+      changed = false;
+      for (const mechanicId of activeMechanicIds) {
+        const mechanic = input.kernel.worldMechanics.find(item => item.id === mechanicId);
+        if (!mechanic) continue;
+        if (mechanic.kind === 'conversion') {
+          if (!mechanic.inputsPerBatch.every(item => reachable.has(item.resourceId))) continue;
+          for (const output of mechanic.outputsPerBatch) {
+            if (reachable.has(output.resourceId)) continue;
+            reachable.add(output.resourceId);
+            changed = true;
+          }
+        } else if (mechanic.kind === 'capability'
+          && mechanic.requiredResourceIds.every(resourceId => reachable.has(resourceId))) {
+          for (const effect of mechanic.effectResources) {
+            if (effect.direction === 'decrease' || reachable.has(effect.resourceId)) continue;
+            reachable.add(effect.resourceId);
+            changed = true;
+          }
+        }
+      }
+    }
+  };
+
+  // A newly activated purchase can make the input for another unambiguous
+  // purchase reachable, so close the graph one bridge at a time.
+  let changed = true;
+  while (changed) {
+    changed = false;
+    extendReachable();
+    const required = new Set<string>();
+    for (const mechanicId of activeMechanicIds) {
+      const mechanic = input.kernel.worldMechanics.find(item => item.id === mechanicId);
+      if (!mechanic) continue;
+      if (mechanic.kind === 'conversion') {
+        mechanic.inputsPerBatch.forEach(item => required.add(item.resourceId));
+        mechanic.outputsPerBatch.forEach(item => required.add(item.resourceId));
+      } else if (mechanic.kind === 'capability') {
+        mechanic.requiredResourceIds.forEach(resourceId => required.add(resourceId));
+        mechanic.effectResources.forEach(effect => required.add(effect.resourceId));
+      }
+    }
+    const missing = [...required].filter(resourceId => !reachable.has(resourceId));
+    for (const resourceId of missing) {
+      if (resources.get(resourceId)?.kind !== 'numeric') continue;
+      const candidates = input.kernel.worldMechanics.filter((mechanic): mechanic is Extract<StoryKernel['worldMechanics'][number], { kind: 'conversion' }> => (
+        mechanic.kind === 'conversion'
+        && !active.has(mechanic.id)
+        && mechanic.outputsPerBatch.some(output => output.resourceId === resourceId)
+        && mechanic.inputsPerBatch.every(item => reachable.has(item.resourceId))
+      ));
+      if (candidates.length !== 1) continue;
+      const candidate = candidates[0];
+      active.add(candidate.id);
+      activeMechanicIds.push(candidate.id);
+      activatedMechanicIds.push(candidate.id);
+      changed = true;
+    }
+  }
+
+  return {
+    arc: activatedMechanicIds.length
+      ? { ...input.arc, activeMechanicIds }
+      : input.arc,
+    activatedMechanicIds,
+  };
+}
+
 export function applyCanonExtension(input: {
   kernel: StoryKernel;
   state: StoryState;
@@ -673,12 +771,13 @@ function validateScenes(kernel: StoryKernel, state: StoryState, plan: ChapterPla
     if (!worldRuleIds.has(ruleId)) fail(`Chapter ${plan.chapterNumber} references unknown world rule ${ruleId}.`);
   }
   const referenced = new Set<string>();
-  const startingLocations = new Map(state.characters.map(item => [item.characterId, item.locationId]));
-  const locations = new Map(startingLocations);
+  const locations = new Map(state.characters.map(item => [item.characterId, item.locationId]));
+  const movementDeltaIds = new Set<string>();
   for (const scene of plan.scenes) {
     if (!characterIds.has(scene.povCharacterId)) fail(`Scene ${scene.id} has unknown POV ${scene.povCharacterId}.`);
     if (!scene.participantIds.includes(scene.povCharacterId)) fail(`Scene ${scene.id} POV is not a participant.`);
     if (!locationIds.has(scene.locationId)) fail(`Scene ${scene.id} has unknown location ${scene.locationId}.`);
+    const movements: Array<{ characterId: string; beforeLocationId: string; afterLocationId: string }> = [];
     for (const participantId of scene.participantIds) {
       if (!characterIds.has(participantId)) fail(`Scene ${scene.id} has unknown participant ${participantId}.`);
       const previous = locations.get(participantId);
@@ -693,14 +792,52 @@ function validateScenes(kernel: StoryKernel, state: StoryState, plan: ChapterPla
             planned: scene.travelMinutesFromPrevious,
           });
         }
+        movements.push({
+          characterId: participantId,
+          beforeLocationId: previous,
+          afterLocationId: scene.locationId,
+        });
       }
-      locations.set(participantId, scene.locationId);
     }
     for (const deltaId of scene.requiredDeltaIds) {
       if (!deltaIds.has(deltaId)) fail(`Scene ${scene.id} references unknown delta ${deltaId}.`);
       referenced.add(deltaId);
     }
     const sceneDeltas = scene.requiredDeltaIds.map(deltaId => plan.requiredDeltas.find(delta => delta.id === deltaId)!);
+    const locationDeltas = sceneDeltas.filter(
+      (delta): delta is Extract<StateDelta, { kind: 'location' }> => delta.kind === 'location',
+    );
+    for (const movement of movements) {
+      const matches = locationDeltas.filter(delta => (
+        delta.characterId === movement.characterId
+        && delta.beforeLocationId === movement.beforeLocationId
+        && delta.afterLocationId === movement.afterLocationId
+      ));
+      if (matches.length !== 1) {
+        fail(`Scene ${scene.id} must commit the exact location transition for ${movement.characterId}.`, {
+          beforeLocationId: movement.beforeLocationId,
+          afterLocationId: movement.afterLocationId,
+          matchingLocationDeltaIds: matches.map(delta => delta.id),
+        });
+      }
+      movementDeltaIds.add(matches[0].id);
+    }
+    for (const delta of locationDeltas) {
+      const isExactMovement = movements.some(movement => (
+        movement.characterId === delta.characterId
+        && movement.beforeLocationId === delta.beforeLocationId
+        && movement.afterLocationId === delta.afterLocationId
+      ));
+      if (!isExactMovement) {
+        fail(`Scene ${scene.id} assigns a location delta that does not match a movement in that scene.`, {
+          locationDeltaId: delta.id,
+          characterId: delta.characterId,
+          beforeLocationId: delta.beforeLocationId,
+          afterLocationId: delta.afterLocationId,
+        });
+      }
+    }
+    for (const participantId of scene.participantIds) locations.set(participantId, scene.locationId);
     const broadAcquisition = hasVietnameseTerm(
       `${scene.objective} ${scene.action}`,
       String.raw`cướp (?:toàn bộ )?(?:trang bị|vũ khí|chiến lợi phẩm|đồ đạc) (?:của )?(?:chúng|địch|đối phương)|thu gom (?:toàn bộ )?(?:trang bị|vũ khí|chiến lợi phẩm)|giữ lại (?:mọi|những|các) (?:trang bị|vũ khí|chiến lợi phẩm|thứ có giá trị)`,
@@ -816,20 +953,15 @@ function validateScenes(kernel: StoryKernel, state: StoryState, plan: ChapterPla
   validateRouteEfficiency(kernel, state, plan);
   const orphaned = [...deltaIds].filter(id => !referenced.has(id));
   if (orphaned.length) fail(`Chapter ${plan.chapterNumber} has deltas not assigned to a scene.`, orphaned);
-  for (const [characterId, afterLocationId] of locations) {
-    const beforeLocationId = startingLocations.get(characterId);
-    if (!beforeLocationId || beforeLocationId === afterLocationId) continue;
-    const locationDeltas = plan.requiredDeltas.filter(
-      (delta): delta is Extract<StateDelta, { kind: 'location' }> => delta.kind === 'location' && delta.characterId === characterId,
-    );
-    if (locationDeltas.length !== 1
-      || locationDeltas[0].beforeLocationId !== beforeLocationId
-      || locationDeltas[0].afterLocationId !== afterLocationId) {
-      fail(`Chapter ${plan.chapterNumber} must commit the final location of ${characterId}.`, {
-        beforeLocationId,
-        afterLocationId,
-      });
-    }
+  const unusedLocationDeltas = plan.requiredDeltas.filter(
+    (delta): delta is Extract<StateDelta, { kind: 'location' }> => (
+      delta.kind === 'location' && !movementDeltaIds.has(delta.id)
+    ),
+  );
+  if (unusedLocationDeltas.length) {
+    fail(`Chapter ${plan.chapterNumber} has location deltas not tied to their exact scene movement.`, {
+      locationDeltaIds: unusedLocationDeltas.map(delta => delta.id),
+    });
   }
 }
 

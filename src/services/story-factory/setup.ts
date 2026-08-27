@@ -16,6 +16,7 @@ import type { ProviderUsage, StoryModelProvider } from './provider';
 import { geminiProvider } from './provider';
 import {
   ARC_ACTIVE_MECHANIC_BUDGET,
+  activateUnambiguousAcquisitionMechanics,
   validateArcActivationBudget,
   validateArcAgainstKernel,
   assertRenewableConversionInputs,
@@ -1516,7 +1517,11 @@ State có đúng một entry cho mọi character, resource và promise trong Ker
     schemaVersion: 2,
     selectedConceptId: launchIdentity.value.selectedConceptId,
     kernel,
-    arc: launchState.value.arc,
+    arc: activateUnambiguousAcquisitionMechanics({
+      kernel,
+      arc: launchState.value.arc,
+      state: launchState.value.initialState,
+    }).arc,
     initialState: launchState.value.initialState,
     coverPrompt: launchIdentity.value.coverPrompt,
   });
