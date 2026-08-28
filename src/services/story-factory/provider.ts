@@ -160,6 +160,18 @@ function retryable(error: unknown): boolean {
   return error instanceof TypeError;
 }
 
+function credentialFailure(provider: string, envName: string, status: number, detail: string): StoryFactoryError | null {
+  // A revoked/malformed key or an authorization denial cannot become healthy by
+  // repeating the same request. Park the job for configuration repair instead of
+  // consuming its infrastructure retry budget.
+  const rejected = status === 401
+    || status === 403
+    || /\b(?:API_KEY_INVALID|invalid[_ ]api[_ ]key|API key not valid|incorrect API key)\b/i.test(detail);
+  return rejected
+    ? new StoryFactoryError('setup_blocked', `${provider} credentials were rejected (HTTP ${status}). Update ${envName}, then revive the job.`)
+    : null;
+}
+
 /**
  * Node's fetch occasionally leaves a TLS request pending after AbortSignal.timeout
  * fires. The signal alone therefore did not guarantee that a factory stage returned
@@ -271,7 +283,7 @@ async function openaiGenerate(input: {
   verbosity?: 'low' | 'medium' | 'high';
 }): Promise<ProviderResult<string>> {
   const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) throw new StoryFactoryError('infra_blocked', 'OPENAI_API_KEY is not configured for a gpt-* route.');
+  if (!apiKey) throw new StoryFactoryError('setup_blocked', 'OPENAI_API_KEY is not configured for a gpt-* route.');
   const strictSchema = input.responseSchema
     ? JSON.parse(JSON.stringify(input.responseSchema), (key, value) => {
       if (value && typeof value === 'object' && !Array.isArray(value)) {
@@ -329,6 +341,8 @@ async function openaiGenerate(input: {
       }, input.timeoutMs ?? DEFAULT_TIMEOUT_MS);
       if (!response.ok) {
         const detail = await response.text().catch(() => '');
+        const credential = credentialFailure('OpenAI', 'OPENAI_API_KEY', response.status, detail);
+        if (credential) throw credential;
         throw new ProviderHttpError(response.status, `OpenAI ${input.model} ${response.status}: ${detail.slice(0, 500)}`);
       }
       const payload = await response.json();
@@ -385,7 +399,7 @@ async function openrouterGenerate(input: {
   transportRetryLimit?: TransportRetryLimit;
 }): Promise<ProviderResult<string>> {
   const apiKey = process.env.OPENROUTER_API_KEY;
-  if (!apiKey) throw new StoryFactoryError('infra_blocked', 'OPENROUTER_API_KEY is not configured for a slash-vendor route.');
+  if (!apiKey) throw new StoryFactoryError('setup_blocked', 'OPENROUTER_API_KEY is not configured for a slash-vendor route.');
   const strictSchema = input.responseSchema
     ? JSON.parse(JSON.stringify(input.responseSchema), (key, value) => {
       if (value && typeof value === 'object' && !Array.isArray(value)) {
@@ -454,6 +468,8 @@ async function openrouterGenerate(input: {
             `${input.prompt}\n\nTrả về đúng một object JSON hợp lệ theo JSON Schema sau, giữ nguyên toàn bộ tên field, không markdown:\n${JSON.stringify(strictSchema)}`;
           continue;
         }
+        const credential = credentialFailure('OpenRouter', 'OPENROUTER_API_KEY', response.status, detail);
+        if (credential) throw credential;
         throw new ProviderHttpError(response.status, `OpenRouter ${input.model} ${response.status}: ${detail.slice(0, 500)}`);
       }
       const payload = await response.json();
@@ -513,7 +529,7 @@ async function generate(input: {
     return openaiGenerate(input);
   }
   const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) throw new StoryFactoryError('infra_blocked', 'GEMINI_API_KEY is not configured.');
+  if (!apiKey) throw new StoryFactoryError('setup_blocked', 'GEMINI_API_KEY is not configured.');
 
   const generationConfig: Record<string, unknown> = {
     temperature: input.temperature,
@@ -555,6 +571,8 @@ async function generate(input: {
       }, input.timeoutMs ?? DEFAULT_TIMEOUT_MS);
       if (!response.ok) {
         const detail = await response.text().catch(() => '');
+        const credential = credentialFailure('Gemini', 'GEMINI_API_KEY', response.status, detail);
+        if (credential) throw credential;
         throw new ProviderHttpError(response.status, `Gemini ${input.model} ${response.status}: ${detail.slice(0, 500)}`);
       }
       const payload = await response.json();

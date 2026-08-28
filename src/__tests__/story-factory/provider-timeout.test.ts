@@ -26,4 +26,22 @@ describe('Story Factory provider timeout', () => {
     })).rejects.toThrow('Gemini gemini-3.5-flash 429');
     expect(global.fetch).toHaveBeenCalledTimes(1);
   });
+
+  test('parks an invalid Gemini credential instead of spending retry budget', async () => {
+    process.env.GEMINI_API_KEY = 'revoked-gemini-key';
+    (global.fetch as jest.Mock).mockResolvedValue(new Response(JSON.stringify({
+      error: { status: 'INVALID_ARGUMENT', details: [{ reason: 'API_KEY_INVALID' }] },
+    }), { status: 400 }));
+
+    await expect(geminiProvider.text({
+      model: 'gemini-3.5-flash',
+      system: 'test',
+      prompt: 'test',
+      transportRetryLimit: 2,
+    })).rejects.toMatchObject({
+      code: 'setup_blocked',
+      message: expect.stringContaining('GEMINI_API_KEY'),
+    });
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+  });
 });
