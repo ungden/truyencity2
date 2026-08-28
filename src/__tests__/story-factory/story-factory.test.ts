@@ -6051,7 +6051,40 @@ describe('prose-craft gates', () => {
     };
     expect(() => assertNoRepeatedCausalShape({
       plans: [repeatedQualityTradeoff], state: qualityTradeoffHistory,
-    })).toThrow(/lặp lại payoff chất lượng-đổi-sản lượng/);
+    })).toThrow(/lặp lại payoff hy sinh sản lượng ngắn hạn/);
+
+    // The Ch50 -> Ch51 production failure had no explicit argument from Minh:
+    // it still replayed the same "stop the catch to preserve quality" payoff.
+    // A partner-conflict requirement made the old guard miss this exact shape.
+    const silentQualityHistory: StoryState = {
+      ...initialState,
+      chapterNumber: 50,
+      recentOutcomes: [{
+        chapterNumber: 50,
+        title: 'Mười Kg Trên Khoang Đá',
+        event: 'Phan ra Rạn Đá Đen câu được 10kg mực rồi phát hiện dầu hao nhanh.',
+        method: 'Phan dừng câu sớm để giữ dầu quay về an toàn.',
+        result: 'Mẻ mực được bán nhưng hầm đá quá nhỏ để bảo quản hàng tươi.',
+        endingSituation: 'Sức chứa hầm đá trở thành giới hạn mới.',
+        evidenceSpans: ['Phan dừng câu sớm'],
+      }],
+    };
+    const repeatedSilentQualityBeat = plan(51);
+    repeatedSilentQualityBeat.scenes[0] = {
+      ...repeatedSilentQualityBeat.scenes[0],
+      objective: 'Giữ chất lượng mực trong hầm đá đang tan.',
+      obstacle: 'Đá tan nhanh làm hầm đá không còn bảo quản được hàng.',
+      action: 'Phan quyết định quay về và không câu thêm để giữ độ tươi.',
+    };
+    expect(() => assertNoRepeatedCausalShape({
+      plans: [repeatedSilentQualityBeat], state: silentQualityHistory,
+    })).toThrow(/lặp lại payoff hy sinh sản lượng ngắn hạn/);
+
+    const qualityWithoutRestraint = structuredClone(repeatedSilentQualityBeat);
+    qualityWithoutRestraint.scenes[0].action = 'Phan mở thêm hầm lạnh mới và tiếp tục giao hàng đúng tiêu chuẩn.';
+    expect(() => assertNoRepeatedCausalShape({
+      plans: [qualityWithoutRestraint], state: silentQualityHistory,
+    })).not.toThrow();
   });
 
   test('keeps raw plot steering out of the Writer and projects bounded craft history', () => {

@@ -1976,7 +1976,7 @@ export interface CausalShape {
   effectChain: string[];
 }
 
-type NarrativeTradeoffKind = 'quality_restraint_partner_conflict';
+type NarrativeTradeoffKind = 'quality_restraint_replay';
 
 export interface NarrativeTradeoff {
   chapterNumber: number;
@@ -2029,23 +2029,23 @@ function includesNarrativeSignal(value: string, signals: string[]): boolean {
 /**
  * This is intentionally much narrower than a generic keyword quality check.
  * It flags the exact stale beat that readers feel as repetition: protagonist
- * sacrifices immediate yield to protect quality/reputation, while a partner
- * resists because of the lost gain. Adjacent chapters must change the type of
+ * sacrifices immediate yield to protect quality/reputation. A partner conflict
+ * often makes the beat more visible, but is not required: the reader still
+ * experiences a replay when the next chapter again stops a harvest or sale
+ * because storage/quality failed. Adjacent chapters must change the type of
  * risk or payoff; they cannot simply change why the goods became bad.
  */
-function hasQualityRestraintPartnerConflict(value: string): boolean {
+function hasQualityRestraintReplay(value: string): boolean {
   const normalized = normalizedNarrativeText(value);
   const quality = includesNarrativeSignal(normalized, [
     'chat luong', 'tieu chuan', 'uy tin', 'bao quan', 'hang kem', 'hang hong', 'do tuoi',
+    'ham da', 'da tan',
   ]);
   const restraint = includesNarrativeSignal(normalized, [
     'dung lai', 'ngung lai', 'bo lo', 'bo qua', 'vut bo', 'quay ve',
     'khong lay them', 'khong cau them', 'chap nhan thiet hai', 'giu lai',
   ]);
-  const conflict = includesNarrativeSignal(normalized, [
-    'buc tuc', 'tuc gian', 'noi gian', 'xot cua', 'phan doi', 'cung nhac', 'bat dong',
-  ]);
-  return quality && restraint && conflict;
+  return quality && restraint;
 }
 
 export function committedNarrativeTradeoffs(state?: Pick<StoryState, 'recentOutcomes'>): NarrativeTradeoff[] {
@@ -2054,8 +2054,8 @@ export function committedNarrativeTradeoffs(state?: Pick<StoryState, 'recentOutc
     const text = [outcome.event, outcome.method, outcome.result, outcome.endingSituation]
       .filter((value): value is string => Boolean(value))
       .join(' ');
-    return hasQualityRestraintPartnerConflict(text)
-      ? [{ chapterNumber: outcome.chapterNumber, kind: 'quality_restraint_partner_conflict' as const }]
+    return hasQualityRestraintReplay(text)
+      ? [{ chapterNumber: outcome.chapterNumber, kind: 'quality_restraint_replay' as const }]
       : [];
   });
 }
@@ -2064,8 +2064,8 @@ function planNarrativeTradeoffs(plan: ChapterPlan): NarrativeTradeoff[] {
   const text = plan.scenes
     .flatMap(scene => [scene.objective, scene.obstacle, scene.action])
     .join(' ');
-  return hasQualityRestraintPartnerConflict(text)
-    ? [{ chapterNumber: plan.chapterNumber, kind: 'quality_restraint_partner_conflict' }]
+  return hasQualityRestraintReplay(text)
+    ? [{ chapterNumber: plan.chapterNumber, kind: 'quality_restraint_replay' }]
     : [];
 }
 
@@ -2110,8 +2110,8 @@ export function assertNoRepeatedCausalShape(input: {
   }
 
   // Mechanic IDs alone cannot see a narrative restatement where a chapter
-  // swaps a sale for a discard but repeats the same quality-vs-yield argument
-  // with the same partner conflict. Keep the window deliberately short so a
+  // swaps a sale for a discard but repeats the same quality-vs-yield argument.
+  // Keep the window deliberately short so a
   // later, materially changed return to the theme remains available.
   const recentNarrativeWindow = 2;
   const narrativeSeen = new Map<NarrativeTradeoffKind, number>();
@@ -2126,7 +2126,7 @@ export function assertNoRepeatedCausalShape(input: {
       if (priorChapter !== undefined && priorChapter !== plan.chapterNumber) {
         throw new StoryFactoryError(
           'plan_blocked',
-          `Chương ${plan.chapterNumber} lặp lại payoff chất lượng-đổi-sản lượng có xung đột đồng đội của chương ${priorChapter}. Đổi loại rủi ro, đối tượng xung đột hoặc payoff kế tiếp thay vì lại để main hy sinh hàng ngắn hạn để giữ chất lượng/uy tín.`,
+          `Chương ${plan.chapterNumber} lặp lại payoff hy sinh sản lượng ngắn hạn để giữ chất lượng/uy tín của chương ${priorChapter}. Đổi loại rủi ro, đối tượng xung đột hoặc payoff kế tiếp thay vì thay lý do rồi lại cho main dừng khai thác/bán hàng vì chất lượng.`,
           { chapterNumber: plan.chapterNumber, repeatsChapter: priorChapter, narrativeTradeoff: tradeoff.kind },
         );
       }
@@ -2308,7 +2308,7 @@ export async function planRollingWindow(input: {
         },
         recentNarrativeTradeoffs: {
           shapes: committedNarrativeTradeoffs(input.state),
-          rule: 'Nếu chapter gần nhất đã có beat main hy sinh sản lượng ngắn hạn để giữ chất lượng/uy tín và đồng đội phản đối, chapter mới phải đổi loại rủi ro hoặc payoff. Không thay đá xấu bằng hầm chật hay đổi “dừng câu” thành “vứt hàng” rồi lặp lại cùng beat.',
+          rule: 'Nếu chapter gần nhất đã có beat main hy sinh sản lượng ngắn hạn để giữ chất lượng/uy tín, chapter mới phải đổi loại rủi ro hoặc payoff. Không thay đá xấu bằng hầm chật hay đổi “dừng câu” thành “vứt hàng” rồi lặp lại cùng beat.',
         },
         // Author steering: a priority direction for upcoming chapters, applied
         // through planning choices. It never overrides canon, the ledger, or

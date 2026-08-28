@@ -162,6 +162,80 @@ async function mutate() {
   if (updated.error) throw updated.error;
 }
 
+/**
+ * Remove exactly one last published chapter after a confirmed publication defect.
+ * The prior run's immutable stateAfter is the only allowed restore point; the
+ * RPC locks the job/project, archives the removed prose in the run artifact,
+ * deletes the matching event ledger, and leaves the job cancelled for review.
+ */
+async function rollbackLastChapter() {
+  const jobId = value('--job-id');
+  const chapterValue = value('--chapter');
+  const publishedRunId = value('--run-id');
+  const reason = value('--reason')?.trim();
+  if (!jobId || !chapterValue || !publishedRunId || !reason) {
+    throw new Error('rollback-last-chapter requires --job-id, --chapter, --run-id, and --reason.');
+  }
+  const chapterNumber = Number(chapterValue);
+  if (!Number.isInteger(chapterNumber) || chapterNumber < 1) {
+    throw new Error('--chapter must be a positive integer.');
+  }
+  const jobLookup = await db.from('story_factory_jobs')
+    .select('id,project_id,novel_id,status,stage,current_chapter,chapters_today,rolling_plan')
+    .eq('id', jobId).single();
+  if (jobLookup.error) throw jobLookup.error;
+  const job = jobLookup.data;
+  if (job.current_chapter !== chapterNumber) {
+    throw new Error(`Job is at chapter ${job.current_chapter}; only its actual last chapter can be rolled back.`);
+  }
+  if (job.status === 'writing') throw new Error('Stop the active job before rolling back a chapter.');
+
+  const [priorRun, publishedRun, chapter] = await Promise.all([
+    db.from('story_factory_runs').select('id,chapter_number,status,output_artifact')
+      .eq('project_id', job.project_id).eq('chapter_number', chapterNumber - 1).eq('status', 'published')
+      .order('finished_at', { ascending: false }).limit(1).maybeSingle(),
+    db.from('story_factory_runs').select('id,chapter_number,status')
+      .eq('id', publishedRunId).eq('project_id', job.project_id).single(),
+    db.from('chapters').select('id,chapter_number,title,content')
+      .eq('novel_id', job.novel_id).eq('chapter_number', chapterNumber).single(),
+  ]);
+  if (priorRun.error) throw priorRun.error;
+  if (publishedRun.error) throw publishedRun.error;
+  if (chapter.error) throw chapter.error;
+  if (!priorRun.data || !publishedRun.data || !chapter.data) {
+    throw new Error('Rollback requires the published chapter, its run, and the immediately prior published state.');
+  }
+  if (publishedRun.data.status !== 'published' || publishedRun.data.chapter_number !== chapterNumber) {
+    throw new Error(`Run ${publishedRunId} is not the published record for chapter ${chapterNumber}.`);
+  }
+  const restoreState = StoryStateSchema.parse((priorRun.data.output_artifact as { stateAfter?: unknown }).stateAfter);
+  if (restoreState.chapterNumber !== chapterNumber - 1) {
+    throw new Error(`Published chapter ${chapterNumber - 1} does not contain an exact stateAfter restore point.`);
+  }
+  console.log(JSON.stringify({
+    dryRun: !apply,
+    command,
+    jobId,
+    chapterNumber,
+    publishedRunId,
+    restoreFromRunId: priorRun.data.id,
+    restoreToChapter: restoreState.chapterNumber,
+    removedTitle: chapter.data.title,
+    removedCharacters: chapter.data.content.length,
+    reason,
+  }, null, 2));
+  if (!apply) return;
+  const rollback = await db.rpc('rollback_story_factory_last_published_chapter', {
+    p_job_id: jobId,
+    p_expected_chapter: chapterNumber,
+    p_restore_state: restoreState,
+    p_published_run_id: publishedRunId,
+    p_reason: reason,
+  });
+  if (rollback.error) throw rollback.error;
+  console.log(JSON.stringify(rollback.data, null, 2));
+}
+
 const digest = (artifact: unknown) => createHash('sha256').update(JSON.stringify(artifact)).digest('hex');
 
 /**
@@ -435,8 +509,9 @@ async function main() {
     console.log(JSON.stringify(result, null, 2));
     return;
   }
+  if (command === 'rollback-last-chapter') return rollbackLastChapter();
   if (['start', 'stop', 'release'].includes(command)) return mutate();
-  throw new Error('Usage: factory-operator.ts status|portfolio|seed|restage|revive|repair-reachability|repair-invalid-capability-effect|tick|start|stop|release [options] [--apply]');
+  throw new Error('Usage: factory-operator.ts status|portfolio|seed|restage|revive|repair-reachability|repair-invalid-capability-effect|rollback-last-chapter|tick|start|stop|release [options] [--apply]');
 }
 
 main().catch(error => {
