@@ -444,6 +444,7 @@ class QueueProvider implements StoryModelProvider {
     temperature?: number;
     thinkingLevel?: 'minimal' | 'low' | 'medium' | 'high';
     verbosity?: 'low' | 'medium' | 'high';
+    deferApplicationSchemaValidation?: boolean;
   }): Promise<ProviderResult<T>> {
     this.calls.push(input.model);
     this.temperatures.push(input.temperature);
@@ -451,7 +452,7 @@ class QueueProvider implements StoryModelProvider {
     this.verbosities.push(input.verbosity);
     this.prompts.push(input.prompt);
     const value = this.values.shift();
-    return { value: input.schema.parse(value), usage };
+    return { value: input.deferApplicationSchemaValidation ? value as T : input.schema.parse(value), usage };
   }
 }
 
@@ -5132,6 +5133,30 @@ describe('canonical Story Factory', () => {
     await expect(planRollingWindow({ kernel, arc, state: initialState, routes, provider }))
       .rejects.toMatchObject({ code: 'plan_blocked' });
     expect(provider.calls).toEqual(['planner', 'planner']);
+  });
+
+  test('an oversized delta wire is repaired as one compact chapter without echoing the failed JSON', async () => {
+    const oversized = plannerWire();
+    const baseDelta = structuredClone(oversized.chapters[0].deltas[0]);
+    oversized.chapters[0].deltas = Array.from({ length: 31 }, (_, index) => ({
+      ...baseDelta,
+      id: `oversized_delta_${index + 1}`,
+    }));
+    const provider = new QueueProvider([oversized, plannerWire()]);
+
+    const result = await planRollingWindow({ kernel, arc, state: initialState, routes, provider });
+
+    expect(result.rollingPlan.plans).toHaveLength(1);
+    expect(provider.calls).toEqual(['planner', 'planner']);
+    const repairPrompt = JSON.parse(provider.prompts[1]);
+    expect(repairPrompt.previousResponse).toBeUndefined();
+    expect(repairPrompt.windowBudget).toMatchObject({
+      requestedChapterCount: 1,
+      perChapter: { maximumDeltas: 30, preferredDeltas: '6_to_16' },
+    });
+    expect(repairPrompt.compactContract.strictRules).toEqual(expect.arrayContaining([
+      expect.stringContaining('mỗi chương tối đa 5 scenes, 30 deltas và 30 mechanics'),
+    ]));
   });
 
   test('preserves exact materialization evidence after Planner repair is exhausted', async () => {

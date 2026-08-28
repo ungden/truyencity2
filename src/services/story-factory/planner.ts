@@ -223,6 +223,7 @@ const PLANNER_COMPACT_CONTRACT = {
   },
   strictRules: [
     'Mọi field compact đều bắt buộc; dùng null đúng chỗ, không bỏ field. counterpart chỉ khác null với relationship.',
+    'Ngân sách output là ràng buộc cứng dù response schema không hiển thị maxItems: cả window tối đa 3 chương; mỗi chương tối đa 5 scenes, 30 deltas và 30 mechanics. Bình thường chỉ dùng 2-4 scenes, 6-16 durable deltas và 1-6 mechanics. Nếu một ý định sẽ vượt ngân sách, chọn một beat có hậu quả rõ và để phần còn lại thành pressure cho chương sau — không bẻ nhỏ cùng một sự kiện thành nhiều delta giải thích.',
     'resource_numeric phải ghi nguồn/đích theo dấu của change: change dương có source cụ thể và sink=null; change âm có sink cụ thể và source=null; không tạo delta change=0.',
     'pre.k chỉ được fact|resource|location|promise; resource_numeric và resource_state chỉ dùng cho deltas.k.',
     'Mỗi pre.value là giá trị equality chính xác tại đầu chương, tuyệt đối không dùng như minimum/maximum hay ngưỡng. Ví dụ State có 100 thì pre resource phải là 100, không phải 20 với ý nghĩa “ít nhất 20”.',
@@ -2168,12 +2169,14 @@ export async function planRollingWindow(input: {
     task: string;
     previousResponse?: unknown;
     validationIssues?: unknown;
+    requestedWindowSize?: number;
     temperature: number;
   }) => {
     const nextChapter = input.state.chapterNumber + 1;
+    const requestedWindowSize = inputForAttempt.requestedWindowSize ?? input.requiredWindowSize;
     const requestedEndChapter = Math.min(
       input.arc.plannedEndChapter,
-      nextChapter + (input.requiredWindowSize ?? 3) - 1,
+      nextChapter + (requestedWindowSize ?? 3) - 1,
     );
     const plannerKernel = projectKernelForRollingPlanner(input.kernel, input.arc);
     const plannerState = projectStateForRollingPlanner(input.state);
@@ -2284,6 +2287,18 @@ export async function planRollingWindow(input: {
         } : null,
         nextChapter,
         maximumEndChapter: input.arc.plannedEndChapter,
+        windowBudget: {
+          requestedChapterCount: requestedWindowSize ?? '1_to_3',
+          maximumChapterCount: 3,
+          perChapter: {
+            maximumScenes: 5,
+            maximumDeltas: 30,
+            maximumMechanics: 30,
+            preferredScenes: '2_to_4',
+            preferredDeltas: '6_to_16',
+            preferredMechanics: '1_to_6',
+          },
+        },
         compactContract: PLANNER_COMPACT_CONTRACT,
         recoveryEvidence: input.recoveryEvidence,
         previousResponse: inputForAttempt.previousResponse,
@@ -2364,12 +2379,20 @@ export async function planRollingWindow(input: {
           : input.requiredWindowSize
             ? `Lập đúng ${input.requiredWindowSize} chương tiếp theo, không vượt quá cuối arc.`
             : 'Lập từ một đến ba chương tiếp theo, không vượt quá cuối arc.'
-        : 'Tạo lại toàn bộ rolling window và sửa đúng các validation issue cơ học; không vá cục bộ.',
-      previousResponse: mechanicalAttempt === 1 ? undefined : currentResponse,
+        : 'Tạo đúng MỘT chương kế tiếp từ canon/state hiện tại và sửa các validation issue cơ học. Không chép lại JSON lỗi, không cố bao phủ các beat tương lai, không vá cục bộ.',
+      // The full failed wire can be tens of thousands of tokens. Canonical state
+      // and the concise validation evidence are sufficient to regenerate; echoing
+      // that wire makes the repair expensive and encourages the same oversized
+      // structure. Outside benchmark windows, shrink the one visible repair to a
+      // single chapter so it has a concrete compact target.
+      previousResponse: undefined,
       validationIssues: mechanicalAttempt === 1 ? undefined : {
         message: mechanicalError?.message,
         evidence: mechanicalError?.evidence ?? null,
       },
+      requestedWindowSize: mechanicalAttempt === 1 || input.requiredWindowSize
+        ? undefined
+        : 1,
       // Mechanical planning is a constrained compiler input, not a prose
       // diversity task. Keep it reproducible; live qualitative drift belongs
       // to the periodic window review, while Plan Judge is offline-only.
