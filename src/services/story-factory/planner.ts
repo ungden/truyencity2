@@ -1033,6 +1033,47 @@ function orderMechanicUsesByDependency(
   return result;
 }
 
+/**
+ * The compact wire is a declaration, not an execution log: providers commonly
+ * group deltas by resource while mechanics are ordered by scene/dependency. The
+ * canonical before/after values must follow the same effect order the validator
+ * replays, otherwise two valid transactions touching one balance can fail only
+ * because their JSON array happened to be reversed.
+ */
+function orderPlannerDeltasForExecution(
+  chapter: z.infer<typeof PlannerCompactChapterSchema>,
+  orderedMechanicUses: z.infer<typeof PlannerCompactChapterSchema>['mechanics'],
+  effectOwnership: Map<string, string[]>,
+): z.infer<typeof PlannerCompactChapterSchema>['deltas'] {
+  const deltasById = new Map(chapter.deltas.map(delta => [delta.id, delta]));
+  const ordered: z.infer<typeof PlannerCompactChapterSchema>['deltas'] = [];
+  const added = new Set<string>();
+  const append = (deltaId: string) => {
+    if (added.has(deltaId)) return;
+    const delta = deltasById.get(deltaId);
+    if (!delta) return;
+    added.add(deltaId);
+    ordered.push(delta);
+  };
+
+  for (const scene of chapter.scenes) {
+    // validateCausalMechanics replays effect uses before external facts and
+    // external outflows in each scene. Keep materialization on that exact
+    // deterministic order so derived balances cannot disagree with validation.
+    for (const use of orderedMechanicUses) {
+      if (use.scene !== scene.id || use.role !== 'effect') continue;
+      const deltaIds = effectOwnership.get(use.id)
+        ?? [use.primaryDeltaId, ...use.additionalDeltaIds];
+      deltaIds.forEach(append);
+    }
+    scene.deltaIds.forEach(append);
+  }
+  // Invalid/unreferenced deltas stay at the tail; validators will still report
+  // them instead of a normalizer silently deleting durable state.
+  chapter.deltas.forEach(delta => append(delta.id));
+  return ordered;
+}
+
 export function materializePlannerRollingPlan(
   value: z.infer<typeof PlannerRollingPlanResponseSchema>,
   initialState: StoryState,
@@ -1114,6 +1155,11 @@ export function materializePlannerRollingPlan(
         kernel,
         effectOwnership,
       );
+      const orderedDeltas = orderPlannerDeltasForExecution(
+        augmentedChapter,
+        orderedMechanicUses,
+        effectOwnership,
+      );
       return {
       schemaVersion: compact.v,
       chapterNumber: chapter.n,
@@ -1133,7 +1179,7 @@ export function materializePlannerRollingPlan(
         action: scene.act,
         requiredDeltaIds: scene.deltaIds,
       })),
-      requiredDeltas: augmentedChapter.deltas.map(delta => {
+      requiredDeltas: orderedDeltas.map(delta => {
         if (delta.k === 'fact') {
           const before = factValues.get(delta.target) ?? null;
           const after = delta.after === null ? null : String(delta.after);

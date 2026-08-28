@@ -4132,7 +4132,7 @@ describe('canonical Story Factory', () => {
       kernel: ambiguousKernel,
       state: chainedState,
       plan: ambiguous.plans[0],
-    })).toThrow('causal validation issues');
+    })).toThrow('without a validated world mechanic');
   });
 
   test('compiler infers a unique capability effect but blocks ambiguous ownership', () => {
@@ -4532,6 +4532,42 @@ describe('canonical Story Factory', () => {
       { id: 'spend_money', before: 100, delta: -30, after: 70 },
       { id: 'earn_money', before: 70, delta: 10, after: 80 },
     ]);
+  });
+
+  test('derives same-resource balances in validated mechanic execution order, not provider delta order', () => {
+    const wire = plannerWire();
+    const chapter = wire.chapters[0];
+    chapter.scenes[0].deltaIds = ['gain_money', 'spend_money'];
+    // Providers often group or sort the compact delta array independently from
+    // mechanics. The raw order below is deliberately the opposite of execution.
+    chapter.deltas = [
+      {
+        id: 'spend_money', k: 'resource_numeric', target: 'money', counterpart: null,
+        before: null, change: -5, after: null, source: null, sink: 'mua đá',
+      },
+      {
+        id: 'gain_money', k: 'resource_numeric', target: 'money', counterpart: null,
+        before: null, change: 20, after: null, source: 'bán mẻ cá', sink: null,
+      },
+    ];
+    chapter.mechanics = [
+      {
+        id: 'use_gain', scene: chapter.scenes[0].id, mechanic: 'mechanic_trade', role: 'effect',
+        actor: 'main', qty: 20, facts: [], primaryDeltaId: 'gain_money', additionalDeltaIds: [],
+      },
+      {
+        id: 'use_spend', scene: chapter.scenes[0].id, mechanic: 'mechanic_trade', role: 'effect',
+        actor: 'main', qty: 5, facts: [], primaryDeltaId: 'spend_money', additionalDeltaIds: [],
+      },
+    ];
+
+    const rolling = materializePlannerRollingPlan(wire, initialState, kernel);
+    expect(rolling.plans[0].requiredDeltas).toMatchObject([
+      { id: 'gain_money', before: 100, delta: 20, after: 120 },
+      { id: 'spend_money', before: 120, delta: -5, after: 115 },
+    ]);
+    expect(applyChapterPlan({ kernel, state: initialState, plan: rolling.plans[0] }).state.resources)
+      .toEqual([{ resourceId: 'money', kind: 'numeric', value: 115 }]);
   });
 
   test('Planner wire cannot emit a decorative mechanic without a required delta', () => {
