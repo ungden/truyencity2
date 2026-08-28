@@ -1,5 +1,6 @@
 import {
   narrativelyObservableDeltaIds,
+  StoryKernelSchema,
   type ArcPlan,
   type CanonExtension,
   type ChapterOutcome,
@@ -11,7 +12,7 @@ import {
   StoryFactoryError,
 } from './contracts';
 
-export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-36-location-path-acquisition-bridge';
+export const CAUSAL_VALIDATOR_VERSION = 'story-factory-causal-validator-37-canon-extension-kernel-commit';
 
 export interface StateEvent {
   chapterNumber: number;
@@ -538,8 +539,18 @@ export function applyCanonExtension(input: {
     }
     kernel.travelRules.push(rule);
   }
-  validateKernelState(kernel, state);
-  return { kernel, state };
+  // CanonExtensionSchema only proves the extension is internally well-formed.
+  // The resource-kind contract depends on the *combined* kernel (for example, a
+  // new capability cannot declare state_change against an existing numeric
+  // resource). Validate that combined artifact before it can cross the durable
+  // arc-transition boundary; otherwise the next planner tick sees a poisoned
+  // kernel and stops after this provider call has already been paid for.
+  const parsedKernel = StoryKernelSchema.safeParse(kernel);
+  if (!parsedKernel.success) {
+    fail('Canon extension creates an invalid story kernel.', parsedKernel.error.issues);
+  }
+  validateKernelState(parsedKernel.data, state);
+  return { kernel: parsedKernel.data, state };
 }
 
 function preconditionMatches(actual: string | number | undefined, expected: string | number): boolean {

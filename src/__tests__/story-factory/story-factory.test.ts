@@ -2111,6 +2111,37 @@ describe('canonical Story Factory', () => {
     expect(withLocation.kernel.worldModel.geography.some(location => location.id === 'district_market')).toBe(true);
   });
 
+  test('canon extension cannot persist a state_change effect against a numeric resource', () => {
+    const extensionKernel = structuredClone(kernel);
+    extensionKernel.seriesSpine.stages[1].expansionSeeds.push({
+      id: 'seed_insulated_hold',
+      kind: 'world_mechanic',
+      description: 'Hầm bảo ôn mới cho chuyến biển xa.',
+    });
+    const extension = CanonExtensionSchema.parse({
+      stageId: 'stage_2',
+      characters: [], locations: [], travelRules: [], promises: [], worldRules: [],
+      worldMechanics: [{
+        seedId: 'seed_insulated_hold',
+        definition: {
+          id: 'cap_insulated_hold',
+          kind: 'capability',
+          name: 'Hầm bảo ôn',
+          description: 'Hải hoàn thiện hầm bảo ôn để giữ mực tươi.',
+          allowedActorIds: ['main'],
+          requiredFacts: [],
+          requiredResourceIds: ['money'],
+          effectResources: [{ resourceId: 'money', direction: 'state_change' }],
+          effectFactIds: ['fact_day'],
+          capacityUnit: null,
+          maximumUnitsPerMinute: null,
+        },
+      }],
+    });
+    expect(() => applyCanonExtension({ kernel: extensionKernel, state: initialState, extension }))
+      .toThrow('Canon extension creates an invalid story kernel');
+  });
+
   test('exact-ID memory lookup keys cover stage, cast, locations, rules and relationships', () => {
     expect(memoryEntityIdsForArc(kernel, arc, initialState)).toEqual(expect.arrayContaining([
       'main', 'stage_1', 'mother', 'home', 'money', 'rule_market',
