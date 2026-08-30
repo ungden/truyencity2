@@ -18,10 +18,14 @@ async function recordFactoryHeartbeat(result: Awaited<ReturnType<typeof runStory
     const checkedAt = new Date().toISOString();
     const { count, error } = await db.from('story_factory_jobs')
       .select('*', { count: 'exact', head: true })
-      .in('status', ['setup', 'ready', 'writing', 'revise', 'plan', 'arc', 'cover', 'window_review'])
+      // Match the queue portion of claim_story_factory_job. A job with an active
+      // lease is deliberately `writing`; a parallel cron cannot claim it and must
+      // not report it as an idle, runnable job.
+      .in('status', ['setup', 'ready', 'finale'])
       // A ready job waiting for its quota reset is scheduled, not runnable. Counting
       // it here made every healthy idle cron write a false critical heartbeat.
-      .lte('next_run_at', checkedAt);
+      .lte('next_run_at', checkedAt)
+      .or(`lease_until.is.null,lease_until.lt.${checkedAt}`);
     if (error) throw error;
     const enabled = isStoryFactoryEnabled();
     const runnableJobs = count ?? 0;
