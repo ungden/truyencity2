@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyCronAuth } from '@/lib/auth/cron-auth';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
-import { isStoryFactoryEnabled, runStoryFactoryTicks, STORY_FACTORY_RELEASE } from '@/services/story-factory';
+import {
+  isStoryFactoryEnabled,
+  deliverStoryFactoryOperatorAlerts,
+  enqueueStoryFactoryOperatorAlert,
+  runStoryFactoryTicks,
+  STORY_FACTORY_RELEASE,
+} from '@/services/story-factory';
 
 export const maxDuration = 300;
 export const dynamic = 'force-dynamic';
@@ -34,6 +40,18 @@ async function recordFactoryHeartbeat(result: Awaited<ReturnType<typeof runStory
         : 'Story Factory cron heartbeat recorded.',
     });
     if (insertError) throw insertError;
+    if (stalled) {
+      await enqueueStoryFactoryOperatorAlert(db, {
+        kind: 'stalled_cron',
+        // A stalled queue is one incident per day, not a mail every two-minute
+        // cron heartbeat. A terminal job error has its own run-scoped alert.
+        idempotencyKey: `story-factory-stalled-${checkedAt.slice(0, 10)}`,
+        title: 'cron đang kẹt',
+        message: `Cron thấy ${runnableJobs} job có thể chạy nhưng tick không hoàn tất stage nào (${result.status}).`,
+        stage: 'cron',
+        errorCode: 'stalled_cron',
+      });
+    }
   } catch (error) {
     // Monitoring must never consume the writing tick. Vercel logs retain this failure.
     console.error('[story-factory] heartbeat failed', error);
@@ -45,9 +63,18 @@ export async function GET(request: NextRequest) {
   try {
     const batch = await runStoryFactoryTicks();
     await recordFactoryHeartbeat(batch);
+    await deliverStoryFactoryOperatorAlerts(getSupabaseAdmin());
     return NextResponse.json({ release: STORY_FACTORY_RELEASE, ...batch });
   } catch (error) {
     console.error('[story-factory]', error);
+    await enqueueStoryFactoryOperatorAlert(getSupabaseAdmin(), {
+      kind: 'cron_failure',
+      idempotencyKey: `story-factory-cron-failure-${new Date().toISOString().slice(0, 10)}`,
+      title: 'cron lỗi',
+      message: error instanceof Error ? error.message : String(error),
+      stage: 'cron',
+      errorCode: 'cron_failure',
+    });
     return NextResponse.json({
       release: STORY_FACTORY_RELEASE,
       status: 'failed',

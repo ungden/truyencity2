@@ -39,6 +39,7 @@ import {
 import { requireMarketBlueprint, runConceptLab, StoryCommissionSchema } from './setup';
 import { assertFirst30PortfolioCommission } from './portfolio';
 import type { SetupCheckpoint } from './setup';
+import { enqueueStoryFactoryOperatorAlert } from './alerts';
 
 interface FactoryJobRow {
   id: string;
@@ -245,6 +246,22 @@ async function blockRun(
       : {}),
   }).eq('id', job.id).eq('lease_token', job.lease_token);
   if (jobUpdate.error) console.warn('[story-factory] blockRun job update failed:', jobUpdate.error.message);
+  if (!retryable) {
+    await enqueueStoryFactoryOperatorAlert(db, {
+      kind: 'terminal_block',
+      // This is stable for the same terminal run, including an invocation retry.
+      // A later human-triggered retry receives a new run ID and earns one new alert.
+      idempotencyKey: `story-factory-terminal-${runId ?? job.id}-${factoryError.code}`,
+      title: 'job bị chặn',
+      message: factoryError.message,
+      jobId: job.id,
+      novelId: job.novel_id,
+      runId,
+      stage: job.stage,
+      chapterNumber: job.current_chapter,
+      errorCode: factoryError.code,
+    });
+  }
   return {
     status: retryable ? 'completed' : 'blocked',
     jobId: job.id,

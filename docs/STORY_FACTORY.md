@@ -175,6 +175,25 @@ rewrite itself, rather than redrafting blind.
 Parked statuses are invisible to the claim query by construction. `revive` is how they come
 back.
 
+### Operator email alerts
+
+Terminal job blocks, a cron failure, and a cron that leaves runnable jobs without completing
+a stage are added to a private, durable alert outbox. The writing job is never retried or
+unblocked merely because email cannot be delivered. On later cron ticks, pending alerts retry
+with bounded backoff; Resend receives a deterministic idempotency key so concurrent invocations
+cannot mail the same incident twice.
+
+To enable delivery in Vercel Production, configure all three server-only values:
+
+```bash
+RESEND_API_KEY=re_...
+STORY_FACTORY_ALERT_FROM="TruyenCity Alerts <alerts@your-verified-domain.com>"
+STORY_FACTORY_ALERT_EMAIL=operator@example.com
+```
+
+`STORY_FACTORY_ALERT_EMAIL` may contain up to four comma-separated recipients. Without all
+three values, incidents remain in the outbox and the scheduler keeps running normally.
+
 ## Models
 
 `routes.ts` is the exact, versioned route. There is no substitution: a stage's model
