@@ -1983,6 +1983,20 @@ export interface NarrativeTradeoff {
   kind: NarrativeTradeoffKind;
 }
 
+/**
+ * A coarse, deterministic outcome fingerprint for the production loop that
+ * caused the Ch46 → Ch50 → Ch51 regression. It is deliberately narrower than
+ * "commerce" or "fishing": a serial may revisit either. What readers reject
+ * is replaying the entire harvest → sell → cold-storage-limit conclusion while
+ * only changing the yield or price.
+ */
+type NarrativeCycleKind = 'harvest_sale_storage_loop';
+
+export interface NarrativeCycle {
+  chapterNumber: number;
+  kind: NarrativeCycleKind;
+}
+
 const causalPair = (mechanicId: string, actorId: string) => `${mechanicId} bởi ${actorId}`;
 const shapeSignature = (chain: string[]) => [...chain].sort().join(' + ');
 
@@ -2048,6 +2062,23 @@ function hasQualityRestraintReplay(value: string): boolean {
   return quality && restraint;
 }
 
+function hasHarvestSaleStorageLoop(value: string): boolean {
+  const normalized = normalizedNarrativeText(value);
+  const harvest = includesNarrativeSignal(normalized, [
+    'cau duoc', 'danh bat', 'keo luoi', 'thu hoach', 'thu duoc', 'me hang',
+    'san luong', 'lay them hang',
+  ]);
+  const sale = includesNarrativeSignal(normalized, [
+    'ban duoc', 'duoc ban', 'ban hang', 'ban cho', 'giao hang', 'nguoi mua', 'gia ban',
+    'ban me', 'ban tai', 'xuat hang', 'thu tien', 'doi lay tien',
+  ]);
+  const storage = includesNarrativeSignal(normalized, [
+    'ham da', 'da tan', 'bao quan', 'giu tuoi', 'uop da', 'kho lanh',
+    'ham lanh', 'dong lanh', 'suc chua',
+  ]);
+  return harvest && sale && storage;
+}
+
 export function committedNarrativeTradeoffs(state?: Pick<StoryState, 'recentOutcomes'>): NarrativeTradeoff[] {
   if (!state) return [];
   return state.recentOutcomes.flatMap(outcome => {
@@ -2066,6 +2097,27 @@ function planNarrativeTradeoffs(plan: ChapterPlan): NarrativeTradeoff[] {
     .join(' ');
   return hasQualityRestraintReplay(text)
     ? [{ chapterNumber: plan.chapterNumber, kind: 'quality_restraint_replay' }]
+    : [];
+}
+
+export function committedNarrativeCycles(state?: Pick<StoryState, 'recentOutcomes'>): NarrativeCycle[] {
+  if (!state) return [];
+  return state.recentOutcomes.flatMap(outcome => {
+    const text = [outcome.event, outcome.method, outcome.result, outcome.endingSituation]
+      .filter((value): value is string => Boolean(value))
+      .join(' ');
+    return hasHarvestSaleStorageLoop(text)
+      ? [{ chapterNumber: outcome.chapterNumber, kind: 'harvest_sale_storage_loop' as const }]
+      : [];
+  });
+}
+
+function planNarrativeCycles(plan: ChapterPlan): NarrativeCycle[] {
+  const text = plan.scenes
+    .flatMap(scene => [scene.objective, scene.obstacle, scene.action])
+    .join(' ');
+  return hasHarvestSaleStorageLoop(text)
+    ? [{ chapterNumber: plan.chapterNumber, kind: 'harvest_sale_storage_loop' }]
     : [];
 }
 
@@ -2131,6 +2183,32 @@ export function assertNoRepeatedCausalShape(input: {
         );
       }
       narrativeSeen.set(tradeoff.kind, plan.chapterNumber);
+    }
+  }
+
+  // This catches the broader commercial loop that can evade the restraint
+  // guard: the protagonist may complete the catch and sale rather than stop
+  // early, yet the chapter still ends on the same cold-storage bottleneck.
+  // Five chapters is long enough to protect the reader's working memory while
+  // allowing a later return after the story has actually changed arenas.
+  const recentCycleWindow = 5;
+  const cycleSeen = new Map<NarrativeCycleKind, number>();
+  for (const cycle of committedNarrativeCycles(input.state)) {
+    if (cycle.chapterNumber >= minimumChapter - recentCycleWindow) {
+      cycleSeen.set(cycle.kind, cycle.chapterNumber);
+    }
+  }
+  for (const plan of input.plans) {
+    for (const cycle of planNarrativeCycles(plan)) {
+      const priorChapter = cycleSeen.get(cycle.kind);
+      if (priorChapter !== undefined && priorChapter !== plan.chapterNumber) {
+        throw new StoryFactoryError(
+          'plan_blocked',
+          `Chương ${plan.chapterNumber} lặp lại vòng khai thác → bán → nút thắt bảo quản của chương ${priorChapter}. Đổi arena hoặc câu hỏi trung tâm: xử lý chuỗi lạnh, thương lượng quyền phân phối, đối thủ khai thác điểm yếu, hay một payoff có hậu quả mới; không đổi số kg/giá rồi quay lại cùng kết luận.`,
+          { chapterNumber: plan.chapterNumber, repeatsChapter: priorChapter, narrativeCycle: cycle.kind },
+        );
+      }
+      cycleSeen.set(cycle.kind, plan.chapterNumber);
     }
   }
 }
@@ -2309,6 +2387,10 @@ export async function planRollingWindow(input: {
         recentNarrativeTradeoffs: {
           shapes: committedNarrativeTradeoffs(input.state),
           rule: 'Nếu chapter gần nhất đã có beat main hy sinh sản lượng ngắn hạn để giữ chất lượng/uy tín, chapter mới phải đổi loại rủi ro hoặc payoff. Không thay đá xấu bằng hầm chật hay đổi “dừng câu” thành “vứt hàng” rồi lặp lại cùng beat.',
+        },
+        recentNarrativeCycles: {
+          cycles: committedNarrativeCycles(input.state),
+          rule: 'Nếu recentNarrativeCycles có harvest_sale_storage_loop, không lập lại vòng khai thác/câu được hàng → bán → kết ở hầm đá, độ tươi hoặc sức chứa. Phải chuyển arena/câu hỏi trung tâm sang xử lý chuỗi lạnh, thương lượng quyền phân phối, đối thủ tận dụng nút thắt hoặc payoff có hậu quả mới. Đổi số kg, giá hay lý do đá tan không tính là đổi.',
         },
         // Author steering: a priority direction for upcoming chapters, applied
         // through planning choices. It never overrides canon, the ledger, or

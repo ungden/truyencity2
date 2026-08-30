@@ -4386,11 +4386,14 @@ describe('canonical Story Factory', () => {
         planningRule: string;
         mechanics: Array<{ mechanicId: string }>;
       };
+      recentNarrativeCycles: { cycles: Array<{ chapterNumber: number; kind: string }>; rule: string };
     };
     expect(prompt.mechanicDependencyGuide.planningRule).toContain('producerMechanicId');
     expect(prompt.mechanicDependencyGuide.planningRule).toContain('forbiddenFacts');
     expect(prompt.mechanicDependencyGuide.mechanics.map(item => item.mechanicId))
       .toEqual(expect.arrayContaining(arc.activeMechanicIds));
+    expect(prompt.recentNarrativeCycles.cycles).toEqual([]);
+    expect(prompt.recentNarrativeCycles.rule).toContain('Đổi số kg, giá');
   });
 
   test('fact before values are derived sequentially from State across a rolling window', () => {
@@ -6079,6 +6082,44 @@ describe('prose-craft gates', () => {
     expect(() => assertNoRepeatedCausalShape({
       plans: [repeatedSilentQualityBeat], state: silentQualityHistory,
     })).toThrow(/lặp lại payoff hy sinh sản lượng ngắn hạn/);
+
+    // The quality-restraint guard is intentionally narrow. A chapter can still
+    // be stale when it completes the sale instead of stopping early, then lands
+    // on the same cold-storage bottleneck. This was the wider Ch46/50 pattern.
+    const harvestSaleStorageHistory: StoryState = {
+      ...initialState,
+      chapterNumber: 50,
+      recentOutcomes: [{
+        chapterNumber: 50,
+        title: 'Mười Kg Trên Khoang Đá',
+        event: 'Phan câu được mẻ mực lớn ngoài rạn rồi đưa về bến.',
+        method: 'Anh dùng máy mới đưa mẻ hàng về trước giờ chợ.',
+        result: 'Mẻ hàng được bán nhưng hầm đá không đủ để bảo quản phần còn lại.',
+        endingSituation: 'Sức chứa hầm đá tiếp tục là nút thắt của chuyến biển.',
+        evidenceSpans: ['Mẻ hàng được bán'],
+      }],
+    };
+    const repeatedHarvestSaleStorage = plan(51);
+    repeatedHarvestSaleStorage.scenes[0] = {
+      ...repeatedHarvestSaleStorage.scenes[0],
+      objective: 'Ra rạn câu được thêm mẻ mực lớn để tăng sản lượng.',
+      obstacle: 'Hầm đá nhỏ khiến phần hàng còn lại khó bảo quản.',
+      action: 'Phan bán mẻ mực ở chợ rồi lại tính cách xoay xở với đá tan.',
+    };
+    expect(() => assertNoRepeatedCausalShape({
+      plans: [repeatedHarvestSaleStorage], state: harvestSaleStorageHistory,
+    })).toThrow(/lặp lại vòng khai thác → bán → nút thắt bảo quản/);
+
+    const coldChainPivot = structuredClone(repeatedHarvestSaleStorage);
+    coldChainPivot.scenes[0] = {
+      ...coldChainPivot.scenes[0],
+      objective: 'Chốt quyền dùng kho lạnh chung trước khi chuyến biển kế tiếp khởi hành.',
+      obstacle: 'Chủ kho đòi độc quyền nguồn hàng và Minh muốn bỏ cuộc.',
+      action: 'Phan đưa điều kiện chia lợi nhuận, buộc chủ kho chọn hợp tác hoặc để đối thủ chiếm bến.',
+    };
+    expect(() => assertNoRepeatedCausalShape({
+      plans: [coldChainPivot], state: harvestSaleStorageHistory,
+    })).not.toThrow();
 
     const qualityWithoutRestraint = structuredClone(repeatedSilentQualityBeat);
     qualityWithoutRestraint.scenes[0].action = 'Phan mở thêm hầm lạnh mới và tiếp tục giao hàng đúng tiêu chuẩn.';
