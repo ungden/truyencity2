@@ -23,7 +23,7 @@ import type { MarketBlueprint } from './setup';
 
 // Defined here, not in release.ts: release → benchmark → planner already exists, so a
 // planner → release import closes a cycle and breaks the production bundle (TDZ at init).
-export const FACTORY_PLANNER_VERSION = 'story-factory-planner-91-blocked-capability-causal-order';
+export const FACTORY_PLANNER_VERSION = 'story-factory-planner-92-recovery-precondition-circuit';
 import { EDITOR_SYSTEM_PROMPT, PLANNER_SYSTEM_PROMPT, PLAN_JUDGE_SYSTEM_PROMPT } from './prompts';
 import {
   ARC_ACTIVE_MECHANIC_BUDGET,
@@ -261,6 +261,16 @@ const PLANNER_COMPACT_CONTRACT = {
 
 type PlannerMechanicGuide = {
   planningRule: string;
+  /** Opening-state prerequisites promoted from contextual guide to hard task constraints. */
+  hardConstraints: Array<{
+    consumerMechanicId: string;
+    conditionKind: 'fact' | 'resource';
+    conditionId: string;
+    current: string | number | null;
+    required: string | number | null;
+    producerMechanicIds: string[];
+    instruction: string;
+  }>;
   mechanics: Array<{
     mechanicId: string;
     kind: StoryKernel['worldMechanics'][number]['kind'];
@@ -287,6 +297,34 @@ type PlannerMechanicGuide = {
     unlocksResourceIds: string[];
   }>;
 };
+
+function plannerHardMechanicDirective(guide: PlannerMechanicGuide): string | null {
+  if (!guide.hardConstraints.length) return null;
+  const constraints = guide.hardConstraints.map(constraint => {
+    const producers = constraint.producerMechanicIds.length
+      ? `producer hợp lệ: ${constraint.producerMechanicIds.join(', ')}`
+      : 'không có producer hợp lệ trong activeMechanicIds';
+    return `${constraint.consumerMechanicId} bị cấm ở đầu window vì ${constraint.conditionKind} ${constraint.conditionId} hiện là ${String(constraint.current)} (cần ${String(constraint.required)}; ${producers}).`;
+  });
+  return [
+    'RÀNG BUỘC CƠ HỌC BẮT BUỘC (ưu tiên cao hơn beat sáng tạo):',
+    ...constraints,
+    'Chỉ dùng consumer sau khi một producer nêu trên đã tạo điều kiện thật sự ở effect của scene trước, hoặc effect sớm hơn trong cùng scene nếu replay ledger cho thấy điều kiện đã khả dụng. Nếu không thể chứng minh điều đó bằng mechanics và delta hợp lệ, bỏ consumer khỏi plan. Không dùng role=support để mượn output cùng scene.',
+  ].join('\n');
+}
+
+function isPlanBlockedRecovery(value: unknown): value is { source: 'plan_blocked'; message: string } {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const record = value as Record<string, unknown>;
+  return record.source === 'plan_blocked' && typeof record.message === 'string';
+}
+
+/** A repeated rejected predicate is evidence, not a reason to buy the same repair twice. */
+function repeatsPlanBlockedRecovery(input: unknown, error: StoryFactoryError): boolean {
+  if (!isPlanBlockedRecovery(input)) return false;
+  const normalize = (message: string) => message.trim().replace(/\s+/g, ' ').toLocaleLowerCase('en-US');
+  return normalize(input.message) === normalize(error.message);
+}
 
 /**
  * Compile the causal dependency graph into a small, state-aware projection.
@@ -342,9 +380,7 @@ export function buildPlannerMechanicGuide(input: {
       && Number(current) === expected)
   );
 
-  return {
-    planningRule: 'activeMechanicIds là working set, không phải checklist. Nếu availableAtWindowStart=false, phải dùng một producerMechanicId hợp lệ ở scene/chương trước rồi mới dùng mechanic bị khóa. Nếu producerMechanicIds rỗng thì không được dùng mechanic đó trong window. Với constraint/capability, requiredFacts và forbiddenFacts có cấu trúc thắng description; replay lại điều kiện tại đúng scene và bỏ mechanic nếu một fact vừa chuyển sang giá trị forbidden.',
-    mechanics: activeMechanics.map(mechanic => {
+  const mechanics = activeMechanics.map(mechanic => {
       const requiredFacts = mechanic.kind === 'conversion' ? [] : mechanic.requiredFacts;
       const requiredResources = mechanic.kind === 'conversion'
         ? mechanic.inputsPerBatch.map(inputResource => ({
@@ -408,7 +444,35 @@ export function buildPlannerMechanicGuide(input: {
         unlocksFactIds,
         unlocksResourceIds,
       };
-    }),
+    });
+
+  return {
+    planningRule: 'activeMechanicIds là working set, không phải checklist. Nếu availableAtWindowStart=false, phải dùng một producerMechanicId hợp lệ ở scene/chương trước rồi mới dùng mechanic bị khóa. Nếu producerMechanicIds rỗng thì không được dùng mechanic đó trong window. Với constraint/capability, requiredFacts và forbiddenFacts có cấu trúc thắng description; replay lại điều kiện tại đúng scene và bỏ mechanic nếu một fact vừa chuyển sang giá trị forbidden.',
+    hardConstraints: mechanics.flatMap(mechanic => [
+      ...mechanic.blockedByFacts.map(condition => ({
+        consumerMechanicId: mechanic.mechanicId,
+        conditionKind: 'fact' as const,
+        conditionId: condition.factId,
+        current: condition.current,
+        required: condition.expected,
+        producerMechanicIds: condition.producerMechanicIds,
+        instruction: condition.producerMechanicIds.length
+          ? 'Run a listed producer causally before this mechanic, or omit the consumer.'
+          : 'No active producer can satisfy this prerequisite; omit the consumer.',
+      })),
+      ...mechanic.blockedByResources.map(condition => ({
+        consumerMechanicId: mechanic.mechanicId,
+        conditionKind: 'resource' as const,
+        conditionId: condition.resourceId,
+        current: condition.current,
+        required: condition.minimumForOneUse,
+        producerMechanicIds: condition.producerMechanicIds,
+        instruction: condition.producerMechanicIds.length
+          ? 'Run a listed producer causally before this mechanic, or omit the consumer.'
+          : 'No active producer can satisfy this prerequisite; omit the consumer.',
+      })),
+    ]),
+    mechanics,
   };
 }
 
@@ -2315,6 +2379,12 @@ export async function planRollingWindow(input: {
         error instanceof Error ? error.message : String(error));
     }
   };
+  const mechanicDependencyGuide = buildPlannerMechanicGuide({
+    kernel: input.kernel,
+    arc: input.arc,
+    state: input.state,
+  });
+  const hardMechanicDirective = plannerHardMechanicDirective(mechanicDependencyGuide);
   const requestPlan = async (inputForAttempt: {
     task: string;
     previousResponse?: unknown;
@@ -2338,7 +2408,7 @@ export async function planRollingWindow(input: {
       thinkingLevel: 'low',
       system: PLANNER_SYSTEM_PROMPT,
       prompt: JSON.stringify({
-        task: inputForAttempt.task,
+        task: [inputForAttempt.task, hardMechanicDirective].filter(Boolean).join('\n\n'),
         kernel: plannerKernel,
         arc: input.arc,
         state: plannerState,
@@ -2386,11 +2456,8 @@ export async function planRollingWindow(input: {
             )),
           },
         ])),
-        mechanicDependencyGuide: buildPlannerMechanicGuide({
-          kernel: input.kernel,
-          arc: input.arc,
-          state: input.state,
-        }),
+        mechanicDependencyGuide,
+        mechanicHardConstraints: mechanicDependencyGuide.hardConstraints,
         travelConstraints: {
           initialLocationsByCharacter: Object.fromEntries(
             input.state.characters.map(item => [item.characterId, item.locationId]),
@@ -2509,6 +2576,7 @@ export async function planRollingWindow(input: {
   let currentResponse: z.infer<typeof PlannerRollingPlanResponseSchema> | undefined;
   let currentPlan: RollingPlan | undefined;
   let mechanicalError: StoryFactoryError | undefined;
+  let recoveryCircuitOpen = false;
   if (resume) {
     const stored = PlannerRollingPlanResponseSchema.safeParse(resume.mechanicalResponse);
     if (stored.success) {
@@ -2578,11 +2646,16 @@ export async function planRollingWindow(input: {
         validationEvidence: mechanicalError.evidence ?? null,
         usage: result.usage,
       });
+      if (mechanicalAttempt === 1 && repeatsPlanBlockedRecovery(input.recoveryEvidence, mechanicalError)) {
+        recoveryCircuitOpen = true;
+        break;
+      }
     }
   }
   if (!currentPlan || !currentResponse) {
     throw new StoryFactoryError('plan_blocked', mechanicalError?.message ?? 'Planner mechanical repair budget was exhausted.', {
       validation: mechanicalError?.evidence ?? null,
+      recoveryCircuitOpen,
       usages,
       attempts,
     });

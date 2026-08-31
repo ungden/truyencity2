@@ -4441,6 +4441,15 @@ describe('canonical Story Factory', () => {
       unlocksFactIds: ['fact_day'],
       unlocksResourceIds: [],
     });
+    expect(guide.hardConstraints).toEqual([{
+      consumerMechanicId: 'approve_loan',
+      conditionKind: 'resource',
+      conditionId: 'processed_dossiers',
+      current: 0,
+      required: null,
+      producerMechanicIds: ['process_dossier'],
+      instruction: 'Run a listed producer causally before this mechanic, or omit the consumer.',
+    }]);
   });
 
   test('Planner prompt receives the state-aware mechanic dependency guide', async () => {
@@ -5087,6 +5096,48 @@ describe('canonical Story Factory', () => {
       { attempt: 'mechanical_repair', status: 'validated' },
       { attempt: 'judge_replan', status: 'validated' },
     ]);
+  });
+
+  test('a recovery that repeats the exact blocked predicate opens the repair circuit after one call', async () => {
+    const invalidWire = plannerWire();
+    invalidWire.chapters[0].mechanics = [{
+      id: 'invalid_support',
+      scene: 'scene_1',
+      mechanic: 'mechanic_daylight',
+      role: 'support',
+      actor: 'main',
+      qty: 1,
+      facts: ['fact_day'],
+      primaryDeltaId: 'missing_delta',
+      additionalDeltaIds: [],
+    }];
+
+    // Establish the actual validator message first. The circuit compares the
+    // persisted predicate, not a brittle hand-written copy of that message.
+    const first = new QueueProvider([invalidWire, structuredClone(invalidWire)]);
+    let blocked: Error | undefined;
+    try {
+      await planRollingWindow({ kernel, arc, state: initialState, routes, provider: first });
+    } catch (error) {
+      expect(error).toBeInstanceOf(Error);
+      blocked = error as Error;
+    }
+    expect(blocked).toBeDefined();
+    expect(first.calls).toEqual(['planner', 'planner']);
+
+    const recovery = new QueueProvider([structuredClone(invalidWire)]);
+    await expect(planRollingWindow({
+      kernel,
+      arc,
+      state: initialState,
+      routes,
+      provider: recovery,
+      recoveryEvidence: { source: 'plan_blocked', message: blocked!.message },
+    })).rejects.toMatchObject({
+      code: 'plan_blocked',
+      evidence: expect.objectContaining({ recoveryCircuitOpen: true }),
+    });
+    expect(recovery.calls).toEqual(['planner']);
   });
 
   test('a Plan Judge replan gets one bounded mechanical repair before re-review', async () => {
