@@ -27,7 +27,7 @@ describe('Story Factory provider timeout', () => {
     expect(global.fetch).toHaveBeenCalledTimes(1);
   });
 
-  test('parks an invalid Gemini credential instead of spending retry budget', async () => {
+  test('parks an invalid Gemini credential as revivable infrastructure without spending retry budget', async () => {
     process.env.GEMINI_API_KEY = 'revoked-gemini-key';
     (global.fetch as jest.Mock).mockResolvedValue(new Response(JSON.stringify({
       error: { status: 'INVALID_ARGUMENT', details: [{ reason: 'API_KEY_INVALID' }] },
@@ -39,8 +39,9 @@ describe('Story Factory provider timeout', () => {
       prompt: 'test',
       transportRetryLimit: 2,
     })).rejects.toMatchObject({
-      code: 'setup_blocked',
+      code: 'infra_blocked',
       message: expect.stringContaining('GEMINI_API_KEY'),
+      evidence: expect.objectContaining({ providerCredential: true }),
     });
     expect(global.fetch).toHaveBeenCalledTimes(1);
   });

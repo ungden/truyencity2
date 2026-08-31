@@ -220,7 +220,10 @@ describe('Story Factory architecture boundary', () => {
     const provider = read('src/services/story-factory/provider.ts');
     expect(provider).toContain('408, 409, 429, 499');
     expect(runtime).toContain('const infraRetryLimit = options?.infraRetryLimit ?? INFRA_RETRY_LIMIT');
-    expect(runtime).toContain("factoryError.code === 'infra_blocked' && job.retry_count < infraRetryLimit");
+    expect(runtime).toContain("factoryError.code === 'infra_blocked'");
+    expect(runtime).toContain('job.retry_count < infraRetryLimit');
+    expect(provider).toContain("new StoryFactoryError('infra_blocked', `${provider} credentials were rejected");
+    expect(runtime).toContain('terminalProviderCredential');
     // Semantic verdicts about the story are not retried — they need a human or a replan.
     expect(runtime).toContain("status: retryable ? 'ready' : factoryError.code");
   });

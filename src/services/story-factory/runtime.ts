@@ -349,7 +349,14 @@ async function blockRun(
   // attempt materially differs (retryOnce: a first plan verdict whose evidence just
   // became plan_feedback), which earns exactly one automatic retry before parking.
   const infraRetryLimit = options?.infraRetryLimit ?? INFRA_RETRY_LIMIT;
-  const retryable = (factoryError.code === 'infra_blocked' && job.retry_count < infraRetryLimit)
+  const terminalProviderCredential = factoryError.code === 'infra_blocked'
+    && !!(factoryError.evidence
+      && typeof factoryError.evidence === 'object'
+      && !Array.isArray(factoryError.evidence)
+      && (factoryError.evidence as { providerCredential?: unknown }).providerCredential === true);
+  const retryable = (factoryError.code === 'infra_blocked'
+    && !terminalProviderCredential
+    && job.retry_count < infraRetryLimit)
     || options?.retryOnce === true;
   const now = new Date();
   const jobUpdate = await db.from('story_factory_jobs').update({

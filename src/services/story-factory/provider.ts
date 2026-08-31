@@ -181,14 +181,28 @@ function retryable(error: unknown): boolean {
 
 function credentialFailure(provider: string, envName: string, status: number, detail: string): StoryFactoryError | null {
   // A revoked/malformed key or an authorization denial cannot become healthy by
-  // repeating the same request. Park the job for configuration repair instead of
-  // consuming its infrastructure retry budget.
+  // repeating the same request. It is infrastructure, not a malformed story
+  // setup, but carries terminal evidence so blockRun will not spend its
+  // automatic infrastructure retry budget before an operator revives it.
   const rejected = status === 401
     || status === 403
     || /\b(?:API_KEY_INVALID|invalid[_ ]api[_ ]key|API key not valid|incorrect API key)\b/i.test(detail);
   return rejected
-    ? new StoryFactoryError('setup_blocked', `${provider} credentials were rejected (HTTP ${status}). Update ${envName}, then revive the job.`)
+    ? new StoryFactoryError('infra_blocked', `${provider} credentials were rejected (HTTP ${status}). Update ${envName}, then revive the job.`, {
+      providerCredential: true,
+      provider,
+      envName,
+      status,
+    })
     : null;
+}
+
+function missingCredential(envName: string, route: string): StoryFactoryError {
+  return new StoryFactoryError('infra_blocked', `${envName} is not configured for ${route}.`, {
+    providerCredential: true,
+    envName,
+    missing: true,
+  });
 }
 
 /**
@@ -302,7 +316,7 @@ async function openaiGenerate(input: {
   verbosity?: 'low' | 'medium' | 'high';
 }): Promise<ProviderResult<string>> {
   const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) throw new StoryFactoryError('setup_blocked', 'OPENAI_API_KEY is not configured for a gpt-* route.');
+  if (!apiKey) throw missingCredential('OPENAI_API_KEY', 'a gpt-* route');
   const strictSchema = input.responseSchema
     ? JSON.parse(JSON.stringify(input.responseSchema), (key, value) => {
       if (value && typeof value === 'object' && !Array.isArray(value)) {
@@ -418,7 +432,7 @@ async function openrouterGenerate(input: {
   transportRetryLimit?: TransportRetryLimit;
 }): Promise<ProviderResult<string>> {
   const apiKey = process.env.OPENROUTER_API_KEY;
-  if (!apiKey) throw new StoryFactoryError('setup_blocked', 'OPENROUTER_API_KEY is not configured for a slash-vendor route.');
+  if (!apiKey) throw missingCredential('OPENROUTER_API_KEY', 'a slash-vendor route');
   const strictSchema = input.responseSchema
     ? JSON.parse(JSON.stringify(input.responseSchema), (key, value) => {
       if (value && typeof value === 'object' && !Array.isArray(value)) {
@@ -548,7 +562,7 @@ async function generate(input: {
     return openaiGenerate(input);
   }
   const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) throw new StoryFactoryError('setup_blocked', 'GEMINI_API_KEY is not configured.');
+  if (!apiKey) throw missingCredential('GEMINI_API_KEY', 'a Gemini route');
 
   const generationConfig: Record<string, unknown> = {
     temperature: input.temperature,
