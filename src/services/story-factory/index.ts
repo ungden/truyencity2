@@ -6,6 +6,7 @@ export * from './craft';
 export * from './context';
 export * from './cover';
 export * from './memory';
+export * from './operator-recovery';
 export * from './pipeline';
 export * from './planner';
 export * from './portfolio';

@@ -40,7 +40,7 @@ export default function FactoryPage() {
   }, []);
   useEffect(() => { void load(); }, [load]);
 
-  const act = async (action: 'start' | 'stop' | 'release' | 'revive', jobId?: string) => {
+  const act = async (action: 'start' | 'stop' | 'release' | 'revive' | 'repair-plan', jobId?: string) => {
     setActionError(null);
     const response = await fetch('/api/admin/factory', {
       method: 'POST',
@@ -58,6 +58,9 @@ export default function FactoryPage() {
   };
 
   const blocked = jobs.filter(job => job.status.endsWith('_blocked'));
+  const infraBlocked = blocked.filter(job => job.status === 'infra_blocked');
+  const planBlocked = blocked.filter(job => job.status === 'plan_blocked');
+  const qualityBlocked = blocked.filter(job => job.status === 'quality_blocked');
   const staleRelease = jobs.filter(job => {
     const projectR = projectRelease(job);
     return projectR !== null && release !== '' && projectR !== release;
@@ -71,11 +74,17 @@ export default function FactoryPage() {
     {actionError && <Card>
       <CardContent className="pt-6"><p className="text-sm text-red-600">{actionError}</p></CardContent>
     </Card>}
-    {blocked.length > 0 && <Card>
+    {infraBlocked.length > 0 && <Card>
       <CardContent className="flex items-center justify-between gap-4 pt-6">
-        <p className="text-sm">{blocked.length} job đang bị chặn và sẽ không tự chạy lại.</p>
-        <Button size="sm" onClick={() => act('revive')}>Hồi sinh tất cả</Button>
+        <p className="text-sm">{infraBlocked.length} job lỗi hạ tầng có thể thử lại.</p>
+        <Button size="sm" onClick={() => act('revive')}>Thử lại lỗi hạ tầng</Button>
       </CardContent>
+    </Card>}
+    {planBlocked.length > 0 && <Card>
+      <CardContent className="pt-6"><p className="text-sm">{planBlocked.length} plan bị chặn. Dùng Repair plan theo từng job để bỏ window chưa commit, giữ evidence và validate state trước khi requeue.</p></CardContent>
+    </Card>}
+    {qualityBlocked.length > 0 && <Card>
+      <CardContent className="pt-6"><p className="text-sm">{qualityBlocked.length} quality block cần review theo evidence; hệ thống không tự chạy lại hoặc sửa nội dung public.</p></CardContent>
     </Card>}
     {staleRelease.length > 0 && <Card>
       <CardContent className="pt-6">
@@ -99,8 +108,9 @@ export default function FactoryPage() {
           {needsRestage && <p className="text-sm text-amber-600">Release cũ ({jobRelease}) — cần restage trước khi chạy.</p>}
           {job.last_error && <p className="text-sm text-red-600">{job.last_error}</p>}
           <div className="flex gap-2">
-            <Button size="sm" onClick={() => act('start', job.id)}>Start</Button>
+            <Button size="sm" disabled={job.status.endsWith('_blocked')} onClick={() => act('start', job.id)}>Start</Button>
             <Button size="sm" variant="outline" onClick={() => act('stop', job.id)}>Stop</Button>
+            {job.status === 'plan_blocked' && <Button size="sm" variant="outline" onClick={() => act('repair-plan', job.id)}>Repair plan</Button>}
             {job.current_chapter >= 10 && novel?.hidden && <Button size="sm" onClick={() => act('release', job.id)}>Public</Button>}
           </div>
         </CardContent>

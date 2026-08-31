@@ -23,6 +23,7 @@ import {
   validateArcResourceReachability,
   validateKernelState,
   validateRollingPlan,
+  repairPlanBlockedJob,
 } from '../src/services/story-factory';
 
 dotenv.config({ path: '.env.runtime', quiet: true });
@@ -152,8 +153,11 @@ async function mutate() {
     console.log(JSON.stringify(result.data, null, 2));
     return;
   }
-  const lookup = await db.from('story_factory_jobs').select('stage').eq('id', jobId).single();
+  const lookup = await db.from('story_factory_jobs').select('stage,status').eq('id', jobId).single();
   if (lookup.error) throw lookup.error;
+  if (command === 'start' && lookup.data.status.endsWith('_blocked')) {
+    throw new Error(`Job ${jobId} is ${lookup.data.status}; use its specific repair flow instead of start.`);
+  }
   const statusValue = command === 'stop' ? 'cancelled' : (lookup.data.stage === 'setup' ? 'setup' : 'ready');
   const updated = await db.from('story_factory_jobs').update({
     status: statusValue, lease_owner: null, lease_token: null, lease_until: null,
@@ -318,15 +322,12 @@ async function restage() {
   console.log(JSON.stringify({ dryRun: !apply, command, toRelease: STORY_FACTORY_RELEASE, migrated, skipped }, null, 2));
 }
 
-/**
- * Return parked jobs to the queue. Blocked jobs are unclaimable by construction, so
- * without this a transient failure removes a novel from production until a human notices.
- */
+/** Return only exhausted infrastructure retries to the queue. */
 async function revive() {
   const jobId = value('--job-id');
   const query = db.from('story_factory_jobs')
     .select('id,status,stage,current_chapter,last_error,ai_story_projects!story_factory_jobs_project_id_fkey(engine_release)')
-    .in('status', ['setup_blocked', 'plan_blocked', 'quality_blocked', 'infra_blocked']);
+    .eq('status', 'infra_blocked');
   const lookup = await (jobId ? query.eq('id', jobId) : query);
   if (lookup.error) throw lookup.error;
   // Revive returns a job to the claimable set, but claim also requires the project's
@@ -360,6 +361,18 @@ async function revive() {
   }).in('id', jobs.map(job => job.id));
   if (updated.error) throw updated.error;
   console.log(JSON.stringify({ revived: jobs.length, needingRestage: staleCount }, null, 2));
+}
+
+/**
+ * Requeue one plan-blocked job only after its current artifacts parse and validate.
+ * The failed window is uncommitted and is deliberately discarded; the exact failure
+ * evidence is retained for the one bounded recovery plan.
+ */
+async function repairPlan() {
+  const jobId = value('--job-id');
+  if (!jobId) throw new Error('repair-plan requires --job-id.');
+  const recovery = await repairPlanBlockedJob(db, jobId, STORY_FACTORY_RELEASE, apply);
+  console.log(JSON.stringify({ dryRun: !apply, command, release: STORY_FACTORY_RELEASE, recovery }, null, 2));
 }
 
 /**
@@ -499,6 +512,7 @@ async function main() {
   if (command === 'seed') return seed();
   if (command === 'restage') return restage();
   if (command === 'revive') return revive();
+  if (command === 'repair-plan') return repairPlan();
   if (command === 'repair-reachability') return repairReachability();
   if (command === 'repair-invalid-capability-effect') return repairInvalidCapabilityEffect();
   if (command === 'tick') {
@@ -511,7 +525,7 @@ async function main() {
   }
   if (command === 'rollback-last-chapter') return rollbackLastChapter();
   if (['start', 'stop', 'release'].includes(command)) return mutate();
-  throw new Error('Usage: factory-operator.ts status|portfolio|seed|restage|revive|repair-reachability|repair-invalid-capability-effect|rollback-last-chapter|tick|start|stop|release [options] [--apply]');
+  throw new Error('Usage: factory-operator.ts status|portfolio|seed|restage|revive|repair-plan|repair-reachability|repair-invalid-capability-effect|rollback-last-chapter|tick|start|stop|release [options] [--apply]');
 }
 
 main().catch(error => {

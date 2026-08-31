@@ -305,6 +305,21 @@ describe('Story Factory architecture boundary', () => {
     expect(route).toContain('const stale = enabled && (oldestRunnableAgeMinutes ?? 0) > 30');
   });
 
+  test('plan blocks require validated recovery instead of a generic revive', () => {
+    const recovery = read('src/services/story-factory/operator-recovery.ts');
+    const admin = read('src/app/api/admin/factory/route.ts');
+    const operator = read('scripts/factory-operator.ts');
+    expect(recovery).toContain("job.status !== 'plan_blocked' || job.stage !== 'plan'");
+    expect(recovery).toContain('validateArcResourceReachability({ kernel, arc, state })');
+    expect(recovery).toContain('rolling_plan: null');
+    expect(recovery).toContain(".eq('error_code', 'plan_blocked')");
+    expect(admin).toContain("action: z.literal('repair-plan')");
+    expect(admin).toContain("const REVIVABLE_STATUS = 'infra_blocked'");
+    expect(admin).toContain('use its specific repair flow instead');
+    expect(operator).toContain("if (command === 'repair-plan') return repairPlan()");
+    expect(operator).toContain(".eq('status', 'infra_blocked')");
+  });
+
   test('a new story validates its opening plan before paying for a cover', () => {
     const runtime = read('src/services/story-factory/runtime.ts');
     const setup = sliceBetween(runtime, 'async function runSetup', 'async function runCover');

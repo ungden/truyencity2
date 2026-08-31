@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { isAuthorizedAdmin } from '@/lib/auth/admin-auth';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
-import { STORY_FACTORY_RELEASE } from '@/services/story-factory';
+import { repairPlanBlockedJob, STORY_FACTORY_RELEASE } from '@/services/story-factory';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,9 +16,13 @@ const actionSchema = z.union([
     action: z.literal('revive'),
     jobId: z.string().uuid().optional(),
   }).strict(),
+  z.object({
+    action: z.literal('repair-plan'),
+    jobId: z.string().uuid(),
+  }).strict(),
 ]);
 
-const BLOCKED_STATUSES = ['setup_blocked', 'plan_blocked', 'quality_blocked', 'infra_blocked'];
+const REVIVABLE_STATUS = 'infra_blocked';
 
 export async function GET(request: NextRequest) {
   if (!(await isAuthorizedAdmin(request))) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -49,6 +53,14 @@ export async function POST(request: NextRequest) {
     if (error) return NextResponse.json({ error: error.message }, { status: 409 });
     return NextResponse.json(data);
   }
+  if (parsed.data.action === 'repair-plan') {
+    try {
+      const recovery = await repairPlanBlockedJob(db, parsed.data.jobId, STORY_FACTORY_RELEASE, true);
+      return NextResponse.json({ repaired: recovery });
+    } catch (error) {
+      return NextResponse.json({ error: error instanceof Error ? error.message : String(error) }, { status: 409 });
+    }
+  }
   const now = new Date().toISOString();
   const cleared = {
     retry_count: 0,
@@ -62,7 +74,7 @@ export async function POST(request: NextRequest) {
 
   if (parsed.data.action === 'revive') {
     const query = db.from('story_factory_jobs').update({ status: 'ready', ...cleared })
-      .in('status', BLOCKED_STATUSES);
+      .eq('status', REVIVABLE_STATUS);
     const { data, error } = await (parsed.data.jobId ? query.eq('id', parsed.data.jobId) : query).select('id');
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
     return NextResponse.json({ revived: data?.map(job => job.id) ?? [] });
@@ -71,6 +83,9 @@ export async function POST(request: NextRequest) {
   const { data: job, error: lookupError } = await db.from('story_factory_jobs')
     .select('id,stage,status').eq('id', parsed.data.jobId).single();
   if (lookupError) return NextResponse.json({ error: lookupError.message }, { status: 404 });
+  if (parsed.data.action === 'start' && job.status.endsWith('_blocked')) {
+    return NextResponse.json({ error: `Job is ${job.status}; use its specific repair flow instead.` }, { status: 409 });
+  }
   const status = parsed.data.action === 'stop' ? 'cancelled' : (job.stage === 'setup' ? 'setup' : 'ready');
   const { error } = await db.from('story_factory_jobs').update({ status, ...cleared }).eq('id', job.id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });

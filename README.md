@@ -27,7 +27,7 @@ Truyện mới chạy ẩn: viết chương 1–10 với `hidden = true`, window
 ```bash
 npm run factory:writing-smoke -- --apply    # cho phép release hiện tại chạy
 npm run factory:operator -- status          # xem toàn đội đang làm gì
-npm run factory:operator -- revive --apply  # hồi sinh job bị chặn
+npm run factory:operator -- revive --apply  # chỉ thử lại job lỗi hạ tầng
 ```
 
 Cần `STORY_FACTORY_ENABLED=true` thì hệ thống mới viết bất cứ thứ gì.

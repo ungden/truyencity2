@@ -135,17 +135,19 @@ real accumulating state, followed by a human public/private decision.
 
 ```bash
 npm run factory:operator -- status                    # every job, with release
-npm run factory:operator -- revive --apply            # return parked jobs to the queue
+npm run factory:operator -- revive --apply            # retry only infra_blocked jobs
 npm run factory:operator -- revive --job-id=<id> --apply
+npm run factory:operator -- repair-plan --job-id=<id> --apply # validate state, discard uncommitted plan, then replan once
 npm run factory:operator -- restage --all --apply     # migrate jobs onto the current release
 npm run factory:operator -- tick --apply              # run one stage now
 npm run factory:operator -- stop --job-id=<id> --apply
 npx tsx scripts/pause-all-writing.ts --apply          # fleet kill switch
 ```
 
-Admin UI at `/admin/factory`: per-job state, a revive-all button when jobs are parked, a
-warning when jobs sit on an old release, and manual publish once a canary reaches
-chapter 10.
+Admin UI at `/admin/factory`: per-job state, an infra-only retry action, a per-job
+plan-repair action that preserves failure evidence, a warning when jobs sit on an old
+release, and manual publish once a canary reaches chapter 10. Quality blocks remain
+parked for evidence-led review; public prose is never auto-edited.
 
 Kill switch: `STORY_FACTORY_ENABLED` must be exactly `true` for any work to happen.
 
