@@ -78,7 +78,7 @@ describe('Story Factory architecture boundary', () => {
     const writingCrons = files('src/app/api/cron')
       .filter(file => file.endsWith('route.ts') && /story-factory|write-chapters|flagship-factory/.test(file));
     expect(writingCrons).toEqual(['src/app/api/cron/story-factory/route.ts']);
-    expect(read(writingCrons[0])).toContain(".lte('next_run_at', checkedAt)");
+    expect(read(writingCrons[0])).toContain("rpc('story_factory_claimable_queue_health'");
     const source = files('src')
       .filter(file => /\.tsx?$/.test(file) && !file.includes('/__tests__/'))
       .map(read).join('\n');
@@ -290,13 +290,17 @@ describe('Story Factory architecture boundary', () => {
     expect(read('src/app/api/cron/story-factory/route.ts')).toContain('runStoryFactoryTicks()');
   });
 
-  test('health check excludes quota-delayed jobs and detects the oldest claimable job', () => {
+  test('health check uses the full database claim predicate', () => {
     const route = read('src/app/api/cron/health-check/route.ts');
-    expect(route).toContain(".lte('next_run_at', checkedAt)");
-    expect(route).toContain("['setup', 'ready', 'finale']");
-    expect(route).toContain('lease_until.is.null,lease_until.lt.${checkedAt}');
-    expect(route).toContain('const checkedAt = new Date().toISOString()');
-    expect(route).toContain(".order('next_run_at', { ascending: true })");
+    const heartbeat = read('src/app/api/cron/story-factory/route.ts');
+    const claim = read(latestMigrationDefining('public.claim_story_factory_job'));
+    const queueHealth = read(latestMigrationDefining('public.story_factory_claimable_queue_health'));
+    const claimPredicate = sliceBetween(claim, "WHERE job.status IN ('setup', 'ready', 'finale')", 'ORDER BY job.next_run_at');
+    const healthPredicate = sliceBetween(queueHealth, "WHERE job.status IN ('setup', 'ready', 'finale')", '$$;');
+    const normalizePredicate = (value: string) => value.replace(/\s+/g, ' ').trim().replace(/;$/, '');
+    expect(normalizePredicate(healthPredicate)).toBe(normalizePredicate(claimPredicate));
+    expect(route).toContain("rpc('story_factory_claimable_queue_health'");
+    expect(heartbeat).toContain("rpc('story_factory_claimable_queue_health'");
     expect(route).toContain('oldestRunnableAgeMinutes');
     expect(route).toContain('const stale = enabled && (oldestRunnableAgeMinutes ?? 0) > 30');
   });

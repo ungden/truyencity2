@@ -12,23 +12,23 @@ import {
 export const maxDuration = 300;
 export const dynamic = 'force-dynamic';
 
+interface ClaimableQueueHealth {
+  runnable_jobs: number | string;
+}
+
 async function recordFactoryHeartbeat(result: Awaited<ReturnType<typeof runStoryFactoryTicks>>) {
   try {
     const db = getSupabaseAdmin();
-    const checkedAt = new Date().toISOString();
-    const { count, error } = await db.from('story_factory_jobs')
-      .select('*', { count: 'exact', head: true })
-      // Match the queue portion of claim_story_factory_job. A job with an active
-      // lease is deliberately `writing`; a parallel cron cannot claim it and must
-      // not report it as an idle, runnable job.
-      .in('status', ['setup', 'ready', 'finale'])
-      // A ready job waiting for its quota reset is scheduled, not runnable. Counting
-      // it here made every healthy idle cron write a false critical heartbeat.
-      .lte('next_run_at', checkedAt)
-      .or(`lease_until.is.null,lease_until.lt.${checkedAt}`);
+    const heartbeatAt = new Date().toISOString();
+    const { data, error } = await db
+      // The database owns the full claim predicate; do not reimplement only its
+      // queue subset here or a non-approved/release-mismatched job can alert.
+      .rpc('story_factory_claimable_queue_health', { p_engine_release: STORY_FACTORY_RELEASE })
+      .maybeSingle();
     if (error) throw error;
+    const queue = data as ClaimableQueueHealth | null;
     const enabled = isStoryFactoryEnabled();
-    const runnableJobs = count ?? 0;
+    const runnableJobs = Number(queue?.runnable_jobs ?? 0);
     const stalled = enabled && runnableJobs > 0 && result.status !== 'completed';
     const status = stalled || (!enabled && runnableJobs > 0) ? 'critical' : 'healthy';
     const { error: insertError } = await db.from('health_checks').insert({
@@ -49,7 +49,7 @@ async function recordFactoryHeartbeat(result: Awaited<ReturnType<typeof runStory
         kind: 'stalled_cron',
         // A stalled queue is one incident per day, not a mail every two-minute
         // cron heartbeat. A terminal job error has its own run-scoped alert.
-        idempotencyKey: `story-factory-stalled-${checkedAt.slice(0, 10)}`,
+        idempotencyKey: `story-factory-stalled-${heartbeatAt.slice(0, 10)}`,
         title: 'cron đang kẹt',
         message: `Cron thấy ${runnableJobs} job có thể chạy nhưng tick không hoàn tất stage nào (${result.status}).`,
         stage: 'cron',
