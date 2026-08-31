@@ -4490,6 +4490,57 @@ describe('canonical Story Factory', () => {
     expect(prompt.compactContract.strictRules.join('\n')).toContain('Capability role=support được kiểm tại đầu scene');
   });
 
+  test('Planner guide gives a bounded conversion backbone for a zero-resource capability recovery', () => {
+    const recoveryKernel: StoryKernel = structuredClone(kernel);
+    recoveryKernel.resources.push({
+      id: 'debris', name: 'Phế liệu', kind: 'numeric', unit: 'mảnh', ownerEntityId: 'main', minimum: 0,
+    });
+    recoveryKernel.worldMechanics.push(
+      {
+        id: 'salvage_debris', name: 'Trục vớt', kind: 'conversion', description: 'Dùng vốn để trục vớt phế liệu.',
+        inputsPerBatch: [{ resourceId: 'money', amount: 1 }],
+        outputsPerBatch: [{ resourceId: 'debris', amount: 10 }],
+        maximumBatchesPerUse: 2,
+      },
+      {
+        id: 'purify_debris', name: 'Thanh tẩy', kind: 'conversion', description: 'Đổi phế liệu lấy vốn.',
+        inputsPerBatch: [{ resourceId: 'debris', amount: 10 }],
+        outputsPerBatch: [{ resourceId: 'money', amount: 1 }],
+        maximumBatchesPerUse: 3,
+      },
+      {
+        id: 'execute_purify', name: 'Chỉ đạo thanh tẩy', kind: 'capability', description: 'Cho phép thanh tẩy phế liệu.',
+        allowedActorIds: ['main'], requiredFacts: [], requiredResourceIds: ['debris'],
+        effectResources: [
+          { resourceId: 'debris', direction: 'decrease' },
+          { resourceId: 'money', direction: 'increase' },
+        ],
+        effectFactIds: [], capacityUnit: 'mẻ', maximumUnitsPerMinute: 1,
+      },
+    );
+    const recoveryState: StoryState = structuredClone(initialState);
+    recoveryState.resources.push({ resourceId: 'debris', kind: 'numeric', value: 0 });
+    const recoveryArc: ArcPlan = {
+      ...structuredClone(arc),
+      activeMechanicIds: [...arc.activeMechanicIds, 'salvage_debris', 'purify_debris', 'execute_purify'],
+    };
+
+    const guide = buildPlannerMechanicGuide({ kernel: recoveryKernel, arc: recoveryArc, state: recoveryState });
+    expect(guide.recoveryRecipes).toEqual([{
+      capabilityMechanicId: 'execute_purify',
+      requiredResourceId: 'debris',
+      openingValue: 0,
+      producerConversionId: 'salvage_debris',
+      producerMaximumBatches: 2,
+      consumerConversionId: 'purify_debris',
+      consumerMaximumBatches: 3,
+    }]);
+    expect(guide.conversionLimits).toEqual(expect.arrayContaining([
+      { mechanicId: 'salvage_debris', maximumBatchesPerUse: 2 },
+      { mechanicId: 'purify_debris', maximumBatchesPerUse: 3 },
+    ]));
+  });
+
   test('fact before values are derived sequentially from State across a rolling window', () => {
     const first = structuredClone(plannerWire(1).chapters[0]);
     const second = structuredClone(plannerWire(2).chapters[0]);

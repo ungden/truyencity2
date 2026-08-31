@@ -271,6 +271,20 @@ type PlannerMechanicGuide = {
     producerMechanicIds: string[];
     instruction: string;
   }>;
+  conversionLimits: Array<{
+    mechanicId: string;
+    maximumBatchesPerUse: number | null;
+  }>;
+  /** A safe conversion backbone when a capability is blocked on a zero resource. */
+  recoveryRecipes: Array<{
+    capabilityMechanicId: string;
+    requiredResourceId: string;
+    openingValue: string | number | null;
+    producerConversionId: string;
+    producerMaximumBatches: number | null;
+    consumerConversionId: string;
+    consumerMaximumBatches: number | null;
+  }>;
   mechanics: Array<{
     mechanicId: string;
     kind: StoryKernel['worldMechanics'][number]['kind'];
@@ -306,9 +320,13 @@ function plannerHardMechanicDirective(guide: PlannerMechanicGuide): string | nul
       : 'không có producer hợp lệ trong activeMechanicIds';
     return `${constraint.consumerMechanicId} bị cấm ở đầu window vì ${constraint.conditionKind} ${constraint.conditionId} hiện là ${String(constraint.current)} (cần ${String(constraint.required)}; ${producers}).`;
   });
+  const recoveryRecipes = guide.recoveryRecipes.map(recipe => (
+    `Khuôn phục hồi cho ${recipe.capabilityMechanicId}: resource ${recipe.requiredResourceId} mở đầu=${String(recipe.openingValue)}. Scene sớm phải có ${recipe.producerConversionId} role=effect với qty nguyên dương không vượt ${String(recipe.producerMaximumBatches)}. Scene SAU đó mới dùng ${recipe.consumerConversionId} role=effect với qty nguyên dương không vượt ${String(recipe.consumerMaximumBatches)}; ${recipe.consumerConversionId} sở hữu toàn bộ resource delta. ${recipe.capabilityMechanicId} có thể bỏ; nếu giữ thì chỉ role=support ở scene sau, tuyệt đối không role=effect và không sở hữu resource delta.`
+  ));
   return [
     'RÀNG BUỘC CƠ HỌC BẮT BUỘC (ưu tiên cao hơn beat sáng tạo):',
     ...constraints,
+    ...(recoveryRecipes.length ? ['KHUÔN RECOVERY BẮT BUỘC:', ...recoveryRecipes] : []),
     'Chỉ dùng consumer sau khi một producer nêu trên đã tạo điều kiện thật sự ở effect của scene trước, hoặc effect sớm hơn trong cùng scene nếu replay ledger cho thấy điều kiện đã khả dụng. Nếu không thể chứng minh điều đó bằng mechanics và delta hợp lệ, bỏ consumer khỏi plan. Không dùng role=support để mượn output cùng scene.',
   ].join('\n');
 }
@@ -323,7 +341,19 @@ function isPlanBlockedRecovery(value: unknown): value is { source: 'plan_blocked
 function repeatsPlanBlockedRecovery(input: unknown, error: StoryFactoryError): boolean {
   if (!isPlanBlockedRecovery(input)) return false;
   const normalize = (message: string) => message.trim().replace(/\s+/g, ' ').toLocaleLowerCase('en-US');
-  return normalize(input.message) === normalize(error.message);
+  const evidence = error.evidence && typeof error.evidence === 'object' && !Array.isArray(error.evidence)
+    ? error.evidence as { issues?: unknown }
+    : null;
+  const issueMessages = Array.isArray(evidence?.issues)
+    ? evidence.issues.flatMap(issue => (
+      issue && typeof issue === 'object' && !Array.isArray(issue)
+        && typeof (issue as { message?: unknown }).message === 'string'
+        ? [(issue as { message: string }).message]
+        : []
+    ))
+    : [];
+  const prior = normalize(input.message);
+  return [error.message, ...issueMessages].some(message => normalize(message) === prior);
 }
 
 /**
@@ -446,6 +476,40 @@ export function buildPlannerMechanicGuide(input: {
       };
     });
 
+  const activeConversions = activeMechanics.filter((mechanic): mechanic is Extract<StoryKernel['worldMechanics'][number], { kind: 'conversion' }> => (
+    mechanic.kind === 'conversion'
+  ));
+  const activeMechanicsById = new Map(activeMechanics.map(mechanic => [mechanic.id, mechanic]));
+  const recoveryRecipes = mechanics.flatMap(guideMechanic => {
+    const capability = activeMechanicsById.get(guideMechanic.mechanicId);
+    if (capability?.kind !== 'capability') return [];
+    return guideMechanic.blockedByResources.flatMap(blocked => {
+      const producer = activeConversions.find(conversion => (
+        conversion.outputsPerBatch.some(output => output.resourceId === blocked.resourceId)
+      ));
+      const consumer = activeConversions.find(conversion => (
+        conversion.id !== producer?.id
+        && conversion.inputsPerBatch.some(inputResource => inputResource.resourceId === blocked.resourceId)
+        && capability.effectResources
+          .filter(effect => effect.direction === 'decrease')
+          .every(effect => conversion.inputsPerBatch.some(inputResource => inputResource.resourceId === effect.resourceId))
+        && capability.effectResources
+          .filter(effect => effect.direction === 'increase')
+          .every(effect => conversion.outputsPerBatch.some(output => output.resourceId === effect.resourceId))
+      ));
+      if (!producer || !consumer) return [];
+      return [{
+        capabilityMechanicId: capability.id,
+        requiredResourceId: blocked.resourceId,
+        openingValue: blocked.current,
+        producerConversionId: producer.id,
+        producerMaximumBatches: producer.maximumBatchesPerUse,
+        consumerConversionId: consumer.id,
+        consumerMaximumBatches: consumer.maximumBatchesPerUse,
+      }];
+    });
+  });
+
   return {
     planningRule: 'activeMechanicIds là working set, không phải checklist. Nếu availableAtWindowStart=false, phải dùng một producerMechanicId hợp lệ ở scene/chương trước rồi mới dùng mechanic bị khóa. Nếu producerMechanicIds rỗng thì không được dùng mechanic đó trong window. Với constraint/capability, requiredFacts và forbiddenFacts có cấu trúc thắng description; replay lại điều kiện tại đúng scene và bỏ mechanic nếu một fact vừa chuyển sang giá trị forbidden.',
     hardConstraints: mechanics.flatMap(mechanic => [
@@ -472,6 +536,11 @@ export function buildPlannerMechanicGuide(input: {
           : 'No active producer can satisfy this prerequisite; omit the consumer.',
       })),
     ]),
+    conversionLimits: activeConversions.map(conversion => ({
+      mechanicId: conversion.id,
+      maximumBatchesPerUse: conversion.maximumBatchesPerUse,
+    })),
+    recoveryRecipes,
     mechanics,
   };
 }
@@ -2458,6 +2527,8 @@ export async function planRollingWindow(input: {
         ])),
         mechanicDependencyGuide,
         mechanicHardConstraints: mechanicDependencyGuide.hardConstraints,
+        mechanicRecoveryRecipes: mechanicDependencyGuide.recoveryRecipes,
+        conversionLimits: mechanicDependencyGuide.conversionLimits,
         travelConstraints: {
           initialLocationsByCharacter: Object.fromEntries(
             input.state.characters.map(item => [item.characterId, item.locationId]),
