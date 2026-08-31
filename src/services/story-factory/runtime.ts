@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import { getVietnamDayBounds } from '@/lib/utils/vietnam-time';
+import { withGeminiUsageContext } from '@/services/gemini-usage-ledger';
 import {
   ArcPlanSchema,
   LaunchPackSchema,
@@ -14,18 +15,21 @@ import {
   type RollingPlan,
 } from './contracts';
 import { generateFactoryCover } from './cover';
-import { extractCraftGuidance, type CraftGuidance } from './craft';
+import { analyzeVietnameseStyleTelemetry, extractCraftGuidance, type CraftGuidance } from './craft';
 import {
   loadContinuityPacket,
   memoryEntityIdsForArc,
   memoryEntityIdsForPlan,
 } from './memory';
 import {
+  assessStoryDraftCheckpoint,
+  ChapterDraftSchema,
   draftStoryChapter,
   reviseStoryChapter,
   type ChapterAttemptTelemetry,
   type ChapterPipelineResult,
   type PendingRevision,
+  type WriterDraftCheckpoint,
 } from './pipeline';
 import { planArcLifecycle, planRollingWindow, reviewFiveChapterWindow } from './planner';
 import type { ProviderUsage, StoryModelProvider } from './provider';
@@ -132,6 +136,17 @@ function usageCost(usages: ProviderUsage[]): number {
   return usages.reduce((total, usage) => total + usage.costUsd, 0);
 }
 
+function storyFactoryUsageContext(job: FactoryJobRow, runId: string, operation: string, chapterNumber?: number) {
+  return {
+    operation,
+    sourceType: 'story_factory_run',
+    sourceId: runId,
+    projectId: job.project_id,
+    novelId: job.novel_id,
+    ...(chapterNumber === undefined ? {} : { chapterNumber }),
+  };
+}
+
 /**
  * Reuse already-paid literary findings as forward steering. No prose, grounded
  * quote or model-written instruction is forwarded; extractCraftGuidance reduces
@@ -158,6 +173,110 @@ async function loadCraftGuidance(
 function pipelineTelemetryFromError(error: StoryFactoryError): ChapterAttemptTelemetry | undefined {
   const evidence = error.evidence as { pipelineTelemetry?: ChapterAttemptTelemetry } | undefined;
   return evidence?.pipelineTelemetry;
+}
+
+interface DraftCheckpointProvenance {
+  projectId: string;
+  chapterNumber: number;
+  stateDigest: string;
+  planDigest: string;
+  engineRelease: string;
+  engineRevision: string;
+}
+
+interface StoredDraftCheckpoint extends WriterDraftCheckpoint {
+  provenance: DraftCheckpointProvenance;
+}
+
+function draftCheckpointProvenance(input: {
+  projectId: string;
+  chapterNumber: number;
+  state: unknown;
+  plan: unknown;
+}): DraftCheckpointProvenance {
+  return {
+    projectId: input.projectId,
+    chapterNumber: input.chapterNumber,
+    stateDigest: digestArtifact(input.state),
+    planDigest: digestArtifact(input.plan),
+    engineRelease: STORY_FACTORY_RELEASE,
+    engineRevision: STORY_FACTORY_REVISION,
+  };
+}
+
+function isUsage(value: unknown): value is ProviderUsage {
+  if (!value || typeof value !== 'object') return false;
+  const usage = value as Partial<ProviderUsage>;
+  return typeof usage.model === 'string'
+    && typeof usage.inputTokens === 'number' && Number.isFinite(usage.inputTokens)
+    && typeof usage.outputTokens === 'number' && Number.isFinite(usage.outputTokens)
+    && typeof usage.costUsd === 'number' && Number.isFinite(usage.costUsd)
+    && typeof usage.finishReason === 'string';
+}
+
+/**
+ * Reject stale or malformed JSONB before it reaches Editor. A checkpoint never
+ * substitutes for canonical state: it must match the exact chapter plan and the
+ * release/revision that created it.
+ */
+export function readDraftCheckpoint(
+  artifact: unknown,
+  expected: DraftCheckpointProvenance,
+): WriterDraftCheckpoint | null {
+  if (!artifact || typeof artifact !== 'object') return null;
+  const candidate = (artifact as { draftCheckpoint?: unknown }).draftCheckpoint;
+  if (!candidate || typeof candidate !== 'object') return null;
+  const checkpoint = candidate as Partial<StoredDraftCheckpoint>;
+  const provenance = checkpoint.provenance;
+  if (!provenance || typeof provenance !== 'object'
+    || (provenance as DraftCheckpointProvenance).projectId !== expected.projectId
+    || (provenance as DraftCheckpointProvenance).chapterNumber !== expected.chapterNumber
+    || (provenance as DraftCheckpointProvenance).stateDigest !== expected.stateDigest
+    || (provenance as DraftCheckpointProvenance).planDigest !== expected.planDigest
+    || (provenance as DraftCheckpointProvenance).engineRelease !== expected.engineRelease
+    || (provenance as DraftCheckpointProvenance).engineRevision !== expected.engineRevision) {
+    return null;
+  }
+  const parsedDraft = ChapterDraftSchema.safeParse(checkpoint.draft);
+  if (!parsedDraft.success || checkpoint.v !== 1 || !isUsage(checkpoint.usage)) return null;
+  return { v: 1, draft: parsedDraft.data, usage: checkpoint.usage };
+}
+
+async function persistDraftCheckpoint(input: {
+  db: SupabaseClient;
+  runId: string;
+  checkpoint: WriterDraftCheckpoint;
+  provenance: DraftCheckpointProvenance;
+}): Promise<void> {
+  const stored: StoredDraftCheckpoint = { ...input.checkpoint, provenance: input.provenance };
+  const saved = await input.db.from('story_factory_runs').update({
+    output_artifact: { draftCheckpoint: stored },
+  }).eq('id', input.runId).eq('status', 'running');
+  if (saved.error) throw saved.error;
+}
+
+async function reopenDraftCheckpoint(input: {
+  db: SupabaseClient;
+  job: Pick<FactoryJobRow, 'id' | 'last_run_id'>;
+  provenance: DraftCheckpointProvenance;
+}): Promise<{ runId: string; checkpoint: WriterDraftCheckpoint } | null> {
+  if (!input.job.last_run_id) return null;
+  const prior = await input.db.from('story_factory_runs')
+    .select('id,status,output_artifact,engine_release,engine_revision,chapter_number')
+    .eq('id', input.job.last_run_id).eq('job_id', input.job.id).maybeSingle();
+  if (prior.error) throw prior.error;
+  if (!prior.data || prior.data.status !== 'infra_blocked'
+    || prior.data.engine_release !== input.provenance.engineRelease
+    || prior.data.engine_revision !== input.provenance.engineRevision
+    || prior.data.chapter_number !== input.provenance.chapterNumber) return null;
+  const checkpoint = readDraftCheckpoint(prior.data.output_artifact, input.provenance);
+  if (!checkpoint) return null;
+  const reopened = await input.db.from('story_factory_runs').update({
+    status: 'running', error_code: null, error_message: null, finished_at: null,
+  }).eq('id', prior.data.id).eq('status', 'infra_blocked').select('id').maybeSingle();
+  if (reopened.error) throw reopened.error;
+  if (!reopened.data) return null;
+  return { runId: reopened.data.id as string, checkpoint };
 }
 
 async function createRun(db: SupabaseClient, job: FactoryJobRow, kind: string, chapterNumber?: number) {
@@ -360,7 +479,9 @@ async function runSetup(db: SupabaseClient, job: FactoryJobRow, project: Factory
         conflictEconomyFingerprint: parsed.data.conflictEconomyFingerprint,
       }] : [];
     });
-    const result = await runConceptLab({
+    const result = await withGeminiUsageContext(
+      storyFactoryUsageContext(job, runId, 'story_factory_setup'),
+      () => runConceptLab({
       commission,
       research: setupInput.research,
       routes,
@@ -376,7 +497,8 @@ async function runSetup(db: SupabaseClient, job: FactoryJobRow, project: Factory
         }).eq('id', runId).eq('status', 'running');
         if (updated.error) throw updated.error;
       },
-    });
+      }),
+    );
     const pack = LaunchPackSchema.parse(result.launchPack);
     const launchPackDigest = digestArtifact(pack);
     const protagonist = pack.kernel.characters.find(character => character.id === pack.kernel.protagonistId)!;
@@ -458,7 +580,13 @@ async function runCover(db: SupabaseClient, job: FactoryJobRow, project: Factory
     const { data: novel, error: novelError } = await db.from('novels').select('cover_prompt').eq('id', job.novel_id).single();
     if (novelError) throw novelError;
     if (!novel.cover_prompt) throw new StoryFactoryError('setup_blocked', 'Launch pack has no cover background prompt.');
-    const cover = await generateFactoryCover({ db, novelId: job.novel_id, title: kernel.title, backgroundPrompt: novel.cover_prompt });
+    const cover = await generateFactoryCover({
+      db,
+      novelId: job.novel_id,
+      title: kernel.title,
+      backgroundPrompt: novel.cover_prompt,
+      usageContext: storyFactoryUsageContext(job, runId, 'story_factory_cover'),
+    });
     const now = new Date().toISOString();
     const novelUpdate = await db.from('novels').update({ cover_url: cover.coverUrl, updated_at: now }).eq('id', job.novel_id);
     if (novelUpdate.error) throw novelUpdate.error;
@@ -518,7 +646,9 @@ async function runPlan(db: SupabaseClient, job: FactoryJobRow, project: FactoryP
       state,
       entityIds: memoryEntityIdsForArc(kernel, arc, state),
     });
-    const planned = await planRollingWindow({
+    const planned = await withGeminiUsageContext(
+      storyFactoryUsageContext(job, runId, 'story_factory_plan', job.current_chapter + 1),
+      () => planRollingWindow({
       kernel,
       arc,
       state,
@@ -547,7 +677,8 @@ async function runPlan(db: SupabaseClient, job: FactoryJobRow, project: FactoryP
         }).eq('id', runId).eq('status', 'running');
         if (saved.error) throw saved.error;
       },
-    });
+      }),
+    );
     const now = new Date().toISOString();
     const jobUpdate = await db.from('story_factory_jobs').update({
       rolling_plan: planned.rollingPlan, plan_feedback: null, status: 'ready', stage: job.current_chapter === 0 ? 'cover' : 'write', retry_count: 0, lease_owner: null,
@@ -618,7 +749,22 @@ async function runChapter(db: SupabaseClient, job: FactoryJobRow, project: Facto
   const plan = rolling.plans.find(item => item.chapterNumber === nextChapter)!;
   const nextPlan = rolling.plans.find(item => item.chapterNumber === nextChapter + 1);
   if (plan.arcNumber !== arc.arcNumber) return blockRun(db, job, null, new StoryFactoryError('plan_blocked', 'Rolling plan belongs to a different arc.'));
-  const runId = await createRun(db, job, 'chapter', plan.chapterNumber);
+  const checkpointProvenance = draftCheckpointProvenance({
+    projectId: project.id,
+    chapterNumber: plan.chapterNumber,
+    state,
+    plan,
+  });
+  // A prior run can be retried only when it durably crossed Writer and every
+  // input still matches. Reopen that same run so its paid Writer usage and final
+  // Editor verdict remain one auditable chapter attempt.
+  let resumed: { runId: string; checkpoint: WriterDraftCheckpoint } | null;
+  try {
+    resumed = await reopenDraftCheckpoint({ db, job, provenance: checkpointProvenance });
+  } catch (error) {
+    return blockRun(db, job, null, error);
+  }
+  const runId = resumed?.runId ?? await createRun(db, job, 'chapter', plan.chapterNumber);
   try {
     const entityIds = memoryEntityIdsForPlan(kernel, plan);
     const continuityPacket = await loadContinuityPacket({
@@ -633,7 +779,7 @@ async function runChapter(db: SupabaseClient, job: FactoryJobRow, project: Facto
       if (error || !data?.content) throw new StoryFactoryError('plan_blocked', 'Previous published chapter is missing.');
       previousChapter = data.content;
     }
-    const drafted = await draftStoryChapter({
+    const input = {
       kernel,
       state,
       plan,
@@ -643,7 +789,24 @@ async function runChapter(db: SupabaseClient, job: FactoryJobRow, project: Facto
       craftGuidance: await loadCraftGuidance(db, job),
       routes,
       provider,
-    });
+    };
+    const drafted = resumed
+      ? await withGeminiUsageContext(
+        storyFactoryUsageContext(job, runId, 'story_factory_chapter', plan.chapterNumber),
+        () => assessStoryDraftCheckpoint({ ...input, checkpoint: resumed.checkpoint }),
+      )
+      : await withGeminiUsageContext(
+        storyFactoryUsageContext(job, runId, 'story_factory_chapter', plan.chapterNumber),
+        () => draftStoryChapter({
+        ...input,
+        onDraftCheckpoint: checkpoint => persistDraftCheckpoint({
+          db,
+          runId,
+          checkpoint,
+          provenance: checkpointProvenance,
+        }),
+        }),
+      );
     if (drafted.decision === 'revise') {
       // Hand the rewrite to its own tick. The run row stays 'running' so it remains the
       // single record of this chapter attempt and the commit guard still applies.
@@ -808,7 +971,9 @@ async function runRevision(db: SupabaseClient, job: FactoryJobRow, project: Fact
       if (error || !data?.content) throw new StoryFactoryError('plan_blocked', 'Previous published chapter is missing.');
       previousChapter = data.content;
     }
-    const result = await reviseStoryChapter({
+    const result = await withGeminiUsageContext(
+      storyFactoryUsageContext(job, runRow.data.id, 'story_factory_revision', plan.chapterNumber),
+      async () => reviseStoryChapter({
       kernel: kernelResult.data,
       state: stateResult.data,
       plan,
@@ -819,7 +984,8 @@ async function runRevision(db: SupabaseClient, job: FactoryJobRow, project: Fact
       routes: routesResult.data,
       provider,
       pending,
-    });
+      }),
+    );
     return commitChapter(db, job, runRow.data.id, rollingResult.data, plan, result, 'revise');
   } catch (error) {
     if (error instanceof StoryFactoryError && error.code === 'plan_blocked') {
@@ -881,9 +1047,17 @@ async function runWindowReview(db: SupabaseClient, job: FactoryJobRow, project: 
       .lte('chapter_number', job.current_chapter)
       .order('chapter_number').order('id');
     if (events.error) throw events.error;
-    const reviewed = await reviewFiveChapterWindow({
+    const windowChapters = (chapters ?? []).map(chapter => ({
+      chapterNumber: chapter.chapter_number,
+      title: chapter.title,
+      content: chapter.content ?? '',
+    }));
+    const styleTelemetry = analyzeVietnameseStyleTelemetry(windowChapters);
+    const reviewed = await withGeminiUsageContext(
+      storyFactoryUsageContext(job, runId, 'story_factory_window_review', job.current_chapter),
+      () => reviewFiveChapterWindow({
       kernel, arc, state,
-      chapters: (chapters ?? []).map(chapter => ({ chapterNumber: chapter.chapter_number, title: chapter.title, content: chapter.content ?? '' })),
+      chapters: windowChapters,
       resourceTransitions: (events.data ?? []).map(event => ({
         chapterNumber: event.chapter_number,
         entityId: event.entity_id,
@@ -891,8 +1065,10 @@ async function runWindowReview(db: SupabaseClient, job: FactoryJobRow, project: 
         after: event.after_value,
         source: event.source,
       })),
+      styleTelemetry,
       routes, marketBlueprint, provider,
-    });
+      }),
+    );
     if (reviewed.review.status === 'block') {
       // Hidden chapters are still drafts: park so the operator can repair the
       // prose and re-review. Published chapters are canon a reader may have seen
@@ -906,7 +1082,7 @@ async function runWindowReview(db: SupabaseClient, job: FactoryJobRow, project: 
         const runUpdate = await db.from('story_factory_runs').update({
           status: 'blocked', error_code: 'quality_blocked',
           error_message: 'Window review blocked on published canon; verdict fed forward to the next window plan.',
-          output_artifact: { evidence: { review: reviewed.review } },
+          output_artifact: { evidence: { review: reviewed.review, styleTelemetry } },
           usage: [reviewed.usage], estimated_cost_usd: reviewed.usage.costUsd, finished_at: now,
         }).eq('id', runId);
         if (runUpdate.error) throw runUpdate.error;
@@ -930,6 +1106,7 @@ async function runWindowReview(db: SupabaseClient, job: FactoryJobRow, project: 
       }
       throw new StoryFactoryError('quality_blocked', 'Five-chapter window review detected drift.', {
         review: reviewed.review,
+        styleTelemetry,
         usages: [reviewed.usage],
       });
     }
@@ -938,7 +1115,7 @@ async function runWindowReview(db: SupabaseClient, job: FactoryJobRow, project: 
     const nextRunAt = nextRunAfterNonChapterStage(job, new Date(now));
     const nextStage = state.chapterNumber >= arc.plannedEndChapter ? 'arc' : 'write';
     const runUpdate = await db.from('story_factory_runs').update({
-      status: 'passed', output_artifact: reviewed.review, usage: [reviewed.usage],
+      status: 'passed', output_artifact: { ...reviewed.review, styleTelemetry }, usage: [reviewed.usage],
       estimated_cost_usd: reviewed.usage.costUsd, finished_at: now,
     }).eq('id', runId);
     if (runUpdate.error) throw runUpdate.error;

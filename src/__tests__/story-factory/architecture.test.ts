@@ -290,6 +290,17 @@ describe('Story Factory architecture boundary', () => {
     expect(read('src/app/api/cron/story-factory/route.ts')).toContain('runStoryFactoryTicks()');
   });
 
+  test('health check excludes quota-delayed jobs and detects the oldest claimable job', () => {
+    const route = read('src/app/api/cron/health-check/route.ts');
+    expect(route).toContain(".lte('next_run_at', checkedAt)");
+    expect(route).toContain("['setup', 'ready', 'finale']");
+    expect(route).toContain('lease_until.is.null,lease_until.lt.${checkedAt}');
+    expect(route).toContain('const checkedAt = new Date().toISOString()');
+    expect(route).toContain(".order('next_run_at', { ascending: true })");
+    expect(route).toContain('oldestRunnableAgeMinutes');
+    expect(route).toContain('const stale = enabled && (oldestRunnableAgeMinutes ?? 0) > 30');
+  });
+
   test('a new story validates its opening plan before paying for a cover', () => {
     const runtime = read('src/services/story-factory/runtime.ts');
     const setup = sliceBetween(runtime, 'async function runSetup', 'async function runCover');

@@ -2,11 +2,12 @@ import { createHash } from 'node:crypto';
 import { ImageResponse } from 'next/og';
 import sharp from 'sharp';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { recordGeminiUsageEvent, type GeminiUsageContext, type GeminiUsageMetadata } from '@/services/gemini-usage-ledger';
 import { StoryFactoryError } from './contracts';
 
 const WIDTH = 1_200;
 const HEIGHT = 1_800;
-const IMAGE_MODEL = process.env.GEMINI_IMAGE_MODEL || 'gemini-3-pro-image-preview';
+const IMAGE_MODEL = process.env.GEMINI_IMAGE_MODEL || 'gemini-3-pro-image';
 const API_BASE = 'https://generativelanguage.googleapis.com/v1beta';
 
 function wrapTitle(title: string, maxCharacters = 24): string[] {
@@ -116,7 +117,10 @@ export async function renderCoverTypography(title: string): Promise<Buffer> {
   return overlay;
 }
 
-async function generateBackground(prompt: string): Promise<{ buffer: Buffer; mimeType: string }> {
+async function generateBackground(
+  prompt: string,
+  usageContext?: GeminiUsageContext,
+): Promise<{ buffer: Buffer; mimeType: string }> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new StoryFactoryError('infra_blocked', 'GEMINI_API_KEY is not configured for cover generation.');
   const response = await fetch(`${API_BASE}/models/${IMAGE_MODEL}:generateContent`, {
@@ -134,6 +138,14 @@ async function generateBackground(prompt: string): Promise<{ buffer: Buffer; mim
   if (!response.ok) throw new StoryFactoryError('infra_blocked', `Cover provider failed with ${response.status}: ${(await response.text()).slice(0, 500)}`);
   const payload = await response.json();
   const inline = payload?.candidates?.[0]?.content?.parts?.find((part: { inlineData?: unknown }) => part.inlineData)?.inlineData;
+  await recordGeminiUsageEvent({
+    model: IMAGE_MODEL,
+    modelVersion: typeof payload?.modelVersion === 'string' ? payload.modelVersion : undefined,
+    responseId: typeof payload?.responseId === 'string' ? payload.responseId : undefined,
+    usageMetadata: payload?.usageMetadata as GeminiUsageMetadata | undefined,
+    status: inline?.data ? 'succeeded' : 'blocked',
+    context: usageContext,
+  });
   if (!inline?.data) throw new StoryFactoryError('infra_blocked', 'Cover provider returned no image.');
   return { buffer: Buffer.from(inline.data, 'base64'), mimeType: inline.mimeType || 'image/png' };
 }
@@ -143,8 +155,9 @@ export async function generateFactoryCover(input: {
   novelId: string;
   title: string;
   backgroundPrompt: string;
+  usageContext?: GeminiUsageContext;
 }): Promise<{ coverUrl: string; path: string; sha256: string; width: number; height: number }> {
-  const background = await generateBackground(input.backgroundPrompt);
+  const background = await generateBackground(input.backgroundPrompt, input.usageContext);
   const typography = await renderCoverTypography(input.title);
   const rendered = await sharp(background.buffer)
     .rotate()

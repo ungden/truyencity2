@@ -10,6 +10,7 @@ import {
   AIMessage,
   AI_PROVIDERS,
 } from '@/lib/types/ai-providers';
+import { recordGeminiUsageEvent, type GeminiUsageMetadata } from '@/services/gemini-usage-ledger';
 
 export class AIProviderService {
   private apiKeys: Partial<Record<AIProviderType, string>> = {};
@@ -354,6 +355,14 @@ export class AIProviderService {
         const content = data.candidates?.[0]?.content?.parts
           ?.map((part: { text?: string }) => part.text || '')
           .join('') || '';
+        await recordGeminiUsageEvent({
+          model,
+          modelVersion: typeof data.modelVersion === 'string' ? data.modelVersion : undefined,
+          responseId: typeof data.responseId === 'string' ? data.responseId : undefined,
+          usageMetadata: data.usageMetadata as GeminiUsageMetadata | undefined,
+          status: content ? 'succeeded' : 'blocked',
+          context: { operation: 'ai_provider_chat', sourceType: 'ai_provider_chat' },
+        });
 
         return {
           success: true,

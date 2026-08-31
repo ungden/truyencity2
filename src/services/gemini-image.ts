@@ -15,11 +15,12 @@
  */
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { recordGeminiUsageEvent, type GeminiUsageMetadata } from '@/services/gemini-usage-ledger';
 
 // Types inlined from deleted factory/types.ts
 export type ImageResolution = '1K' | '2K' | '4K';
 export type ImageAspectRatio = '1:1' | '2:3' | '3:2' | '3:4' | '4:3' | '4:5' | '5:4' | '9:16' | '16:9' | '21:9';
-export type GeminiImageModel = 'gemini-3-pro-image-preview';
+export type GeminiImageModel = 'gemini-3-pro-image' | 'gemini-3-pro-image-preview';
 export interface GeminiImageOptions {
   model?: GeminiImageModel;
   numberOfImages?: number;
@@ -43,7 +44,7 @@ export interface ServiceResult<T = void> {
 }
 
 const GEMINI_API_BASE = 'https://generativelanguage.googleapis.com/v1beta';
-const MODEL = 'gemini-3-pro-image-preview';
+const MODEL = 'gemini-3-pro-image';
 
 export interface ImageGenerationRequest {
   prompt: string;
@@ -120,8 +121,9 @@ export class GeminiImageService {
         requestBody.tools = [{ google_search: {} }];
       }
 
+      const model = options?.model || MODEL;
       const response = await fetch(
-        `${GEMINI_API_BASE}/models/${MODEL}:generateContent?key=${this.apiKey}`,
+        `${GEMINI_API_BASE}/models/${model}:generateContent?key=${this.apiKey}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -165,6 +167,15 @@ export class GeminiImageService {
           });
         }
       }
+
+      await recordGeminiUsageEvent({
+        model,
+        modelVersion: typeof data.modelVersion === 'string' ? data.modelVersion : undefined,
+        responseId: typeof data.responseId === 'string' ? data.responseId : undefined,
+        usageMetadata: data.usageMetadata as GeminiUsageMetadata | undefined,
+        status: images.length ? 'succeeded' : 'blocked',
+        context: { operation: 'gemini_image_service', sourceType: 'gemini_image_service' },
+      });
 
       if (images.length === 0) {
         return {

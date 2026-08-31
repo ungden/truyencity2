@@ -234,6 +234,12 @@ None of these gate production. They exist for model selection and forensic audit
 Corpora carry both `engineRelease` and `engineRevision`; the staleness guards require both
 to match, so corpora from different engine generations are never compared head-to-head.
 
+Writer experiments may override only `writerVoicePolicy`: `buildWriterSystemPrompt` keeps the
+canon, ledger, scene-completion and promise protocol intact while substituting the literary
+voice segment. Production uses the default policy byte-for-byte. A Window Review also stores
+bounded deterministic Vietnamese style clues (repeated phrase/title frame/ending/attribution)
+as context for the independent Editor; these clues never block publication by themselves.
+
 ## Verification
 
 ```bash
@@ -329,6 +335,12 @@ chapter. It chooses prose, dialogue, pacing, emotion, scene boundaries and lengt
 count is telemetry, never a gate** — `architecture.test.ts` asserts `pipeline.ts` contains no
 word-count comparison.
 
+The Writer protocol and literary voice are separate. Only an offline `writerVoicePolicy` may
+vary in a prose experiment; canon/ledger/promise protocol stays code-owned. After the paid
+Writer response returns, runtime writes a draft checkpoint carrying exact state/plan/release/
+revision digests before it starts Editor. An Editor infrastructure retry reopens that run and
+resumes from the checkpoint; any digest mismatch discards it and starts a fresh Writer attempt.
+
 **Editor** — receives the relevant canon, recent accepted outcomes, the plan and the draft.
 Reports only issues it can evidence verbatim in the prose, plus any unrealized delta. It
 also extracts the accepted `ChapterOutcome`. **Code decides publication, not the model**:
@@ -357,6 +369,9 @@ and setup route.
 The live plan stage checkpoints its raw Planner response and, when necessary, the single
 mechanical repair. A killed invocation resumes from that stable intermediate and re-validates
 it against current durable state, so a stale checkpoint is ignored rather than trusted.
+The Writer stage has the same recovery principle, but never trusts serialized context: it
+rebuilds context from canonical state and verifies a checkpoint's state, plan, release and
+revision digests before asking Editor to continue.
 Plan Judge and judge-driven replan remain available only through the explicit
 `reviewMode: 'offline_judge'` used by frozen-corpus benchmark tooling; they never gate live
 publication.

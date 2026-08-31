@@ -1,5 +1,6 @@
 import type { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
+import { recordGeminiUsageEvent, type GeminiUsageMetadata } from '@/services/gemini-usage-ledger';
 import { StoryFactoryError } from './contracts';
 
 const API_BASE = 'https://generativelanguage.googleapis.com/v1beta';
@@ -29,10 +30,10 @@ export const CHAPTER_CALL_TIMEOUT_MS = 120_000;
 const PRICING: Record<string, { input: number; output: number }> = {
   'gemini-2.5-pro': { input: 1.25, output: 10 },
   'gemini-2.5-flash': { input: 0.3, output: 2.5 },
-  'gemini-3.5-flash': { input: 0.75, output: 4.5 },
+  'gemini-3.5-flash': { input: 1.5, output: 9 },
   'gemini-3-flash-preview': { input: 0.5, output: 3 },
   'gemini-3.1-pro-preview': { input: 2, output: 12 },
-  'gemini-3.6-flash': { input: 1.5, output: 7.5 },
+  'gemini-3.6-flash': { input: 0.75, output: 3.75 },
   // Introductory price through 2026-12-31 (launch email 2026-08-13); reverts to
   // 3.6-flash-level pricing after — recheck before relying on the margin.
   'gemini-3.7-flash': { input: 0.75, output: 3.75 },
@@ -83,6 +84,15 @@ export interface ProviderUsage {
   outputTokens: number;
   costUsd: number;
   finishReason: string;
+  /** Gemini reports cache hits inside promptTokenCount; retain them separately for billing. */
+  cachedInputTokens?: number;
+  candidateTokens?: number;
+  candidateTextTokens?: number;
+  candidateImageTokens?: number;
+  thinkingTokens?: number;
+  toolUsePromptTokens?: number;
+  totalTokens?: number;
+  priceStatus?: 'priced' | 'unpriced';
   grounding?: {
     searchQueries: string[];
     sourceUrls: string[];
@@ -139,12 +149,21 @@ function cost(model: string, inputTokens: number, outputTokens: number): number 
   return (inputTokens * price.input + outputTokens * price.output) / 1_000_000;
 }
 
-function mergeUsage(first: ProviderUsage, second: ProviderUsage): ProviderUsage {
+/** Preserve every billed Gemini bucket when one visible operation needs repair. */
+export function mergeProviderUsage(first: ProviderUsage, second: ProviderUsage): ProviderUsage {
   return {
     ...second,
     inputTokens: first.inputTokens + second.inputTokens,
     outputTokens: first.outputTokens + second.outputTokens,
     costUsd: first.costUsd + second.costUsd,
+    cachedInputTokens: (first.cachedInputTokens ?? 0) + (second.cachedInputTokens ?? 0),
+    candidateTokens: (first.candidateTokens ?? first.outputTokens) + (second.candidateTokens ?? second.outputTokens),
+    candidateTextTokens: (first.candidateTextTokens ?? first.outputTokens) + (second.candidateTextTokens ?? second.outputTokens),
+    candidateImageTokens: (first.candidateImageTokens ?? 0) + (second.candidateImageTokens ?? 0),
+    thinkingTokens: (first.thinkingTokens ?? 0) + (second.thinkingTokens ?? 0),
+    toolUsePromptTokens: (first.toolUsePromptTokens ?? 0) + (second.toolUsePromptTokens ?? 0),
+    totalTokens: (first.totalTokens ?? first.inputTokens + first.outputTokens) + (second.totalTokens ?? second.inputTokens + second.outputTokens),
+    priceStatus: first.priceStatus === 'unpriced' || second.priceStatus === 'unpriced' ? 'unpriced' : 'priced',
     grounding: first.grounding || second.grounding
       ? {
         searchQueries: [...(first.grounding?.searchQueries ?? []), ...(second.grounding?.searchQueries ?? [])],
@@ -579,12 +598,6 @@ async function generate(input: {
       const candidate = payload?.candidates?.[0];
       const value = candidate?.content?.parts?.map((part: { text?: string }) => part.text ?? '').join('').trim() ?? '';
       const finishReason = candidate?.finishReason ?? 'UNKNOWN';
-      if (!value || finishReason === 'MAX_TOKENS') {
-        throw new StoryFactoryError('infra_blocked', `Gemini returned ${value ? 'truncated' : 'empty'} output (${finishReason}).`);
-      }
-      const inputTokens = payload?.usageMetadata?.promptTokenCount ?? 0;
-      const outputTokens = (payload?.usageMetadata?.candidatesTokenCount ?? 0)
-        + (payload?.usageMetadata?.thoughtsTokenCount ?? 0);
       const groundingMetadata = candidate?.groundingMetadata;
       const grounding = groundingMetadata ? {
         searchQueries: Array.isArray(groundingMetadata.webSearchQueries)
@@ -596,14 +609,37 @@ async function generate(input: {
           ))
           : [],
       } : undefined;
+      // Persist usage before validating the response body. A blocked, truncated,
+      // or schema-invalid generation can still consume tokens and must remain in
+      // the daily ledger rather than disappearing into a retry.
+      const usageMetadata = payload?.usageMetadata as GeminiUsageMetadata | undefined;
+      const calculated = await recordGeminiUsageEvent({
+        model: input.model,
+        modelVersion: typeof payload?.modelVersion === 'string' ? payload.modelVersion : undefined,
+        responseId: typeof payload?.responseId === 'string' ? payload.responseId : undefined,
+        usageMetadata,
+        groundingSearchQueries: grounding?.searchQueries.length ?? 0,
+        status: !value || finishReason === 'MAX_TOKENS' ? 'blocked' : 'succeeded',
+      });
+      if (!value || finishReason === 'MAX_TOKENS') {
+        throw new StoryFactoryError('infra_blocked', `Gemini returned ${value ? 'truncated' : 'empty'} output (${finishReason}).`);
+      }
       return {
         value,
         usage: {
           model: input.model,
-          inputTokens,
-          outputTokens,
-          costUsd: cost(input.model, inputTokens, outputTokens),
+          inputTokens: calculated.promptTokens,
+          outputTokens: calculated.candidateTokens + calculated.thinkingTokens,
+          costUsd: calculated.tokenCostUsd ?? 0,
           finishReason,
+          cachedInputTokens: calculated.cachedInputTokens,
+          candidateTokens: calculated.candidateTokens,
+          candidateTextTokens: calculated.candidateTextTokens,
+          candidateImageTokens: calculated.candidateImageTokens,
+          thinkingTokens: calculated.thinkingTokens,
+          toolUsePromptTokens: calculated.toolUsePromptTokens,
+          totalTokens: calculated.totalTokens,
+          priceStatus: calculated.priceStatus,
           grounding,
         },
       };
@@ -672,7 +708,7 @@ export const geminiProvider: StoryModelProvider = {
         jsonMode: true,
         googleSearch: input.grounding === 'google_search',
       });
-      usage = mergeUsage(usage, jsonCorrection.usage);
+      usage = mergeProviderUsage(usage, jsonCorrection.usage);
       try {
         raw = JSON.parse(jsonCorrection.value);
       } catch {
@@ -722,7 +758,7 @@ Trả lại đúng một object JSON đã sửa, không giải thích.`,
           usage: corrective.usage,
         });
       }
-      const usageTotal = mergeUsage(usage, corrective.usage);
+      const usageTotal = mergeProviderUsage(usage, corrective.usage);
       parsed = input.schema.safeParse(raw);
       if (!parsed.success) {
         throw new StoryFactoryError('infra_blocked', 'Provider output failed application schema validation after one correction.', {

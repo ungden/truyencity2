@@ -31,6 +31,10 @@ import {
   nextRunAfterNonChapterStage,
   PlannerRollingPlanResponseSchema,
   REVISION_SYSTEM_PROMPT,
+  WRITER_PROTOCOL_PREFIX,
+  WRITER_PROTOCOL_SUFFIX,
+  WRITER_SYSTEM_PROMPT,
+  buildWriterSystemPrompt,
   WindowReviewSchema,
   WindowReviewWireSchema,
   appendAcceptedOutcome,
@@ -53,6 +57,7 @@ import {
   detectFlatDialogue,
   detectRawEmotionTelling,
   detectSentenceRhythmMonotony,
+  analyzeVietnameseStyleTelemetry,
   buildSetupCheckpointProvenance,
   bookSetupCheckpointCost,
   createLaunchWorldWireSchema,
@@ -90,6 +95,8 @@ import {
   scenePacing,
   validationPasses,
   draftStoryChapter,
+  assessStoryDraftCheckpoint,
+  readDraftCheckpoint,
   readPendingRevision,
   reviseStoryChapter,
   writeStoryChapter,
@@ -431,6 +438,7 @@ class QueueProvider implements StoryModelProvider {
   temperatures: Array<number | undefined> = [];
   thinkingLevels: Array<string | undefined> = [];
   verbosities: Array<string | undefined> = [];
+  systems: string[] = [];
   prompts: string[] = [];
   constructor(private readonly values: unknown[]) {}
   async text(input: { model: string }): Promise<ProviderResult<string>> {
@@ -439,6 +447,7 @@ class QueueProvider implements StoryModelProvider {
   }
   async json<T>(input: {
     model: string;
+    system: string;
     prompt: string;
     schema: z.ZodType<T, z.ZodTypeDef, unknown>;
     temperature?: number;
@@ -450,6 +459,7 @@ class QueueProvider implements StoryModelProvider {
     this.temperatures.push(input.temperature);
     this.thinkingLevels.push(input.thinkingLevel);
     this.verbosities.push(input.verbosity);
+    this.systems.push(input.system);
     this.prompts.push(input.prompt);
     const value = this.values.shift();
     return { value: input.deferApplicationSchemaValidation ? value as T : input.schema.parse(value), usage };
@@ -2698,6 +2708,79 @@ describe('canonical Story Factory', () => {
     expect(result.wordCount).toBeLessThan(100);
   });
 
+  test('voice-only prompt overrides preserve every Writer protocol guard', () => {
+    expect(buildWriterSystemPrompt()).toBe(WRITER_SYSTEM_PROMPT);
+    const candidate = buildWriterSystemPrompt({
+      voicePolicy: 'Ưu tiên cảnh có va chạm trực diện và chi tiết nghề nghiệp có hậu quả.',
+      cadencePolicy: 'Dùng nhịp câu đa dạng, nhưng không nhắc đến prompt hay schema.',
+    });
+    expect(candidate).toContain(WRITER_PROTOCOL_PREFIX.slice(0, 600));
+    expect(candidate).toContain(WRITER_PROTOCOL_SUFFIX.slice(0, 500));
+    expect(candidate).toContain('không được tự tạo thay đổi trạng thái bền vững ngoài requiredChanges');
+    expect(candidate).toContain('Lời hứa, cam kết tiền bạc, hẹn ước là thay đổi trạng thái bền vững');
+    expect(candidate).toContain('Ưu tiên cảnh có va chạm trực diện');
+    expect(candidate).not.toContain('Mỗi scene phải được lọc qua thiên kiến');
+  });
+
+  test('Writer accepts an offline voice variant without replacing its protocol', async () => {
+    const draft = { title: 'Mẻ hàng đầu tiên', content: 'Hải đặt rổ xuống giữa nhà. Anh chia việc với mẹ rồi kiểm lại số tiền trước khi bắt tay làm.' };
+    const provider = new QueueProvider([draft, editorWirePass('delta_1', 'chia việc với mẹ')]);
+    await writeStoryChapter({
+      kernel,
+      state: initialState,
+      plan: plan(1),
+      routes,
+      provider,
+      writerVoicePolicy: 'Chỉ dùng chi tiết nghề nghiệp khi nó ép nhân vật lựa chọn trước đối lực thật.',
+    });
+    expect(provider.systems[0]).toContain('Chỉ dùng chi tiết nghề nghiệp');
+    expect(provider.systems[0]).toContain('không được tự tạo thay đổi trạng thái bền vững ngoài requiredChanges');
+    expect(provider.systems[0]).toContain('Lời hứa, cam kết tiền bạc, hẹn ước là thay đổi trạng thái bền vững');
+  });
+
+  test('a durable Writer checkpoint resumes at Editor without a second Writer call', async () => {
+    const draft = {
+      title: 'Mẻ hàng đầu tiên',
+      content: 'Hải đặt rổ xuống giữa nhà. Anh chia việc với mẹ rồi kiểm lại số tiền trước khi bắt tay làm ngay trong buổi sáng.',
+    };
+    let checkpoint: Awaited<Parameters<NonNullable<Parameters<typeof draftStoryChapter>[0]['onDraftCheckpoint']>>[0]> | null = null;
+    const interrupted = new QueueProvider([draft]);
+    await expect(draftStoryChapter({
+      kernel,
+      state: initialState,
+      plan: plan(1),
+      routes,
+      provider: interrupted,
+      onDraftCheckpoint: async saved => {
+        checkpoint = JSON.parse(JSON.stringify(saved));
+        expect(interrupted.calls).toEqual(['writer']);
+      },
+    })).rejects.toMatchObject({ code: 'infra_blocked' });
+    expect(checkpoint).toMatchObject({ v: 1, draft });
+    expect(interrupted.calls).toEqual(['writer', 'editor']);
+
+    const resumed = new QueueProvider([editorWirePass('delta_1', 'chia việc với mẹ')]);
+    const outcome = await assessStoryDraftCheckpoint({
+      kernel,
+      state: initialState,
+      plan: plan(1),
+      routes,
+      provider: resumed,
+      checkpoint: checkpoint!,
+    });
+    expect(resumed.calls).toEqual(['editor']);
+    expect(outcome.decision).toBe('publish');
+    if (outcome.decision !== 'publish') throw new Error('unreachable');
+    expect(outcome.result.usages).toHaveLength(2);
+
+    const provenance = {
+      projectId: 'project-1', chapterNumber: 1, stateDigest: 'state', planDigest: 'plan',
+      engineRelease: 'sf_test', engineRevision: 'rev_test',
+    };
+    expect(readDraftCheckpoint({ draftCheckpoint: { ...checkpoint!, provenance } }, provenance)).toEqual(checkpoint);
+    expect(readDraftCheckpoint({ draftCheckpoint: { ...checkpoint!, provenance } }, { ...provenance, planDigest: 'stale' })).toBeNull();
+  });
+
   test('transition-only recovery uses one low-verbosity Writer call instead of a length retry', async () => {
     const bridgeKernel: StoryKernel = structuredClone(kernel);
     bridgeKernel.resources.push({
@@ -4387,6 +4470,7 @@ describe('canonical Story Factory', () => {
         mechanics: Array<{ mechanicId: string }>;
       };
       recentNarrativeCycles: { cycles: Array<{ chapterNumber: number; kind: string }>; rule: string };
+      compactContract: { strictRules: string[] };
     };
     expect(prompt.mechanicDependencyGuide.planningRule).toContain('producerMechanicId');
     expect(prompt.mechanicDependencyGuide.planningRule).toContain('forbiddenFacts');
@@ -4394,6 +4478,7 @@ describe('canonical Story Factory', () => {
       .toEqual(expect.arrayContaining(arc.activeMechanicIds));
     expect(prompt.recentNarrativeCycles.cycles).toEqual([]);
     expect(prompt.recentNarrativeCycles.rule).toContain('Đổi số kg, giá');
+    expect(prompt.compactContract.strictRules.join('\n')).toContain('Capability role=support được kiểm tại đầu scene');
   });
 
   test('fact before values are derived sequentially from State across a rolling window', () => {
@@ -5341,6 +5426,22 @@ describe('canonical Story Factory', () => {
     expect(materializeWindowReview(wire)).toEqual(windowReviewPass());
   });
 
+  test('window review binds five wire patterns to the supplied chapter order', async () => {
+    const chapters = Array.from({ length: 5 }, (_, index) => ({
+      chapterNumber: index + 1,
+      title: `Chương ${index + 1}`,
+      content: `Bằng chứng nguyên văn chương ${index + 1}.`,
+    }));
+    const duplicateIds = windowReviewWirePass();
+    duplicateIds.patterns = duplicateIds.patterns.map(pattern => ({ ...pattern, c: 1 }));
+    const provider = new QueueProvider([duplicateIds]);
+
+    const result = await reviewFiveChapterWindow({ kernel, arc, state: initialState, chapters, routes, provider });
+
+    expect(result.review.chapterPatterns.map(pattern => pattern.chapterNumber)).toEqual([1, 2, 3, 4, 5]);
+    expect(provider.calls).toEqual(['editor']);
+  });
+
   test('window review decision is code-derived when the model reports an issue with true checks', () => {
     const wire = windowReviewWirePass();
     wire.issues = [{
@@ -5387,6 +5488,19 @@ describe('canonical Story Factory', () => {
     });
   });
 
+  test('window review receives deterministic Vietnamese style clues as non-gating context', async () => {
+    const chapters = Array.from({ length: 5 }, (_, index) => ({
+      chapterNumber: index + 1,
+      title: `Cái Giá Chương ${index + 1}`,
+      content: `Bằng chứng nguyên văn chương ${index + 1}. Hải Đông Lạnh đáp. Giữ luồng là việc hôm nay. Giữ luồng chưa thể dừng. Cánh cửa mới mở ra.`,
+    }));
+    const telemetry = analyzeVietnameseStyleTelemetry(chapters);
+    const provider = new QueueProvider([windowReviewWirePass()]);
+    await reviewFiveChapterWindow({ kernel, arc, state: initialState, chapters, styleTelemetry: telemetry, routes, provider });
+    expect(provider.prompts[0]).toContain('deterministicStyleTelemetry');
+    expect(provider.prompts[0]).toContain('giữ luồng');
+  });
+
   test('one corrective pass recovers a review whose quotes were paraphrased', async () => {
     // Reviewing five long chapters, the model measurably compresses quotes — one
     // production window failed grounding four rolls straight. A single same-model
@@ -5401,6 +5515,23 @@ describe('canonical Story Factory', () => {
     const good = windowReviewWirePass();
     const provider = new QueueProvider([bad, good]);
     const result = await reviewFiveChapterWindow({ kernel, arc, state: initialState, chapters, routes, provider });
+    expect(result.review.status).toBe('pass');
+    expect(provider.calls).toEqual(['editor', 'editor']);
+  });
+
+  test('window review corrects a wire payload that cannot satisfy the durable evidence minimum', async () => {
+    const chapters = Array.from({ length: 5 }, (_, index) => ({
+      chapterNumber: index + 1,
+      title: `Chương ${index + 1}`,
+      content: `Bằng chứng nguyên văn chương ${index + 1}.`,
+    }));
+    const bad = windowReviewWirePass();
+    bad.evidence = bad.evidence.filter(item => !(item.k === 'v' && item.c === 2));
+    const good = windowReviewWirePass();
+    const provider = new QueueProvider([bad, good]);
+
+    const result = await reviewFiveChapterWindow({ kernel, arc, state: initialState, chapters, routes, provider });
+
     expect(result.review.status).toBe('pass');
     expect(provider.calls).toEqual(['editor', 'editor']);
   });
@@ -5984,6 +6115,31 @@ describe('prose-craft gates', () => {
     expect(issue).not.toBeNull();
     expect(moderate).toContain(issue!.evidence);
     expect(detectBlandSensoryCliche(moderate + moderate)).toMatchObject({ severity: 'major' });
+  });
+
+  test('Vietnamese style telemetry records repeated slogans, title frames, endings and attributions', () => {
+    const telemetry = analyzeVietnameseStyleTelemetry(Array.from({ length: 5 }, (_, index) => ({
+      chapterNumber: index + 1,
+      title: `Cái Giá Của Mẻ Hàng ${index + 1}`,
+      content: `Hải Đông Lạnh đáp. Giữ luồng là việc hôm nay. Giữ luồng chưa thể dừng. Không phải lúc để bán tháo. Cánh cửa mới mở ra.`,
+    })));
+    expect(telemetry).toMatchObject({
+      v: 1,
+      chapterNumbers: [1, 2, 3, 4, 5],
+      negateThenCorrectCount: 5,
+    });
+    expect(telemetry.repeatedPhrases).toEqual(expect.arrayContaining([
+      expect.objectContaining({ phrase: 'giữ luồng', occurrences: 10 }),
+    ]));
+    expect(telemetry.repeatedTitleStems).toEqual(expect.arrayContaining([
+      expect.objectContaining({ stem: 'cái giá', occurrences: 5 }),
+    ]));
+    expect(telemetry.repeatedEndingPhrases).toEqual(expect.arrayContaining([
+      expect.objectContaining({ phrase: 'cánh cửa mới mở ra', occurrences: 5 }),
+    ]));
+    expect(telemetry.repeatedDialogueAttributions).toEqual(expect.arrayContaining([
+      expect.objectContaining({ phrase: 'hải đông lạnh đáp', occurrences: 5 }),
+    ]));
   });
 
   test('a plan repeating a committed causal shape is rejected deterministically', () => {

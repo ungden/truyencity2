@@ -17,7 +17,11 @@ import type { CraftGuidance } from './craft';
 import type { ContinuityPacket } from './memory';
 import type { ProviderUsage, StoryModelProvider } from './provider';
 import { CHAPTER_CALL_TIMEOUT_MS, geminiProvider } from './provider';
-import { EDITOR_SYSTEM_PROMPT, REVISION_SYSTEM_PROMPT, WRITER_SYSTEM_PROMPT } from './prompts';
+import {
+  EDITOR_SYSTEM_PROMPT,
+  REVISION_SYSTEM_PROMPT,
+  buildWriterSystemPrompt,
+} from './prompts';
 import {
   appendAcceptedOutcome,
   applyChapterPlan,
@@ -909,6 +913,21 @@ export interface ChapterStageInput {
   craftGuidance?: CraftGuidance[];
   routes: ModelRoutes;
   provider?: StoryModelProvider;
+  /** Offline-only literary variant. Protocol guards remain code-owned. */
+  writerVoicePolicy?: string;
+  /** Durable hand-off immediately after the paid Writer call, before Editor starts. */
+  onDraftCheckpoint?: (checkpoint: WriterDraftCheckpoint) => Promise<void>;
+}
+
+/**
+ * The smallest recoverable unit after Writer completes. It deliberately carries
+ * no state transition or prompt: runtime binds it to immutable state/plan/release
+ * digests before an Editor resume can use it.
+ */
+export interface WriterDraftCheckpoint {
+  v: 1;
+  draft: ChapterDraft;
+  usage: ProviderUsage;
 }
 
 /**
@@ -974,56 +993,40 @@ function rethrowWithTelemetry(error: unknown, telemetry: ChapterAttemptTelemetry
   });
 }
 
-/** Writer + Editor. Publishes on a clean first pass, otherwise hands back the rewrite payload. */
-export async function draftStoryChapter(input: ChapterStageInput): Promise<ChapterDraftOutcome> {
+/**
+ * Continue from a draft that has already crossed the durable Writer checkpoint.
+ * This is used only after runtime proves the checkpoint belongs to the exact
+ * current state and plan, so retrying an Editor outage never pays Writer again.
+ */
+export async function assessStoryDraftCheckpoint(
+  input: ChapterStageInput & { checkpoint: WriterDraftCheckpoint },
+): Promise<ChapterDraftOutcome> {
   const provider = input.provider ?? geminiProvider;
-  // Validate and materialize the exact state transition before spending a model call.
-  const transition = applyChapterPlan({ kernel: input.kernel, state: input.state, plan: input.plan });
-  const contexts = buildChapterContexts({ ...input, stateAfter: transition.state });
-  const usages: ProviderUsage[] = [];
-  let initialDraft: ChapterDraft | null = null;
+  const usages: ProviderUsage[] = [input.checkpoint.usage];
   let initialAssessment: EditorAssessment | null = null;
   const telemetry = (): ChapterAttemptTelemetry => ({
-    initialDraft,
+    initialDraft: input.checkpoint.draft,
     initialAssessment,
     revisionDraft: null,
     finalAssessment: initialAssessment,
     usages: [...usages],
     revisionCount: 0,
-    draftAttempts: initialDraft ? 1 : 0,
+    draftAttempts: 1,
     firstPass: initialAssessment ? initialAssessment.status === 'pass' : null,
   });
 
   try {
-    const compressedBridge = contexts.brief.chapterPacing === 'compressed_bridge';
-    const initial = await provider.json({
-      model: input.routes.writer,
-      timeoutMs: CHAPTER_CALL_TIMEOUT_MS,
-      // This is a provider-level output control, not a second-pass length gate.
-      // Transition-only recovery briefs get one short generation instead of a
-      // normal high-verbosity chapter that must later be rewritten or padded.
-      verbosity: compressedBridge ? 'low' : 'high',
-      system: WRITER_SYSTEM_PROMPT,
-      prompt: JSON.stringify({
-        task: compressedBridge
-          ? 'Viết nhịp cầu chuyển tiếp ngắn dưới 600 từ; không độn thành chương thường.'
-          : 'Viết chương truyện hoàn chỉnh.',
-        chapterNumber: input.plan.chapterNumber,
-        writerBrief: contexts.brief,
-        previousChapterTail: contexts.previousTail || null,
-      }),
-      schema: ChapterDraftSchema,
-      temperature: 1,
-    });
-    initialDraft = initial.value;
-    usages.push(initial.usage);
+    // Recompute pure artifacts from canonical state rather than trusting a
+    // serialized projection beside the prose.
+    const transition = applyChapterPlan({ kernel: input.kernel, state: input.state, plan: input.plan });
+    const contexts = buildChapterContexts({ ...input, stateAfter: transition.state });
     const firstAssessment = await assessStoryDraft({
       provider,
       model: input.routes.editor,
       kernel: contexts.editorKernel,
       state: contexts.editorState,
       plan: input.plan,
-      draft: initial.value,
+      draft: input.checkpoint.draft,
     });
     initialAssessment = firstAssessment.assessment;
     usages.push(firstAssessment.usage);
@@ -1036,7 +1039,7 @@ export async function draftStoryChapter(input: ChapterStageInput): Promise<Chapt
           stage: input,
           transition,
           contexts,
-          draft: initial.value,
+          draft: input.checkpoint.draft,
           assessment: acceptedAssessment,
           usages,
           revisionCount: 0,
@@ -1057,12 +1060,65 @@ export async function draftStoryChapter(input: ChapterStageInput): Promise<Chapt
     return {
       decision: 'revise',
       pending: {
-        draft: initial.value,
+        draft: input.checkpoint.draft,
         assessment: firstAssessment.assessment,
         usages,
         telemetry: telemetry(),
       },
     };
+  } catch (error) {
+    rethrowWithTelemetry(error, telemetry());
+  }
+}
+
+/** Writer + Editor. Publishes on a clean first pass, otherwise hands back the rewrite payload. */
+export async function draftStoryChapter(input: ChapterStageInput): Promise<ChapterDraftOutcome> {
+  const provider = input.provider ?? geminiProvider;
+  const usages: ProviderUsage[] = [];
+  let initialDraft: ChapterDraft | null = null;
+  const telemetry = (): ChapterAttemptTelemetry => ({
+    initialDraft,
+    initialAssessment: null,
+    revisionDraft: null,
+    finalAssessment: null,
+    usages: [...usages],
+    revisionCount: 0,
+    draftAttempts: initialDraft ? 1 : 0,
+    firstPass: null,
+  });
+
+  try {
+    // Validate and materialize the exact state transition before spending a model call.
+    const transition = applyChapterPlan({ kernel: input.kernel, state: input.state, plan: input.plan });
+    const contexts = buildChapterContexts({ ...input, stateAfter: transition.state });
+    const compressedBridge = contexts.brief.chapterPacing === 'compressed_bridge';
+    const initial = await provider.json({
+      model: input.routes.writer,
+      timeoutMs: CHAPTER_CALL_TIMEOUT_MS,
+      // This is a provider-level output control, not a second-pass length gate.
+      // Transition-only recovery briefs get one short generation instead of a
+      // normal high-verbosity chapter that must later be rewritten or padded.
+      verbosity: compressedBridge ? 'low' : 'high',
+      system: buildWriterSystemPrompt({ voicePolicy: input.writerVoicePolicy }),
+      prompt: JSON.stringify({
+        task: compressedBridge
+          ? 'Viết nhịp cầu chuyển tiếp ngắn dưới 600 từ; không độn thành chương thường.'
+          : 'Viết chương truyện hoàn chỉnh.',
+        chapterNumber: input.plan.chapterNumber,
+        writerBrief: contexts.brief,
+        previousChapterTail: contexts.previousTail || null,
+      }),
+      schema: ChapterDraftSchema,
+      temperature: 1,
+    });
+    initialDraft = initial.value;
+    usages.push(initial.usage);
+    const checkpoint: WriterDraftCheckpoint = { v: 1, draft: initial.value, usage: initial.usage };
+    // Do not start the paid Editor call until the Writer response can survive a
+    // process death. A checkpoint-write failure is infrastructure failure, not
+    // permission to silently risk redrafting a paid chapter.
+    await input.onDraftCheckpoint?.(checkpoint);
+    return assessStoryDraftCheckpoint({ ...input, checkpoint });
   } catch (error) {
     rethrowWithTelemetry(error, telemetry());
   }

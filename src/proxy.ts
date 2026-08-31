@@ -1,11 +1,11 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Only protect /admin routes (API routes have their own auth)
-  const isAdminRoute = pathname.startsWith('/admin');
+  const isAdminRoute = pathname === '/admin' || pathname.startsWith('/admin/');
   if (!isAdminRoute) {
     return NextResponse.next();
   }
@@ -31,9 +31,13 @@ export async function middleware(request: NextRequest) {
       setAll(cookiesToSet) {
         cookiesToSet.forEach(({ name, value, options }) => {
           request.cookies.set(name, value);
-          response = NextResponse.next({
-            request: { headers: request.headers },
-          });
+        });
+
+        response = NextResponse.next({
+          request: { headers: request.headers },
+        });
+
+        cookiesToSet.forEach(({ name, value, options }) => {
           response.cookies.set(name, value, options);
         });
       },

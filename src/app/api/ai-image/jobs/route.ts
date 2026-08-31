@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseFromAuthHeader } from '@/integrations/supabase/auth-helpers';
-import { supabase } from '@/integrations/supabase/client';
 import { AIImageJobSchema, ValidationError, createValidationErrorResponse } from '@/lib/security/validation';
 
 export const maxDuration = 15;
@@ -44,8 +43,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Invoke the edge function asynchronously (fire-and-forget)
-    supabase.functions.invoke('gemini-cover-generate', {
-      body: { jobId: job.id, prompt },
+    userClient.functions.invoke('gemini-cover-generate', {
+      body: { jobId: job.id },
+      headers: { Authorization: `Bearer ${token}` },
     }).catch(err => {
       console.error("Error invoking edge function (fire-and-forget):", err);
     });

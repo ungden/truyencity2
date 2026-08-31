@@ -11,6 +11,125 @@ export interface CraftGuidance {
   rule: string;
 }
 
+export interface VietnameseStyleTelemetry {
+  v: 1;
+  chapterNumbers: number[];
+  tokenCount: number;
+  negateThenCorrectCount: number;
+  repeatedPhrases: Array<{ phrase: string; occurrences: number; chapterNumbers: number[] }>;
+  repeatedTitleStems: Array<{ stem: string; occurrences: number; chapterNumbers: number[] }>;
+  repeatedEndingPhrases: Array<{ phrase: string; occurrences: number; chapterNumbers: number[] }>;
+  repeatedDialogueAttributions: Array<{ phrase: string; occurrences: number; chapterNumbers: number[] }>;
+}
+
+interface StyleChapter {
+  chapterNumber: number;
+  title: string;
+  content: string;
+}
+
+interface TextFrequency {
+  occurrences: number;
+  chapterNumbers: Set<number>;
+}
+
+const VIETNAMESE_STOPWORDS = new Set([
+  'và', 'là', 'của', 'có', 'cho', 'với', 'một', 'những', 'các', 'đã', 'đang',
+  'trong', 'không', 'được', 'sau', 'trước', 'khi', 'thì', 'lại', 'cũng', 'vẫn',
+  'rằng', 'này', 'đó', 'ấy', 'từ', 'đến', 'về', 'ra', 'vào', 'theo', 'như',
+]);
+
+function vietnameseTokens(value: string): string[] {
+  return value
+    .normalize('NFC')
+    .toLocaleLowerCase('vi')
+    .match(/[\p{L}\p{M}\p{N}]+/gu) ?? [];
+}
+
+function registerFrequency(map: Map<string, TextFrequency>, phrase: string, chapterNumber: number): void {
+  const existing = map.get(phrase) ?? { occurrences: 0, chapterNumbers: new Set<number>() };
+  existing.occurrences += 1;
+  existing.chapterNumbers.add(chapterNumber);
+  map.set(phrase, existing);
+}
+
+function frequentRows(map: Map<string, TextFrequency>, limit: number): Array<{
+  phrase: string;
+  occurrences: number;
+  chapterNumbers: number[];
+}> {
+  return [...map.entries()]
+    .filter(([, value]) => value.occurrences >= 2 && value.chapterNumbers.size >= 2)
+    .map(([phrase, value]) => ({
+      phrase,
+      occurrences: value.occurrences,
+      chapterNumbers: [...value.chapterNumbers].sort((a, b) => a - b),
+    }))
+    .sort((a, b) => b.occurrences - a.occurrences || b.chapterNumbers.length - a.chapterNumbers.length || a.phrase.localeCompare(b.phrase, 'vi'))
+    .slice(0, limit);
+}
+
+function titleStem(title: string): string | null {
+  const tokens = vietnameseTokens(title)
+    .filter(token => token !== 'chương' && !/^\d+$/.test(token));
+  return tokens.length >= 2 ? tokens.slice(0, 2).join(' ') : null;
+}
+
+/**
+ * Deterministic, Vietnamese-specific reading clues for a five-chapter window.
+ * These are deliberately observations, never a publication gate: named people,
+ * motifs and a deliberate refrain can all repeat for good narrative reasons. The
+ * independent Editor decides whether a clue warrants a grounded advisory.
+ */
+export function analyzeVietnameseStyleTelemetry(chapters: StyleChapter[]): VietnameseStyleTelemetry {
+  const phrases = new Map<string, TextFrequency>();
+  const titleStems = new Map<string, TextFrequency>();
+  const endings = new Map<string, TextFrequency>();
+  const attributions = new Map<string, TextFrequency>();
+  let tokenCount = 0;
+  let negateThenCorrectCount = 0;
+
+  for (const chapter of chapters) {
+    const tokens = vietnameseTokens(chapter.content);
+    tokenCount += tokens.length;
+    for (let size = 2; size <= 3; size += 1) {
+      for (let index = 0; index + size <= tokens.length; index += 1) {
+        const words = tokens.slice(index, index + size);
+        // Pure connective n-grams add noise; retain any phrase with a concrete
+        // word so repeated slogans such as "giữ luồng" remain visible.
+        if (words.every(word => VIETNAMESE_STOPWORDS.has(word) || /^\d+$/.test(word))) continue;
+        registerFrequency(phrases, words.join(' '), chapter.chapterNumber);
+      }
+    }
+    const stem = titleStem(chapter.title);
+    if (stem) registerFrequency(titleStems, stem, chapter.chapterNumber);
+    const ending = tokens.slice(-5).join(' ');
+    if (ending.split(' ').length === 5) registerFrequency(endings, ending, chapter.chapterNumber);
+    for (const match of chapter.content.matchAll(/(?:^|[.!?…]\s*)([\p{L}][\p{L}\p{M}\s]{0,36}?\s(?:nói|đáp|hỏi|quát|thốt|lẩm bẩm|lên tiếng))\b/giu)) {
+      const phrase = vietnameseTokens(match[1] ?? '').join(' ');
+      if (phrase.split(' ').length >= 2) registerFrequency(attributions, phrase, chapter.chapterNumber);
+    }
+    negateThenCorrectCount += (chapter.content.match(/(?:^|[.!?…\n]\s*)Không phải\b/gu) ?? []).length;
+  }
+
+  return {
+    v: 1,
+    chapterNumbers: chapters.map(chapter => chapter.chapterNumber).sort((a, b) => a - b),
+    tokenCount,
+    negateThenCorrectCount,
+    // A phrase needs three total hits before spending review attention. Titles,
+    // endings and attributions are much rarer, so two cross-chapter matches are
+    // useful clues but still require Editor confirmation.
+    repeatedPhrases: frequentRows(new Map(
+      [...phrases].filter(([, value]) => value.occurrences >= 3),
+    ), 8),
+    repeatedTitleStems: frequentRows(titleStems, 4).map(row => ({ ...row, stem: row.phrase }))
+      .map(({ phrase: _phrase, ...row }) => row),
+    repeatedEndingPhrases: frequentRows(endings, 4),
+    repeatedDialogueAttributions: frequentRows(attributions, 4),
+  };
+}
+
 interface CraftRunLike {
   kind?: unknown;
   chapter_number?: unknown;

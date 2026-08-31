@@ -16,14 +16,14 @@ import {
   type StoryState,
 } from './contracts';
 import type { ContinuityPacket } from './memory';
-import type { CraftGuidance } from './craft';
-import type { ProviderUsage, StoryModelProvider } from './provider';
+import type { CraftGuidance, VietnameseStyleTelemetry } from './craft';
+import { mergeProviderUsage, type ProviderUsage, type StoryModelProvider } from './provider';
 import { geminiProvider } from './provider';
 import type { MarketBlueprint } from './setup';
 
 // Defined here, not in release.ts: release → benchmark → planner already exists, so a
 // planner → release import closes a cycle and breaks the production bundle (TDZ at init).
-export const FACTORY_PLANNER_VERSION = 'story-factory-planner-90-canon-extension-contract-gate';
+export const FACTORY_PLANNER_VERSION = 'story-factory-planner-91-blocked-capability-causal-order';
 import { EDITOR_SYSTEM_PROMPT, PLANNER_SYSTEM_PROMPT, PLAN_JUDGE_SYSTEM_PROMPT } from './prompts';
 import {
   ARC_ACTIVE_MECHANIC_BUDGET,
@@ -245,6 +245,7 @@ const PLANNER_COMPACT_CONTRACT = {
     'Trước khi tạo resource_numeric dương hoặc resource_state delta, phải tìm đúng một conversion/capability effect trong arc có quyền tạo resource đó. Resource_numeric âm chỉ được bỏ effect mechanic khi chủ sở hữu resource có mặt và thực sự trả/tiêu ra ngoài với sink cụ thể không phải mechanic ID; nếu là đầu vào chuyển hóa thì vẫn phải gắn conversion. Nếu không thỏa một trong hai trường hợp, không được thay đổi resource; dùng fact, relationship hoặc promise delta chỉ khi loại đó phản ánh đúng thay đổi và ID hợp lệ.',
     'Kiểm công suất capability theo qty <= maximumUnitsPerMinute * availableMinutes. Với role=effect, availableMinutes=scene.dur. Với role=support, availableMinutes=scene.dur+scene.travel vì support có thể vận hành trong chính quãng chuyển cảnh.',
     'Khai báo đầy đủ mechanic tạo fact/resource và mechanic sử dụng nó trong đúng scene; compiler sẽ sắp thứ tự dependency tất định trong scene. Fact ngoại cảnh không có effect mechanic như thời tiết bắt đầu chỉ trở thành khả dụng sau scene ghi fact delta; capability phụ thuộc nó phải ở scene sau.',
+    'Capability role=support được kiểm tại đầu scene: không được dùng support để tiêu thụ resource/fact chỉ vừa được tạo trong chính scene đó. Khi capability bị khóa vì resource/fact đang bằng 0, hoặc đặt capability ở scene sau producer, hoặc dùng role=effect với một fact/resource delta thuộc chính capability để compiler xếp producer trước capability. Không để support “mượn” output cùng scene.',
     'Conversion là một batch nguyên tử: chỉ commit toàn bộ input và output trong cùng scene khi batch hoàn tất. Chương chuẩn bị chưa hoàn tất batch phải dùng fact hoặc resource_state để ghi tiến độ; không được trừ trước một phần input numeric rồi để output sang chương sau.',
     'Trước khi trả kết quả, replay đúng thứ tự chapter -> scene -> mechanics từ ledgerSnapshot. Với mỗi conversion, kiểm balance hiện tại đủ input, trừ toàn bộ input rồi mới cộng output. Producer phải ở scene trước consumer nếu consumer không chạy được từ state đầu scene; không được lấy output tương lai làm before hiện tại.',
     'Actor của mọi mechanics entry phải có trong scene.people. Không gắn cùng resource delta cho cả conversion và capability chỉ để diễn tả thao tác: conversion sở hữu vector input/output; capability chỉ effect khi nó tạo một fact/resource effect riêng đã khai báo, nếu không thì support hoặc bỏ entry.',
@@ -1499,8 +1500,20 @@ export const WindowReviewWireSchema = z.object({
   }).strict()).max(3),
 }).strict();
 
-export function materializeWindowReview(value: unknown): WindowReview {
-  const wire = WindowReviewWireSchema.parse(value);
+export function materializeWindowReview(
+  value: unknown,
+  patternChapterNumbers?: number[],
+): WindowReview {
+  const parsedWire = WindowReviewWireSchema.safeParse(value);
+  if (!parsedWire.success) {
+    throw new StoryFactoryError('infra_blocked', 'Window Review output failed the compact wire contract.', {
+      issues: parsedWire.error.issues,
+    });
+  }
+  const wire = parsedWire.data;
+  const positionalPatternNumbers = patternChapterNumbers?.length === wire.patterns.length
+    ? patternChapterNumbers
+    : null;
   const checkNames = {
     s: 'structureVariety',
     r: 'reactionVariety',
@@ -1591,21 +1604,34 @@ export function materializeWindowReview(value: unknown): WindowReview {
     // a failed check behind as a blocking side channel.
     for (const key of Object.keys(checks) as Array<keyof typeof checks>) checks[key] = true;
   }
-  return WindowReviewSchema.parse({
+  const materialized = WindowReviewSchema.safeParse({
     status: issues.length ? 'block' : 'pass',
     checks,
     checkEvidence,
-    chapterPatterns: wire.patterns.map(pattern => ({
-      chapterNumber: pattern.c,
-      dominantStructure: structures[pattern.s],
-      validationSource: validationSources[pattern.v],
-      evidenceStage: evidenceStages[pattern.e],
-      claimStrength: claimStrengths[pattern.k],
-      evidence: [{ chapterNumber: pattern.c, quote: pattern.q }],
-    })),
+    chapterPatterns: wire.patterns.map((pattern, index) => {
+      // The model has historically duplicated or skipped `c` despite returning
+      // five patterns. The request always supplies chapters in chronological
+      // order, so bind each wire row to that deterministic position. Its quote
+      // is still grounded against the bound chapter immediately below.
+      const chapterNumber = positionalPatternNumbers?.[index] ?? pattern.c;
+      return {
+        chapterNumber,
+        dominantStructure: structures[pattern.s],
+        validationSource: validationSources[pattern.v],
+        evidenceStage: evidenceStages[pattern.e],
+        claimStrength: claimStrengths[pattern.k],
+        evidence: [{ chapterNumber, quote: pattern.q }],
+      };
+    }),
     issues,
     advisories,
   });
+  if (!materialized.success) {
+    throw new StoryFactoryError('infra_blocked', 'Window Review output failed the durable evidence contract.', {
+      issues: materialized.error.issues,
+    });
+  }
+  return materialized.data;
 }
 
 const ArcLifecycleSchema = z.discriminatedUnion('status', [
@@ -2747,6 +2773,8 @@ export async function reviewFiveChapterWindow(input: {
     after: unknown;
     source: string | null;
   }>;
+  /** Deterministic clues only; Editor must still ground any advisory in prose. */
+  styleTelemetry?: VietnameseStyleTelemetry;
   routes: ModelRoutes;
   marketBlueprint?: MarketBlueprint | null;
   provider?: StoryModelProvider;
@@ -2767,6 +2795,7 @@ export async function reviewFiveChapterWindow(input: {
 Block nếu nhân vật phản ứng như quên sự kiện vừa trải qua, cơ chế vật phẩm/công nghệ đổi cách hoạt động, số tiền/khối lượng/giá trong prose lệch với ledger, hoặc năm chương lặp cùng cấu trúc mà không tạo tiến triển.
 Kiểm số dư theo LỊCH SỬ: resourceTransitions là chuỗi giao dịch đã commit theo thứ tự (before → after tại từng chương). Một câu tổng kết số dư trong chương N phải khớp với after của transition cuối cùng tính đến thời điểm đó trong chương N — KHÔNG so với currentState, vì currentState chỉ là số dư sau chương cuối cửa sổ. Chỉ báo lỗi tiền khi con số lệch với transition lịch sử tương ứng.
 Phải đọc trải nghiệm của cả cửa sổ: bắt lặp chức năng “giải thích cơ chế → biểu diễn → quần chúng kinh ngạc”, stock reaction tương đương dù khác từ, main và đối thủ nói cùng giọng, đối thủ liên tục làm công cụ, hoặc progression tăng mạnh thiếu tích lũy/chi phí.
+deterministicStyleTelemetry chỉ là dấu hiệu đếm bằng code (cụm/tựa/câu kết/attribution lặp), không phải lỗi hay bằng chứng. Chỉ tạo advisory prose_pattern nếu chính bạn đọc prose và xác nhận nó làm văn lặp; quote của advisory vẫn phải copy nguyên văn từ chapter tương ứng.
 Nếu payload có dueMarketPayoffs, đây là deadline sản phẩm chứ không phải gợi ý: block reward_loop/progression nếu tới byChapter mà prose chưa hoàn tất đúng payoff, chưa cho đúng visibleTo chứng kiến, chưa đổi positionChange hoặc chưa mở nextPressure. Một payoff khác dù sảng hơn cũng không được tính thay.
 Không mặc định một thiết kế là tối ưu hoặc một kết quả là tuyệt đối chỉ vì nhân vật giải thích tự tin hay thử thành công một lần. Với realityMode=grounded, kết luận phải tương xứng số lần quan sát và sai số thực tế.
 Lập patterns cho đủ đúng năm chương trước khi kết luận. Mỗi quote trong evidence, patterns và issues phải được sao chép nguyên văn từ content của đúng chapterNumber; mỗi check phải so sánh ít nhất hai chương khác nhau.
@@ -2840,13 +2869,21 @@ Trạng thái pass cũng phải có bằng chứng cụ thể. Chỉ báo tối 
       arc: input.arc,
       currentState: input.state,
       resourceTransitions: input.resourceTransitions ?? [],
+      deterministicStyleTelemetry: input.styleTelemetry ?? null,
       chapters: input.chapters,
     }),
     schema: WindowReviewWireSchema,
+    // The Window Review owns a single visible correction pass. Returning raw
+    // JSON here lets it account for every malformed wire result rather than
+    // letting provider.json throw before the repair policy can run.
+    deferApplicationSchemaValidation: true,
     temperature: 0.4,
   });
   const materializeAndGround = (value: unknown) => {
-    const materialized = materializeWindowReview(value);
+    const materialized = materializeWindowReview(
+      value,
+      input.chapters.map(chapter => chapter.chapterNumber),
+    );
     validateWindowEvidence(materialized, input.chapters);
     return applyDeterministicWindowPolicy(materialized, input.kernel.realityMode);
   };
@@ -2869,6 +2906,7 @@ Bản review trước bị từ chối vì evidence không sao chép NGUYÊN VĂ
         realityMode: input.kernel.realityMode,
         marketBlueprint: input.marketBlueprint ?? null,
         dueMarketPayoffs,
+        deterministicStyleTelemetry: input.styleTelemetry ?? null,
         chapters: input.chapters,
         kernelIdentity: {
           protagonistId: input.kernel.protagonistId,
@@ -2879,14 +2917,10 @@ Bản review trước bị từ chối vì evidence không sao chép NGUYÊN VĂ
         currentState: input.state,
       }),
       schema: WindowReviewWireSchema,
+      deferApplicationSchemaValidation: true,
       temperature: 0.2,
     });
-    const usageTotal = {
-      ...corrective.usage,
-      inputTokens: result.usage.inputTokens + corrective.usage.inputTokens,
-      outputTokens: result.usage.outputTokens + corrective.usage.outputTokens,
-      costUsd: result.usage.costUsd + corrective.usage.costUsd,
-    };
+    const usageTotal = mergeProviderUsage(result.usage, corrective.usage);
     try {
       return { review: materializeAndGround(corrective.value), usage: usageTotal };
     } catch (secondError) {
