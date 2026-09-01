@@ -23,7 +23,7 @@ import type { MarketBlueprint } from './setup';
 
 // Defined here, not in release.ts: release → benchmark → planner already exists, so a
 // planner → release import closes a cycle and breaks the production bundle (TDZ at init).
-export const FACTORY_PLANNER_VERSION = 'story-factory-planner-92-recovery-precondition-circuit';
+export const FACTORY_PLANNER_VERSION = 'story-factory-planner-93-owned-provenance';
 import { EDITOR_SYSTEM_PROMPT, PLANNER_SYSTEM_PROMPT, PLAN_JUDGE_SYSTEM_PROMPT } from './prompts';
 import {
   ARC_ACTIVE_MECHANIC_BUDGET,
@@ -963,6 +963,44 @@ function completeDeclaredConversions(
   return completed;
 }
 
+/**
+ * A model may declare or the compiler may infer a uniquely-owned mechanic
+ * effect while still omitting the duplicated source/sink field on its numeric
+ * delta. Once ownership is proved from the conversion vector or capability
+ * contract, the mechanic ID is the canonical provenance. Fill only that
+ * mechanical provenance; an unowned negative delta remains invalid so this
+ * cannot turn an unexplained payment or consumption into a valid plan.
+ */
+function normalizeOwnedNumericProvenance(
+  chapter: z.infer<typeof PlannerCompactChapterSchema>,
+  kernel: StoryKernel | undefined,
+): z.infer<typeof PlannerCompactChapterSchema> {
+  if (!kernel) return chapter;
+  const normalized = {
+    ...chapter,
+    deltas: chapter.deltas.map(delta => ({ ...delta })),
+  };
+  const effects = new Map(
+    normalized.mechanics
+      .filter(use => use.role === 'effect')
+      .map(use => [use.id, use] as const),
+  );
+  const deltas = new Map(normalized.deltas.map(delta => [delta.id, delta]));
+  const ownership = deriveEffectOwnership(normalized, kernel);
+
+  for (const [useId, deltaIds] of ownership) {
+    const use = effects.get(useId);
+    if (!use) continue;
+    for (const deltaId of deltaIds) {
+      const delta = deltas.get(deltaId);
+      if (delta?.k !== 'resource_numeric' || delta.change === null) continue;
+      if (delta.change > 0 && !delta.source?.trim()) delta.source = use.mechanic;
+      if (delta.change < 0 && !delta.sink?.trim()) delta.sink = use.mechanic;
+    }
+  }
+  return normalized;
+}
+
 function compilePlannerMechanics(
   chapter: z.infer<typeof PlannerCompactChapterSchema>,
   kernel: StoryKernel | undefined,
@@ -971,7 +1009,8 @@ function compilePlannerMechanics(
   const exactConversions = inferExactConversionUses(chapter, kernel);
   const provenanceConversions = inferProvenanceConversionUses(exactConversions, kernel);
   const completedConversions = completeDeclaredConversions(provenanceConversions, kernel, openingBalances);
-  return inferExactCapabilityUses(completedConversions, kernel);
+  const inferredCapabilities = inferExactCapabilityUses(completedConversions, kernel);
+  return normalizeOwnedNumericProvenance(inferredCapabilities, kernel);
 }
 
 function inferExactCapabilityUses(

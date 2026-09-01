@@ -4012,7 +4012,9 @@ describe('canonical Story Factory', () => {
     explicitWire.chapters[0].scenes[0].deltaIds = ['delta_1', 'pay_for_box'];
     explicitWire.chapters[0].deltas.push({
       id: 'pay_for_box', k: 'resource_numeric', target: 'money', counterpart: null,
-      before: null, change: -10, after: null, source: null, sink: 'buy_ice_box',
+      // The mechanic use plus its exact vector prove this is the conversion
+      // input, so the compiler may fill only the omitted mechanical sink.
+      before: null, change: -10, after: null, source: null, sink: null,
     });
     explicitWire.chapters[0].mechanics = [{
       id: 'use_buy_box', scene: 'scene_1', mechanic: 'buy_ice_box', role: 'effect', actor: 'main',
@@ -4023,6 +4025,9 @@ describe('canonical Story Factory', () => {
       delta.kind === 'resource_numeric' && delta.resourceId === 'ice_box'
     ));
     expect(compiledOutput).toMatchObject({ delta: 1, before: 0, after: 1, source: 'buy_ice_box' });
+    expect(explicit.plans[0].requiredDeltas).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: 'pay_for_box', sink: 'buy_ice_box' }),
+    ]));
     expect(explicit.plans[0].mechanicUses[0].deltaIds)
       .toEqual(expect.arrayContaining(['pay_for_box', compiledOutput?.id]));
     expect(() => applyChapterPlan({ kernel: purchaseKernel, state: purchaseState, plan: explicit.plans[0] }))
