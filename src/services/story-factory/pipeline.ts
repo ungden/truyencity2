@@ -1165,6 +1165,10 @@ export async function reviseStoryChapter(
         previousTail: contexts.previousTail,
         assessment: input.pending.assessment,
         rejectedDraft: input.pending.draft,
+        plannerCausalSpine: input.plan.scenes.map(scene => ({
+          sceneId: scene.id,
+          action: scene.action,
+        })),
       })),
       schema: ChapterDraftSchema,
       temperature: 1,

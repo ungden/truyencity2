@@ -23,7 +23,7 @@ import type { MarketBlueprint } from './setup';
 
 // Defined here, not in release.ts: release → benchmark → planner already exists, so a
 // planner → release import closes a cycle and breaks the production bundle (TDZ at init).
-export const FACTORY_PLANNER_VERSION = 'story-factory-planner-93-owned-provenance';
+export const FACTORY_PLANNER_VERSION = 'story-factory-planner-94-causal-core';
 import { EDITOR_SYSTEM_PROMPT, PLANNER_SYSTEM_PROMPT, PLAN_JUDGE_SYSTEM_PROMPT } from './prompts';
 import {
   ARC_ACTIVE_MECHANIC_BUDGET,
@@ -2198,6 +2198,23 @@ export interface NarrativeCycle {
 const causalPair = (mechanicId: string, actorId: string) => `${mechanicId} bởi ${actorId}`;
 const shapeSignature = (chain: string[]) => [...chain].sort().join(' + ');
 
+/**
+ * A full-set comparison lets a planner replay the same chapter by retaining
+ * every meaningful operation and merely dropping (or adding) one cosmetic
+ * effect. Three shared actor/mechanic effects are already a complete causal
+ * recipe; require substantial overlap on both sides so a genuine pivot or a
+ * small connective chapter remains legal.
+ */
+function repeatsCausalCore(candidate: string[], prior: string[]): boolean {
+  const candidateSet = [...new Set(candidate)];
+  const priorSet = new Set(prior);
+  if (candidateSet.length < 3 || priorSet.size < 3) return false;
+  const shared = candidateSet.filter(effect => priorSet.has(effect)).length;
+  return shared >= 3
+    && shared / candidateSet.length >= 0.75
+    && shared / priorSet.size >= 0.6;
+}
+
 export function committedCausalShapes(packet?: ContinuityPacket): CausalShape[] {
   if (!packet) return [];
   const byChapter = new Map<number, string[]>();
@@ -2340,9 +2357,13 @@ export function assertNoRepeatedCausalShape(input: {
   const recentWindow = input.recentChapterWindow ?? 5;
   const minimumChapter = Math.min(...input.plans.map(plan => plan.chapterNumber));
   const seen = new Map<string, number>();
+  const seenShapes: CausalShape[] = [];
   for (const shape of committedCausalShapes(input.packet)) {
     if (shape.chapterNumber < minimumChapter - recentWindow) continue;
-    if (shape.effectChain.length >= 2) seen.set(shapeSignature(shape.effectChain), shape.chapterNumber);
+    if (shape.effectChain.length >= 2) {
+      seen.set(shapeSignature(shape.effectChain), shape.chapterNumber);
+      seenShapes.push(shape);
+    }
   }
   for (const plan of input.plans) {
     const shape = planCausalShape(plan);
@@ -2356,7 +2377,19 @@ export function assertNoRepeatedCausalShape(input: {
         { chapterNumber: plan.chapterNumber, repeatsChapter: priorChapter, effectChain: shape.effectChain },
       );
     }
+    const repeatedCore = seenShapes.find(prior =>
+      prior.chapterNumber !== plan.chapterNumber && repeatsCausalCore(shape.effectChain, prior.effectChain));
+    if (repeatedCore) {
+      const priorEffects = new Set(repeatedCore.effectChain);
+      const shared = [...new Set(shape.effectChain)].filter(effect => priorEffects.has(effect));
+      throw new StoryFactoryError(
+        'plan_blocked',
+        `Chương ${plan.chapterNumber} lặp lại causal core của chương ${repeatedCore.chapterNumber}: giữ lại ${shared.length}/${new Set(shape.effectChain).size} thao tác effect do cùng actor thực hiện (${shared.join(', ')}). Thêm hoặc bỏ một thao tác phụ không phải leo thang — đổi ít nhất một thao tác cốt lõi, actor dẫn, đối tượng xung đột hoặc loại rủi ro.`,
+        { chapterNumber: plan.chapterNumber, repeatsChapter: repeatedCore.chapterNumber, sharedEffectChain: shared },
+      );
+    }
     seen.set(signature, plan.chapterNumber);
+    seenShapes.push(shape);
   }
 
   // Mechanic IDs alone cannot see a narrative restatement where a chapter

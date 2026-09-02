@@ -1,4 +1,4 @@
-export const FACTORY_PROMPT_VERSION = 'story-factory-2026-08-30.61-voice-layer-checkpoints';
+export const FACTORY_PROMPT_VERSION = 'story-factory-2026-09-02.62-causal-spine-revision';
 
 /**
  * Invariants that protect canon, ledger, scene completion and the reader-facing
@@ -102,6 +102,7 @@ Trước khi trả revise, quét lại toàn bộ draft sau khi đã tìm thấy
 
 export const REVISION_SYSTEM_PROMPT = `Bạn là tác giả sửa chương truyện theo biên tập.
 rejectedDraft là bản bị trả; các lỗi kèm bằng chứng nguyên văn chỉ đúng chỗ hỏng. Sửa triệt để các đoạn bị nêu và mọi hệ quả của chúng; giữ nguyên nội dung hợp lệ, nhưng không được giả định phần Editor chưa nêu là đã đúng. Trước khi trả, tự rà lại toàn bộ bản sửa theo mọi constraint trong brief, đặc biệt từng con số, location của từng scene và vị trí đầu-cuối nhân vật.
+plannerCausalSpine là chuỗi hành động riêng của Planner, chỉ cấp cho lượt sửa để khôi phục đúng nhân quả của plan. Khi lỗi liên quan continuity, causality hoặc event order, phải diễn các action theo đúng thứ tự scene đã khóa; không được chỉ đạt requiredChanges bằng một trình tự khác. Dùng chúng như ràng buộc sự kiện, không chép nguyên văn câu action vào prose và không suy ra plot/state ngoài chúng.
 Tuyệt đối không thêm sự kiện, lời hứa, giao dịch, di chuyển hay chi tiết trạng thái mới không có trong brief — lỗi phổ biến nhất của bản sửa là bịa thêm thứ mới trong lúc sửa thứ cũ. Trả về toàn bộ chương hoàn chỉnh sau khi sửa.
 Mọi constraint cơ học trong brief vẫn bất biến khi sửa: thời lượng cảnh, thời gian di chuyển, vị trí, tài nguyên, tri thức, quan hệ và trạng thái đầu-cuối. Sửa lỗi được nêu nhưng không được tạo mâu thuẫn mới với bất kỳ constraint nào khác.
 Không mô tả resource bị dùng hết, phá hủy, tan sạch hay bỏ lại nếu required changes không có delta giảm/state_change tương ứng; bản sửa phải giữ vật còn tồn tại đúng ledger.

@@ -517,6 +517,8 @@ export function buildRevisionContext(input: {
   previousTail: string;
   assessment: EditorAssessment;
   rejectedDraft?: { title: string; content: string };
+  /** Raw plan action stays out of Writer but anchors a continuity repair. */
+  plannerCausalSpine?: Array<{ sceneId: string; action: string }>;
 }) {
   if (input.assessment.status !== 'revise') throw new Error('Revision context requires a revise assessment.');
   return {
@@ -528,6 +530,7 @@ export function buildRevisionContext(input: {
     // rewrite fixed the cited findings and rolled brand-new violations elsewhere.
     // A targeted repair keeps the ~90% of the draft that already passed inspection.
     rejectedDraft: input.rejectedDraft ?? null,
+    plannerCausalSpine: input.plannerCausalSpine ?? [],
     continuityIssues: input.assessment.continuityIssues,
     readingIssues: input.assessment.readingIssues,
   };

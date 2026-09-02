@@ -3660,10 +3660,15 @@ describe('canonical Story Factory', () => {
       revised,
       editorWirePass('delta_1', 'công việc đã khởi động'),
     ]);
+    const causalSpine = 'Lời đe dọa phải đến trước khi Hải rời bến; sau đó Hải mới chọn cách vá lưới.';
+    const causalPlan = {
+      ...plan(1),
+      scenes: plan(1).scenes.map(scene => ({ ...scene, action: causalSpine })),
+    };
     const result = await writeStoryChapter({
       kernel,
       state: initialState,
-      plan: plan(1),
+      plan: causalPlan,
       routes,
       provider,
     });
@@ -3679,6 +3684,11 @@ describe('canonical Story Factory', () => {
     expect(provider.prompts[2]).toContain('rejectedDraft');
     expect(provider.prompts[2]).toContain(first.content);
     expect(provider.prompts[2]).toContain('required_delta');
+    // Raw plot steering remains unavailable to Writer, but a grounded rewrite
+    // receives the canonical action order that it must restore.
+    expect(provider.prompts[0]).not.toContain(causalSpine);
+    expect(provider.prompts[2]).toContain('plannerCausalSpine');
+    expect(provider.prompts[2]).toContain(causalSpine);
   });
 
   test('code derives revise from issues without accepting a model decision', () => {
@@ -6274,6 +6284,52 @@ describe('prose-craft gates', () => {
     };
     expect(() => assertNoRepeatedCausalShape({ plans: [repeatPlan], packet }))
       .toThrow(/lặp lại y nguyên causal shape của chương 5/);
+
+    // A planner previously evaded the exact-set guard by retaining the full
+    // recharge -> salvage -> purify recipe while dropping a fourth opposition
+    // effect. That is still the same reader-facing causal recipe, not a pivot.
+    const threeStepHistory = {
+      ...packet,
+      recentMechanicUses: [
+        transition(5, 'mech_recharge', 'char_tu'),
+        transition(5, 'mech_salvage', 'char_tu'),
+        transition(5, 'mech_purify', 'char_mai'),
+        transition(5, 'mech_blockade', 'char_dich'),
+      ],
+    };
+    const partialRepeat = {
+      ...plan(6),
+      mechanicUses: [
+        mechanicUse('mu_1', 'mech_recharge', 'char_tu'),
+        mechanicUse('mu_2', 'mech_salvage', 'char_tu'),
+        mechanicUse('mu_3', 'mech_purify', 'char_mai'),
+      ],
+    };
+    expect(() => assertNoRepeatedCausalShape({ plans: [partialRepeat], packet: threeStepHistory }))
+      .toThrow(/lặp lại causal core của chương 5/);
+    const twoStepOverlap = {
+      ...partialRepeat,
+      mechanicUses: [
+        mechanicUse('mu_1', 'mech_recharge', 'char_tu'),
+        mechanicUse('mu_2', 'mech_salvage', 'char_tu'),
+        mechanicUse('mu_3', 'mech_new_risk', 'char_mai'),
+      ],
+    };
+    expect(() => assertNoRepeatedCausalShape({ plans: [twoStepOverlap], packet: threeStepHistory })).not.toThrow();
+
+    // Reusing one conversion in two scenes is still one causal operation. It
+    // must not manufacture a third shared core effect through duplicate count.
+    const repeatedSingleOperation = {
+      ...partialRepeat,
+      mechanicUses: [
+        mechanicUse('mu_1', 'mech_recharge', 'char_tu'),
+        mechanicUse('mu_2', 'mech_recharge', 'char_tu'),
+        mechanicUse('mu_3', 'mech_salvage', 'char_tu'),
+        mechanicUse('mu_4', 'mech_new_risk', 'char_mai'),
+      ],
+    };
+    expect(() => assertNoRepeatedCausalShape({ plans: [repeatedSingleOperation], packet: threeStepHistory })).not.toThrow();
+
     // A different actor leading the same mechanics is real escalation, not a repeat.
     const escalated = {
       ...repeatPlan,
