@@ -20,27 +20,33 @@ async function recordFactoryHeartbeat(result: Awaited<ReturnType<typeof runStory
   try {
     const db = getSupabaseAdmin();
     const heartbeatAt = new Date().toISOString();
-    const { data, error } = await db
+    const [{ data, error }, blockedJobs] = await Promise.all([
       // The database owns the full claim predicate; do not reimplement only its
       // queue subset here or a non-approved/release-mismatched job can alert.
-      .rpc('story_factory_claimable_queue_health', { p_engine_release: STORY_FACTORY_RELEASE })
-      .maybeSingle();
-    if (error) throw error;
+      db.rpc('story_factory_claimable_queue_health', { p_engine_release: STORY_FACTORY_RELEASE })
+      .maybeSingle(),
+      db.from('story_factory_jobs').select('id', { count: 'exact', head: true }).in('status', ['setup_blocked', 'plan_blocked', 'quality_blocked', 'infra_blocked']),
+    ]);
+    if (error || blockedJobs.error) throw error ?? blockedJobs.error;
     const queue = data as ClaimableQueueHealth | null;
     const enabled = isStoryFactoryEnabled();
     const runnableJobs = Number(queue?.runnable_jobs ?? 0);
     const stalled = enabled && runnableJobs > 0 && result.status !== 'completed';
-    const status = stalled || (!enabled && runnableJobs > 0) ? 'critical' : 'healthy';
+    const blockedJobCount = blockedJobs.count ?? 0;
+    const status = stalled || blockedJobCount > 0 || (!enabled && runnableJobs > 0) ? 'critical' : 'healthy';
     const { error: insertError } = await db.from('health_checks').insert({
       status,
       score: status === 'healthy' ? 100 : 0,
-      metrics: { enabled, runnableJobs, tickStatus: result.status, stagesCompleted: result.results.length },
+      metrics: { enabled, runnableJobs, blockedJobCount, tickStatus: result.status, stagesCompleted: result.results.length },
       checks: [
         { name: 'Story Factory enabled', status: enabled ? 'pass' : 'fail' },
         { name: 'Cron tick', status: stalled ? 'fail' : 'pass', message: result.status },
+        { name: 'Blocked jobs', status: blockedJobCount > 0 ? 'fail' : 'pass', message: `${blockedJobCount} job(s) need operator action` },
       ],
       summary: stalled
         ? `Cron ran but ${runnableJobs} job(s) remain runnable without a completed stage.`
+        : blockedJobCount > 0
+          ? `Cron is reachable, but ${blockedJobCount} job(s) are blocked and require operator action.`
         : 'Story Factory cron heartbeat recorded.',
     });
     if (insertError) throw insertError;
