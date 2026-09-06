@@ -418,9 +418,9 @@ export default function ReadingScreen() {
         id: cached.id,
         novel_id: cached.novel_id,
         chapter_number: cached.chapter_number,
-        title: cached.title,
+        title: cached.title ?? '',
         content: cached.content,
-        created_at: cached.created_at,
+        created_at: cached.created_at ?? new Date(0).toISOString(),
       });
       if (cached.totalChapters > 0) setTotalChapters(cached.totalChapters);
       doSaveProgress(cached.novelId, chapterNumber, cached.id);

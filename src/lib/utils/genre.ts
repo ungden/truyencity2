@@ -9,6 +9,14 @@ const GENRE_LABELS: Record<string, string> = Object.fromEntries(
   Object.entries(GENRE_CONFIG).map(([k, v]) => [k, v.name])
 );
 
+// Older production rows use story-factory topic lanes. They are product labels,
+// not text suitable for readers, so keep their display mapping at the boundary.
+Object.assign(GENRE_LABELS, {
+  era_coastal: 'Thời đại ven biển',
+  xuanhuan_rules: 'Huyền huyễn quy tắc',
+  xuanhuan_civilization: 'Huyền huyễn văn minh',
+});
+
 const GENRE_ICONS: Record<string, string> = Object.fromEntries(
   Object.entries(GENRE_CONFIG).map(([k, v]) => [k, v.icon])
 );

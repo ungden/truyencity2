@@ -13,7 +13,7 @@ Một service, một cron, một hàng đợi. 17 file phẳng, không thư mụ
 
 ```
 cron */2  →  /api/cron/story-factory  →  claim job (Postgres, SKIP LOCKED)
-             setup → cover → plan → write → [revise] → window_review → arc → …
+             setup → cover → plan → write drafts → [revise] → window_review → publish 5 → arc → …
 ```
 
 Mỗi tick chạy một stage; một lần gọi rút hàng đợi đến hết ngân sách thời gian. Bốn vai AI:
@@ -21,8 +21,7 @@ Mỗi tick chạy một stage; một lần gọi rút hàng đợi đến hết 
 kiểm chương. Chuyển trạng thái là hàm tất định được `validation.ts` kiểm trước mọi model
 call — model không bao giờ tự tạo trạng thái bền vững.
 
-Truyện mới chạy ẩn: viết chương 1–10 với `hidden = true`, window review ở chương 5 và 10,
-đạt thì tự động xuất bản.
+Mỗi cụm năm chương được viết riêng, review trước khi phát hành và chỉ xuất bản nguyên cụm khi đạt.
 
 ```bash
 npm run factory:writing-smoke -- --apply    # cho phép release hiện tại chạy

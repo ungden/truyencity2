@@ -34,10 +34,23 @@ export async function GET(request: NextRequest) {
     novels!story_factory_jobs_novel_id_fkey(title, cover_url, hidden)
   `).order('updated_at', { ascending: false });
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  const { data: recentRuns } = await db.from('story_factory_runs')
-    .select('id,job_id,kind,chapter_number,status,estimated_cost_usd,word_count,error_code,error_message,started_at,finished_at')
-    .order('started_at', { ascending: false }).limit(50);
-  return NextResponse.json({ release: STORY_FACTORY_RELEASE, jobs: data ?? [], recentRuns: recentRuns ?? [] });
+  const [recentRunsResult, healthResult, windowsResult] = await Promise.all([
+    db.from('story_factory_runs')
+      .select('id,job_id,kind,chapter_number,status,estimated_cost_usd,word_count,error_code,error_message,started_at,finished_at')
+      .order('started_at', { ascending: false }).limit(50),
+    db.from('health_checks').select('created_at,status,score,metrics,summary').order('created_at', { ascending: false }).limit(1).maybeSingle(),
+    db.from('story_factory_windows').select('job_id,status,start_chapter,end_chapter,repair_attempts,updated_at').in('status', ['generating', 'reviewing', 'blocked']).order('updated_at', { ascending: false }),
+  ]);
+  if (recentRunsResult.error || healthResult.error || windowsResult.error) {
+    return NextResponse.json({ error: recentRunsResult.error?.message ?? healthResult.error?.message ?? windowsResult.error?.message }, { status: 500 });
+  }
+  return NextResponse.json({
+    release: STORY_FACTORY_RELEASE,
+    jobs: data ?? [],
+    recentRuns: recentRunsResult.data ?? [],
+    health: healthResult.data ?? null,
+    windows: windowsResult.data ?? [],
+  });
 }
 
 export async function POST(request: NextRequest) {

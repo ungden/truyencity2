@@ -65,6 +65,7 @@ class ExportService {
         .from('novels')
         .select('*')
         .eq('id', options.novelId)
+        .eq('hidden', false)
         .eq('user_id', userId)
         .single();
 
@@ -77,6 +78,7 @@ class ExportService {
         .from('chapters')
         .select('*')
         .eq('novel_id', options.novelId)
+        .eq('publication_state', 'published')
         .order('chapter_number', { ascending: true });
 
       if (options.chapters && options.chapters.length > 0) {

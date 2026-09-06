@@ -379,11 +379,12 @@ describe('Story Factory architecture boundary', () => {
     expect(read('src/services/story-factory/runtime.ts')).toContain('p_stale_minutes: 0');
   });
 
-  test('canary promotion requires the latest chapter-10 review on the exact release', () => {
+  test('factory publication is private until an exact reviewed window is committed', () => {
     const runtime = read('src/services/story-factory/runtime.ts');
     const migration = read(latestMigrationDefining('public.promote_story_factory_canary'));
     expect(runtime).not.toContain("db.rpc('promote_story_factory_canary'");
-    expect(runtime).toContain("canaryReadyForHumanReview ? 'completed' : 'ready'");
+    expect(runtime).toContain("db.rpc('publish_story_factory_window'");
+    expect(runtime).toContain(".eq('publication_state', 'draft')");
     expect(migration).toContain('ORDER BY finished_at DESC NULLS LAST, started_at DESC');
     expect(migration).toContain("latest_review_status IS DISTINCT FROM 'passed'");
     expect(migration).toContain('latest_review_release IS DISTINCT FROM p_engine_release');
@@ -391,16 +392,23 @@ describe('Story Factory architecture boundary', () => {
     expect(migration).toContain('setup_digest IS DISTINCT FROM job.launch_pack_digest');
   });
 
-  test('window review reads five chapters and the chapter commit is atomic', () => {
-    const commit = read(latestMigrationDefining('public.commit_story_factory_chapter'));
-    expect(commit).toContain('p_expected_chapter % 5 = 0');
-    expect(commit).not.toContain('p_expected_chapter % 10 = 0');
-    // A committed chapter resets the transient-failure budget: it proves the job is healthy.
-    expect(commit).toContain('retry_count = 0');
+  test('window review reads five private chapters and publication is atomic', () => {
+    const commit = read(latestMigrationDefining('public.commit_story_factory_draft_chapter'));
+    const publish = read(latestMigrationDefining('public.publish_story_factory_window'));
+    const runtime = read('src/services/story-factory/runtime.ts');
+    expect(commit).toContain("publication_state='draft'");
+    expect(commit).toContain("v_drafts >= 5 THEN 'window_review'");
+    expect(publish).toContain("publication_state='published'");
+    expect(publish).toContain("v_count <> 5 OR v_max <> v_window.end_chapter");
+    expect(publish).toContain("status='published'");
+    const repair = read(latestMigrationDefining('public.repair_story_factory_draft_window'));
+    expect(repair).toContain("v_window.repair_attempts >= 1");
+    expect(repair).toContain("chapter_number BETWEEN v_window.start_chapter AND v_window.end_chapter");
+    expect(repair).toContain("status='ready',stage='plan'");
+    expect(runtime).toContain("db.rpc('repair_story_factory_draft_window'");
     const memory = read(latestMigrationContaining('USING gin (related_entity_ids)'));
     expect(memory).toContain('related_entity_ids text[]');
     expect(memory).not.toContain('DROP INDEX');
-    const runtime = read('src/services/story-factory/runtime.ts');
     expect(runtime).toContain("db.rpc('commit_story_factory_arc_transition'");
     expect(runtime).not.toContain('update({ arc_plan: result.lifecycle.nextArc');
   });

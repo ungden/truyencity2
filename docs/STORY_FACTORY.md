@@ -15,7 +15,7 @@ cron */2  →  /api/cron/story-factory  →  runStoryFactoryTicks()  →  runSto
                                                                      ↓
                                             claim_story_factory_job (Postgres, SKIP LOCKED)
                                                                      ↓
-                          setup → cover → plan → write → [revise] → window_review → arc → …
+                          setup → cover → plan → write drafts → [revise] → window_review → publish 5 → arc → …
 ```
 
 One invocation drains as many stages as its budget allows. Admission is adaptive: another
@@ -45,7 +45,7 @@ off by the 300s route ceiling.
 | `plan` | 1–2 visible calls (Planner, then at most one low-temperature mechanical repair) | `write` |
 | `write` | 2 (Writer, Editor) | commit, or `revise` only for a hard finding |
 | `revise` | 2 (Rewrite, Editor) | commit or park |
-| `window_review` | 1, every 5th chapter | `write` or `arc` |
+| `window_review` | 1, every 5 private draft chapters | atomically publish 5, then `write` or `arc` |
 | `arc` | 1, at arc boundary | `plan` |
 
 With full three-chapter rolling windows, no hard rewrite and a 20–30 chapter arc, steady
@@ -124,12 +124,10 @@ route must have passed. A failing smoke therefore *revokes* a stale approval —
 until green. It binds the four generation routes plus `routeVersion`, and deliberately
 not the engine revision: a prompt fix must never stall the fleet behind a re-smoke.
 
-The novel writes chapters 1–10 with `novels.hidden = true`. Window reviews run at 5 and 10;
-passing chapter 10 parks the job as `completed` while the novel remains hidden. An operator
-must inspect the persisted title, setup and actual prose before running
-`factory:operator -- release --job-id=<id> --apply`; only that explicit action calls
-`promote_story_factory_canary` and publishes it. That is the quality gate: real chapters on
-real accumulating state, followed by a human public/private decision.
+Every production window writes five private draft chapters. The reviewer must pass the exact
+five prose rows before one database transaction changes them to public and updates reader
+counts. A blocked window remains private with its grounded evidence; readers never receive a
+window that is later declared defective.
 
 ## Operating
 

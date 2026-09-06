@@ -842,7 +842,7 @@ async function commitChapter(
     startChapter: plan.chapterNumber + 1,
     plans: rolling.plans.filter(item => item.chapterNumber > plan.chapterNumber),
   };
-  const { error } = await db.rpc('commit_story_factory_chapter', {
+  const { error } = await db.rpc('commit_story_factory_draft_chapter', {
     p_job_id: job.id,
     p_lease_token: job.lease_token,
     p_run_id: runId,
@@ -1041,7 +1041,8 @@ async function runWindowReview(db: SupabaseClient, job: FactoryJobRow, project: 
     const routes = ModelRoutesSchema.parse(project.model_routes);
     const marketBlueprint = requireMarketBlueprint(project.market_blueprint);
     const { data: chapters, error } = await db.from('chapters').select('chapter_number,title,content')
-      .eq('novel_id', job.novel_id).gte('chapter_number', job.current_chapter - 4).lte('chapter_number', job.current_chapter)
+      .eq('novel_id', job.novel_id).eq('publication_state', 'draft')
+      .gte('chapter_number', job.current_chapter - 4).lte('chapter_number', job.current_chapter)
       .order('chapter_number');
     if (error) throw error;
     // The reviewer cross-checks balances quoted in prose. currentState only holds
@@ -1077,62 +1078,43 @@ async function runWindowReview(db: SupabaseClient, job: FactoryJobRow, project: 
       }),
     );
     if (reviewed.review.status === 'block') {
-      // Hidden chapters are still drafts: park so the operator can repair the
-      // prose and re-review. Published chapters are canon a reader may have seen
-      // — they cannot be repaired, so parking would stall the novel forever on a
-      // verdict about unchangeable text. Instead the verdict becomes steering:
-      // the issues land in plan_feedback, the stale rolling plan is dropped, and
-      // the next window is planned against them. The run row still records the
-      // honest blocked verdict for telemetry.
-      if (job.execution_mode === 'production') {
-        const now = new Date().toISOString();
-        const runUpdate = await db.from('story_factory_runs').update({
-          status: 'blocked', error_code: 'quality_blocked',
-          error_message: 'Window review blocked on published canon; verdict fed forward to the next window plan.',
-          output_artifact: { evidence: { review: reviewed.review, styleTelemetry } },
-          usage: [reviewed.usage], estimated_cost_usd: reviewed.usage.costUsd, finished_at: now,
-        }).eq('id', runId);
-        if (runUpdate.error) throw runUpdate.error;
-        const jobUpdate = await db.from('story_factory_jobs').update({
-          // Steering must still respect the arc boundary: at plannedEndChapter the
-          // next stage is the arc transition, not a plan for a chapter the current
-          // arc cannot contain (two seniors dead-ended planning ch26 of a 25-chapter
-          // arc). The feedback survives either way and steers the next window.
-          status: 'ready', stage: state.chapterNumber >= arc.plannedEndChapter ? 'arc' : 'plan', retry_count: 0,
-          rolling_plan: null,
-          plan_feedback: {
-            source: 'window_review_public',
-            message: 'Cửa sổ vừa xuất bản bị reviewer chê; không thể sửa chương đã đăng — cửa sổ kế tiếp phải đổi hướng theo các issue này.',
-            issues: reviewed.review.issues,
-          },
-          lease_owner: null, lease_token: null, lease_until: null,
-          next_run_at: nextRunAfterNonChapterStage(job, new Date(now)), updated_at: now,
-        }).eq('id', job.id).eq('lease_token', job.lease_token);
-        if (jobUpdate.error) throw jobUpdate.error;
+      // First failure returns to the saved private checkpoint and replans from
+      // the first bad chapter. A second failure is deliberately frozen; neither
+      // path exposes prose that did not pass the full-window review.
+      const review = { ...reviewed.review, styleTelemetry };
+      const { data: repaired, error: repairError } = await db.rpc('repair_story_factory_draft_window', {
+        p_job_id: job.id,
+        p_lease_token: job.lease_token,
+        p_review_run_id: runId,
+        p_review: review,
+        p_usage: [reviewed.usage],
+        p_cost_usd: reviewed.usage.costUsd,
+      });
+      if (repairError) throw repairError;
+      if (repaired?.requeued === true) {
         return { status: 'completed', jobId: job.id, stage: 'window_review', chapterNumber: job.current_chapter };
       }
       throw new StoryFactoryError('quality_blocked', 'Five-chapter window review detected drift.', {
-        review: reviewed.review,
+        review,
         styleTelemetry,
         usages: [reviewed.usage],
       });
     }
-    const now = new Date().toISOString();
-    const canaryReadyForHumanReview = job.current_chapter >= 10 && job.execution_mode === 'hidden_canary';
-    const nextRunAt = nextRunAfterNonChapterStage(job, new Date(now));
     const nextStage = state.chapterNumber >= arc.plannedEndChapter ? 'arc' : 'write';
-    const runUpdate = await db.from('story_factory_runs').update({
-      status: 'passed', output_artifact: { ...reviewed.review, styleTelemetry }, usage: [reviewed.usage],
-      estimated_cost_usd: reviewed.usage.costUsd, finished_at: now,
-    }).eq('id', runId);
-    if (runUpdate.error) throw runUpdate.error;
-    const jobUpdate = await db.from('story_factory_jobs').update({
-      status: canaryReadyForHumanReview ? 'completed' : 'ready', stage: nextStage, retry_count: 0,
-      lease_owner: null, lease_token: null, lease_until: null,
-      next_run_at: nextRunAt, updated_at: now,
-      ...(canaryReadyForHumanReview ? { completed_at: now } : {}),
-    }).eq('id', job.id).eq('lease_token', job.lease_token);
-    if (jobUpdate.error) throw jobUpdate.error;
+    const runTelemetry = await db.from('story_factory_runs').update({
+      output_artifact: { ...reviewed.review, styleTelemetry }, usage: [reviewed.usage],
+      estimated_cost_usd: reviewed.usage.costUsd,
+    }).eq('id', runId).eq('status', 'running');
+    if (runTelemetry.error) throw runTelemetry.error;
+    const { error: publishError } = await db.rpc('publish_story_factory_window', {
+      p_job_id: job.id,
+      p_lease_token: job.lease_token,
+      p_review_run_id: runId,
+      p_review: { ...reviewed.review, styleTelemetry },
+      p_review_digest: digestArtifact({ review: reviewed.review, chapters: windowChapters }),
+      p_next_stage: nextStage,
+    });
+    if (publishError) throw publishError;
     return { status: 'completed', jobId: job.id, stage: 'window_review', chapterNumber: job.current_chapter };
   } catch (error) {
     return blockRun(db, job, runId, error);

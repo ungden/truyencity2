@@ -22,7 +22,9 @@ function retryDelays(limit: TransportRetryLimit | undefined): number[] {
  * which must fit two calls inside the 300s route ceiling, passes CHAPTER_CALL_TIMEOUT_MS
  * explicitly (see pipeline.ts).
  */
-const DEFAULT_TIMEOUT_MS = 240_000;
+// A factory lease/checkpoint is the retry boundary. Do not let one provider
+// request consume a whole cron invocation before durable recovery can run.
+const DEFAULT_TIMEOUT_MS = 140_000;
 
 /** Two of these plus commit overhead must fit inside maxDuration = 300s. */
 export const CHAPTER_CALL_TIMEOUT_MS = 120_000;

@@ -21,7 +21,7 @@ export function LatestUpdatesCarousel({ novels }: LatestUpdatesCarouselProps) {
   const [pageIndex, setPageIndex] = useState(0);
 
   const totalPages = useMemo(
-    () => Math.ceil(novels.length / ITEMS_PER_PAGE),
+    () => Math.max(1, Math.ceil(novels.length / ITEMS_PER_PAGE)),
     [novels.length]
   );
 
@@ -59,7 +59,9 @@ export function LatestUpdatesCarousel({ novels }: LatestUpdatesCarouselProps) {
       </div>
 
       {/* Cards grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {visibleNovels.length === 0 ? (
+        <p className="py-6 text-sm text-muted-foreground">Chưa có truyện mới cập nhật.</p>
+      ) : <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {visibleNovels.map((novel: Novel) => (
           <NovelCard
             key={novel.id}
@@ -75,7 +77,7 @@ export function LatestUpdatesCarousel({ novels }: LatestUpdatesCarouselProps) {
             variant="horizontal"
           />
         ))}
-      </div>
+      </div>}
     </div>
   );
 }

@@ -27,7 +27,7 @@ One service, one cron, one queue: `src/services/story-factory/` → `/api/cron/s
 
 The short version:
 
-- **Stages**: setup → cover → plan → write → (revise) → window_review → arc → loop.
+- **Stages**: setup → cover → plan → write private drafts → (revise) → window_review → publish 5 → arc → loop.
   One stage per tick; one invocation drains as many as its time budget allows.
 - **Agents**: Planner and Plan Judge decide what happens; Writer and Editor produce and
   check the prose. Exactly one rewrite is allowed, and it runs in its own tick.
@@ -36,8 +36,8 @@ The short version:
 - **Two identities**: `STORY_FACTORY_RELEASE` (artifact compatibility — gates claiming) and
   `STORY_FACTORY_REVISION` (generation quality — telemetry only). Improving a prompt does
   not orphan running novels.
-- **Gate**: a writing smoke proves the machine runs; a hidden canary proves the writing is
-  good. Chapters 1–10 are written unpublished, reviewed at 5 and 10, then auto-published.
+- **Gate**: a writing smoke proves the machine runs. Every production window is written as
+  five private drafts, reviewed, then atomically auto-published only when it passes.
 
 ```bash
 npm run factory:writing-smoke -- --apply      # authorize the current release

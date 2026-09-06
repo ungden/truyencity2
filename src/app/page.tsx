@@ -103,13 +103,13 @@ export default async function HomePage() {
 
   // Featured = novel with most chapters and a cover
   const featuredNovel = featuredNovels[0] || novels[0];
-  // Trending = novels with most chapters (active writing)
+  // This query is sorted by chapter count, not measured weekly readership.
   const allSorted = [...novels].sort((a, b) => getChapterCount(b) - getChapterCount(a));
   const trendingNovels = allSorted.filter(n => n.id !== featuredNovel?.id).slice(0, 6);
-  // Latest = most recently updated (excluding featured + trending)
-  const usedIds = new Set([featuredNovel?.id, ...trendingNovels.map(n => n.id)]);
-  const latestNovels = novels.filter(n => !usedIds.has(n.id)).slice(0, 8);
-  const newestNovels = newestNovelsRaw.filter(n => !usedIds.has(n.id)).slice(0, 8);
+  // Keep each section useful when the catalogue is small.  Filtering the shared
+  // feed by hero and ranking cards previously left this section empty.
+  const latestNovels = novels.slice(0, 8);
+  const newestNovels = newestNovelsRaw.slice(0, 8);
   // Ranking = by chapter count
   const rankingNovels = allSorted.slice(0, 6);
 
@@ -154,7 +154,7 @@ export default async function HomePage() {
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <Sparkles size={20} className="text-primary" />
-                  <h2 className="text-lg font-semibold">Thịnh hành tuần này</h2>
+                  <h2 className="text-lg font-semibold">Nhiều chương nhất</h2>
                 </div>
                 <Link
                   href="/ranking"

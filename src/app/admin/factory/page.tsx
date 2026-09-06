@@ -18,6 +18,9 @@ type Job = {
   novels: { title: string; hidden: boolean; cover_url: string | null } | Array<{ title: string; hidden: boolean; cover_url: string | null }>;
 };
 
+type FactoryWindow = { job_id: string; status: string; start_chapter: number; end_chapter: number; repair_attempts: number; updated_at: string };
+type FactoryHealth = { created_at: string; status: string; score: number; metrics: { enabled?: boolean; runnableJobs?: number; lastRunAgeMinutes?: number | null }; summary: string };
+
 function projectRelease(job: Job): string | null {
   const project = Array.isArray(job.ai_story_projects) ? job.ai_story_projects[0] : job.ai_story_projects;
   return project?.engine_release ?? null;
@@ -28,6 +31,8 @@ export default function FactoryPage() {
   const [release, setRelease] = useState('');
   const [loading, setLoading] = useState(true);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [windows, setWindows] = useState<FactoryWindow[]>([]);
+  const [health, setHealth] = useState<FactoryHealth | null>(null);
   const load = useCallback(async () => {
     setLoading(true);
     const response = await fetch('/api/admin/factory', { cache: 'no-store' });
@@ -35,6 +40,8 @@ export default function FactoryPage() {
     if (response.ok) {
       setJobs(payload.jobs ?? []);
       setRelease(payload.release ?? '');
+      setWindows(payload.windows ?? []);
+      setHealth(payload.health ?? null);
     }
     setLoading(false);
   }, []);
@@ -65,12 +72,21 @@ export default function FactoryPage() {
     const projectR = projectRelease(job);
     return projectR !== null && release !== '' && projectR !== release;
   });
+  const stopped = jobs.filter(job => job.status === 'cancelled' || job.status.endsWith('_blocked'));
 
   return <div className="space-y-6 p-6">
     <div>
       <h1 className="text-3xl font-bold">Story Factory</h1>
       <p className="text-sm text-muted-foreground">Một queue duy nhất · release {release || '—'}</p>
     </div>
+    <Card>
+      <CardContent className="grid gap-2 pt-6 text-sm md:grid-cols-4">
+        <p>Cron: {health?.status === 'healthy' ? 'đang phản hồi' : 'chưa có tín hiệu'}</p>
+        <p>Job dừng/chặn: {stopped.length}</p>
+        <p>Window đang giữ riêng: {windows.length}</p>
+        <p>Tiến độ công khai chỉ tăng sau review 5 chương.</p>
+      </CardContent>
+    </Card>
     {actionError && <Card>
       <CardContent className="pt-6"><p className="text-sm text-red-600">{actionError}</p></CardContent>
     </Card>}
@@ -84,7 +100,7 @@ export default function FactoryPage() {
       <CardContent className="pt-6"><p className="text-sm">{planBlocked.length} plan bị chặn. Dùng Repair plan theo từng job để bỏ window chưa commit, giữ evidence và validate state trước khi requeue.</p></CardContent>
     </Card>}
     {qualityBlocked.length > 0 && <Card>
-      <CardContent className="pt-6"><p className="text-sm">{qualityBlocked.length} quality block cần review theo evidence; hệ thống không tự chạy lại hoặc sửa nội dung public.</p></CardContent>
+      <CardContent className="pt-6"><p className="text-sm">{qualityBlocked.length} window chất lượng chưa đạt đang được giữ riêng; độc giả chưa thể đọc các chương này.</p></CardContent>
     </Card>}
     {staleRelease.length > 0 && <Card>
       <CardContent className="pt-6">
