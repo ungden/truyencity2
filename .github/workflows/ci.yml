@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test -- --runInBand
+      - run: npm run security:secrets
+      - run: npm run build
+      - name: Install mobile dependencies
+        run: npm ci
+        working-directory: mobile
+      - name: Typecheck mobile
+        run: npm run typecheck
+        working-directory: mobile
