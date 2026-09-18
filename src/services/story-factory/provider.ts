@@ -18,12 +18,12 @@ function retryDelays(limit: TransportRetryLimit | undefined): number[] {
 /**
  * Default per-request timeout. Setup and planner calls legitimately run long — a
  * pro-class model emitting a full three-chapter window of structured JSON, or a
- * search-grounded research call — so the default stays generous. The chapter tick,
- * which must fit two calls inside the 300s route ceiling, passes CHAPTER_CALL_TIMEOUT_MS
- * explicitly (see pipeline.ts).
+ * search-grounded research call — but the lease checkpoint, not the provider, is
+ * the retry boundary: one request must never burn a whole 300s cron invocation
+ * and leave durable recovery no room to run. The chapter tick, which must fit two
+ * calls inside that ceiling, passes CHAPTER_CALL_TIMEOUT_MS explicitly
+ * (see pipeline.ts).
  */
-// A factory lease/checkpoint is the retry boundary. Do not let one provider
-// request consume a whole cron invocation before durable recovery can run.
 const DEFAULT_TIMEOUT_MS = 140_000;
 
 /** Two of these plus commit overhead must fit inside maxDuration = 300s. */

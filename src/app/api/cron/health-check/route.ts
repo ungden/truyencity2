@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyCronAuth } from '@/lib/auth/cron-auth';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
-import { isStoryFactoryEnabled, STORY_FACTORY_RELEASE } from '@/services/story-factory';
+import { FACTORY_BLOCKED_JOB_STATUSES, isStoryFactoryEnabled, STORY_FACTORY_RELEASE } from '@/services/story-factory';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     // claim_story_factory_job, including release approval and project mode.
     db.rpc('story_factory_claimable_queue_health', { p_engine_release: STORY_FACTORY_RELEASE }).maybeSingle(),
     db.from('story_factory_runs').select('started_at,status').order('started_at', { ascending: false }).limit(1).maybeSingle(),
-    db.from('story_factory_jobs').select('id', { count: 'exact', head: true }).in('status', ['setup_blocked', 'plan_blocked', 'quality_blocked', 'infra_blocked']),
+    db.from('story_factory_jobs').select('id', { count: 'exact', head: true }).in('status', [...FACTORY_BLOCKED_JOB_STATUSES]),
   ]);
 
   if (queueHealth.error || latestRun.error || blockedJobs.error) {

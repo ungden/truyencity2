@@ -778,7 +778,16 @@ export function narrativelyObservableDeltaIds(
   }));
 }
 
-export type FactoryBlockCode = 'setup_blocked' | 'plan_blocked' | 'quality_blocked' | 'infra_blocked';
+/**
+ * A blocked job is parked for an operator; the cron will never pick it up again
+ * on its own. Health reporting and the admin page read the same list so a new
+ * block code can never be surfaced in one place and silently missed in another.
+ */
+export const FACTORY_BLOCKED_JOB_STATUSES = [
+  'setup_blocked', 'plan_blocked', 'quality_blocked', 'infra_blocked',
+] as const;
+
+export type FactoryBlockCode = (typeof FACTORY_BLOCKED_JOB_STATUSES)[number];
 
 export class StoryFactoryError extends Error {
   constructor(public readonly code: FactoryBlockCode, message: string, public readonly evidence?: unknown) {

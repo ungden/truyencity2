@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyCronAuth } from '@/lib/auth/cron-auth';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import {
+  FACTORY_BLOCKED_JOB_STATUSES,
   isStoryFactoryEnabled,
   deliverStoryFactoryOperatorAlerts,
   enqueueStoryFactoryOperatorAlert,
@@ -25,7 +26,7 @@ async function recordFactoryHeartbeat(result: Awaited<ReturnType<typeof runStory
       // queue subset here or a non-approved/release-mismatched job can alert.
       db.rpc('story_factory_claimable_queue_health', { p_engine_release: STORY_FACTORY_RELEASE })
       .maybeSingle(),
-      db.from('story_factory_jobs').select('id', { count: 'exact', head: true }).in('status', ['setup_blocked', 'plan_blocked', 'quality_blocked', 'infra_blocked']),
+      db.from('story_factory_jobs').select('id', { count: 'exact', head: true }).in('status', [...FACTORY_BLOCKED_JOB_STATUSES]),
     ]);
     if (error || blockedJobs.error) throw error ?? blockedJobs.error;
     const queue = data as ClaimableQueueHealth | null;
