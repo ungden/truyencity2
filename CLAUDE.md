@@ -20,7 +20,19 @@ Mobile: Expo SDK 54 at `/mobile/`.
 
 Repo `github.com/ungden/truyencity2` (branch `main`) · `truyencity.com`.
 
-## The writing system
+## Two writing systems
+
+`src/services/story-factory/` is the incumbent, documented below and in
+[docs/STORY_FACTORY.md](docs/STORY_FACTORY.md). **It is stopped** — every job has been
+blocked or cancelled since 2026-09-02 — and it is being replaced, not repaired. Do not
+add validators or rules to it.
+
+`src/services/serial/` is the replacement, built 2026-09-19. Read
+[docs/SERIAL_ENGINE.md](docs/SERIAL_ENGINE.md) before touching it, and
+[docs/REDESIGN_PLAN.md](docs/REDESIGN_PLAN.md) for why it exists. It has not written a
+chapter yet; `SERIAL_ENGINE_ENABLED` is unset.
+
+## The writing system (incumbent)
 
 One service, one cron, one queue: `src/services/story-factory/` → `/api/cron/story-factory`.
 17 files, no subdirectories. Full documentation in [docs/STORY_FACTORY.md](docs/STORY_FACTORY.md).
@@ -83,6 +95,7 @@ NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_K
 GEMINI_API_KEY
 CRON_SECRET
 STORY_FACTORY_ENABLED=true
+SERIAL_ENGINE_ENABLED=true   # the replacement engine; unset today
 ```
 
 `verifyCronAuth` falls open in development when `CRON_SECRET` is unset. Make sure it is set
@@ -95,7 +108,7 @@ and a silent production stall.
 
 ```bash
 npm run typecheck
-npm test                 # 285
+npm test                 # 311
 npm run security:secrets
 ```
 

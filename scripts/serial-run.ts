@@ -11,6 +11,7 @@
  * Without --apply it makes no provider calls at all: it validates the premise, seeds the
  * Bible, prints the plan and the estimated spend, and stops.
  */
+import dotenv from 'dotenv';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { geminiProvider } from '@/services/story-factory/provider';
@@ -20,6 +21,9 @@ import { DEFAULT_SERIAL_ROUTES } from '@/services/serial/routes';
 import { seedBible } from '@/services/serial/state';
 import { planNextCycle, readingHealth, writeOneChapter } from '@/services/serial/engine';
 import { SERIAL_PROMPT_VERSION } from '@/services/serial/prompts';
+
+dotenv.config({ path: '.env.runtime', quiet: true });
+dotenv.config({ path: '.env.local', quiet: true });
 
 const arg = (name: string): string | undefined =>
   process.argv.find(item => item.startsWith(`--${name}=`))?.split('=').slice(1).join('=');

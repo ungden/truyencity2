@@ -15,17 +15,23 @@ Không phải do thiếu cố gắng. Từ ngày rewrite (2026-07-20) đến nay
 (sau `story-engine/` bị xoá 1.496 file, rồi factory v1, rồi factory + "Faloo correction" 14/08).
 Cả ba lần cùng một kiểu chết. Số liệu production nói rõ nguyên nhân.
 
-### 1.1 Máy chạy, nhưng không ra truyện đọc được
+### 1.1 Máy tự dừng, và thứ nó viết ra lặp lại chính nó
 
 | Số liệu (từ 20/07) | Giá trị |
 |---|---|
 | Chương đã xuất bản | 460 (5 bộ public, dài nhất 93 chương) |
-| Lượt đọc **tổng cộng** | 3 lượt, 2 người, **0 lượt trong 30 ngày** |
-| Người dùng đăng ký / VIP | 136 / 1 |
 | Job đang chạy hôm nay | **0** — toàn bộ queue là `cancelled` hoặc `*_blocked` từ 02/09 |
+| `plan` hỏng | 46% số lần chạy |
+| `window_review` chặn | 67% số lần chạy |
 
-Không ai đọc. Đó là kết luận quan trọng nhất và nó không phải lỗi marketing: bộ dài nhất là
-*"Trùng Sinh 1988: Ta Từ Xưởng Máy Rách Xây Đội Tàu Vạn Tấn"* — tiêu đề kiểu Faloo, nhưng đến
+> **Lượt đọc không phải bằng chứng ở đây.** Bản đầu của tài liệu này mở bằng "460 chương, 3
+> lượt đọc" và coi đó là kết luận quan trọng nhất. Sai: app chưa quảng bá lần nào, nên không
+> có traffic là chuyện đương nhiên, không nói gì về chất lượng truyện. Chẩn đoán dưới đây
+> đứng bằng **bằng chứng nội tại** — chính reviewer của hệ thống, cấu trúc kernel, và tỉ lệ
+> hỏng của từng stage — và không cần tới số liệu độc giả.
+
+Bộ dài nhất là *"Trùng Sinh 1988: Ta Từ Xưởng Máy Rách Xây Đội Tàu Vạn Tấn"* — tiêu đề kiểu
+Faloo, nhưng đến
 **chương 92 nhân vật chính vẫn đang cùng cha lựa sắt vụn ở bãi rã tàu**. Kernel của bộ này có
 đúng **3 nhân vật** (Trần Sinh, Hai Thép, Ông Sáu) sau 93 chương, và 8 "resource" được theo dõi
 bằng ledger, trong đó có *"Dầu hỏa tẩy rửa"* và *"Điểm uy tín thợ máy"*. Reviewer của chính hệ
@@ -96,6 +102,10 @@ Vercel. Trần đó đã lỗi thời: Vercel Fluid compute cho **800s GA trên 
 
 > Hệ thống được thiết kế để *chứng minh* truyện không mâu thuẫn, không phải để *làm* độc giả
 > muốn đọc chương tiếp theo. Mọi bản fix đều làm nó chứng minh giỏi hơn và viết dở hơn.
+
+Bằng chứng mạnh nhất không đến từ độc giả mà đến từ chính cái máy: **reviewer của nó tự chặn
+67% số cửa sổ vì lặp**, và nó tự khoá toàn bộ hàng đợi. Một hệ thống nói với ta rằng nó đang
+viết lặp thì không cần thêm ý kiến nào từ bên ngoài.
 
 Không có bản vá nào trên kiến trúc này đổi được kết quả. Phải đổi cái được tối ưu.
 
@@ -385,8 +395,8 @@ mới ổn, có thể viết cho mỗi bộ một "quyển kết" 20–30 chươ
 | **1a. Lõi offline (miễn phí)** | ✅ xong 19/09 | Schema `Premise`/`Bible`/`CyclePlan`/`Digest`; prompt Writer/Judge/Extractor dựng thẳng từ [`FALOO_CRAFT.md`](FALOO_CRAFT.md); merge + 10 luật cứng; script runner local. | 302 test xanh (37 test cho `serial/`), typecheck + build + secret scan sạch, dry-run chạy được. |
 | **1b. Chạy thử (~$8–12)** | 1–2 ngày | Bakeoff writer 3 model; sinh **4 chương vàng + 11 chương** cho 1 premise. | Bạn đọc 4 chương vàng: có kim thủ chỉ ch1, payoff có tên ch2, hook mọi chương. Scorecard ≥ 3,5/5. Cost ≤ $0,15/ch. |
 | **2. Kế hoạch động** | 5–7 ngày | Cycle/Volume planner + review + nén Bible; chạy **2 premise × 40 chương** offline; đo lặp (repetition), hook bị quên, cast growth. | Cast ≥ 12 sau 40 chương; không loại 爽点 nào lặp 2 chu kỳ liền; 0 mâu thuẫn fact do người đọc bắt được. |
-| **3. Runtime** | 5 ngày | Fluid 800s, queue, cycle publish, dashboard scorecard, chính sách thất bại. Chạy **2 bộ canary ẩn tới 100 chương**. | 0 job park trong 14 ngày; ≥ 3 chương/ngày/bộ đều đặn; cost thực tế ≤ $0,15. |
-| **4. Ra mắt** | tuần 4 | 5 lane ở mục 5, 3 chương/ngày, cover mới, mô tả bán hàng theo Faloo; ẩn 5 bộ cũ. | Bookmark và tỉ lệ đọc tiếp ch1→ch10 (KPI theo công thức Faloo, không dùng lượt xem). |
+| **3. Runtime** | ✅ hạ tầng xong 19/09 | 4 bảng + 5 RPC đã apply lên production, cron `/api/cron/serial`, `/admin/serial`, operator CLI, chính sách thất bại. Xem [`SERIAL_ENGINE.md`](SERIAL_ENGINE.md). Còn lại: chạy **2 bộ ẩn tới 100 chương** sau khi 1b đạt. | 0 job park trong 14 ngày; ≥ 3 chương/ngày/bộ đều đặn; cost thực tế ≤ $0,15. |
+| **4. Ra mắt** | tuần 4 | 5 lane ở mục 5, 3 chương/ngày, cover mới, mô tả bán hàng theo Faloo; ẩn 5 bộ cũ. | Bookmark và tỉ lệ đọc tiếp ch1→ch10. Chỉ có nghĩa sau khi quảng bá — việc riêng, ngoài plan này. |
 | **5. Đường dài** | liên tục | Mỗi bộ chạy tới 300 chương → đo quality drift bằng blind A/B chương 8 vs chương 250 (tool `literary-ab` giữ được). | Chương 250 không thua chương 8 trong blind test. |
 
 Thứ tự này cố ý để **giai đoạn 1 và 2 không đụng runtime, DB hay Vercel** — chỉ là script và
@@ -409,7 +419,7 @@ chỗ nào Faloo không trả lời thì ghi rõ là suy luận của tôi.
 | 5 | **5 bộ cũ: ẩn** (`hidden = true`), không xoá. Không viết quyển kết. | Faloo gọi là 切书. 3 lượt đọc tổng cộng, không có gì để cứu; nhưng 2 người đã đọc nên không xoá dữ liệu. |
 | 6 | **Bakeoff lại Writer** ở Giai đoạn 1 (Terra vs Gemini 3.7 Flash vs 3.1 Pro, ~$5). | Suy luận của tôi: prose mục tiêu đổi sang giọng thông tục + độc thoại + bảng 【】; kết quả bakeoff cũ (văn tả nghề) không còn đại diện. |
 | 7 | **Lane có hệ thống thì bảng số hiện cho độc giả** trong 【】; lane không hệ thống vẫn giấu ledger như cũ. | `FALOO_CRAFT.md` §3.4 — với truyện hệ thống, bảng thưởng *chính là* phần thưởng của độc giả. |
-| 8 | **KPI là bookmark + tỉ lệ đọc tiếp ch1→ch10**, không phải lượt xem. | Công thức bảng sách mới của Faloo: 总收藏×15 so với 周点击/30. |
+| 8 | **KPI là bookmark + tỉ lệ đọc tiếp ch1→ch10**, không phải lượt xem. Chỉ đo được sau khi có traffic; trước đó cổng chất lượng duy nhất là người đọc thử. | Công thức bảng sách mới của Faloo: 总收藏×15 so với 周点击/30. |
 
 Hai ràng buộc không được quên:
 

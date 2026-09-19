@@ -74,8 +74,12 @@ achievements), AdMob banner + interstitial hidden for VIP.
 Core: `novels`, `chapters`, `ai_story_projects`, `ai_authors`, `chapter_reads`,
 `reading_progress`, `bookmarks`, `comments`, `ratings`, `app_versions`.
 
-Factory: `story_factory_jobs`, `story_factory_runs`, `story_state_events` — see
-[`docs/STORY_FACTORY.md`](../docs/STORY_FACTORY.md).
+Factory (incumbent, stopped): `story_factory_jobs`, `story_factory_runs`,
+`story_state_events` — see [`docs/STORY_FACTORY.md`](../docs/STORY_FACTORY.md).
+
+Serial engine (replacement): `serial_novels`, `serial_cycles`, `serial_jobs`, `serial_runs`
+— see [`docs/SERIAL_ENGINE.md`](../docs/SERIAL_ENGINE.md). Chapters land in `chapters` with
+`publication_state = 'draft'` and become visible only when their whole cycle publishes.
 
 RPCs: `get_novel_stats`, `get_novels_with_stats` (batch, avoids N+1),
 `get_top_novels_by_views|rating|bookmarks`, `get_ranked_novels`, `get_reader_status`,
@@ -94,6 +98,8 @@ Two schedulers, verified 2026-08-13 against production:
 - **`story-factory` runs on Vercel Cron** (`vercel.json`, `*/2 * * * *`) — the writing
   pipeline. It is NOT in `cron.job`, so it cannot be paused from SQL; pausing it means a
   deploy or the Vercel dashboard.
+- **`serial` runs on Vercel Cron** (`*/5 * * * *`) — the replacement writing pipeline. It
+  returns `disabled` unless `SERIAL_ENGINE_ENABLED=true`.
 - **pg_cron runs the housekeeping jobs** (covers, health check, VIP expiry, RAG archive…),
   listed in `cron.job`. Secret lives in Supabase Vault as `cron_secret`; every pg_cron job
   sends `Authorization: Bearer ${CRON_SECRET}`.
