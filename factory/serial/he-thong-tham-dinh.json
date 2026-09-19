@@ -10,30 +10,114 @@
     "rule": "Nhìn vào một món đồ là thấy tên thật, niên đại thật và giá trị thật của nó hiện lên thành bảng trước mắt.",
     "scope": "Chỉ đọc được đồ vật, không đọc được ý định của người đang cầm nó, và chỉ khi hắn chạm tay vào. Nó cho biết món đồ đáng bao nhiêu, không cho biết ai sẽ trả.",
     "evolution": [
-      { "id": "ev1", "name": "Thẩm định đồ vật", "changesUse": "Chỉ thấy giá thật và niên đại." },
-      { "id": "ev2", "name": "Thẩm định lai lịch", "changesUse": "Thấy món đồ từng qua tay những ai." },
-      { "id": "ev3", "name": "Thẩm định người", "changesUse": "Thấy năng lực thật của một người, không phải bằng cấp họ khoe." },
-      { "id": "ev4", "name": "Thẩm định vận giá", "changesUse": "Thấy món đồ sẽ lên hay xuống giá trong bao lâu." },
-      { "id": "ev5", "name": "Thẩm định địa mạch", "changesUse": "Quét được cả một khu đất hoặc một kho hàng thay vì từng món." },
-      { "id": "ev6", "name": "Thẩm định nhân quả", "changesUse": "Thấy trước ai sẽ tranh món đồ này với hắn và vì lý do gì." }
+      {
+        "id": "ev1",
+        "name": "Thẩm định đồ vật",
+        "changesUse": "Chỉ thấy giá thật và niên đại."
+      },
+      {
+        "id": "ev2",
+        "name": "Thẩm định lai lịch",
+        "changesUse": "Thấy món đồ từng qua tay những ai."
+      },
+      {
+        "id": "ev3",
+        "name": "Thẩm định người",
+        "changesUse": "Thấy năng lực thật của một người, không phải bằng cấp họ khoe."
+      },
+      {
+        "id": "ev4",
+        "name": "Thẩm định vận giá",
+        "changesUse": "Thấy món đồ sẽ lên hay xuống giá trong bao lâu."
+      },
+      {
+        "id": "ev5",
+        "name": "Thẩm định địa mạch",
+        "changesUse": "Quét được cả một khu đất hoặc một kho hàng thay vì từng món."
+      },
+      {
+        "id": "ev6",
+        "name": "Thẩm định nhân quả",
+        "changesUse": "Thấy trước ai sẽ tranh món đồ này với hắn và vì lý do gì."
+      }
     ]
   },
   "tierLadder": [
-    { "id": "tier_hoc_viec", "name": "Học việc" },
-    { "id": "tier_tho_xem", "name": "Thợ xem" },
-    { "id": "tier_chuong_quay", "name": "Chưởng quầy" },
-    { "id": "tier_giam_dinh_su", "name": "Giám định sư" },
-    { "id": "tier_dai_su", "name": "Đại sư" },
-    { "id": "tier_tong_giam", "name": "Tổng giám" }
+    {
+      "id": "tier_hoc_viec",
+      "name": "Học việc"
+    },
+    {
+      "id": "tier_tho_xem",
+      "name": "Thợ xem"
+    },
+    {
+      "id": "tier_chuong_quay",
+      "name": "Chưởng quầy"
+    },
+    {
+      "id": "tier_giam_dinh_su",
+      "name": "Giám định sư"
+    },
+    {
+      "id": "tier_dai_su",
+      "name": "Đại sư"
+    },
+    {
+      "id": "tier_tong_giam",
+      "name": "Tổng giám"
+    }
   ],
   "castSeed": [
-    { "id": "khang", "name": "Trần Khang", "role": "protagonist", "agenda": "Kiếm đủ tiền chữa bệnh cho mẹ trước khi hết đợt điều trị.", "antagonistClass": null },
-    { "id": "me_khang", "name": "Bà Tư", "role": "family", "agenda": "Không muốn con trai dính vào giới buôn đồ cổ như cha nó ngày xưa.", "antagonistClass": null },
-    { "id": "lao_hoa", "name": "Lão Hoà", "role": "ally", "agenda": "Tìm người nối nghiệp tiệm cầm đồ sắp sập của mình.", "antagonistClass": null },
-    { "id": "chu_tiem", "name": "Bảy Thạch", "role": "antagonist", "agenda": "Giữ độc quyền thu mua ở chợ Cũ, không cho người mới có chỗ đứng.", "antagonistClass": "chủ tiệm địa phương" },
-    { "id": "ba_lam", "name": "Bà Lâm", "role": "antagonist", "agenda": "Thâu tóm toàn bộ tuyến hàng cổ vật của Vân Cảng về một mối.", "antagonistClass": "hội trưởng hội thẩm định" },
-    { "id": "tieu_my", "name": "Tiểu Mỹ", "role": "rival", "agenda": "Chứng minh bằng cấp chính quy hơn con mắt thiên phú.", "antagonistClass": null },
-    { "id": "ong_quang", "name": "Ông Quảng", "role": "authority", "agenda": "Giữ cho phiên đấu giá kín của Vân Cảng không bị tai tiếng.", "antagonistClass": null }
+    {
+      "id": "khang",
+      "name": "Trần Khang",
+      "role": "protagonist",
+      "agenda": "Kiếm đủ tiền chữa bệnh cho mẹ trước khi hết đợt điều trị.",
+      "antagonistClass": null
+    },
+    {
+      "id": "me_khang",
+      "name": "Bà Tư",
+      "role": "family",
+      "agenda": "Không muốn con trai dính vào giới buôn đồ cổ như cha nó ngày xưa.",
+      "antagonistClass": null
+    },
+    {
+      "id": "lao_hoa",
+      "name": "Lão Hoà",
+      "role": "ally",
+      "agenda": "Tìm người nối nghiệp tiệm cầm đồ sắp sập của mình.",
+      "antagonistClass": null
+    },
+    {
+      "id": "chu_tiem",
+      "name": "Bảy Thạch",
+      "role": "antagonist",
+      "agenda": "Giữ độc quyền thu mua ở chợ Cũ, không cho người mới có chỗ đứng.",
+      "antagonistClass": "chủ tiệm địa phương"
+    },
+    {
+      "id": "ba_lam",
+      "name": "Bà Lâm",
+      "role": "antagonist",
+      "agenda": "Thâu tóm toàn bộ tuyến hàng cổ vật của Vân Cảng về một mối.",
+      "antagonistClass": "hội trưởng hội thẩm định"
+    },
+    {
+      "id": "tieu_my",
+      "name": "Tiểu Mỹ",
+      "role": "rival",
+      "agenda": "Chứng minh bằng cấp chính quy hơn con mắt thiên phú.",
+      "antagonistClass": null
+    },
+    {
+      "id": "ong_quang",
+      "name": "Ông Quảng",
+      "role": "authority",
+      "agenda": "Giữ cho phiên đấu giá kín của Vân Cảng không bị tai tiếng.",
+      "antagonistClass": null
+    }
   ],
   "oppositionEngine": "Ai định giá thì người đó cầm quyền chia tiền. Mỗi lần Khang định giá đúng là cắt mất phần của cả một dây chuyền ăn chênh lệch — từ chủ sạp chợ Cũ tới hội thẩm định thành phố đều mất tiền khi hắn thắng, nên họ phải chặn hắn.",
   "arena": "Giới buôn và thẩm định đồ cổ ở Vân Cảng, một thành phố cảng của thế giới song song.",
@@ -44,6 +128,17 @@
     "register": "Thông tục, tự giễu, nhiều thoại, câu ngắn, độc thoại nội tâm đứng riêng thành đoạn.",
     "chapterTitleRule": "Một câu nói hoặc câu nghĩ có thái độ, trích thẳng từ đoạn cuối chương.",
     "showsSystemPanel": true,
-    "taboos": ["Không nhắc chính trị", "Không mô tả bạo lực với trẻ em", "Không nhắc tới AI"]
-  }
+    "taboos": [
+      "Không nhắc chính trị",
+      "Không mô tả bạo lực với trẻ em",
+      "Không nhắc tới AI"
+    ]
+  },
+  "conflictLadder": {
+    "survival": "Khang phải kiếm đủ tiền đợt điều trị cho mẹ trước khi bệnh viện cắt phác đồ.",
+    "rules": "Không có chứng chỉ thì định giá của hắn không được công nhận ở bất cứ phiên đấu nào.",
+    "ideology": "Định giá nên là thứ công khai ai cũng tra được, hay là đặc quyền của vài người ngồi trong phòng kín.",
+    "self": "Khi hắn nói một món đồ đáng bao nhiêu thì cả thành phố tin — và hắn bắt đầu thấy mình thích cảm giác đó."
+  },
+  "hiddenThread": "Cuốn sổ cũ trong tiệm Lão Hoà ghi giá của những món đã qua tay ba mươi năm. Nó gieo từ chương bốn như một kỷ vật, giữa truyện lộ ra là bằng chứng một dây định giá khống, và cuối cùng là thứ Khang dùng để dựng sàn công khai."
 }

@@ -44,6 +44,8 @@ export const premise: Premise = PremiseSchema.parse({
     { id: 'tieu_my', name: 'Tiểu Mỹ', role: 'rival', agenda: 'Chứng minh bằng cấp hơn con mắt.' },
   ],
   oppositionEngine: 'Ai định giá thì người đó cầm quyền chia tiền. Khang định giá đúng là cắt phần của cả một dây chuyền ăn chênh lệch, nên từ chủ sạp tới hội thẩm định đều mất tiền khi hắn thắng.',
+  conflictLadder: {"survival": "Khang phải kiếm đủ tiền đợt điều trị cho mẹ trước khi bệnh viện cắt phác đồ.", "rules": "Không có chứng chỉ thì định giá của hắn không được công nhận ở bất cứ phiên đấu nào.", "ideology": "Định giá nên là thứ công khai ai cũng tra được, hay là đặc quyền của vài người ngồi trong phòng kín.", "self": "Khi hắn nói một món đồ đáng bao nhiêu thì cả thành phố tin — và hắn bắt đầu thấy mình thích cảm giác đó."},
+  hiddenThread: "Cuốn sổ cũ trong tiệm Lão Hoà ghi giá của những món đã qua tay ba mươi năm. Nó gieo từ chương bốn như một kỷ vật, giữa truyện lộ ra là bằng chứng một dây định giá khống, và cuối cùng là thứ Khang dùng để dựng sàn công khai.",
   arena: 'Giới buôn và thẩm định đồ cổ ở Vân Cảng, một thành phố cảng của thế giới song song.',
   novelty: 'Hệ thống định giá được cả người chứ không chỉ đồ vật.',
   endingDirection: 'Trần Khang lập ra sàn thẩm định công khai, phá thế độc quyền định giá của các hội kín.',

@@ -1,5 +1,5 @@
 {
-  "version": "2026-09-19.4",
+  "version": "2026-09-19.5",
   "note": "Craft that dates. Code owns contracts; this file owns taste. Edit here, not in prompts.ts.",
   "payoffKinds": [
     {
@@ -264,6 +264,30 @@
       "observedAt": "2026-09-19",
       "evidence": "genreCanon.theGioiHienDai.ngonNgu",
       "text": "NGÔN NGỮ KHÔNG BAO GIỜ LÀ MỘT CHỦ ĐỀ\nNhân vật hai thế giới nói chuyện với nhau bình thường. Không viết cảnh ngạc nhiên vì hiểu được nhau, không rào cản tiếng nói, không phiên dịch, không ai học nói, không chữ viết nào cần giải mã trừ khi brief khoá điều đó thành một biến cố.\nĐộc giả truyện convert chưa bao giờ hỏi câu này. Nhắc tới là tự tạo ra thắc mắc."
+    },
+    {
+      "id": "protagonist_needs_contrast",
+      "role": "premise",
+      "status": "active",
+      "observedAt": "2026-09-19",
+      "evidence": "https://www.wangwen666.com/post/178.html",
+      "text": "NHÂN VẬT CHÍNH PHẢI CÓ NHÃN VÀ CÓ ĐỘ CHÊNH.\nĐộc giả nhớ một nhân vật không vì thân phận, mà vì cách hắn hành xử, cách hắn nói, và cách hắn phản ứng khi phải chọn.\nCách hiệu quả nhất là dựng độ chênh: thân phận tầm thường nhưng hành vi hoặc năng lực khác thường — anh giao hàng là sát thủ hạng S, chị lao công là mẹ của đại lão, bảo vệ là thần y ẩn danh.\nĐộ chênh đó phải ló ra NGAY CHƯƠNG MỘT, không giấu tới vài chục vạn chữ.\nVà hắn phải muốn một thứ cụ thể, nhỏ, đo được — 'kiếm đủ năm triệu rồi sang tiệm' hay hơn 'muốn mạnh nhất'."
+    },
+    {
+      "id": "product_against_agony",
+      "role": "premise",
+      "status": "active",
+      "observedAt": "2026-09-19",
+      "evidence": "https://wap.faloo.com/1446664.html",
+      "text": "KHÔNG LIỆT KÊ MẶT HÀNG — GHÉP MỘT MÓN CỤ THỂ VÀO MỘT NỖI KHỔ CỤ THỂ.\nBộ 3.000 chương đang chạy của Faloo bán hàng thế này trong phần giới thiệu:\n  'Trời lạnh cóng không có nổi miếng ăn nóng? Cơm tự sôi, tìm hiểu đi!'\n  'Khí hậu khắc nghiệt, lính chết rét hàng loạt? Miếng dán giữ nhiệt, dán một cái là ấm cả người.'\nMỗi dòng là một cú 'ừ nhỉ, cái đó đúng là dùng được thật'. Đó mới là chỗ sướng.\nViết 'bán mì gói, bật lửa, pin' là liệt kê danh mục — không ai thấy gì cả. Phải nêu đích danh món hàng, đích danh nỗi khổ nó giải, và người đang chịu nỗi khổ đó là ai.\nTiêu đề chương được phép chính là câu chào hàng đó."
+    },
+    {
+      "id": "conflict_changes_dimension",
+      "role": "planner",
+      "status": "active",
+      "observedAt": "2026-09-19",
+      "evidence": "https://www.zhihu.com/question/373347616",
+      "text": "XUNG ĐỘT PHẢI ĐỔI CHIỀU, KHÔNG PHẢI ĐỔI CỠ.\nThang bốn bậc: sinh tồn (thú dữ, du côn) → quy tắc (chấp pháp, tông môn) → lý niệm (hiền giả, kẻ cách mạng) → tự thân (tâm ma).\nCứ đánh mãi ở một bậc rồi tăng con số là chồng số, không phải leo thang — đó là lý do một bộ chết ở chương 500. Mỗi quyển phải nhích lên một bậc hoặc ít nhất chạm vào bậc trên.\nVà phải có đường ngầm: một tuyến gieo từ sớm, nổi lên giữa truyện, nhập vào tuyến chính ở cuối."
     }
   ],
   "genreCanon": {
@@ -318,6 +342,18 @@
       "thayBang": "Tự đặt tên: một thành phố cảng tên Vân Cảng, một hội thẩm định, một cục vật liệu, một sàn đấu giá, một triều đại hư cấu. Đặt xong thì dùng nhất quán suốt bộ — chúng là thực thể có tên, đếm vào luật mỗi chương một thứ mới.",
       "evidence": "https://wap.faloo.com/1261957.html",
       "ngonNgu": "Không bao giờ nhắc tới chuyện ngôn ngữ. Không nói hai bên nói cùng thứ tiếng, không có rào cản tiếng nói, không có cơ chế phiên dịch, không có ai phải học nói. Nêu ra là tự tạo cho độc giả một câu hỏi mà truyện convert xưa nay chưa ai hỏi."
+    },
+    "truyenDai": {
+      "vanDe": "Bộ nào cũng chết ở khoảng chương 300–500 vì hết chuyện, không phải vì hết sức mạnh.",
+      "thangXungDot": [
+        "sinh tồn",
+        "quy tắc",
+        "lý niệm",
+        "tự thân"
+      ],
+      "songTuyen": "Hai tuyến chính chạy song song để luôn có thứ kéo độc giả, cộng đường ngầm gieo sớm nổi muộn.",
+      "tranCanhSucManh": "Phải đặt trần cho hệ thống sức mạnh ngay từ đầu, nếu không hậu kỳ vỡ.",
+      "evidence": "https://www.zhihu.com/question/373347616"
     }
   }
 }

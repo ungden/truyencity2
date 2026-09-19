@@ -81,6 +81,23 @@ export const PremiseSchema = z.object({
   }).strict(),
 
   /**
+   * The four dimensions the conflict has to climb, one line each. Comparable serials
+   * die around chapter 300–500 not because the protagonist runs out of power but
+   * because the story runs out of *kinds* of problem, and a bigger number is not a
+   * new problem. The old engine's novels were still fighting the same market rival
+   * at chapter 90 as at chapter 9.
+   */
+  conflictLadder: z.object({
+    survival: line,   // beasts, thugs, going hungry
+    rules: line,      // enforcers, sects, guilds, the law
+    ideology: line,   // who should hold this, and why
+    self: line,       // what winning has made of him
+  }).strict(),
+
+  /** Planted early, surfaces mid-story, merges with the main line at the end. */
+  hiddenThread: para,
+
+  /**
    * Front: the protagonist wins on stage. Broker: allies win with what he gave them and
    * the reader, not the crowd, knows why. Mixed: both, cycle by cycle.
    */

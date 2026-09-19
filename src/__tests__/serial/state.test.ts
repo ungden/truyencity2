@@ -10,6 +10,15 @@ import { payoffKindIds, activeRules, staleRules } from '@/services/serial/playbo
 import { premise, baseBible, digest, cycle } from './fixtures';
 
 describe('serial contracts', () => {
+  test('a premise must climb four dimensions of conflict, not one dimension four times', () => {
+    // Comparable serials die around chapter 300-500 because they run out of kinds of
+    // problem. The old engine's novels were fighting the same market rival at 90 as at 9.
+    expect(Object.keys(premise.conflictLadder)).toEqual(['survival', 'rules', 'ideology', 'self']);
+    expect(premise.hiddenThread.length).toBeGreaterThan(40);
+    expect(() => PremiseSchema.parse({ ...premise, conflictLadder: undefined })).toThrow();
+    expect(CYCLE_PLANNER_SYSTEM_PROMPT).toMatch(/XUNG ĐỘT PHẢI ĐỔI CHIỀU, KHÔNG PHẢI ĐỔI CỠ/);
+  });
+
   test('a premise must name six or more cast members with two antagonist classes', () => {
     const classes = new Set(premise.castSeed.filter(m => m.role === 'antagonist').map(m => m.antagonistClass));
     expect(premise.castSeed.length).toBeGreaterThanOrEqual(6);
@@ -275,6 +284,8 @@ describe('craft playbook', () => {
       'asymmetry_is_the_engine',   // no gimmick conditions bolted onto the premise
       'economy_must_close',        // name a real buyer on each side
       'modern_side_is_parallel',   // invented city, no real places to nitpick
+      'protagonist_needs_contrast',// a tag and a contrast, visible in chapter one
+      'product_against_agony',     // one named product against one named suffering
     ]));
     expect(PREMISE_SYSTEM_PROMPT).toMatch(/THẾ GIỚI SONG SONG, KHÔNG PHẢI VIỆT NAM THẬT/);
     // Naming the language would invent the very question the parallel world avoids.
