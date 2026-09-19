@@ -1,5 +1,5 @@
 {
-  "version": "2026-09-19.1",
+  "version": "2026-09-19.2",
   "note": "Craft that dates. Code owns contracts; this file owns taste. Edit here, not in prompts.ts.",
   "payoffKinds": [
     {
@@ -240,6 +240,59 @@
       "observedAt": "2026-09-19",
       "evidence": "https://www.sohu.com/a/876257711_122129349",
       "text": "ĐỘNG CƠ LÀ CHÊNH LỆCH, KHÔNG PHẢI CƠ CHẾ.\nThứ hiếm bên này là thứ tầm thường bên kia, và ngược lại. Chỉ riêng điều đó đã đủ nuôi cả bộ truyện: nhân vật mua rẻ bán đắt, giàu lên, mạnh lên, dựng thế lực. Hãy nói thẳng hai chiều hàng hoá và dừng lại.\nKHÔNG gắn thêm điều kiện vặt lên cánh cửa: không đồng hồ đếm ngược, không hạn mức, không khung giờ, không 'phải có mã vận đơn', không luật lệ rườm rà cho việc đi lại. Mỗi điều kiện thêm vào là một chương nói về việc quản lý điều kiện đó — đúng thứ đã giết năm bộ truyện cũ.\nscope được phép để trống. Chỉ ghi khi nó là sự thật tự nhiên của hai thế giới (bên kia không có điện nên đồ điện tử vô dụng), không bao giờ là luật do tác giả áp đặt lên cái cổng.\nCái ngăn nhân vật không phải là cổng, mà là người: bên kia cũng có chủ, có giá, có kẻ đang nắm tuyến hàng."
+    },
+    {
+      "id": "economy_must_close",
+      "role": "premise",
+      "status": "active",
+      "observedAt": "2026-09-19",
+      "evidence": "genreCanon.quyDoiVeTraiDat",
+      "text": "VÒNG TIỀN PHẢI KHÉP KÍN, VÀ PHẢI CÓ NGƯỜI MUA CÓ THẬT Ở CẢ HAI ĐẦU.\nSai lầm điển hình: quy tiền tệ của thế giới bên kia ra tiền Việt. Linh thạch là tiền tệ nội bộ của tu tiên giới — Trái Đất không có chợ linh thạch, không người mua, không giá tham chiếu. Viết 'một viên linh thạch bằng tháng lương' là lỗ logic độc giả thấy ngay.\nĐúng phải là ba nhánh: (1) hàng Trái Đất bán bên kia lấy tiền tệ bên kia; (2) tiền tệ đó Ở LẠI bên kia làm vốn — mua đan, mua công pháp, thuê người, mua chỗ đứng cho người của mình, tức là quyền lực lớn lên ở bên kia; (3) thứ mang về Trái Đất phải là thứ Trái Đất đã có chợ sẵn: vàng bạc, ngọc đá quý, dược liệu đông y, cổ vật, vật liệu lạ đem giám định.\nNêu đích danh người mua ở mỗi đầu. Không nêu được thì chưa phải premise."
     }
-  ]
+  ],
+  "genreCanon": {
+    "note": "Quy ước thể loại mà độc giả convert đã thuộc. Đừng bịa lại; bịa lại là mất độc giả ngay chương đầu.",
+    "observedAt": "2026-09-19",
+    "evidence": [
+      "https://www.zhihu.com/question/372678506",
+      "https://zhuanlan.zhihu.com/p/713104060",
+      "https://zhuanlan.zhihu.com/p/564936816",
+      "https://www.sohu.com/a/876257711_122129349"
+    ],
+    "tuTien": {
+      "canhGioi": [
+        "Luyện Khí — phàm nhân vừa dẫn khí vào thân, thọ ~100 năm",
+        "Trúc Cơ — bắt đầu tính là tu sĩ, thọ ~200 năm, ngự khí bay ngắn",
+        "Kim Đan — một phương nhân vật, thọ ~500 năm",
+        "Nguyên Anh — trưởng lão tông môn, thọ ~1.000 năm, nguyên anh xuất khiếu",
+        "Hoá Thần",
+        "Luyện Hư",
+        "Hợp Thể",
+        "Đại Thừa",
+        "Độ Kiếp"
+      ],
+      "canhGioiNho": "Mỗi cảnh giới chia sơ kỳ / trung kỳ / hậu kỳ / đại viên mãn.",
+      "tienTe": "Linh thạch bốn bậc: hạ phẩm → trung phẩm → thượng phẩm → cực phẩm, quy đổi 100:1 mỗi bậc. Đây là tiền tệ NỘI BỘ của tu tiên giới. Phàm nhân bên đó vẫn dùng vàng bạc.",
+      "toChuc": "Tông môn (có tàng kinh các, đan phòng, khí phòng, linh điền, linh khoáng) · phường thị · đấu giá hội · thương hội · tán tu (không tông môn, nghèo, đông nhất) · thế gia.",
+      "taiNguyen": "Hai nguồn lớn: linh thạch và linh dược. Tông môn giàu nhất thường là tông luyện đan. Linh dược phải trồng nơi linh khí dày hoặc hái ở chỗ nguy hiểm.",
+      "vatPham": "Đan dược (Trúc Cơ đan, Hồi Khí đan...) · pháp khí / pháp bảo · phù lục · trận pháp · công pháp. Đều chia phẩm giai.",
+      "linhCan": "Linh căn quyết định tốc độ tu luyện: kim mộc thuỷ hoả thổ, hiếm hơn là phong lôi băng. Thiên linh căn (đơn thuộc tính) là thứ cả tông môn tranh nhau."
+    },
+    "kiemHiep": {
+      "sucManh": "Nội công / tâm pháp / chiêu thức / khinh công. Không có cảnh giới thần tiên, cao thủ vẫn là người.",
+      "toChuc": "Môn phái chính đạo · ma giáo · bang hội · tiêu cục (áp tải hàng) · tiền trang (ngân hàng) · triều đình. Giang hồ và triều đình luôn giằng co.",
+      "boiCanh": "Hay đặt vào thời loạn: cuối Bắc Tống, cuối Nam Tống, cuối Nguyên — cao thủ vừa có ân oán vừa có chuyện nước nhà."
+    },
+    "quyDoiVeTraiDat": {
+      "luat": "Linh thạch KHÔNG quy đổi được ra tiền Trái Đất. Trái Đất không có chợ linh thạch, không có người mua, không có giá tham chiếu.",
+      "giuLaiBenKia": "Linh thạch ở lại tu tiên giới làm vốn: mua đan dược, mua công pháp, thuê người, mua đất phường thị, dựng chỗ đứng cho người của mình. Quyền lực lớn lên ở bên kia.",
+      "mangVeTraiDat": [
+        "Vàng, bạc — phàm nhân bên kia vẫn tiêu. Tiệm vàng nào cũng mua, không cần giải thích một chữ.",
+        "Ngọc, đá quý — có chợ sẵn, có người định giá.",
+        "Dược liệu — thứ bên kia mọc dại, ở đây là sâm rừng / linh chi cổ, giới đông y trả tiền tỷ.",
+        "Cổ vật — đồ đồng, gốm, sách cũ bên kia là đồ dùng, ở đây là cổ vật, có nhà đấu giá.",
+        "Vật liệu lạ — đem giám định thành 'hợp kim chưa từng thấy', bán cho giới sưu tầm hoặc phòng thí nghiệm vật liệu."
+      ]
+    }
+  }
 }

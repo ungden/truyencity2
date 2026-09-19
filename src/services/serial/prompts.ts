@@ -1,4 +1,4 @@
-import { craftBlock } from './playbook';
+import { craftBlock, genreCanonBlock } from './playbook';
 import playbookData from './playbook.json';
 
 /**
@@ -70,4 +70,7 @@ Thang cấp bậc phải có tên cho từng nấc, để tiến bộ của nhâ
 Dàn nhân vật mở màn tối thiểu sáu người có tên, trong đó ít nhất hai đối thủ thuộc hai giai cấp khác nhau, ai cũng có mục tiêu riêng.
 blurb đi theo thứ tự: áp lực đang đè lên nhân vật, lợi thế riêng, cú thắng đầu tiên, rồi cái lớn hơn đang chờ. Không mở đầu bằng lịch sử thế giới.
 
-${craftBlock('premise')}`;
+${craftBlock('premise')}
+
+QUY ƯỚC THỂ LOẠI — độc giả convert đã thuộc nằm lòng, đừng bịa lại:
+${genreCanonBlock()}`;

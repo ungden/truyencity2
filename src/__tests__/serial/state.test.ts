@@ -257,12 +257,23 @@ describe('craft playbook', () => {
     expect(staleRules(120, new Date('2026-09-20'))).toEqual([]);
   });
 
+  test('the premise prompt carries the genre conventions it kept inventing around', () => {
+    // The bug this caught: a premise priced spirit stones in Vietnamese dong. Earth has
+    // no spirit-stone market, no buyer and no reference price, and a convert reader sees
+    // that in one line.
+    expect(PREMISE_SYSTEM_PROMPT).toMatch(/Linh thạch là tiền tệ nội bộ/);
+    expect(PREMISE_SYSTEM_PROMPT).toMatch(/Nêu đích danh người mua ở mỗi đầu/);
+    expect(PREMISE_SYSTEM_PROMPT).toMatch(/Luyện Khí|Trúc Cơ|Kim Đan/);
+    expect(PREMISE_SYSTEM_PROMPT).toMatch(/hạ phẩm.*trung phẩm.*thượng phẩm/);
+  });
+
   test('the corrections from this session are recorded as rules with evidence', () => {
     const ids = activeRules('premise').map(rule => rule.id);
     expect(ids).toEqual(expect.arrayContaining([
       'no_self_punishing_power',   // advantages must not bill their owner
       'business_jumps',            // commerce jumps a tier per cycle
       'asymmetry_is_the_engine',   // no gimmick conditions bolted onto the premise
+      'economy_must_close',        // name a real buyer on each side
     ]));
     expect(PREMISE_SYSTEM_PROMPT).toMatch(/KHÔNG gắn thêm điều kiện vặt/);
   });

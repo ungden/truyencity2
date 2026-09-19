@@ -40,6 +40,13 @@ const CraftRuleSchema = z.object({
 export const PlaybookSchema = z.object({
   version: z.string().trim().min(3),
   note: z.string().trim().optional(),
+  /**
+   * Genre conventions the convert-novel reader already knows: realm ladders, spirit
+   * stone denominations, sect and market structures, and — the one that bit us — how
+   * goods from the other world actually become money on Earth. Free-form on purpose:
+   * it is reference the premise writer reads, not a contract anything validates.
+   */
+  genreCanon: z.record(z.unknown()).optional(),
   payoffKinds: z.array(PayoffKindSchema).min(5),
   rules: z.array(CraftRuleSchema).min(1),
 }).strict();
@@ -65,6 +72,12 @@ export function activeRules(role: CraftRole): CraftRule[] {
 /** The rules for one role, joined into the block a prompt appends. */
 export function craftBlock(role: CraftRole): string {
   return activeRules(role).map(rule => rule.text).join('\n\n');
+}
+
+/** Genre reference handed to the premise writer so it stops inventing broken economics. */
+export function genreCanonBlock(): string {
+  const canon = playbook().genreCanon;
+  return canon ? JSON.stringify(canon, null, 1) : '';
 }
 
 /** Open registry: a new beat kind is a data edit, never a schema migration. */
