@@ -34,7 +34,7 @@ off by the 300s route ceiling.
 | `memory.ts` | Bounded continuity reads over `story_state_events`. No embeddings, no model calls. |
 | `provider.ts` | Routed REST providers. No SDK, no fallback provider; chapter calls cap at 120s, Planner at 140s. |
 | `benchmark.ts`, `benchmark-resume.ts` | Offline model evaluation. Not a gate. |
-| `cover.ts`, `portfolio.ts`, `prompts.ts`, `release.ts`, `routes.ts`, `index.ts` | Support. `portfolio.ts` giữ slate 20 high-concept fantasy / 10 urban-era thay vì nghiêng sang nghề nghiệp-cozy. |
+| `cover.ts`, `cover-image.ts`, `portfolio.ts`, `prompts.ts`, `release.ts`, `routes.ts`, `index.ts` | Support. `cover-image.ts` dispatches the backdrop call by model id: `gpt-image-*` to OpenAI's images endpoint, everything else to Gemini. `portfolio.ts` giữ slate 20 high-concept fantasy / 10 urban-era thay vì nghiêng sang nghề nghiệp-cozy. |
 
 ## Stages
 

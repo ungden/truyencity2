@@ -601,7 +601,7 @@ async function runCover(db: SupabaseClient, job: FactoryJobRow, project: Factory
       status: 'ready', stage: 'write', retry_count: 0, lease_owner: null, lease_token: null, lease_until: null, next_run_at: now, updated_at: now,
     }).eq('id', job.id).eq('lease_token', job.lease_token);
     if (jobUpdate.error) throw jobUpdate.error;
-    const runUpdate = await db.from('story_factory_runs').update({ status: 'passed', output_artifact: cover, finished_at: now }).eq('id', runId);
+    const runUpdate = await db.from('story_factory_runs').update({ status: 'passed', output_artifact: cover, estimated_cost_usd: cover.costUsd, finished_at: now }).eq('id', runId);
     if (runUpdate.error) throw runUpdate.error;
     return { status: 'completed', jobId: job.id, stage: 'cover', chapterNumber: job.current_chapter };
   } catch (error) {

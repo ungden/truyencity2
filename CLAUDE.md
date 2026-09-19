@@ -93,6 +93,8 @@ Goals 1–3 are defended by the causal validator, the event ledger and window re
 ```
 NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY
 GEMINI_API_KEY
+OPENAI_API_KEY               # gpt-* text routes and the default cover model
+COVER_IMAGE_MODEL            # optional; default gpt-image-2.5-sunburst
 CRON_SECRET
 STORY_FACTORY_ENABLED=true
 SERIAL_ENGINE_ENABLED=true   # the replacement engine; unset today
@@ -108,7 +110,7 @@ and a silent production stall.
 
 ```bash
 npm run typecheck
-npm test                 # 311
+npm test                 # 320
 npm run security:secrets
 ```
 

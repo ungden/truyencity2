@@ -21,7 +21,8 @@
     "factory:writing-smoke": "node --import tsx scripts/factory-writing-smoke.ts",
     "factory:window-repair": "node --import tsx scripts/factory-window-repair.ts",
     "serial:run": "node --import tsx scripts/serial-run.ts",
-    "serial:operator": "node --import tsx scripts/serial-operator.ts"
+    "serial:operator": "node --import tsx scripts/serial-operator.ts",
+    "cover:bakeoff": "node --import tsx scripts/cover-bakeoff.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",

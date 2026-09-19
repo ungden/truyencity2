@@ -104,3 +104,6 @@ factory/*-checkpoint.local.json
 
 # Offline serial-engine output: chapters, verdicts, cost reports
 factory/serial/runs/
+
+# Cover bake-off output
+factory/covers/

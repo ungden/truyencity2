@@ -2,13 +2,12 @@ import { createHash } from 'node:crypto';
 import { ImageResponse } from 'next/og';
 import sharp from 'sharp';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { recordGeminiUsageEvent, type GeminiUsageContext, type GeminiUsageMetadata } from '@/services/gemini-usage-ledger';
+import { type GeminiUsageContext } from '@/services/gemini-usage-ledger';
 import { StoryFactoryError } from './contracts';
+import { generateCoverBackdrop } from './cover-image';
 
 const WIDTH = 1_200;
 const HEIGHT = 1_800;
-const IMAGE_MODEL = process.env.GEMINI_IMAGE_MODEL || 'gemini-3-pro-image';
-const API_BASE = 'https://generativelanguage.googleapis.com/v1beta';
 
 function wrapTitle(title: string, maxCharacters = 24): string[] {
   const lines: string[] = [];
@@ -117,47 +116,20 @@ export async function renderCoverTypography(title: string): Promise<Buffer> {
   return overlay;
 }
 
-async function generateBackground(
-  prompt: string,
-  usageContext?: GeminiUsageContext,
-): Promise<{ buffer: Buffer; mimeType: string }> {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) throw new StoryFactoryError('infra_blocked', 'GEMINI_API_KEY is not configured for cover generation.');
-  const response = await fetch(`${API_BASE}/models/${IMAGE_MODEL}:generateContent`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
-    body: JSON.stringify({
-      contents: [{ parts: [{ text: `${prompt}\nVertical Vietnamese web-novel cover background, cinematic composition, clean shapes and controlled texture. Leave the upper safe area readable. Absolutely no text, letters, logos, symbols, signature or watermark.` }] }],
-      generationConfig: {
-        responseModalities: ['IMAGE'],
-        imageConfig: { aspectRatio: '2:3', imageSize: '2K' },
-      },
-    }),
-    signal: AbortSignal.timeout(240_000),
-  });
-  if (!response.ok) throw new StoryFactoryError('infra_blocked', `Cover provider failed with ${response.status}: ${(await response.text()).slice(0, 500)}`);
-  const payload = await response.json();
-  const inline = payload?.candidates?.[0]?.content?.parts?.find((part: { inlineData?: unknown }) => part.inlineData)?.inlineData;
-  await recordGeminiUsageEvent({
-    model: IMAGE_MODEL,
-    modelVersion: typeof payload?.modelVersion === 'string' ? payload.modelVersion : undefined,
-    responseId: typeof payload?.responseId === 'string' ? payload.responseId : undefined,
-    usageMetadata: payload?.usageMetadata as GeminiUsageMetadata | undefined,
-    status: inline?.data ? 'succeeded' : 'blocked',
-    context: usageContext,
-  });
-  if (!inline?.data) throw new StoryFactoryError('infra_blocked', 'Cover provider returned no image.');
-  return { buffer: Buffer.from(inline.data, 'base64'), mimeType: inline.mimeType || 'image/png' };
-}
-
 export async function generateFactoryCover(input: {
   db: SupabaseClient;
   novelId: string;
   title: string;
   backgroundPrompt: string;
   usageContext?: GeminiUsageContext;
-}): Promise<{ coverUrl: string; path: string; sha256: string; width: number; height: number }> {
-  const background = await generateBackground(input.backgroundPrompt, input.usageContext);
+}): Promise<{
+  coverUrl: string; path: string; sha256: string; width: number; height: number;
+  model: string; costUsd: number;
+}> {
+  const background = await generateCoverBackdrop({
+    prompt: input.backgroundPrompt,
+    usageContext: input.usageContext,
+  });
   const typography = await renderCoverTypography(input.title);
   const rendered = await sharp(background.buffer)
     .rotate()
@@ -187,5 +159,7 @@ export async function generateFactoryCover(input: {
     sha256: createHash('sha256').update(rendered).digest('hex'),
     width: WIDTH,
     height: HEIGHT,
+    model: background.model,
+    costUsd: background.costUsd,
   };
 }
