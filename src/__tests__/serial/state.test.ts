@@ -277,6 +277,9 @@ describe('craft playbook', () => {
       'modern_side_is_parallel',   // invented city, no real places to nitpick
     ]));
     expect(PREMISE_SYSTEM_PROMPT).toMatch(/THẾ GIỚI SONG SONG, KHÔNG PHẢI VIỆT NAM THẬT/);
+    // Naming the language would invent the very question the parallel world avoids.
+    expect(WRITER_SYSTEM_PROMPT).toMatch(/NGÔN NGỮ KHÔNG BAO GIỜ LÀ MỘT CHỦ ĐỀ/);
+    expect(PREMISE_SYSTEM_PROMPT).toMatch(/không phiên dịch/);
     // The shipped seed premise has to obey the rule it ships with.
     expect(premise.arena).toMatch(/thế giới song song/);
     expect(PREMISE_SYSTEM_PROMPT).toMatch(/KHÔNG gắn thêm điều kiện vặt/);

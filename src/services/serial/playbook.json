@@ -1,5 +1,5 @@
 {
-  "version": "2026-09-19.3",
+  "version": "2026-09-19.4",
   "note": "Craft that dates. Code owns contracts; this file owns taste. Edit here, not in prompts.ts.",
   "payoffKinds": [
     {
@@ -255,7 +255,15 @@
       "status": "active",
       "observedAt": "2026-09-19",
       "evidence": "https://wap.faloo.com/1261957.html",
-      "text": "PHÍA HIỆN ĐẠI LÀ THẾ GIỚI SONG SONG, KHÔNG PHẢI VIỆT NAM THẬT.\nĐây là quy ước sẵn có của dòng này: bộ nào cũng mở bằng 'xuyên tới thế giới song song'. Lý do rất thực dụng — không ai bắt bẻ được địa lý hay luật lệ, không chạm chuyện nhạy cảm, và tác giả dựng thẳng ra được cái tổ chức mà cốt truyện cần.\nGiữ nguyên kết cấu đời sống cho quen thuộc: điện thoại, app giao hàng, cửa hàng tiện lợi, tiệm vàng, phòng trọ, chợ, giới đông y. Tên người và món ăn vẫn thuần Việt.\nBỏ sạch tên thật: thành phố, tỉnh, quốc gia, thương hiệu, cơ quan nhà nước, nhân vật và sự kiện lịch sử, triều đại có thật. Thay bằng tên tự đặt và dùng nhất quán cả bộ.\nMột thành phố tự đặt tên là một thực thể có tên — nó đếm vào luật mỗi chương phải thêm một thứ mới."
+      "text": "PHÍA HIỆN ĐẠI LÀ THẾ GIỚI SONG SONG, KHÔNG PHẢI VIỆT NAM THẬT.\nĐây là quy ước sẵn có của dòng này: bộ nào cũng mở bằng 'xuyên tới thế giới song song'. Lý do rất thực dụng — không ai bắt bẻ được địa lý hay luật lệ, không chạm chuyện nhạy cảm, và tác giả dựng thẳng ra được cái tổ chức mà cốt truyện cần.\nGiữ nguyên kết cấu đời sống cho quen thuộc: điện thoại, app giao hàng, cửa hàng tiện lợi, tiệm vàng, phòng trọ, chợ, giới đông y.\nTuyệt đối không nhắc tới chuyện ngôn ngữ ở bất cứ đâu — không cùng tiếng, không rào cản, không phiên dịch, không ai phải học nói. Nêu ra là tự đẻ ra một câu hỏi mà không ai hỏi.\nBỏ sạch tên thật: thành phố, tỉnh, quốc gia, thương hiệu, cơ quan nhà nước, nhân vật và sự kiện lịch sử, triều đại có thật. Thay bằng tên tự đặt và dùng nhất quán cả bộ.\nMột thành phố tự đặt tên là một thực thể có tên — nó đếm vào luật mỗi chương phải thêm một thứ mới."
+    },
+    {
+      "id": "never_mention_language",
+      "role": "writer",
+      "status": "active",
+      "observedAt": "2026-09-19",
+      "evidence": "genreCanon.theGioiHienDai.ngonNgu",
+      "text": "NGÔN NGỮ KHÔNG BAO GIỜ LÀ MỘT CHỦ ĐỀ\nNhân vật hai thế giới nói chuyện với nhau bình thường. Không viết cảnh ngạc nhiên vì hiểu được nhau, không rào cản tiếng nói, không phiên dịch, không ai học nói, không chữ viết nào cần giải mã trừ khi brief khoá điều đó thành một biến cố.\nĐộc giả truyện convert chưa bao giờ hỏi câu này. Nhắc tới là tự tạo ra thắc mắc."
     }
   ],
   "genreCanon": {
@@ -305,10 +313,11 @@
     "theGioiHienDai": {
       "luat": "Phía hiện đại luôn là một THẾ GIỚI SONG SONG, không bao giờ là Việt Nam thật.",
       "viSao": "Không ai bắt bẻ được địa lý, luật lệ, cơ quan hay sự kiện; không chạm vào chuyện nhạy cảm; và tác giả được quyền dựng thẳng ra cái tổ chức mà cốt truyện cần.",
-      "giuLai": "Kết cấu đời sống phải y như thật thì độc giả mới thấy quen: điện thoại, app giao hàng, cửa hàng tiện lợi, tiệm vàng, phòng trọ, chợ, sàn thương mại điện tử, giới đông y. Tên người, món ăn, cách nói năng vẫn thuần Việt — đây là một thế giới song song nói tiếng Việt.",
+      "giuLai": "Kết cấu đời sống phải y như thật thì độc giả mới thấy quen: điện thoại, app giao hàng, cửa hàng tiện lợi, tiệm vàng, phòng trọ, chợ, sàn thương mại điện tử, giới đông y. Tên người và món ăn vẫn theo nếp quen của truyện convert.",
       "boDi": "Tên thành phố, tỉnh, quốc gia có thật. Tên thương hiệu có thật. Cơ quan nhà nước có thật. Nhân vật lịch sử, sự kiện lịch sử, chính trị. Triều đại có thật ở phía cổ đại.",
       "thayBang": "Tự đặt tên: một thành phố cảng tên Vân Cảng, một hội thẩm định, một cục vật liệu, một sàn đấu giá, một triều đại hư cấu. Đặt xong thì dùng nhất quán suốt bộ — chúng là thực thể có tên, đếm vào luật mỗi chương một thứ mới.",
-      "evidence": "https://wap.faloo.com/1261957.html"
+      "evidence": "https://wap.faloo.com/1261957.html",
+      "ngonNgu": "Không bao giờ nhắc tới chuyện ngôn ngữ. Không nói hai bên nói cùng thứ tiếng, không có rào cản tiếng nói, không có cơ chế phiên dịch, không có ai phải học nói. Nêu ra là tự tạo cho độc giả một câu hỏi mà truyện convert xưa nay chưa ai hỏi."
     }
   }
 }
