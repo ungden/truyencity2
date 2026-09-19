@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "lane": "thuc_tinh_toan_dan",
+  "title": "Song Xuyên Cao Võ: Rác Chiến Trường Bên Kia Là Siêu Vật Liệu Bên Này",
+  "hook": "Mảnh mai dị thú bị vứt ở tiền tuyến được viện vật liệu trả giá lớn, còn một lô chăn giữ nhiệt mua bằng số tiền đó cứu cả đội trinh sát sắp chết rét.",
+  "blurb": "Bùi Sơn làm ở bãi phế liệu Vân Cảng và sắp mất quyền thuê khu cân vì không có nguồn hàng. Sau đống container là tiền tuyến cao võ Bắc Tuyến, nơi mai dị thú và vũ khí gãy chất thành núi vì không ai luyện được. Viện Tinh Vật hiện đại trả giá lớn cho mảnh mai đầu tiên sau khi kiểm định; Sơn dùng tiền mua đèn dã chiến cùng chăn giữ nhiệt, cứu đội trinh sát Bắc Tuyến và đổi lấy quyền thu gom chiến trường. Nhưng hợp đồng ấy đụng vào quân nhu quan đang ăn chênh lệch, tập đoàn muốn độc quyền vật liệu và bí mật rằng Viện Tinh Vật đã có một mảnh dị thú từ trước khi Sơn mở cửa.",
+  "readerFantasy": "Nhìn ra giá trị trong thứ cả hai thế giới vứt bỏ, từ người cân phế liệu thành chủ chuỗi vật liệu khiến quân đội và tập đoàn đều phải thương lượng.",
+  "goldenFinger": {
+    "name": "Bãi Cân Song Giới",
+    "rule": "Lối giữa hai container nối Vân Cảng với Bắc Tuyến và cho hàng hóa qua tự do; Sơn không được bảng giá thần kỳ, hắn phải tìm đúng viện kiểm định và đúng người đang cần món hàng.",
+    "scope": "Vật liệu dị thú phải qua kiểm định trước khi dùng ở hiện đại, còn thiết bị hiện đại không tự chống được võ giả hoặc dị thú nếu không có người vận hành.",
+    "evolution": [
+      { "id": "ev1", "name": "Một mảnh có giá", "changesUse": "Sơn tìm được người mua thật cho phế liệu đầu tiên và dùng tiền giải đúng nguy cấp bên kia." },
+      { "id": "ev2", "name": "Phân loại chiến trường", "changesUse": "Đồng minh học cách tách phế liệu theo công dụng thay vì cân tất cả như rác." },
+      { "id": "ev3", "name": "Xưởng ghép vật liệu", "changesUse": "Máy công cụ hiện đại và ma tính vật liệu tạo sản phẩm mới cho cả hai bên." },
+      { "id": "ev4", "name": "Quyền thu gom thành trì", "changesUse": "Đội địa phương tự thu, tự bán và giữ phần lợi nhuận thay vì giao hết cho Sơn." },
+      { "id": "ev5", "name": "Chuỗi quân nhu hai giới", "changesUse": "Vật liệu và cứu viện được điều phối theo nhu cầu chiến trường thay vì giá độc quyền." },
+      { "id": "ev6", "name": "Kho dự phòng liên giới", "changesUse": "Mạng thành trì và viện nghiên cứu cùng sở hữu dữ liệu, ngăn một phe biến cánh cửa thành cuộc chạy đua quân bị riêng."
+      }
+    ]
+  },
+  "conflictLadder": {
+    "survival": "Sơn phải cứu đội trinh sát khỏi bão tuyết và bán mảnh mai trước khi mất khu cân.",
+    "rules": "Quân nhu Bắc Tuyến tuyên bố mọi chiến lợi phẩm thuộc kho thành còn viện hiện đại muốn khóa toàn bộ mẫu dưới hợp đồng mật.",
+    "ideology": "Vật liệu liên giới phải phục vụ phòng thủ chung hay thuộc về tổ chức trả nhiều tiền và giữ được bí mật.",
+    "self": "Sơn phải phân biệt lúc nào mình đang mở giá trị cho mọi người và lúc nào hắn chỉ trở thành ông chủ bãi rác lớn hơn những kẻ cũ."
+  },
+  "hiddenThread": "Mảnh mai niêm phong trong Viện Tinh Vật có cùng vết cắt với chiến trường đầu tiên của Sơn nhưng đã được lưu kho mười hai năm. Nó được hé từ lần giám định đầu, giữa truyện lộ ra một tuyến xuyên cũ, và nhập tuyến chính khi chủ tuyến đó quay lại đòi toàn bộ Bắc Tuyến như tài sản thử nghiệm.",
+  "payoffStance": "mixed",
+  "oppositionEngine": "Quân nhu quan mất khoản ăn chênh phế liệu, tập đoàn mất độc quyền mẫu nghiên cứu và võ giả thế gia mất vị trí khi đội hạng thấp có trang bị tốt. Mỗi hợp đồng minh bạch của Sơn làm một nhóm mất tiền, bí mật hoặc quyền phân phối.",
+  "tierLadder": [
+    { "id": "tier_tho_can", "name": "Thợ cân phế liệu" },
+    { "id": "tier_phan_loai", "name": "Chủ kho phân loại" },
+    { "id": "tier_cung_ung", "name": "Nhà cung ứng thành trì" },
+    { "id": "tier_vat_lieu", "name": "Chủ xưởng siêu vật liệu" },
+    { "id": "tier_quan_nhu", "name": "Tổng quản liên tuyến" },
+    { "id": "tier_giu_kho", "name": "Người giữ kho liên giới" }
+  ],
+  "castSeed": [
+    { "id": "bui_son", "name": "Bùi Sơn", "role": "protagonist", "agenda": "Giữ bãi cân và chứng minh rác chỉ là thứ chưa gặp đúng người cần nó.", "antagonistClass": null },
+    { "id": "dao_lam", "name": "Đào Lam", "role": "ally", "agenda": "Đưa đội trinh sát sống về và giành quyền tự trang bị ngoài kho quân nhu.", "antagonistClass": null },
+    { "id": "ky_su_an", "name": "An Vi", "role": "ally", "agenda": "Công bố tính chất vật liệu bằng dữ liệu kiểm nghiệm thay vì mệnh lệnh tập đoàn.", "antagonistClass": null },
+    { "id": "quan_nhu_quan", "name": "Mạc Trình", "role": "antagonist", "agenda": "Giữ quyền thu mua mọi chiến lợi phẩm Bắc Tuyến với giá do mình đặt.", "antagonistClass": "quân nhu quan thành trì" },
+    { "id": "tong_giam", "name": "Lương Khải", "role": "antagonist", "agenda": "Độc quyền bằng sáng chế từ vật liệu dị thú và khóa mọi mẫu ngoài tập đoàn.", "antagonistClass": "tổng giám đốc vật liệu" },
+    { "id": "le_hung", "name": "Lê Hùng", "role": "rival", "agenda": "Dùng mạng thu gom truyền thống giành mọi bãi chiến trường trước Sơn.", "antagonistClass": null },
+    { "id": "vien_truong", "name": "Tần Nghi", "role": "authority", "agenda": "Giữ Viện Tinh Vật độc lập giữa áp lực quân đội và tập đoàn đang tài trợ nó.", "antagonistClass": null }
+  ],
+  "arena": "Bãi phế liệu và viện nghiên cứu tại Vân Cảng hiện đại song song nối với tiền tuyến cao võ chống dị thú ở Bắc Tuyến.",
+  "novelty": "Vòng kinh tế khép kín bằng kiểm định và người mua thật; sức mạnh đến từ chuỗi cung ứng minh bạch chứ không phải bảng định giá toàn năng.",
+  "endingDirection": "Bùi Sơn công khai dữ liệu vật liệu, trao quyền thu gom cho các đội tiền tuyến và biến kho liên giới thành nguồn dự phòng chung thay vì mồi lửa cho cuộc chạy đua quân bị.",
+  "voiceSheet": {
+    "pov": "third_limited",
+    "register": "Rắn, nhanh, có mùi công trường nhưng không sa vào quy trình; mỗi chi tiết vật liệu phải lập tức đổi giá, vị thế hoặc kết quả chiến đấu.",
+    "chapterTitleRule": "Một câu trả giá, kết luận giám định hoặc lời bật lại người vừa gọi món đồ là rác.",
+    "showsSystemPanel": false,
+    "taboos": ["Không dùng viện, tập đoàn hay địa danh có thật", "Không viết hướng dẫn vũ khí", "Không biến chương thành báo cáo vật liệu", "Không nhắc AI"]
+  }
+}

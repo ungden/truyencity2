@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "lane": "he_thong_do_thi",
+  "title": "Song Xuyên Dược Thành: Hộp Chỉ Khâu Của Ta Cứu Sống Thành Chủ",
+  "hook": "Khi đan sư tuyên bố thành chủ hết cứu, một hộp dụng cụ vô trùng của nhân viên kho thất nghiệp khiến cả Dược Thành phải đổi cách nhìn về y thuật.",
+  "blurb": "Võ Kỳ mất việc tại kho vật tư y tế đúng lúc công ty Tân Sinh hủy dự án cuối cùng. Cửa phòng lạnh dẫn tới Dược Thành, nơi đan sư chữa nội thương rất giỏi nhưng bất lực trước vết thương hở của thành chủ. Kỳ đưa hộp chỉ khâu vô trùng cho nữ y sư Liên Dao; cô cứu người ngay trước mặt đan sư vừa tuyên bố vô phương. Dưỡng Mạch Thảo nhận lại được phòng thí nghiệm Tân Sinh kiểm nghiệm thành vật liệu băng vết thương mới, đủ giúp Kỳ có hợp đồng đầu tiên. Cú cứu người ấy đồng thời đụng vào độc quyền chữa trị của Đan Các và cuộc tranh quyền đang chờ thành chủ chết.",
+  "readerFantasy": "Để một món vật tư bị coi là tầm thường đánh bại lời phán của quyền lực, giúp người chữa bệnh thật sự giành lại địa vị và mở y thuật cho dân thường.",
+  "goldenFinger": {
+    "name": "Kho Lạnh Dược Thành",
+    "rule": "Cửa phòng lạnh nối Vân Cảng với Dược Thành, vận chuyển hai chiều tự do; mọi dược liệu mang về phải được kiểm nghiệm như vật liệu mới trước khi sử dụng hoặc bán.",
+    "scope": "Vật tư hiện đại không thay thế tri thức chẩn đoán và dược liệu dị giới không được mặc định chữa bệnh ở người hiện đại nếu chưa qua kiểm nghiệm.",
+    "evolution": [
+      { "id": "ev1", "name": "Hộp cứu một mạng", "changesUse": "Một dụng cụ vô trùng bổ sung đúng điểm mù của y thuật Dược Thành." },
+      { "id": "ev2", "name": "Bộ cấp cứu hai giới", "changesUse": "Liên Dao ghép dụng cụ và thuật trị thương thành quy trình của chính cô." },
+      { "id": "ev3", "name": "Phòng kiểm nghiệm chung", "changesUse": "Mọi dược liệu đều có bằng chứng công dụng trước khi thành hàng hóa." },
+      { "id": "ev4", "name": "Y quán ngoại thành", "changesUse": "Đồng minh đào tạo người chữa thương và tự cứu bệnh nhân khi Kỳ vắng mặt." },
+      { "id": "ev5", "name": "Mạng cứu chữa liên thành", "changesUse": "Ca khó được chuyển tới đúng người thay vì bị một Đan Các giữ lại." },
+      { "id": "ev6", "name": "Y chuẩn song giới", "changesUse": "Hai thế giới chia sẻ chuẩn kiểm chứng nhưng giữ quyền tự quyết chữa trị của mỗi bên." }
+    ]
+  },
+  "conflictLadder": {
+    "survival": "Kỳ phải giúp Liên Dao cứu thành chủ và lấy kết quả kiểm nghiệm trước khi dự án Tân Sinh bị đóng.",
+    "rules": "Đan Các cấm người không có đan bài chữa trị còn công ty hiện đại muốn đăng ký độc quyền mọi vật liệu Kỳ mang về.",
+    "ideology": "Y thuật là bí truyền để bảo đảm quyền lực hay tri thức phải được kiểm chứng và truyền cho người có thể cứu mạng.",
+    "self": "Kỳ phải thôi xem mỗi ca cứu người như bằng chứng giá trị của mình và chấp nhận có một hệ thống chữa trị không cần hắn ở giữa."
+  },
+  "hiddenThread": "Những ca ngoại thương không lành đều có bụi bạc giống lớp phủ trên Dưỡng Mạch Thảo. Dấu này được gieo từ ca thành chủ, giữa truyện chỉ ra một nguồn vật liệu bị che giấu, và cuối cùng nhập tuyến chính khi âm mưu tạo bệnh để bán đan dược lan sang phía hiện đại.",
+  "payoffStance": "mixed",
+  "oppositionEngine": "Đan Các mất tiền và quyền phán sống chết, phe kế vị mất cơ hội khi thành chủ sống, còn tập đoàn hiện đại mất độc quyền nếu kết quả kiểm nghiệm được công khai. Họ chống Kỳ và Liên Dao vì mỗi ca cứu thành công làm một mô hình kiếm lợi sụp xuống.",
+  "tierLadder": [
+    { "id": "tier_thu_kho", "name": "Thủ kho thất nghiệp" },
+    { "id": "tier_dieu_phoi", "name": "Điều phối cứu thương" },
+    { "id": "tier_chu_y_quan", "name": "Chủ y quán hai giới" },
+    { "id": "tier_giam_dinh", "name": "Giám định dược liệu" },
+    { "id": "tier_y_minh", "name": "Minh chủ y đạo" },
+    { "id": "tier_lap_chuan", "name": "Người lập y chuẩn song giới" }
+  ],
+  "castSeed": [
+    { "id": "vo_ky", "name": "Võ Kỳ", "role": "protagonist", "agenda": "Cứu dự án của đội cũ và xây một đường chữa trị nơi vật tư đến được đúng người cần.", "antagonistClass": null },
+    { "id": "lien_dao", "name": "Liên Dao", "role": "ally", "agenda": "Chứng minh ngoại thương không phải án chết và mở y quán cho người không có linh thạch.", "antagonistClass": null },
+    { "id": "thanh_chu", "name": "Tô Mặc", "role": "authority", "agenda": "Sống đủ lâu để phá hợp đồng độc quyền đã trói Dược Thành vào Đan Các.", "antagonistClass": null },
+    { "id": "dan_su_cao", "name": "Cao Phục", "role": "antagonist", "agenda": "Giữ Đan Các là nơi duy nhất có quyền kết luận một người còn cứu được hay không.", "antagonistClass": "đan sư độc quyền" },
+    { "id": "tong_giam_doc", "name": "Tống Nhã", "role": "antagonist", "agenda": "Đăng ký độc quyền mọi dược liệu Kỳ đưa về trước khi nhóm nghiên cứu công bố dữ liệu.", "antagonistClass": "tổng giám đốc sinh học" },
+    { "id": "tran_doanh", "name": "Trần Doanh", "role": "rival", "agenda": "Chứng minh phòng thí nghiệm của mình mới là nơi đủ chuẩn đánh giá Dưỡng Mạch Thảo.", "antagonistClass": null },
+    { "id": "ba_ky", "name": "Bà Kỳ", "role": "family", "agenda": "Muốn con trai có việc ổn định nhưng không chấp nhận hắn kiếm tiền bằng lời hứa chữa bách bệnh.", "antagonistClass": null }
+  ],
+  "arena": "Kho vật tư và phòng thí nghiệm Vân Cảng hiện đại song song nối với Dược Thành tu tiên bị Đan Các kiểm soát quyền chữa trị.",
+  "novelty": "Mọi dược liệu dị giới đều phải qua kiểm nghiệm trong truyện, còn payoff thuộc cả người điều phối lẫn nữ y sư trực tiếp cứu bệnh nhân.",
+  "endingDirection": "Võ Kỳ và Liên Dao công khai y chuẩn, phá quyền phán độc quyền của Đan Các lẫn tập đoàn, rồi giao mạng cứu chữa cho các y quán liên thành tự vận hành.",
+  "voiceSheet": {
+    "pov": "third_limited",
+    "register": "Khẩn trương, rõ hậu quả, tôn trọng người chữa trị; không dùng thuật ngữ y khoa dài và không biến kết quả giả tưởng thành lời khuyên ngoài đời.",
+    "chapterTitleRule": "Một câu phán bệnh bị lật ngược hoặc lời của người vừa cứu được mạng ở cuối chương.",
+    "showsSystemPanel": false,
+    "taboos": ["Không đưa lời khuyên y tế ngoài đời", "Không tuyên bố dược liệu chưa kiểm nghiệm chữa được bệnh hiện đại", "Không dùng tổ chức hay thuốc có thật", "Không nhắc AI"]
+  }
+}

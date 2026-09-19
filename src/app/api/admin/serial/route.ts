@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { isAuthorizedAdmin } from '@/lib/auth/admin-auth';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
-import { DEFAULT_SERIAL_ROUTES, SERIAL_PROMPT_VERSION, isSerialEnabled } from '@/services/serial';
+import {
+  DEFAULT_SERIAL_ROUTES, SERIAL_PREMISE_CATALOG, SERIAL_PROMPT_VERSION, isSerialEnabled,
+} from '@/services/serial';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,7 +23,7 @@ export async function GET(request: NextRequest) {
     db.from('serial_jobs').select(`
       id, serial_novel_id, novel_id, status, stage, current_chapter, current_cycle_id,
       daily_target, chapters_today, quota_date, consecutive_replans, next_run_at, last_error,
-      serial_novels!serial_jobs_serial_novel_id_fkey(approved_at, route_version, prompt_version),
+      serial_novels!serial_jobs_serial_novel_id_fkey(approved_at, opening_reviewed_at, route_version, prompt_version),
       novels!serial_jobs_novel_id_fkey(title, slug, hidden, chapter_count)
     `).order('updated_at', { ascending: false }),
     db.from('serial_runs')
@@ -31,6 +33,21 @@ export async function GET(request: NextRequest) {
   ]);
   if (jobsResult.error || runsResult.error) {
     return NextResponse.json({ error: jobsResult.error?.message ?? runsResult.error?.message }, { status: 500 });
+  }
+
+  const openingReviewNovelIds = (jobsResult.data ?? [])
+    .filter(job => job.status === 'opening_review')
+    .map(job => job.novel_id as string);
+  const openingResult = openingReviewNovelIds.length > 0
+    ? await db.from('chapters')
+      .select('novel_id,chapter_number,title,content,publication_state')
+      .in('novel_id', openingReviewNovelIds)
+      .eq('publication_state', 'draft')
+      .lte('chapter_number', 4)
+      .order('chapter_number', { ascending: true })
+    : { data: [], error: null };
+  if (openingResult.error) {
+    return NextResponse.json({ error: openingResult.error.message }, { status: 500 });
   }
 
   // Reading score over the last ten chapters per story: the number that replaces a
@@ -47,6 +64,7 @@ export async function GET(request: NextRequest) {
     const scores = runs.map(run => Number(run.scorecard_avg)).filter(Number.isFinite);
     return {
       ...job,
+      openingChapters: (openingResult.data ?? []).filter(chapter => chapter.novel_id === job.novel_id),
       readingScore: scores.length ? Number((scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(2)) : null,
       last10Usd: Number(runs.reduce((sum, run) => sum + Number(run.cost_usd ?? 0), 0).toFixed(3)),
     };
@@ -56,6 +74,9 @@ export async function GET(request: NextRequest) {
     enabled: isSerialEnabled(),
     routeVersion: DEFAULT_SERIAL_ROUTES.routeVersion,
     promptVersion: SERIAL_PROMPT_VERSION,
+    // Local, versioned premises. Returning them here does not seed a novel, approve a
+    // job or call a provider; the admin has to review one and use the dry-run CLI first.
+    catalog: SERIAL_PREMISE_CATALOG,
     jobs,
   });
 }
@@ -67,16 +88,27 @@ export async function POST(request: NextRequest) {
 
   const db = getSupabaseAdmin();
   const { data: job, error: lookupError } = await db.from('serial_jobs')
-    .select('id,serial_novel_id,status').eq('id', parsed.data.jobId).single();
+    .select('id,serial_novel_id,status,current_chapter').eq('id', parsed.data.jobId).single();
   if (lookupError) return NextResponse.json({ error: lookupError.message }, { status: 404 });
 
   const now = new Date().toISOString();
   if (parsed.data.action === 'approve') {
-    // The one human gate: someone read the premise and the opening chapters.
-    const approved = await db.from('serial_novels').update({
-      approved_at: now, approved_by: 'admin', updated_at: now,
-    }).eq('id', job.serial_novel_id);
+    const approval = job.status === 'awaiting_approval'
+      ? { approved_at: now, approved_by: 'admin', updated_at: now }
+      : job.status === 'opening_review' && job.current_chapter === 4
+        ? { opening_reviewed_at: now, opening_reviewed_by: 'admin', updated_at: now }
+        : null;
+    if (!approval) {
+      return NextResponse.json({ error: 'Job is not waiting for premise or opening approval.' }, { status: 409 });
+    }
+    const approved = await db.from('serial_novels').update(approval).eq('id', job.serial_novel_id);
     if (approved.error) return NextResponse.json({ error: approved.error.message }, { status: 500 });
+  }
+  if (parsed.data.action === 'resume' && job.status !== 'paused') {
+    return NextResponse.json({ error: 'Only a paused job can be resumed.' }, { status: 409 });
+  }
+  if (parsed.data.action === 'pause' && ['awaiting_approval', 'opening_review'].includes(job.status)) {
+    return NextResponse.json({ error: 'A review gate cannot be replaced by pause.' }, { status: 409 });
   }
 
   const { error } = await db.from('serial_jobs').update({

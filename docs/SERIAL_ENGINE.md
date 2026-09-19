@@ -33,7 +33,7 @@ Readers never see a partial cycle. Chapters land in `chapters` with
 
 | Artifact | Lives in | Written by |
 |---|---|---|
-| `Premise` | `serial_novels.premise` | Concept model, then **a human approves it** |
+| `Premise` | `serial_novels.premise` | Versioned catalog/model output, then **a human approves it** |
 | `Bible` | `serial_novels.bible` | Rewritten every chapter by the deterministic merge |
 | `CyclePlan` | `serial_cycles.plan` | Cycle planner |
 | `ChapterDigest`, `JudgeVerdict` | `serial_runs` | Extractor and Judge |
@@ -107,6 +107,38 @@ Nothing parks waiting for a repair.
 
 A low reading score never blocks anything. It flows into the next cycle plan as steering.
 
+## Two launch gates
+
+Launching is deliberately two decisions, not one:
+
+1. `awaiting_approval`: a person reads the one-page Premise. Approval allows spending to
+   plan and write, but nothing is public.
+2. `opening_review`: chapter four commits atomically with this status. The cron cannot
+   claim chapter five. `/admin/serial` renders all four private drafts; a second approval
+   records `opening_reviewed_at` and lets the story finish its first cycle.
+
+The first cycle remains private until every chapter in it exists and the normal atomic
+publish stage runs. Approval of the opening is therefore permission to continue, not a
+publication side effect.
+
+## Song Xuyên catalog
+
+Ten production-shaped premises live under `factory/serial/song-xuyen/`. They carry full
+cast, six-step advantage evolution, four conflict dimensions, a hidden line and an explicit
+payoff stance. `src/services/serial/catalog.ts` adds review-only evidence that does not
+belong in the immutable Premise: chapter-one proof, the named buyer at each end, and where
+the other world's currency stays as working capital.
+
+```bash
+npm run serial:premises                         # validate and list all ten, no credentials
+npm run serial:premises -- --id=phe-dan-thuc-tinh
+npm run serial:operator -- seed --premise=factory/serial/song-xuyen/03-phe-dan-thuc-tinh.json
+```
+
+The first three pilot candidates are `phe-dan-thuc-tinh`, `hang-ma-phap-khi`, and
+`tiep-van-cuu-chin-thanh`. Ranking is a review order only; it does not seed, approve, call a
+provider or spend money.
+
 ## Tables and RPCs
 
 `serial_novels` · `serial_cycles` · `serial_jobs` · `serial_runs` — all service-role only,
@@ -123,13 +155,15 @@ telemetry and the job cursor move together or not at all.
 ```bash
 npm run serial:operator -- status                                    # every story, with its reading score
 npm run serial:operator -- seed --premise=<file.json> --apply        # create a hidden novel + job
-npm run serial:operator -- read --job-id=<id> --chapter=1            # read a draft before approving
-npm run serial:operator -- approve --job-id=<id> --apply             # the human gate
+npm run serial:operator -- approve --job-id=<id> --apply             # approve premise, then later opening
+npm run serial:operator -- read --job-id=<id> --chapter=1            # read one of the four private drafts
 npm run serial:operator -- pause|resume --job-id=<id> --apply
 ```
 
 Admin UI at `/admin/serial`: reading score over the last ten chapters, cost, stage, and the
-approve/pause controls. There is no block count to show, because there are no blocks.
+premise approval, the four opening drafts, opening approval, reading score, cost and
+pause/resume controls. There is no block count to show, because there are no quality-block
+statuses.
 
 Offline rig, no database and no publishing:
 
@@ -153,6 +187,6 @@ start a stage it cannot finish. Enabling Fluid on the Vercel project allows rais
 
 ## Status
 
-Phases 1a and 3 of the plan are built. Nothing has generated a chapter yet: no premise has
-been seeded and `SERIAL_ENGINE_ENABLED` is unset, so the cron returns `disabled`. The next
-step is phase 1b — one paid run of four chapters, read by a person.
+Phases 1a and 3 of the plan are built, along with the ten-premise Song Xuyên catalog and the
+two launch gates. Catalog entries are source data only: none is seeded, approved or charged
+by adding it to the repository. The next spending decision is still a four-chapter pilot.

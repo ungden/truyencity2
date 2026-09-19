@@ -13,8 +13,9 @@ import { foldVolume, planNextCycle, writeOneChapter } from './engine';
  *
  * There is no blocked status to recover from. A chapter that will not come out right
  * replans its cycle; a cycle that will not come out right twice pauses the story for a
- * person to read it. That is the only place a human is required, and the job is to read,
- * not to repair.
+ * person to read it. Premise approval and the chapter-four opening review are the two
+ * launch gates; after launch, a twice-replanned cycle is the only human interruption.
+ * In every case the job is to read, not to repair state by hand.
  */
 
 /** Chapters are private until their whole cycle publishes, so a volume is ten cycles. */
@@ -210,7 +211,7 @@ async function stageWrite(
   }
 
   const nextStage: SerialStage = chapterNumber >= cycle.plannedEndChapter ? 'publish_cycle' : 'write';
-  const { error } = await db.rpc('commit_serial_chapter', {
+  const { data: commit, error } = await db.rpc('commit_serial_chapter', {
     p_job_id: job.id, p_lease_token: job.lease_token, p_run_id: runId,
     p_expected_chapter: chapterNumber,
     p_title: outcome.chapter.title, p_content: outcome.chapter.content,
@@ -220,10 +221,11 @@ async function stageWrite(
     p_next_stage: nextStage,
   });
   if (error) throw error;
+  const needsOpeningReview = Boolean((commit as { needsOpeningReview?: boolean } | null)?.needsOpeningReview);
 
   return {
     status: 'completed', jobId: job.id, stage: 'write', chapterNumber,
-    detail: `"${outcome.chapter.title}" (${outcome.attempts} attempt${outcome.attempts > 1 ? 's' : ''})`,
+    detail: `"${outcome.chapter.title}" (${outcome.attempts} attempt${outcome.attempts > 1 ? 's' : ''})${needsOpeningReview ? '; paused for opening review' : ''}`,
     costUsd: outcome.costUsd,
   };
 }

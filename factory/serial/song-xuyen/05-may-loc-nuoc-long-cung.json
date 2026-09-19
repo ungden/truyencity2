@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "lane": "huyen_huyen_vo_dich",
+  "title": "Song Xuyên Hải Vực: Một Máy Lọc Nước Đổi Lấy Long Cung",
+  "hook": "Chiếc máy lọc nước cũ biến nước biển thành nước uống ngay trước cuộc xử tội và đổi về viên Hắc Triều Châu đủ cứu cửa hàng lặn của hắn.",
+  "blurb": "Ngô Hải sắp mất cửa hàng lặn ở Vân Cảng vì khoản vay mua thiết bị cứu hộ. Một hầm chứa dưới cầu tàu mở sang Thiên Đảo Hải Vực, nơi gia tộc giữ giếng đang xử tội những người lấy trộm một vò nước. Hải kéo chiếc máy lọc cũ qua cửa, cho cả quảng trường uống nước ngọt và đổi được Hắc Triều Châu mà Kim Các Lam Sa sẵn sàng mua sau khi giám định. Nhưng khi một thiết bị rẻ có thể phá giá nước của cả đảo, Hải lập tức trở thành kẻ thù của giếng chủ, hải thương và long tộc đang âm thầm hút cạn mọi mạch ngọt.",
+  "readerFantasy": "Mang một giải pháp hiện đại tới nơi cả nghìn đảo đang quỳ vì nước, dựng hạm đội tự do và lấy kho báu đáy biển cứu chính cuộc đời mình.",
+  "goldenFinger": {
+    "name": "Hầm Triều Song Giới",
+    "rule": "Hầm dưới cầu tàu nối Vân Cảng với Thiên Đảo Hải Vực, cho người, tàu nhỏ và hàng hóa qua lại tự do; mọi giá trị đến từ sinh thái khác nhau của hai vùng biển.",
+    "scope": "Tín hiệu vệ tinh và mạng viễn thông hiện đại không tồn tại ở Hải Vực; thiết bị phải hoạt động độc lập hoặc dựa vào thủy thủ địa phương.",
+    "evolution": [
+      { "id": "ev1", "name": "Nước cho một đảo", "changesUse": "Một máy lọc phá thế độc quyền của một giếng." },
+      { "id": "ev2", "name": "Trạm nước lưu động", "changesUse": "Thiết bị đi theo thuyền cứu những đảo bị phong tỏa thay vì chờ khách tới." },
+      { "id": "ev3", "name": "Đội lặn hai giới", "changesUse": "Kỹ năng lặn hiện đại và pháp thuật thủy hệ phối hợp lấy vật liệu đáy vực." },
+      { "id": "ev4", "name": "Hạm đội nước ngọt", "changesUse": "Nhiều thuyền tự vận hành trạm lọc và đổi hàng theo cùng một chuẩn." },
+      { "id": "ev5", "name": "Liên minh đảo", "changesUse": "Các đảo góp tàu, người và nguồn nước để chống phong tỏa mà không lệ thuộc Hải." },
+      { "id": "ev6", "name": "Mạch biển tự do", "changesUse": "Hải dùng tri thức hai giới khôi phục nguồn ngọt tự nhiên thay vì bán nước mãi mãi." }
+    ]
+  },
+  "conflictLadder": {
+    "survival": "Hải phải giữ gia tộc bị xử tội sống sót và bán được Hắc Triều Châu trước ngày cửa hàng bị siết.",
+    "rules": "Nghị Hội Giếng cấm tạo nước ngoài hạn ngạch và hải thương kiểm soát mọi bến đủ sâu cho tàu lọc cập.",
+    "ideology": "Nước là tài sản của người đào giếng hay quyền sống của mọi cư dân trên biển.",
+    "self": "Hải phải chọn phục hồi nguồn nước để không ai cần hắn nữa hay giữ vị trí người duy nhất có thể ban nước."
+  },
+  "hiddenThread": "Mỗi Hắc Triều Châu đều có một đường rỗng hướng về đáy biển trung tâm. Dấu này được gieo ngay viên châu đầu tiên, giữa truyện lộ ra mạng hút nước nuôi long mạch, và cuối cùng nhập tuyến chính khi long mạch thức dậy làm cả Hải Vực mất nước cùng lúc.",
+  "payoffStance": "mixed",
+  "oppositionEngine": "Gia tộc giữ giếng mất tiền nước, hải thương mất quyền ép đảo ký nợ và long tộc mất nguồn nuôi mạch. Ở Vân Cảng, kẻ cho vay mất cửa hàng lặn khi Hải trả được nợ và viện vật liệu muốn độc chiếm khoáng vật đáy vực.",
+  "tierLadder": [
+    { "id": "tier_tho_lan", "name": "Thợ lặn mắc nợ" },
+    { "id": "tier_chu_tram", "name": "Chủ trạm nước" },
+    { "id": "tier_thuyen_chu", "name": "Thuyền chủ hai giới" },
+    { "id": "tier_ham_chu", "name": "Hạm chủ Thiên Đảo" },
+    { "id": "tier_minh_chu", "name": "Minh chủ hải vực" },
+    { "id": "tier_phuc_mach", "name": "Người phục hồi mạch biển" }
+  ],
+  "castSeed": [
+    { "id": "ngo_hai", "name": "Ngô Hải", "role": "protagonist", "agenda": "Giữ cửa hàng lặn của cha và để không hòn đảo nào phải quỳ xin nước.", "antagonistClass": null },
+    { "id": "thuy_lam", "name": "Thủy Lam", "role": "ally", "agenda": "Cứu gia tộc khỏi án trộm nước và giành quyền tự chọn nơi cư trú.", "antagonistClass": null },
+    { "id": "lao_phuc", "name": "Lão Phúc", "role": "ally", "agenda": "Đóng con thuyền cuối cùng đủ sức chở trạm lọc qua vùng bão.", "antagonistClass": null },
+    { "id": "chu_gieng", "name": "Kỷ Hoàn", "role": "antagonist", "agenda": "Giữ giếng Ngân Nhãn là nguồn nước duy nhất của đảo và thu nợ qua nhiều thế hệ.", "antagonistClass": "gia chủ độc quyền nước" },
+    { "id": "hai_thuong", "name": "Tề Dực", "role": "antagonist", "agenda": "Mua hoặc đánh chìm mọi trạm lọc trước khi giá vận chuyển nước sụp đổ.", "antagonistClass": "hải thương liên đảo" },
+    { "id": "lam_chau", "name": "Lâm Châu", "role": "rival", "agenda": "Giành quyền giám định toàn bộ vật liệu Hải mang về Vân Cảng.", "antagonistClass": null },
+    { "id": "nghi_truong", "name": "Bà Sương", "role": "authority", "agenda": "Giữ trật tự Thiên Đảo nhưng không muốn nghị hội trở thành con dấu của giếng chủ.", "antagonistClass": null }
+  ],
+  "arena": "Cảng hiện đại Vân Cảng nối với Thiên Đảo Hải Vực, một thế giới tu tiên trên biển nơi nước ngọt quý hơn linh thạch.",
+  "novelty": "Máy lọc nước không chỉ làm giàu mà phá cấu trúc quyền lực của xã hội hải đảo, trong khi vật liệu đáy biển có thị trường kiểm định thật ở hiện đại.",
+  "endingDirection": "Ngô Hải dẫn liên minh đảo phá mạng hút nước, phục hồi các mạch ngọt tự nhiên và biến hạm đội của mình thành lực lượng cứu hộ chung thay vì đế chế bán nước.",
+  "voiceSheet": {
+    "pov": "third_limited",
+    "register": "Khoáng đạt, nhanh, nhiều đối thoại thủy thủ; kỹ thuật lọc nước chỉ nêu một chi tiết đủ tin rồi chuyển ngay sang phản ứng và xung đột.",
+    "chapterTitleRule": "Một câu rao nước, mệnh lệnh trên thuyền hoặc lời tuyên chiến với người đang khóa giếng.",
+    "showsSystemPanel": false,
+    "taboos": ["Không viết hướng dẫn chế tạo thiết bị", "Không dùng địa danh hoặc thương hiệu có thật", "Không biến Hải Vực thành danh sách đảo", "Không nhắc AI"]
+  }
+}

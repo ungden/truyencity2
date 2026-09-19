@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "lane": "huyen_huyen_vo_dich",
+  "title": "Tu Tiên Song Xuyên: Tiệm Tạp Hóa Của Ta Cứu Sống Phường Thị Băng Phong",
+  "hook": "Một miếng giữ nhiệt giá rẻ cứu đứa trẻ giữ lò, còn củ cỏ mọc dại nó tặng lại đủ cứu cả tiệm tạp hóa sắp phá sản.",
+  "blurb": "Phạm Ninh chỉ còn ba ngày trước khi cửa hàng tiện lợi ở Vân Cảng bị thu hồi mặt bằng. Cánh cửa kho lạnh bỗng thông tới phường thị Băng Phong, nơi thợ mỏ linh khoáng chết cóng trong khi đan sư bán Hỏa Hoàn với giá bằng cả năm tiền công. Một miếng giữ nhiệt và suất cơm tự sôi cứu đứa trẻ giữ lò ngay trong chương đầu; củ Tuyết Sâm nó tặng lại được Bách Thảo Các mua với giá đủ trả tiền thuê. Ninh không mang linh thạch về đổi tiền: hắn giữ chúng bên kia để thuê tán tu, mua đất và dựng thương hội khiến giới đan sư mất quyền định giá sự sống.",
+  "readerFantasy": "Dùng những tiện ích bình thường nhất để phá thế độc quyền của tu tiên giới, đồng thời biến một tiệm sắp sập thành thương hội mà tông môn phải xếp hàng.",
+  "goldenFinger": {
+    "name": "Cửa Kho Băng Phong",
+    "rule": "Cửa kho nối thẳng tiệm tạp hóa với Băng Phong, vận chuyển tự do người và vật; sức mạnh thật đến từ chênh lệch khan hiếm chứ không từ điều kiện của cánh cửa.",
+    "scope": "Thiết bị cần mạng điện hiện đại không hoạt động ở Băng Phong nếu không có nguồn điện mang theo; đây là khác biệt tự nhiên của hai thế giới, không phải phí sử dụng cửa.",
+    "evolution": [
+      { "id": "ev1", "name": "Quầy cứu rét", "changesUse": "Ghép một sản phẩm bình thường với một nỗi khổ cụ thể của thợ mỏ." },
+      { "id": "ev2", "name": "Kho linh thạch", "changesUse": "Giữ tiền tệ Băng Phong làm vốn và mua quyền tiếp cận nguồn hàng bên kia." },
+      { "id": "ev3", "name": "Đội tán tu giao hàng", "changesUse": "Đồng minh thay Ninh đưa hàng tới mỏ xa và tự hưởng payoff trước khách hàng." },
+      { "id": "ev4", "name": "Chuẩn hàng hai giới", "changesUse": "Mọi món hàng được kiểm tra theo công dụng thật thay vì danh tiếng của đan sư." },
+      { "id": "ev5", "name": "Hợp đồng tông môn", "changesUse": "Ninh dùng sức mua tập thể buộc tông môn ký điều khoản công khai." },
+      { "id": "ev6", "name": "Thương hội phá băng", "changesUse": "Mạng cửa hàng do thợ mỏ và tán tu đồng sở hữu thay cho một quầy của riêng Ninh." }
+    ]
+  },
+  "conflictLadder": {
+    "survival": "Ninh phải cứu cửa hàng và giữ nhóm thợ mỏ sống qua đợt bão băng đầu tiên.",
+    "rules": "Đan Minh cấm mọi vật không có ấn đan sư được bán như đồ cứu mạng trong phường thị.",
+    "ideology": "Khả năng chống rét và chữa thương là đặc quyền tu sĩ hay hàng thiết yếu mà phàm nhân cũng được mua đúng giá.",
+    "self": "Khi ai cũng gọi mình là người phá băng, Ninh phải chọn giữa quyền định giá mới và lời hứa phá độc quyền cũ."
+  },
+  "hiddenThread": "Các mạch địa hỏa biến mất theo cùng một hình xoắn dưới mỗi mỏ. Dấu vết được gieo trong lần khoan thứ hai, giữa truyện chỉ về một đại trận của Đan Minh, và cuối cùng buộc Ninh chọn cứu Băng Phong hay giữ nguồn Tuyết Sâm nuôi thương hội.",
+  "payoffStance": "mixed",
+  "oppositionEngine": "Đan sư mất lợi nhuận Hỏa Hoàn, chủ mỏ mất quyền trả lương bằng thuốc và nhà phân phối hiện đại mất nguồn dược liệu ép giá. Họ chống Ninh vì mỗi món hàng đúng giá cắt đi một tầng tiền và quyền của họ.",
+  "tierLadder": [
+    { "id": "tier_chu_quay", "name": "Chủ quầy cứu rét" },
+    { "id": "tier_chu_kho", "name": "Chủ kho linh thạch" },
+    { "id": "tier_thuong_nhan", "name": "Thương nhân phường thị" },
+    { "id": "tier_chap_su", "name": "Chấp sự thương hội" },
+    { "id": "tier_hoi_chu", "name": "Hội chủ liên mỏ" },
+    { "id": "tier_pha_bang", "name": "Người phá băng" }
+  ],
+  "castSeed": [
+    { "id": "pham_ninh", "name": "Phạm Ninh", "role": "protagonist", "agenda": "Giữ tiệm của mẹ và chứng minh đồ bình thường cũng có thể cứu người tốt hơn tiên đan bị thổi giá.", "antagonistClass": null },
+    { "id": "tuyet_con", "name": "Tuyết Con", "role": "ally", "agenda": "Giữ lò địa hỏa sống để cha và nhóm thợ mỏ có đường về.", "antagonistClass": null },
+    { "id": "duong_tam", "name": "Dương Tâm", "role": "ally", "agenda": "Lập một đội giao hàng tán tu không phải nộp phí bảo kê cho Đan Minh.", "antagonistClass": null },
+    { "id": "han_duoc_su", "name": "Hàn Dược Sư", "role": "antagonist", "agenda": "Giữ Hỏa Hoàn là lựa chọn duy nhất chống hàn độc tại Băng Phong.", "antagonistClass": "đan sư độc quyền" },
+    { "id": "la_chu_mo", "name": "La Trọng", "role": "antagonist", "agenda": "Khóa thợ mỏ trong hợp đồng lương đổi thuốc để họ không thể rời mỏ.", "antagonistClass": "chủ linh khoáng" },
+    { "id": "mai_an", "name": "Mai An", "role": "rival", "agenda": "Đưa dược liệu của Ninh vào Bách Thảo Các nhưng giành quyền định giá cuối cùng.", "antagonistClass": null },
+    { "id": "tran_giam_thi", "name": "Trần Nguyên", "role": "authority", "agenda": "Giữ phường thị không loạn nhưng không muốn Đan Minh đứng trên luật.", "antagonistClass": null }
+  ],
+  "arena": "Một tiệm tiện lợi tại Vân Cảng hiện đại song song nối với phường thị tu tiên Băng Phong xây trên linh khoáng đóng băng.",
+  "novelty": "Mỗi payoff là một món tiện ích nhỏ đánh trúng một nỗi khổ lớn, còn sức mạnh bên tu tiên được xây bằng đồng vốn ở lại đúng thế giới.",
+  "endingDirection": "Phạm Ninh biến chuỗi quầy cứu rét thành thương hội đồng sở hữu, trả địa hỏa về cho phường thị và để người dân tự quyết giá hàng thiết yếu.",
+  "voiceSheet": {
+    "pov": "third_limited",
+    "register": "Nhanh, đời thường, châm biếm giá tiên đan; một chi tiết sản phẩm là đủ, trọng tâm luôn là phản ứng và vị thế đổi ngay sau giao dịch.",
+    "chapterTitleRule": "Một câu chào hàng nghe vô lý nhưng giải đúng nỗi khổ, hoặc lời bật lại của Ninh ở cuối chương.",
+    "showsSystemPanel": false,
+    "taboos": ["Không biến truyện thành danh mục hàng hóa", "Không quy linh thạch ra tiền hiện đại", "Không dùng địa danh hay tông môn có thật", "Không nhắc AI"]
+  }
+}

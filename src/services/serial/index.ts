@@ -6,3 +6,4 @@ export * from './context';
 export * from './agents';
 export * from './engine';
 export * from './runtime';
+export * from './catalog';

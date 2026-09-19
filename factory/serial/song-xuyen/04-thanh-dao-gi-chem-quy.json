@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "lane": "thuc_tinh_toan_dan",
+  "title": "Song Xuyên Quỷ Dị: Thanh Đao Gỉ Bên Kia Chém Được Quỷ Vương",
+  "hook": "Thanh đao bị cân như sắt vụn ở giang hồ lại giúp một nữ tuần tra hạng chót chém chết con quỷ khiến cả phố phải đóng cửa.",
+  "blurb": "Đỗ Minh làm ca đêm trong kho tang vật của Vân Cảng, nơi quỷ dị phục sinh đã biến giấy phép trừ quỷ thành thứ đắt hơn mạng người. Một cửa sắt hỏng nối kho với bãi binh khí ở giang hồ Ly Châu. Thanh đao gỉ Minh đem về không có linh quang, nhưng sát khí trăm trận khiến nữ tuần tra Khương Ly chém tan Hồng Sa Quỷ ngay trước đội trưởng từng đuổi cô. Đổi lại, một đèn dã chiến và hộp băng gạc giúp tiêu đội Ly Châu sống qua cuộc phục kích. Khi đồ bỏ đi bên này trở thành cứu tinh bên kia, hiệp hội trừ quỷ và võ lâm thế gia cùng muốn khóa cánh cửa vào kho của Minh.",
+  "readerFantasy": "Đứng sau những người từng bị coi thường, trao đúng món vũ khí để họ thắng rực rỡ rồi nhìn cả hai giới tự hỏi ai mới là người bày bàn cờ.",
+  "goldenFinger": {
+    "name": "Kho Binh Khí Song Giới",
+    "rule": "Cửa sắt nối kho tang vật Vân Cảng với bãi binh khí Ly Châu; vật phẩm giữ nguyên bản chất nhưng giá trị đổi hẳn khi đi vào hệ quỷ dị hoặc võ học đối diện.",
+    "scope": "Sát khí trong binh khí chỉ tác động lên quỷ dị, không tự biến người cầm thành cao thủ và không thay họ học cách chiến đấu.",
+    "evolution": [
+      { "id": "ev1", "name": "Đao cũ diệt quỷ", "changesUse": "Minh nhận ra chiến tích đã ngấm vào binh khí và chọn đúng người cầm." },
+      { "id": "ev2", "name": "Trang bị tiêu đội", "changesUse": "Hàng hiện đại được ghép thành bộ cứu một nhiệm vụ thay vì bán lẻ từng món." },
+      { "id": "ev3", "name": "Kho chứng tích", "changesUse": "Mỗi binh khí được nối với câu chuyện và nhân chứng để sức mạnh của nó được dùng có chủ đích." },
+      { "id": "ev4", "name": "Đội tuần tra hậu trường", "changesUse": "Đồng minh tự chọn và sử dụng trang bị, Minh chỉ dựng điều kiện cho họ tỏa sáng." },
+      { "id": "ev5", "name": "Hai giới tiếp viện", "changesUse": "Tiêu đội và tuần tra cứu nhau qua cùng một mối nguy xuất hiện ở hai hình thái." },
+      { "id": "ev6", "name": "Kho trấn giới", "changesUse": "Mạng người giữ vũ khí thay cho một chủ kho độc quyền, đủ sức phong tỏa điểm hợp nhất của hai thế giới." }
+    ]
+  },
+  "conflictLadder": {
+    "survival": "Minh và Khương Ly phải sống qua đêm Hồng Sa Quỷ mở rộng địa bàn, còn tiêu đội bị vây trong núi.",
+    "rules": "Hiệp hội cấm dùng pháp khí không đăng ký và võ lâm thế gia tuyên bố mọi chiến lợi phẩm thuộc về người thắng trận có danh phận.",
+    "ideology": "Vũ khí cứu mạng nên thuộc kho độc quyền để kiểm soát rủi ro hay thuộc về người đủ can đảm đứng ra bảo vệ phố phường.",
+    "self": "Minh phải nhận ra mình đang trao cơ hội cho đồng minh hay chỉ biến họ thành quân cờ đẹp hơn trong kho của mình."
+  },
+  "hiddenThread": "Một phù hiệu hình mắt khép xuất hiện trên chuôi đao, giấy phép trừ quỷ và xe hàng mất tích. Nó được gieo từ chương một, giữa truyện chứng minh hai thế giới từng tách khỏi cùng một tai kiếp, rồi nhập tuyến chính khi phù hiệu bắt đầu mở đường cho Quỷ Vương đi ngược qua cửa.",
+  "payoffStance": "broker",
+  "oppositionEngine": "Hiệp hội mất tiền cấp phép, thế gia mất quyền thu chiến lợi phẩm và các đội trưởng mất địa vị khi người hạng chót thắng bằng trang bị Minh đưa. Họ phải tịch thu kho, bôi nhọ người sử dụng hoặc buộc Minh bán độc quyền.",
+  "tierLadder": [
+    { "id": "tier_thu_kho", "name": "Thủ kho ca đêm" },
+    { "id": "tier_nguoi_chon_dao", "name": "Người chọn đao" },
+    { "id": "tier_tiep_vien", "name": "Chủ tuyến tiếp viện" },
+    { "id": "tier_kho_chu", "name": "Kho chủ trừ quỷ" },
+    { "id": "tier_tran_thu", "name": "Trấn thủ hai giới" },
+    { "id": "tier_giu_cua", "name": "Người giữ cửa tai kiếp" }
+  ],
+  "castSeed": [
+    { "id": "do_minh", "name": "Đỗ Minh", "role": "protagonist", "agenda": "Đưa vũ khí tới người thật sự dám dùng, thay vì để chúng mục trong kho của kẻ có giấy phép.", "antagonistClass": null },
+    { "id": "khuong_ly", "name": "Khương Ly", "role": "ally", "agenda": "Giành lại huy hiệu tuần tra bằng chiến công không ai có thể xóa.", "antagonistClass": null },
+    { "id": "yen_thap", "name": "Yến Thập", "role": "ally", "agenda": "Đưa tiêu đội sống về Ly Châu và tìm người đã bán lộ trình của họ.", "antagonistClass": null },
+    { "id": "vu_doi_truong", "name": "Vũ Kình", "role": "antagonist", "agenda": "Giữ mọi chiến công trong đội mang tên mình và xóa người không chịu phục tùng.", "antagonistClass": "đội trưởng trừ quỷ" },
+    { "id": "ninh_gia_chu", "name": "Ninh Trác", "role": "antagonist", "agenda": "Thu hết binh khí cổ chiến trường về kho thế gia trước khi bí mật sát khí lộ ra.", "antagonistClass": "gia chủ võ lâm" },
+    { "id": "le_tam", "name": "Lê Tâm", "role": "rival", "agenda": "Chứng minh pháp khí được kiểm định vẫn đáng tin hơn đồ gỉ Minh nhặt từ nơi vô danh.", "antagonistClass": null },
+    { "id": "ba_chu_kho", "name": "Bà Tần", "role": "authority", "agenda": "Giữ kho tang vật không trở thành chợ đen nhưng cũng không để hiệp hội chôn đồ cứu mạng.", "antagonistClass": null }
+  ],
+  "arena": "Vân Cảng quỷ dị phục sinh nối với giang hồ Ly Châu, nơi chiến tích ngấm trong binh khí nhưng bị cân bán như sắt vụn.",
+  "novelty": "Payoff chủ đạo thuộc về đồng minh cầm món đồ của main; độc giả biết nguồn sức mạnh còn đám đông chỉ thấy một người hạng chót bỗng chém được thứ không ai chém nổi.",
+  "endingDirection": "Đỗ Minh trao quyền sở hữu kho cho một mạng trấn thủ hai giới, còn Khương Ly và Yến Thập tự dẫn lực lượng phong tỏa Quỷ Vương tại điểm hai thế giới từng bị xé đôi.",
+  "voiceSheet": {
+    "pov": "third_limited",
+    "register": "Kinh dị nhanh, thoại gắt, phản ứng đám đông rõ; bạo lực tập trung vào khoảnh khắc lật thế chứ không sa vào tra tấn.",
+    "chapterTitleRule": "Một câu của người sắp dùng món đồ bị cả đám chê, thường trở thành lời vả mặt ở cuối chương.",
+    "showsSystemPanel": false,
+    "taboos": ["Không giải thích payoff hậu trường bằng lời kể", "Không dùng IP hay địa danh có thật", "Không tôn vinh hành hạ", "Không nhắc AI"]
+  }
+}

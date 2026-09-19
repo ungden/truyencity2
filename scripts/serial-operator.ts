@@ -7,9 +7,8 @@
  *   npm run serial:operator -- approve --job-id=<id> --apply
  *   npm run serial:operator -- pause|resume --job-id=<id> --apply
  *
- * Every mutating command is a dry run without --apply. `approve` is the one human gate
- * in the whole system: nobody can claim a job until someone has read the premise and the
- * first chapters and said yes.
+ * Every mutating command is a dry run without --apply. `approve` handles the two launch
+ * gates: first the premise, then the four private opening chapters.
  */
 import dotenv from 'dotenv';
 import { readFileSync } from 'node:fs';
@@ -125,7 +124,7 @@ async function seed(): Promise<void> {
 
   console.log(JSON.stringify({
     novelId: novel.data.id, serialNovelId: serialNovel.data.id, jobId: job.data.id,
-    next: `Read the premise, then: serial:operator -- approve --job-id=${job.data.id} --apply`,
+    next: `Read the premise, then: npm run serial:operator -- approve --job-id=${job.data.id} --apply`,
   }, null, 2));
 }
 
@@ -150,22 +149,37 @@ async function read(): Promise<void> {
 async function setStatus(next: 'ready' | 'paused', label: string): Promise<void> {
   const jobId = value('job-id');
   if (!jobId) throw new Error(`${label} requires --job-id`);
+  const job = await db.from('serial_jobs')
+    .select('serial_novel_id,status,current_chapter').eq('id', jobId).single();
+  if (job.error) throw job.error;
   const patch: Record<string, unknown> = {
     status: next, lease_owner: null, lease_token: null, lease_until: null,
     next_run_at: new Date().toISOString(), last_error: null, updated_at: new Date().toISOString(),
   };
   if (label === 'approve') {
-    const job = await db.from('serial_jobs').select('serial_novel_id').eq('id', jobId).single();
-    if (job.error) throw job.error;
-    console.log(JSON.stringify({ dryRun: !apply, command: label, jobId }, null, 2));
+    const approval = job.data.status === 'awaiting_approval'
+      ? {
+          gate: 'premise',
+          patch: { approved_at: new Date().toISOString(), approved_by: process.env.USER ?? 'operator', updated_at: new Date().toISOString() },
+        }
+      : job.data.status === 'opening_review' && job.data.current_chapter === 4
+        ? {
+            gate: 'opening',
+            patch: { opening_reviewed_at: new Date().toISOString(), opening_reviewed_by: process.env.USER ?? 'operator', updated_at: new Date().toISOString() },
+          }
+        : null;
+    if (!approval) throw new Error('approve requires a job awaiting premise approval or chapter-four opening review.');
+    console.log(JSON.stringify({ dryRun: !apply, command: label, gate: approval.gate, jobId }, null, 2));
     if (!apply) return;
-    const approved = await db.from('serial_novels').update({
-      approved_at: new Date().toISOString(),
-      approved_by: process.env.USER ?? 'operator',
-      updated_at: new Date().toISOString(),
-    }).eq('id', job.data.serial_novel_id);
+    const approved = await db.from('serial_novels').update(approval.patch).eq('id', job.data.serial_novel_id);
     if (approved.error) throw approved.error;
   } else {
+    if (label === 'resume' && job.data.status !== 'paused') {
+      throw new Error('resume requires a paused job; it cannot bypass a review gate.');
+    }
+    if (label === 'pause' && ['awaiting_approval', 'opening_review'].includes(job.data.status)) {
+      throw new Error('pause cannot replace a premise or opening review gate.');
+    }
     console.log(JSON.stringify({ dryRun: !apply, command: label, jobId }, null, 2));
     if (!apply) return;
   }

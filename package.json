@@ -22,6 +22,7 @@
     "factory:window-repair": "node --import tsx scripts/factory-window-repair.ts",
     "serial:run": "node --import tsx scripts/serial-run.ts",
     "serial:operator": "node --import tsx scripts/serial-operator.ts",
+    "serial:premises": "node --import tsx scripts/serial-premises.ts",
     "cover:bakeoff": "node --import tsx scripts/cover-bakeoff.ts",
     "craft:audit": "node --import tsx scripts/craft-audit.ts"
   },

@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "lane": "thuc_tinh_toan_dan",
+  "title": "Song Xuyên Mạt Thế: Phế Đan Của Ta Khiến Cả Thành Thức Tỉnh",
+  "hook": "Viên phế đan khiến hắn bị đuổi khỏi đan phòng lại cứu một nữ trinh sát và đánh thức năng lực khiến cả trạm trú ẩn phải quỳ giá.",
+  "blurb": "Tạ Vân bị Đan viện Thanh Lô đuổi khỏi ngoại môn vì mẻ Tịnh Tức Đan bị chê là phế phẩm. Sau cánh cửa kho thuốc là Lâm Thành của một thế giới hiện đại song song vừa vỡ trận trước thi quần; tinh hạch nhiễm độc khiến người thức tỉnh lần lượt phát điên. Viên phế đan đầu tiên ổn định tinh hạch của nữ trinh sát An Diệp và đẩy cô thức tỉnh Lôi Quang ngay trước toàn trạm. Tinh hạch cô trả lại giúp lò cũ của Vân cháy bằng thứ hỏa lực sạch chưa từng có. Hai phế phẩm của hai thế giới lập tức biến thành con đường thăng cấp mà Đan viện và liên minh trú ẩn đều muốn cướp.",
+  "readerFantasy": "Lấy thứ hai thế giới vứt đi để tăng cấp nhanh hơn thiên tài, dựng một chuỗi sức mạnh không phe độc quyền nào khóa nổi.",
+  "goldenFinger": {
+    "name": "Đan Môn Song Giới",
+    "rule": "Cửa kho thuốc nối Thanh Lô với Lâm Thành và cho mọi vật qua hai chiều; phế đan cùng tinh hạch trở nên quý vì sinh thái của thế giới đối diện, không phải vì cửa tự biến đổi chúng.",
+    "scope": null,
+    "evolution": [
+      { "id": "ev1", "name": "Đan cứu một người", "changesUse": "Vân phát hiện phế đan ổn định được một tinh hạch sắp bạo phát." },
+      { "id": "ev2", "name": "Hạch nhóm đan hỏa", "changesUse": "Tinh hạch trở thành nguồn lửa luyện mẻ đan mà linh thạch thường không làm được." },
+      { "id": "ev3", "name": "Phối phương hai giới", "changesUse": "Dược liệu và tinh hạch được ghép theo thuộc tính để tạo công dụng mới có thể lặp lại." },
+      { "id": "ev4", "name": "Đội thức tỉnh", "changesUse": "Đồng minh dùng đan của Vân tự đánh và tự giành chiến công thay vì Vân luôn ra mặt." },
+      { "id": "ev5", "name": "Lò đan thành thị", "changesUse": "Một mạng luyện đan phân tán cung cấp cho cả khu trú ẩn mà không lộ một điểm độc quyền." },
+      { "id": "ev6", "name": "Chuỗi tiến hóa chung", "changesUse": "Hai thế giới chia sẻ tiêu chuẩn để người tu luyện và người thức tỉnh cùng tiến hóa mà không nuốt lẫn nhau." }
+    ]
+  },
+  "conflictLadder": {
+    "survival": "Vân phải thoát truy sát ngoại môn còn An Diệp phải giữ trạm trú ẩn qua đợt thi triều kế tiếp.",
+    "rules": "Đan viện cấm truyền phương thuốc ra ngoài và Hội Đồng Lâm Thành buộc mọi tinh hạch phải nộp vào kho trung tâm.",
+    "ideology": "Sức mạnh thức tỉnh nên được một số người kiểm soát để giữ trật tự hay phải mở cho mọi người đủ điều kiện sống sót.",
+    "self": "Vân phải nhận ra lúc nào khát vọng chứng minh phế vật của mình đã biến thành nhu cầu quyết định ai xứng đáng được mạnh lên."
+  },
+  "hiddenThread": "Vết đen trong đáy lò Thanh Lô và hoa văn trong lõi thi vương giống hệt nhau. Nó xuất hiện từ chương ba, giữa truyện chứng minh linh tai và thi triều cùng là hai mặt của một lần thử nghiệm, rồi nhập tuyến chính khi nguồn phát bắt đầu kéo hai thế giới chồng lên nhau.",
+  "payoffStance": "front",
+  "oppositionEngine": "Đan viện mất quyền gọi phế phẩm là vô giá trị rồi mua rẻ, kho trung tâm mất độc quyền tinh hạch và những người thức tỉnh cấp cao mất vị trí khi dân thường có đường tiến hóa. Họ phải đoạt công thức, cắt nguồn hoặc biến Vân thành tài sản.",
+  "tierLadder": [
+    { "id": "tier_hoc_do", "name": "Học đồ bỏ đi" },
+    { "id": "tier_luyen_su", "name": "Luyện sư nhất phẩm" },
+    { "id": "tier_dan_chu", "name": "Đan chủ chiến đội" },
+    { "id": "tier_thanh_su", "name": "Thành cấp đan sư" },
+    { "id": "tier_lien_minh", "name": "Luyện sư liên minh" },
+    { "id": "tier_song_gioi", "name": "Tông sư song giới" }
+  ],
+  "castSeed": [
+    { "id": "ta_van", "name": "Tạ Vân", "role": "protagonist", "agenda": "Dùng chính mẻ đan bị vứt bỏ để bước qua cổng ngoại môn và không bao giờ bị ai định nghĩa là phế vật nữa.", "antagonistClass": null },
+    { "id": "an_diep", "name": "An Diệp", "role": "ally", "agenda": "Tìm cách để đội trinh sát dùng tinh hạch mà không phát điên hoặc lệ thuộc kho trung tâm.", "antagonistClass": null },
+    { "id": "moc_lam", "name": "Mộc Lam", "role": "ally", "agenda": "Giữ lò thuốc cũ của cha và chứng minh dược liệu hoang không thấp kém hơn dược viên tông môn.", "antagonistClass": null },
+    { "id": "lu_truong_lao", "name": "Lư Hạc", "role": "antagonist", "agenda": "Chiếm đan phương mới để Thanh Lô giữ địa vị tông luyện đan số một.", "antagonistClass": "trưởng lão đan viện" },
+    { "id": "tong_chap_chinh", "name": "Tống Nham", "role": "antagonist", "agenda": "Thu toàn bộ tinh hạch về kho trung tâm và chỉ cấp lại cho lực lượng trung thành.", "antagonistClass": "chấp chính trú ẩn" },
+    { "id": "han_kiet", "name": "Hàn Kiệt", "role": "rival", "agenda": "Chứng minh thiên phú đan đạo chính thống có thể nghiền nát mọi đường tắt của Vân.", "antagonistClass": null },
+    { "id": "bac_si_vu", "name": "Vũ Tịnh", "role": "authority", "agenda": "Kiểm chứng mọi viên đan trước khi cho người sống sót dùng và không để chính trị bóp méo kết quả.", "antagonistClass": null }
+  ],
+  "arena": "Đan viện tu tiên Thanh Lô nối với Lâm Thành, đô thị hiện đại song song đang tổ chức xã hội thức tỉnh giữa thi triều.",
+  "novelty": "Phế phẩm của mỗi hệ sức mạnh là nhiên liệu hoàn hảo cho hệ còn lại, tạo vòng tăng cấp hai chiều thay vì một bên chỉ làm siêu thị.",
+  "endingDirection": "Tạ Vân phá kho độc quyền ở cả Đan viện lẫn Lâm Thành, công khai chuẩn phối phương an toàn và dẫn hai hệ sức mạnh đánh thẳng vào nguồn linh tai chung.",
+  "voiceSheet": {
+    "pov": "third_limited",
+    "register": "Mạnh, nhanh, có khẩu khí ma luyện nhưng không tàn nhẫn vô cớ; tên đan, cấp thức tỉnh và kết quả tăng cấp phải hiện rõ trên trang.",
+    "chapterTitleRule": "Một câu thách thức hoặc phản ứng không tin nổi của người vừa thấy phế phẩm tạo kỳ tích.",
+    "showsSystemPanel": false,
+    "taboos": ["Không sao chép tông môn hay thành phố của tác phẩm có sẵn", "Không biến luyện đan thành hướng dẫn kỹ thuật", "Không phạt tuổi thọ hay thân thể khi qua cửa", "Không nhắc AI"]
+  }
+}
