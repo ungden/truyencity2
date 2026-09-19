@@ -160,6 +160,33 @@ export function overdueHooks(bible: Bible, throughChapter: number): Array<{ id: 
     .map(hook => ({ id: hook.id, what: hook.what, dueByChapter: hook.dueByChapter }));
 }
 
+/**
+ * A broker story wins through other people. If the protagonist keeps stepping on stage
+ * himself, it stops being that story; if nobody ever learns he was behind it, the reader
+ * loses the thread. Both drifts are code-owned because both are invisible one cycle at a
+ * time and obvious ten cycles later.
+ */
+export function assertStanceHeld(input: {
+  stance: Premise['payoffStance'];
+  recentCycles: Array<Pick<CyclePlan['climax'], 'performedBy' | 'attribution'>>;
+}): void {
+  if (input.stance !== 'broker' || input.recentCycles.length < 3) return;
+  const window = input.recentCycles.slice(-5);
+  const brokered = window.filter(climax => climax.performedBy !== 'protagonist').length;
+  if (brokered * 2 <= window.length) {
+    throw new SerialStateError(
+      'stance_drift',
+      `A broker story has the protagonist performing ${window.length - brokered} of the last ${window.length} payoffs.`,
+    );
+  }
+  if (window.every(climax => climax.attribution === 'hidden')) {
+    throw new SerialStateError(
+      'attribution_starved',
+      `Nobody has learned who is behind the last ${window.length} payoffs; the reader has nothing to hold on to.`,
+    );
+  }
+}
+
 /** Payoff kinds used recently, newest first — the planner sees this and rotates away. */
 export function recentPayoffKinds(bible: Bible): PayoffKind[] {
   return [...bible.recentSummary].reverse()

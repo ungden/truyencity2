@@ -1,11 +1,12 @@
 import { readFileSync } from 'node:fs';
 import {
-  PremiseSchema, PAYOFF_KINDS, scorecardAverage, type ChapterDigest,
+  PremiseSchema, CyclePlanSchema, scorecardAverage, type ChapterDigest,
 } from '@/services/serial/contracts';
 import {
-  applyDigest, assertPayoffRotation, overdueHooks, recentPayoffKinds, seedBible, SerialStateError, tierIndex,
+  applyDigest, assertPayoffRotation, assertStanceHeld, overdueHooks, recentPayoffKinds, seedBible, SerialStateError, tierIndex,
 } from '@/services/serial/state';
 import { WRITER_SYSTEM_PROMPT, CYCLE_PLANNER_SYSTEM_PROMPT, JUDGE_SYSTEM_PROMPT, PREMISE_SYSTEM_PROMPT } from '@/services/serial/prompts';
+import { payoffKindIds, activeRules, staleRules } from '@/services/serial/playbook';
 import { premise, baseBible, digest, cycle } from './fixtures';
 
 describe('serial contracts', () => {
@@ -163,7 +164,11 @@ describe('serial pacing rules', () => {
 
   test('recent payoff kinds come back newest first for the planner to rotate away from', () => {
     expect(recentPayoffKinds(baseBible())).toEqual(['kho_bau', 'va_mat']);
-    expect(new Set(PAYOFF_KINDS).size).toBe(15);
+    // Open registry, not a closed enum: today's craft note added a beat the old
+    // fifteen could not express — an ally winning with something the protagonist gave them.
+    expect(payoffKindIds()).toContain('hau_truong');
+    expect(payoffKindIds().length).toBeGreaterThan(15);
+    expect(() => cycle({ climax: { payoffKind: 'khong_co_trong_playbook' } })).toThrow(/Unknown payoff kind/);
   });
 });
 
@@ -231,5 +236,66 @@ describe('seeding a story', () => {
     const headless = { ...premise, castSeed: premise.castSeed.map(m => ({ ...m, role: 'ally' as const })) };
     expect(() => seedBible({ premise: headless, startLocationId: 'cho_cu', startLocationNote: 'Chợ Cũ.' }))
       .toThrow(/no character with role/);
+  });
+});
+
+describe('craft playbook', () => {
+  test('taste lives in data, so a craft correction is not a code change', () => {
+    const writer = activeRules('writer');
+    expect(writer.length).toBeGreaterThan(5);
+    // Every rule carries where it came from and when that was last checked.
+    for (const rule of writer) {
+      expect(rule.evidence.length).toBeGreaterThan(3);
+      expect(rule.observedAt).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    }
+    expect(WRITER_SYSTEM_PROMPT).toContain(writer[0].text.split('\n')[0]);
+  });
+
+  test('stale rules surface by age instead of rotting silently', () => {
+    const future = new Date('2027-06-01');
+    expect(staleRules(120, future).length).toBeGreaterThan(0);
+    expect(staleRules(120, new Date('2026-09-20'))).toEqual([]);
+  });
+
+  test('the corrections from this session are recorded as rules with evidence', () => {
+    const ids = activeRules('premise').map(rule => rule.id);
+    expect(ids).toEqual(expect.arrayContaining([
+      'no_self_punishing_power',   // advantages must not bill their owner
+      'business_jumps',            // commerce jumps a tier per cycle
+      'asymmetry_is_the_engine',   // no gimmick conditions bolted onto the premise
+    ]));
+    expect(PREMISE_SYSTEM_PROMPT).toMatch(/KHÔNG gắn thêm điều kiện vặt/);
+  });
+});
+
+describe('broker stance', () => {
+  const climax = (performedBy: 'protagonist' | 'ally', attribution: 'public' | 'hidden' = 'public') =>
+    ({ performedBy, attribution } as const);
+
+  test('a broker story that keeps putting the protagonist on stage is caught', () => {
+    expect(() => assertStanceHeld({
+      stance: 'broker',
+      recentCycles: [climax('ally'), climax('protagonist'), climax('protagonist'), climax('protagonist')],
+    })).toThrow(/performing 3 of the last 4/);
+
+    expect(() => assertStanceHeld({
+      stance: 'broker',
+      recentCycles: [climax('ally'), climax('ally'), climax('protagonist')],
+    })).not.toThrow();
+  });
+
+  test('a broker story where nobody ever finds out is caught too', () => {
+    expect(() => assertStanceHeld({
+      stance: 'broker',
+      recentCycles: [climax('ally', 'hidden'), climax('ally', 'hidden'), climax('faction' as 'ally', 'hidden')],
+    })).toThrow(/nothing to hold on to/);
+  });
+
+  test('a front story is left alone, and so is a story with too little history', () => {
+    expect(() => assertStanceHeld({
+      stance: 'front',
+      recentCycles: [climax('protagonist'), climax('protagonist'), climax('protagonist')],
+    })).not.toThrow();
+    expect(() => assertStanceHeld({ stance: 'broker', recentCycles: [climax('protagonist')] })).not.toThrow();
   });
 });

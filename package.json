@@ -22,7 +22,8 @@
     "factory:window-repair": "node --import tsx scripts/factory-window-repair.ts",
     "serial:run": "node --import tsx scripts/serial-run.ts",
     "serial:operator": "node --import tsx scripts/serial-operator.ts",
-    "cover:bakeoff": "node --import tsx scripts/cover-bakeoff.ts"
+    "cover:bakeoff": "node --import tsx scripts/cover-bakeoff.ts",
+    "craft:audit": "node --import tsx scripts/craft-audit.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",

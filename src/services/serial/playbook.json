@@ -1,0 +1,245 @@
+{
+  "version": "2026-09-19.1",
+  "note": "Craft that dates. Code owns contracts; this file owns taste. Edit here, not in prompts.ts.",
+  "payoffKinds": [
+    {
+      "id": "va_mat",
+      "name": "Vả mặt",
+      "note": "Kẻ coi thường bị đập mặt bằng chính thứ nó vừa chê."
+    },
+    {
+      "id": "nghich_tap",
+      "name": "Nghịch tập",
+      "note": "Từ đáy vươn lên trước mặt người từng đẩy mình xuống."
+    },
+    {
+      "id": "nghien_ep",
+      "name": "Nghiền ép",
+      "note": "Thực lực áp đảo, giải quyết trong một nhịp."
+    },
+    {
+      "id": "giau_manh",
+      "name": "Giấu mạnh lộ mạnh",
+      "note": "Che giấu rồi lộ ra đúng lúc."
+    },
+    {
+      "id": "pha_vay",
+      "name": "Phá vây",
+      "note": "Thoát khỏi thế bị vây ép."
+    },
+    {
+      "id": "tri_thang",
+      "name": "Trí thắng",
+      "note": "Thắng bằng tính toán, không bằng sức."
+    },
+    {
+      "id": "kho_bau",
+      "name": "Kho báu hiện thế",
+      "note": "Nhặt được thứ cả thế giới đang tìm."
+    },
+    {
+      "id": "duoc_cong_nhan",
+      "name": "Được công nhận",
+      "note": "Tập thể hoặc quyền lực phải thừa nhận."
+    },
+    {
+      "id": "cuu_nguy",
+      "name": "Cứu nguy",
+      "note": "Cứu người hoặc cứu cục diện."
+    },
+    {
+      "id": "ky_ngo",
+      "name": "Kỳ ngộ",
+      "note": "Gặp cơ duyên đổi vận."
+    },
+    {
+      "id": "dot_pha",
+      "name": "Đột phá",
+      "note": "Lên một nấc có tên trên thang cấp bậc."
+    },
+    {
+      "id": "ke_manh_tro_ve",
+      "name": "Kẻ mạnh trở về",
+      "note": "Thế lực bạn xuất hiện đúng lúc."
+    },
+    {
+      "id": "tuyet_dia_phan_kich",
+      "name": "Tuyệt địa phản kích",
+      "note": "Lật ngược từ chỗ tưởng đã thua."
+    },
+    {
+      "id": "tinh_truong",
+      "name": "Tình trường",
+      "note": "Quan hệ tiến một bước thật."
+    },
+    {
+      "id": "luc_van_cuong_lan",
+      "name": "Lực vãn cuồng lan",
+      "note": "Một mình gánh cả cục diện."
+    },
+    {
+      "id": "hau_truong",
+      "name": "Hậu trường",
+      "note": "Nhân vật phụ cầm thứ của main đi thắng. Độc giả biết sức mạnh đó từ đâu ra, người trong truyện thì chưa.",
+      "addedAt": "2026-09-19",
+      "evidence": "https://zhuanlan.zhihu.com/p/510570152"
+    },
+    {
+      "id": "di_hoa",
+      "name": "Tự suy diễn",
+      "note": "Một hành động bình thường của main bị phối vai diễn giải thành bố cục sâu xa. Chênh lệch thông tin tự sinh ra cái sướng.",
+      "addedAt": "2026-09-19",
+      "evidence": "https://c.m.163.com/news/a/J2VTBH3E0553JUR8.html"
+    },
+    {
+      "id": "doi_chieu",
+      "name": "Đối chiếu",
+      "note": "Hai bên cùng làm một việc, kết quả chênh nhau tới mức không cần bình luận.",
+      "addedAt": "2026-09-19"
+    },
+    {
+      "id": "chan_dong",
+      "name": "Chấn động",
+      "note": "Một sự thật lộ ra làm cả đám đông phải đánh giá lại mọi thứ đã xảy ra trước đó.",
+      "addedAt": "2026-09-19"
+    }
+  ],
+  "rules": [
+    {
+      "id": "open_on_pressure",
+      "role": "writer",
+      "status": "active",
+      "observedAt": "2026-09-19",
+      "evidence": "https://b.faloo.com/1455340_1.html",
+      "text": "MỞ CHƯƠNG — ba đoạn đầu\nVào thẳng một tình huống đang có áp lực, hoặc một câu hỏi chưa ai trả lời. Chậm nhất đến đoạn thứ ba đã phải có người nói hoặc người làm.\nTuyệt đối không mở chương bằng thời tiết, mùi, ánh sáng, cảnh vật, hồi tưởng, kiểm kê dụng cụ hay giới thiệu thân thế."
+    },
+    {
+      "id": "backstory_three_lines",
+      "role": "writer",
+      "status": "active",
+      "observedAt": "2026-09-19",
+      "evidence": "https://b.faloo.com/1455340_1.html",
+      "text": "TIỀN SỬ\nTối đa ba dòng cho toàn bộ quá khứ, mỗi dòng một đoạn riêng. Chỉ nhắc chuyện cũ khi nó đang gây hậu quả ngay trong cảnh. Không hồi tưởng dài, không giải thích lai lịch."
+    },
+    {
+      "id": "one_named_thing",
+      "role": "writer",
+      "status": "active",
+      "observedAt": "2026-09-19",
+      "evidence": "docs/FALOO_CRAFT.md §2",
+      "text": "MỖI CHƯƠNG PHẢI THÊM MỘT THỨ MỚI CÓ TÊN\nMột năng lực, một nhân vật, một phe, một địa danh, một bậc cấp, một mối đe doạ, một con số định mệnh — nhưng nó phải được gọi bằng tên riêng và phải còn dùng lại được về sau. Chương nào không thêm được gì có tên thì chương đó chưa đáng tồn tại: hãy dồn biến cố lại cho tới khi có."
+    },
+    {
+      "id": "paragraph_rhythm",
+      "role": "writer",
+      "status": "active",
+      "observedAt": "2026-09-19",
+      "evidence": "docs/FALOO_CRAFT.md §1",
+      "text": "NHỊP VIẾT\nĐoạn văn ngắn, phần lớn một câu. Xen nhiều thoại. Được dùng đoạn chỉ có ba bốn chữ để nhấn.\nĐộc thoại nội tâm đứng thành đoạn riêng, viết như nhân vật đang tự nói với mình, được phép dùng dấu hỏi lặp và dấu chấm lửng.\nGiọng thông tục, có tự giễu, có cảm thán. Không văn chương hoa mỹ, không trang trọng, không triết lý."
+    },
+    {
+      "id": "craft_detail_is_seasoning",
+      "role": "writer",
+      "status": "active",
+      "observedAt": "2026-09-19",
+      "evidence": "docs/FALOO_CRAFT.md §7",
+      "text": "CHI TIẾT NGHỀ VÀ KỸ THUẬT\nChỉ giữ khi nó buộc nhân vật phải chọn, phải trả giá, hoặc tạo ra lợi thế trước một người khác. Một chi tiết đủ để tin là dừng. Tuyệt đối không biến chương thành hướng dẫn thao tác, quy trình hay báo cáo công việc."
+    },
+    {
+      "id": "end_hook_mandatory",
+      "role": "writer",
+      "status": "active",
+      "observedAt": "2026-09-19",
+      "evidence": "https://b.faloo.com/1455340_1.html",
+      "text": "KẾT CHƯƠNG — bắt buộc\nBa bốn đoạn cuối phải là một trong ba thứ: một mối đe doạ mới bước vào, một câu hỏi được đặt thẳng ra, hoặc một lời tuyên bố. Không bao giờ kết bằng câu tổng kết êm ả hay một nhịp thở phào."
+    },
+    {
+      "id": "chapter_title_is_a_line",
+      "role": "writer",
+      "status": "active",
+      "observedAt": "2026-09-19",
+      "evidence": "https://wap.faloo.com/1455340.html",
+      "text": "TIÊU ĐỀ CHƯƠNG\nLà một câu nói hoặc một câu nghĩ có thái độ, thường trích thẳng từ đoạn cuối chương. Không đặt tên chương bằng một danh từ tĩnh hay tên một dụng cụ."
+    },
+    {
+      "id": "broker_payoff",
+      "role": "writer",
+      "status": "active",
+      "observedAt": "2026-09-19",
+      "evidence": "https://zhuanlan.zhihu.com/p/510570152",
+      "text": "KHI CÚ THẮNG KHÔNG PHẢI CỦA NHÂN VẬT CHÍNH\nNếu brief ghi cú trả thưởng do người khác thực hiện, hãy viết cảnh đó bằng góc nhìn của người đó và để họ hưởng trọn khoảnh khắc — đừng cắt về nhân vật chính để bình luận.\nĐộc giả đã biết sức mạnh ấy từ đâu ra; người trong cảnh thì chưa. Khoảng chênh đó chính là cái sướng, và nó hỏng ngay khi lời kể giải thích ra.\nNhân vật chính xuất hiện ngắn, làm một việc bình thường, không giải thích gì. Để phản ứng của người khác nói thay."
+    },
+    {
+      "id": "no_self_punishing_power",
+      "role": "premise",
+      "status": "active",
+      "observedAt": "2026-09-19",
+      "evidence": "https://maliangwriter.com/blog/web-novel-trends-2026-mid-year/",
+      "text": "TUYỆT ĐỐI KHÔNG thiết kế kim thủ chỉ quay lại cắn chủ nhân nó. Cấm: trừ thọ nguyên, rút máu, gánh ngược bệnh tật, phạt lên thân thể, nợ chồng nợ, nghèo vĩnh viễn, mỗi lần dùng là mỗi lần trả giá. Độc giả bây giờ bỏ truyện vì mấy thứ đó.\nscope, nếu có, là thứ kim thủ chỉ KHÔNG với tới — không bao giờ là cái giá nó bắt trả. Và xem luật asymmetry_is_the_engine: phần lớn trường hợp nên để trống."
+    },
+    {
+      "id": "opposition_is_people",
+      "role": "premise",
+      "status": "active",
+      "observedAt": "2026-09-19",
+      "evidence": "docs/FALOO_CRAFT.md §4b",
+      "text": "oppositionEngine mới là nguồn căng thẳng: những kẻ muốn đoạt thứ nhân vật đang có, hoặc mất phần khi nhân vật thắng. Mọi áp lực về sau phải truy được về đây."
+    },
+    {
+      "id": "discover_dont_brief",
+      "role": "premise",
+      "status": "active",
+      "observedAt": "2026-09-19",
+      "evidence": "https://wangwen666.com/post/196.html",
+      "text": "Đừng để một hệ thống hiện ra giải thích hết năng lực ngay từ đầu — độc giả đọc câu đầu là đoán ra nửa sau. Hãy để nhân vật và độc giả cùng dò ra ranh giới của nó."
+    },
+    {
+      "id": "business_jumps",
+      "role": "premise",
+      "status": "active",
+      "observedAt": "2026-09-19",
+      "evidence": "https://maliangwriter.com/blog/web-novel-trends-2026-mid-year/",
+      "text": "Làm ăn buôn bán phải nhảy bậc chứ không bò từng bước: mỗi chu kỳ đổi hẳn quy mô và đối thủ. \"Phát triển dần dần\" là lý do độc giả 2026 bỏ dòng kinh thương."
+    },
+    {
+      "id": "activate_in_chapter_one",
+      "role": "premise",
+      "status": "active",
+      "observedAt": "2026-09-19",
+      "evidence": "https://www.163.com/dy/article/HDCQ4C8B0538G530.html",
+      "text": "Kim thủ chỉ phải kích hoạt ngay trong chương một và cho một kết quả nhìn thấy được ngay chương một. Nó tiến hoá qua sáu đến tám nấc, mỗi nấc đổi cách dùng chứ không chỉ đổi con số."
+    },
+    {
+      "id": "cycle_is_pressure_then_release",
+      "role": "planner",
+      "status": "active",
+      "observedAt": "2026-09-19",
+      "evidence": "https://www.jianshu.com/p/6565b9c59568",
+      "text": "Một chu kỳ là một vòng cảm xúc trọn vẹn dài 5 đến 15 chương: dồn nén, leo thang, rồi bung ra.\nBắt đầu bằng việc nhân vật chính bị từ chối, bị lấy mất hoặc bị đe doạ một thứ cụ thể. Đẩy nó xấu đi qua ba đến sáu bước. Rồi trả thưởng bằng một kết quả vật chất nhìn thấy được, trước mặt những người có lợi ích trong đó."
+    },
+    {
+      "id": "opponents_keep_their_will",
+      "role": "planner",
+      "status": "active",
+      "observedAt": "2026-09-19",
+      "evidence": "story_factory_runs window_review verdicts, ch 70/85",
+      "text": "Người thua phải giữ được ý chí và đổi chiến thuật, không quỳ lạy, không sụp đổ nhân cách. Đối thủ phải theo đuổi lợi ích riêng của họ chứ không chỉ làm nền cho nhân vật chính.\nKhi chuyển sang chu kỳ mới, đối thủ phải đổi giai cấp — một kẻ cũ đổi chiêu không tính là leo thang.\nKhông kéo dài một cuộc đối đầu mà độc giả đang mong giải quyết dứt điểm."
+    },
+    {
+      "id": "broker_stance",
+      "role": "planner",
+      "status": "active",
+      "observedAt": "2026-09-19",
+      "evidence": "https://zhuanlan.zhihu.com/p/510570152",
+      "text": "Nếu premise theo lối đứng sau, phần lớn cú trả thưởng phải do đồng minh thực hiện, không phải nhân vật chính. Ghi rõ ai ra mặt (performedBy) và ai biết đó là công của nhân vật chính (attribution).\nGiữ ít nhất một vòng trong đó chỉ người trong cuộc biết — attribution hoàn toàn ẩn suốt nhiều chu kỳ thì độc giả mất chỗ bám, còn công khai hết thì mất luôn khoảng chênh."
+    },
+    {
+      "id": "asymmetry_is_the_engine",
+      "role": "premise",
+      "status": "active",
+      "observedAt": "2026-09-19",
+      "evidence": "https://www.sohu.com/a/876257711_122129349",
+      "text": "ĐỘNG CƠ LÀ CHÊNH LỆCH, KHÔNG PHẢI CƠ CHẾ.\nThứ hiếm bên này là thứ tầm thường bên kia, và ngược lại. Chỉ riêng điều đó đã đủ nuôi cả bộ truyện: nhân vật mua rẻ bán đắt, giàu lên, mạnh lên, dựng thế lực. Hãy nói thẳng hai chiều hàng hoá và dừng lại.\nKHÔNG gắn thêm điều kiện vặt lên cánh cửa: không đồng hồ đếm ngược, không hạn mức, không khung giờ, không 'phải có mã vận đơn', không luật lệ rườm rà cho việc đi lại. Mỗi điều kiện thêm vào là một chương nói về việc quản lý điều kiện đó — đúng thứ đã giết năm bộ truyện cũ.\nscope được phép để trống. Chỉ ghi khi nó là sự thật tự nhiên của hai thế giới (bên kia không có điện nên đồ điện tử vô dụng), không bao giờ là luật do tác giả áp đặt lên cái cổng.\nCái ngăn nhân vật không phải là cổng, mà là người: bên kia cũng có chủ, có giá, có kẻ đang nắm tuyến hàng."
+    }
+  ]
+}

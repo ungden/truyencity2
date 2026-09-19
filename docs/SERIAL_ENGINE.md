@@ -53,6 +53,45 @@ That is the inversion against the old engine, which handed the Writer a ledger o
 deltas and asked it to dramatise them. `architecture` tests assert the brief contains no
 `requiredDelta` or `mechanicUse`.
 
+## Craft lives in data, not in prompts
+
+`src/services/serial/playbook.json` holds every rule about taste: how to open a chapter,
+what a payoff should feel like, what readers have turned against this season. `prompts.ts`
+composes them in. The seam is deliberate — **code owns contracts, the playbook owns taste**,
+and they rot at very different speeds.
+
+This was learned the hard way. Three craft corrections landed in one afternoon (advantages
+that punish their owner, commerce that crawls instead of jumping, gimmick conditions bolted
+onto a premise) and each one meant editing TypeScript, re-running the suite and shipping a
+deploy to change a sentence about taste.
+
+Every rule carries `evidence` and `observedAt`, so a stale rule is visible:
+
+```bash
+npm run craft:audit                          # rules not re-checked in 120 days
+npm run craft:audit -- --days=60 --print=premise
+```
+
+Payoff kinds are an **open registry** in the same file, not an enum. The closed list of
+fifteen could not express "an ally wins using something the protagonist gave them" — a
+named, popular pattern — which is exactly the failure a closed taxonomy produces. Adding a
+kind is a data edit.
+
+`setPlaybook()` lets a caller swap the whole playbook, so a database-backed version needs
+no changes at the call sites. Today it is a file, which means editing craft still ships a
+deploy; it no longer touches schemas, tests or prompt code.
+
+## Who wins on stage
+
+`Premise.payoffStance` is `front`, `broker` or `mixed`, and every cycle climax records
+`performedBy` and `attribution`. A broker story wins through other people: allies carry
+what the protagonist gave them and the reader, not the crowd, knows where it came from.
+
+`assertStanceHeld` guards both drifts, because each is invisible one cycle at a time and
+obvious ten cycles later: a broker story that keeps putting the protagonist on stage stops
+being that story, and one where nobody ever learns who was behind it leaves the reader
+nothing to hold.
+
 ## Failure policy
 
 Nothing parks waiting for a repair.

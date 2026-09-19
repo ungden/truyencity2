@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { isPayoffKind } from './playbook';
 
 /**
  * Artifacts for the serial engine.
@@ -18,25 +19,19 @@ const id = z.string().trim().regex(/^[a-z0-9_]{2,48}$/, 'stable id: lowercase, d
 const line = z.string().trim().min(1).max(400);
 const para = z.string().trim().min(1).max(1_200);
 
-/** The 15 satisfaction beats Faloo rotates. Code forbids repeating one in adjacent cycles. */
-export const PAYOFF_KINDS = [
-  'va_mat',            // đối thủ coi thường bị đập mặt
-  'nghich_tap',        // từ đáy vươn lên
-  'nghien_ep',         // thực lực áp đảo
-  'giau_manh',         // giấu mạnh rồi lộ
-  'pha_vay',           // thoát vòng vây
-  'tri_thang',         // thắng bằng mưu
-  'kho_bau',           // được báu vật/tài nguyên hiếm
-  'duoc_cong_nhan',    // được tập thể/quyền lực thừa nhận
-  'cuu_nguy',          // cứu người/cứu cục diện
-  'ky_ngo',            // gặp cơ duyên
-  'dot_pha',           // lên cấp bậc có tên
-  'ke_manh_tro_ve',    // thế lực bạn xuất hiện
-  'tuyet_dia_phan_kich', // lật ngược từ tuyệt vọng
-  'tinh_truong',       // quan hệ tiến triển
-  'luc_van_cuong_lan', // gánh cả cục diện
-] as const;
-export type PayoffKind = (typeof PAYOFF_KINDS)[number];
+/**
+ * A satisfaction beat, by id. Deliberately NOT an enum: the closed list of fifteen could
+ * not express "an ally wins using something the protagonist gave them", which is a named,
+ * popular stream. Kinds live in playbook.json, so a new one is a data edit.
+ */
+export const PayoffKindSchema = z.string().trim().regex(/^[a-z0-9_]{2,32}$/)
+  .refine(isPayoffKind, value => ({ message: `Unknown payoff kind "${value}". Add it to playbook.json.` }));
+export type PayoffKind = string;
+
+/** Who is on stage for the payoff. A broker premise wins through other people. */
+export const PERFORMERS = ['protagonist', 'ally', 'faction'] as const;
+/** Who in the scene knows the protagonist is behind it. */
+export const ATTRIBUTIONS = ['public', 'inner_circle', 'hidden'] as const;
 
 export const LANES = [
   'he_thong_do_thi',
@@ -80,10 +75,16 @@ export const PremiseSchema = z.object({
      * is what preserves anticipation, without ever turning the advantage into the
      * antagonist.
      */
-    scope: para,
+    scope: para.nullable().default(null),
     /** 6–8 rungs, each changing HOW it is used, never only the number. */
     evolution: z.array(z.object({ id, name: line, changesUse: line })).min(6).max(8),
   }).strict(),
+
+  /**
+   * Front: the protagonist wins on stage. Broker: allies win with what he gave them and
+   * the reader, not the crowd, knows why. Mixed: both, cycle by cycle.
+   */
+  payoffStance: z.enum(['front', 'broker', 'mixed']).default('front'),
 
   /**
    * Where resistance comes from, by contract: people who want what the protagonist
@@ -169,7 +170,7 @@ export const BibleSchema = z.object({
     chapterNumber: z.number().int().min(1),
     title: line,
     summary: line,
-    payoffKind: z.enum(PAYOFF_KINDS).nullable(),
+    payoffKind: PayoffKindSchema.nullable(),
     endedOn: line,
   }).strict()).max(10),
   /** One paragraph per finished volume. This is how the Bible stays bounded at chapter 800. */
@@ -196,7 +197,9 @@ export const CyclePlanSchema = z.object({
   /** 3–6 steps that make it worse before it gets better. */
   escalation: z.array(line).min(3).max(6),
   climax: z.object({
-    payoffKind: z.enum(PAYOFF_KINDS),
+    payoffKind: PayoffKindSchema,
+    performedBy: z.enum(PERFORMERS).default('protagonist'),
+    attribution: z.enum(ATTRIBUTIONS).default('public'),
     /** The visible, material result. "He wins" is not a result. */
     result: para,
     /** Who sees it happen. A payoff nobody witnesses does not land. */
@@ -232,7 +235,7 @@ export const ChapterDigestSchema = z.object({
   chapterNumber: z.number().int().min(1),
   title: line,
   summary: line,
-  payoffKind: z.enum(PAYOFF_KINDS).nullable(),
+  payoffKind: PayoffKindSchema.nullable(),
   endedOn: line,
   newNamedThings: z.array(line).max(8),
   coreChanges: z.object({
