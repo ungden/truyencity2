@@ -31,12 +31,12 @@
     { "id": "me_khang", "name": "Bà Tư", "role": "family", "agenda": "Không muốn con trai dính vào giới buôn đồ cổ như cha nó ngày xưa.", "antagonistClass": null },
     { "id": "lao_hoa", "name": "Lão Hoà", "role": "ally", "agenda": "Tìm người nối nghiệp tiệm cầm đồ sắp sập của mình.", "antagonistClass": null },
     { "id": "chu_tiem", "name": "Bảy Thạch", "role": "antagonist", "agenda": "Giữ độc quyền thu mua ở chợ Cũ, không cho người mới có chỗ đứng.", "antagonistClass": "chủ tiệm địa phương" },
-    { "id": "ba_lam", "name": "Bà Lâm", "role": "antagonist", "agenda": "Thâu tóm toàn bộ tuyến hàng cổ vật của thành phố về một mối.", "antagonistClass": "hội trưởng hội thẩm định" },
+    { "id": "ba_lam", "name": "Bà Lâm", "role": "antagonist", "agenda": "Thâu tóm toàn bộ tuyến hàng cổ vật của Vân Cảng về một mối.", "antagonistClass": "hội trưởng hội thẩm định" },
     { "id": "tieu_my", "name": "Tiểu Mỹ", "role": "rival", "agenda": "Chứng minh bằng cấp chính quy hơn con mắt thiên phú.", "antagonistClass": null },
-    { "id": "ong_quang", "name": "Ông Quảng", "role": "authority", "agenda": "Giữ cho phiên đấu giá kín của thành phố không bị tai tiếng.", "antagonistClass": null }
+    { "id": "ong_quang", "name": "Ông Quảng", "role": "authority", "agenda": "Giữ cho phiên đấu giá kín của Vân Cảng không bị tai tiếng.", "antagonistClass": null }
   ],
   "oppositionEngine": "Ai định giá thì người đó cầm quyền chia tiền. Mỗi lần Khang định giá đúng là cắt mất phần của cả một dây chuyền ăn chênh lệch — từ chủ sạp chợ Cũ tới hội thẩm định thành phố đều mất tiền khi hắn thắng, nên họ phải chặn hắn.",
-  "arena": "Giới buôn và thẩm định đồ cổ ở một thành phố lớn.",
+  "arena": "Giới buôn và thẩm định đồ cổ ở Vân Cảng, một thành phố cảng của thế giới song song.",
   "novelty": "Hệ thống định giá được cả con người chứ không chỉ đồ vật.",
   "endingDirection": "Trần Khang lập ra một sàn thẩm định công khai, phá thế độc quyền định giá của các hội kín.",
   "voiceSheet": {

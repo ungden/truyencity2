@@ -40,11 +40,11 @@ export const premise: Premise = PremiseSchema.parse({
     { id: 'me_khang', name: 'Bà Tư', role: 'family', agenda: 'Không muốn con trai dính vào giới buôn đồ cổ.' },
     { id: 'lao_hoa', name: 'Lão Hoà', role: 'ally', agenda: 'Tìm người nối nghiệp tiệm cầm đồ sắp sập.' },
     { id: 'chu_tiem', name: 'Bảy Thạch', role: 'antagonist', agenda: 'Giữ độc quyền thu mua ở chợ Cũ.', antagonistClass: 'chủ tiệm địa phương' },
-    { id: 'ba_lam', name: 'Bà Lâm', role: 'antagonist', agenda: 'Thâu tóm cả tuyến hàng cổ vật của thành phố.', antagonistClass: 'hội trưởng hội thẩm định' },
+    { id: 'ba_lam', name: 'Bà Lâm', role: 'antagonist', agenda: 'Thâu tóm cả tuyến hàng cổ vật của Vân Cảng.', antagonistClass: 'hội trưởng hội thẩm định' },
     { id: 'tieu_my', name: 'Tiểu Mỹ', role: 'rival', agenda: 'Chứng minh bằng cấp hơn con mắt.' },
   ],
   oppositionEngine: 'Ai định giá thì người đó cầm quyền chia tiền. Khang định giá đúng là cắt phần của cả một dây chuyền ăn chênh lệch, nên từ chủ sạp tới hội thẩm định đều mất tiền khi hắn thắng.',
-  arena: 'Giới buôn và thẩm định đồ cổ ở một thành phố lớn.',
+  arena: 'Giới buôn và thẩm định đồ cổ ở Vân Cảng, một thành phố cảng của thế giới song song.',
   novelty: 'Hệ thống định giá được cả người chứ không chỉ đồ vật.',
   endingDirection: 'Trần Khang lập ra sàn thẩm định công khai, phá thế độc quyền định giá của các hội kín.',
   voiceSheet: {

@@ -274,7 +274,11 @@ describe('craft playbook', () => {
       'business_jumps',            // commerce jumps a tier per cycle
       'asymmetry_is_the_engine',   // no gimmick conditions bolted onto the premise
       'economy_must_close',        // name a real buyer on each side
+      'modern_side_is_parallel',   // invented city, no real places to nitpick
     ]));
+    expect(PREMISE_SYSTEM_PROMPT).toMatch(/THẾ GIỚI SONG SONG, KHÔNG PHẢI VIỆT NAM THẬT/);
+    // The shipped seed premise has to obey the rule it ships with.
+    expect(premise.arena).toMatch(/thế giới song song/);
     expect(PREMISE_SYSTEM_PROMPT).toMatch(/KHÔNG gắn thêm điều kiện vặt/);
   });
 });

@@ -1,5 +1,5 @@
 {
-  "version": "2026-09-19.2",
+  "version": "2026-09-19.3",
   "note": "Craft that dates. Code owns contracts; this file owns taste. Edit here, not in prompts.ts.",
   "payoffKinds": [
     {
@@ -248,6 +248,14 @@
       "observedAt": "2026-09-19",
       "evidence": "genreCanon.quyDoiVeTraiDat",
       "text": "VÒNG TIỀN PHẢI KHÉP KÍN, VÀ PHẢI CÓ NGƯỜI MUA CÓ THẬT Ở CẢ HAI ĐẦU.\nSai lầm điển hình: quy tiền tệ của thế giới bên kia ra tiền Việt. Linh thạch là tiền tệ nội bộ của tu tiên giới — Trái Đất không có chợ linh thạch, không người mua, không giá tham chiếu. Viết 'một viên linh thạch bằng tháng lương' là lỗ logic độc giả thấy ngay.\nĐúng phải là ba nhánh: (1) hàng Trái Đất bán bên kia lấy tiền tệ bên kia; (2) tiền tệ đó Ở LẠI bên kia làm vốn — mua đan, mua công pháp, thuê người, mua chỗ đứng cho người của mình, tức là quyền lực lớn lên ở bên kia; (3) thứ mang về Trái Đất phải là thứ Trái Đất đã có chợ sẵn: vàng bạc, ngọc đá quý, dược liệu đông y, cổ vật, vật liệu lạ đem giám định.\nNêu đích danh người mua ở mỗi đầu. Không nêu được thì chưa phải premise."
+    },
+    {
+      "id": "modern_side_is_parallel",
+      "role": "premise",
+      "status": "active",
+      "observedAt": "2026-09-19",
+      "evidence": "https://wap.faloo.com/1261957.html",
+      "text": "PHÍA HIỆN ĐẠI LÀ THẾ GIỚI SONG SONG, KHÔNG PHẢI VIỆT NAM THẬT.\nĐây là quy ước sẵn có của dòng này: bộ nào cũng mở bằng 'xuyên tới thế giới song song'. Lý do rất thực dụng — không ai bắt bẻ được địa lý hay luật lệ, không chạm chuyện nhạy cảm, và tác giả dựng thẳng ra được cái tổ chức mà cốt truyện cần.\nGiữ nguyên kết cấu đời sống cho quen thuộc: điện thoại, app giao hàng, cửa hàng tiện lợi, tiệm vàng, phòng trọ, chợ, giới đông y. Tên người và món ăn vẫn thuần Việt.\nBỏ sạch tên thật: thành phố, tỉnh, quốc gia, thương hiệu, cơ quan nhà nước, nhân vật và sự kiện lịch sử, triều đại có thật. Thay bằng tên tự đặt và dùng nhất quán cả bộ.\nMột thành phố tự đặt tên là một thực thể có tên — nó đếm vào luật mỗi chương phải thêm một thứ mới."
     }
   ],
   "genreCanon": {
@@ -293,6 +301,14 @@
         "Cổ vật — đồ đồng, gốm, sách cũ bên kia là đồ dùng, ở đây là cổ vật, có nhà đấu giá.",
         "Vật liệu lạ — đem giám định thành 'hợp kim chưa từng thấy', bán cho giới sưu tầm hoặc phòng thí nghiệm vật liệu."
       ]
+    },
+    "theGioiHienDai": {
+      "luat": "Phía hiện đại luôn là một THẾ GIỚI SONG SONG, không bao giờ là Việt Nam thật.",
+      "viSao": "Không ai bắt bẻ được địa lý, luật lệ, cơ quan hay sự kiện; không chạm vào chuyện nhạy cảm; và tác giả được quyền dựng thẳng ra cái tổ chức mà cốt truyện cần.",
+      "giuLai": "Kết cấu đời sống phải y như thật thì độc giả mới thấy quen: điện thoại, app giao hàng, cửa hàng tiện lợi, tiệm vàng, phòng trọ, chợ, sàn thương mại điện tử, giới đông y. Tên người, món ăn, cách nói năng vẫn thuần Việt — đây là một thế giới song song nói tiếng Việt.",
+      "boDi": "Tên thành phố, tỉnh, quốc gia có thật. Tên thương hiệu có thật. Cơ quan nhà nước có thật. Nhân vật lịch sử, sự kiện lịch sử, chính trị. Triều đại có thật ở phía cổ đại.",
+      "thayBang": "Tự đặt tên: một thành phố cảng tên Vân Cảng, một hội thẩm định, một cục vật liệu, một sàn đấu giá, một triều đại hư cấu. Đặt xong thì dùng nhất quán suốt bộ — chúng là thực thể có tên, đếm vào luật mỗi chương một thứ mới.",
+      "evidence": "https://wap.faloo.com/1261957.html"
     }
   }
 }
