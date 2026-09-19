@@ -3,6 +3,7 @@ import {
   BibleSchema, type PayoffKind,
 } from './contracts';
 
+
 /**
  * The whole machine-checked surface of the serial engine.
  *
@@ -164,4 +165,41 @@ export function recentPayoffKinds(bible: Bible): PayoffKind[] {
   return [...bible.recentSummary].reverse()
     .map(entry => entry.payoffKind)
     .filter((kind): kind is PayoffKind => kind !== null);
+}
+
+/**
+ * The Bible a story starts from. Derived entirely from the approved Premise, so a
+ * launch cannot begin from state nobody read: everyone is alive, nobody has risen,
+ * nobody knows the secret, and no hook is owed yet.
+ */
+export function seedBible(input: { premise: Premise; startLocationId: string; startLocationNote: string }): Bible {
+  const { premise } = input;
+  const protagonist = premise.castSeed.find(member => member.role === 'protagonist')
+    ?? fail('no_protagonist', 'Premise has no character with role "protagonist".');
+  return BibleSchema.parse({
+    schemaVersion: 1,
+    symbolicCore: {
+      storyDay: 0,
+      chapterNumber: 0,
+      mc: { tierId: premise.tierLadder[0].id, locationId: input.startLocationId, keyAssetIds: [] },
+      cast: premise.castSeed.map(member => ({
+        id: member.id,
+        alive: true,
+        tierId: member.id === protagonist.id ? premise.tierLadder[0].id : null,
+        locationId: input.startLocationId,
+        lastSeenChapter: 0,
+        knowsFinger: member.id === protagonist.id,
+      })),
+      openHooks: [],
+    },
+    castSheet: premise.castSeed.map(member => ({
+      id: member.id,
+      name: member.name,
+      sheet: `${member.role} — ${member.agenda}${member.antagonistClass ? ` (${member.antagonistClass})` : ''}`,
+    })),
+    world: [{ id: input.startLocationId, name: input.startLocationId, note: input.startLocationNote }],
+    recentSummary: [],
+    volumeSummaries: [],
+    styleMemory: [],
+  });
 }

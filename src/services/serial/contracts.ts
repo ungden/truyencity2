@@ -273,3 +273,23 @@ export function scorecardAverage(verdict: JudgeVerdict): number {
   const s = verdict.scorecard;
   return (s.opening + s.anticipation + s.payoff + s.newness + s.endHook) / 5;
 }
+
+// ------------------------------------------------------------- Model output
+
+/** Writer output. Length is telemetry, never a gate — the judge reads, it does not count. */
+export const ChapterDraftSchema = z.object({
+  title: z.string().trim().min(3).max(160),
+  content: z.string().trim().min(800),
+}).strict();
+export type ChapterDraft = z.infer<typeof ChapterDraftSchema>;
+
+/** Exact, versioned routes. No substitution: a failed call retries the same model. */
+export const SerialRoutesSchema = z.object({
+  premise: z.string().trim().min(3),
+  planner: z.string().trim().min(3),
+  writer: z.string().trim().min(3),
+  judge: z.string().trim().min(3),
+  extractor: z.string().trim().min(3),
+  routeVersion: z.string().trim().min(3),
+}).strict();
+export type SerialRoutes = z.infer<typeof SerialRoutesSchema>;

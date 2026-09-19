@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "lane": "he_thong_do_thi",
+  "title": "Hệ Thống Thẩm Định: Ta Nhìn Một Cái Là Biết Giá Trời",
+  "hook": "Một cái liếc mắt định giá cả gia sản, và cả kẻ đang khinh thường hắn.",
+  "blurb": "Trần Khang bị đuổi khỏi tiệm cầm đồ đúng ngày mẹ nhập viện, trong túi còn đúng hai trăm nghìn. Rồi một bảng chữ xanh hiện ra trước mắt: mọi món đồ hắn nhìn vào đều lộ ra giá thật và lai lịch thật. Ngay chiều hôm đó hắn mua lại cái chén sứt mẻ bị cả chợ chê với giá ba trăm nghìn, rồi bán nó đi bằng một con số khiến chủ tiệm cũ phải chạy tới tận nơi hỏi cho ra lẽ. Nhưng thứ mà hệ thống nhìn thấy không dừng lại ở đồ vật, và giới thẩm định của thành phố này chưa bao giờ ưa người lạ.",
+  "readerFantasy": "Biết thứ người khác không biết, rồi được trả tiền vì điều đó ngay trước mặt họ.",
+  "goldenFinger": {
+    "name": "Hệ Thống Thẩm Định Vạn Vật",
+    "rule": "Nhìn vào một món đồ là thấy tên thật, niên đại thật và giá trị thật của nó hiện lên thành bảng trước mắt.",
+    "limit": "Mỗi ngày chỉ dùng được số lần bằng cấp bậc hiện tại, và thẩm định phải một món đồ giả sẽ khiến hắn đau đầu dữ dội suốt nhiều giờ.",
+    "evolution": [
+      { "id": "ev1", "name": "Thẩm định đồ vật", "changesUse": "Chỉ thấy giá thật và niên đại." },
+      { "id": "ev2", "name": "Thẩm định lai lịch", "changesUse": "Thấy món đồ từng qua tay những ai." },
+      { "id": "ev3", "name": "Thẩm định người", "changesUse": "Thấy năng lực thật của một người, không phải bằng cấp họ khoe." },
+      { "id": "ev4", "name": "Thẩm định vận giá", "changesUse": "Thấy món đồ sẽ lên hay xuống giá trong bao lâu." },
+      { "id": "ev5", "name": "Thẩm định địa mạch", "changesUse": "Quét được cả một khu đất hoặc một kho hàng thay vì từng món." },
+      { "id": "ev6", "name": "Thẩm định nhân quả", "changesUse": "Thấy trước ai sẽ tranh món đồ này với hắn và vì lý do gì." }
+    ]
+  },
+  "tierLadder": [
+    { "id": "tier_hoc_viec", "name": "Học việc" },
+    { "id": "tier_tho_xem", "name": "Thợ xem" },
+    { "id": "tier_chuong_quay", "name": "Chưởng quầy" },
+    { "id": "tier_giam_dinh_su", "name": "Giám định sư" },
+    { "id": "tier_dai_su", "name": "Đại sư" },
+    { "id": "tier_tong_giam", "name": "Tổng giám" }
+  ],
+  "castSeed": [
+    { "id": "khang", "name": "Trần Khang", "role": "protagonist", "agenda": "Kiếm đủ tiền chữa bệnh cho mẹ trước khi hết đợt điều trị.", "antagonistClass": null },
+    { "id": "me_khang", "name": "Bà Tư", "role": "family", "agenda": "Không muốn con trai dính vào giới buôn đồ cổ như cha nó ngày xưa.", "antagonistClass": null },
+    { "id": "lao_hoa", "name": "Lão Hoà", "role": "ally", "agenda": "Tìm người nối nghiệp tiệm cầm đồ sắp sập của mình.", "antagonistClass": null },
+    { "id": "chu_tiem", "name": "Bảy Thạch", "role": "antagonist", "agenda": "Giữ độc quyền thu mua ở chợ Cũ, không cho người mới có chỗ đứng.", "antagonistClass": "chủ tiệm địa phương" },
+    { "id": "ba_lam", "name": "Bà Lâm", "role": "antagonist", "agenda": "Thâu tóm toàn bộ tuyến hàng cổ vật của thành phố về một mối.", "antagonistClass": "hội trưởng hội thẩm định" },
+    { "id": "tieu_my", "name": "Tiểu Mỹ", "role": "rival", "agenda": "Chứng minh bằng cấp chính quy hơn con mắt thiên phú.", "antagonistClass": null },
+    { "id": "ong_quang", "name": "Ông Quảng", "role": "authority", "agenda": "Giữ cho phiên đấu giá kín của thành phố không bị tai tiếng.", "antagonistClass": null }
+  ],
+  "arena": "Giới buôn và thẩm định đồ cổ ở một thành phố lớn.",
+  "novelty": "Hệ thống định giá được cả con người chứ không chỉ đồ vật.",
+  "endingDirection": "Trần Khang lập ra một sàn thẩm định công khai, phá thế độc quyền định giá của các hội kín.",
+  "voiceSheet": {
+    "pov": "third_limited",
+    "register": "Thông tục, tự giễu, nhiều thoại, câu ngắn, độc thoại nội tâm đứng riêng thành đoạn.",
+    "chapterTitleRule": "Một câu nói hoặc câu nghĩ có thái độ, trích thẳng từ đoạn cuối chương.",
+    "showsSystemPanel": true,
+    "taboos": ["Không nhắc chính trị", "Không mô tả bạo lực với trẻ em", "Không nhắc tới AI"]
+  }
+}

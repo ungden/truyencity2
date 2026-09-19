@@ -101,3 +101,6 @@ factory/smoke-pack.local.json
 factory/smoke-checkpoint.local.json
 factory/*-pack.local.json
 factory/*-checkpoint.local.json
+
+# Offline serial-engine output: chapters, verdicts, cost reports
+factory/serial/runs/

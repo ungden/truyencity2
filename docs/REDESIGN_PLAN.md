@@ -382,7 +382,7 @@ mới ổn, có thể viết cho mỗi bộ một "quyển kết" 20–30 chươ
 | Giai đoạn | Thời gian | Làm gì | Bằng chứng để đi tiếp |
 |---|---|---|---|
 | **0. Quyết định** | ✅ xong 19/09 | Chốt hướng: học theo Faloo. 8 quyết định ở mục 5. Factory đã dừng sẵn. | Xong. |
-| **1a. Lõi offline (miễn phí)** | 2–3 ngày | Schema `Premise`/`Bible`/`CyclePlan`/`Digest`; prompt Writer/Judge/Extractor dựng thẳng từ [`FALOO_CRAFT.md`](FALOO_CRAFT.md); merge + 10 luật cứng; script runner local. | Typecheck + test xanh; đọc prompt thấy khớp spec. |
+| **1a. Lõi offline (miễn phí)** | ✅ xong 19/09 | Schema `Premise`/`Bible`/`CyclePlan`/`Digest`; prompt Writer/Judge/Extractor dựng thẳng từ [`FALOO_CRAFT.md`](FALOO_CRAFT.md); merge + 10 luật cứng; script runner local. | 302 test xanh (37 test cho `serial/`), typecheck + build + secret scan sạch, dry-run chạy được. |
 | **1b. Chạy thử (~$8–12)** | 1–2 ngày | Bakeoff writer 3 model; sinh **4 chương vàng + 11 chương** cho 1 premise. | Bạn đọc 4 chương vàng: có kim thủ chỉ ch1, payoff có tên ch2, hook mọi chương. Scorecard ≥ 3,5/5. Cost ≤ $0,15/ch. |
 | **2. Kế hoạch động** | 5–7 ngày | Cycle/Volume planner + review + nén Bible; chạy **2 premise × 40 chương** offline; đo lặp (repetition), hook bị quên, cast growth. | Cast ≥ 12 sau 40 chương; không loại 爽点 nào lặp 2 chu kỳ liền; 0 mâu thuẫn fact do người đọc bắt được. |
 | **3. Runtime** | 5 ngày | Fluid 800s, queue, cycle publish, dashboard scorecard, chính sách thất bại. Chạy **2 bộ canary ẩn tới 100 chương**. | 0 job park trong 14 ngày; ≥ 3 chương/ngày/bộ đều đặn; cost thực tế ≤ $0,15. |
@@ -420,9 +420,17 @@ Hai ràng buộc không được quên:
 
 ### Việc còn lại cần bạn gật một tiếng
 
-Giai đoạn 1 có hai phần: (a) viết schema + prompt + script — **không tốn tiền**, tôi làm ngay;
-(b) **chạy thử 15 chương × 1 premise và bakeoff writer — tốn khoảng $8–12**. Tôi sẽ dừng trước
-(b) và hỏi, trừ khi bạn bảo cứ chạy luôn.
+Giai đoạn 1a đã xong và đã push. Toàn bộ vòng lặp chương chạy được với provider giả trong
+test, nên chính sách thất bại đã được kiểm chứng mà không tốn đồng nào.
+
+Còn lại là **1b: chạy thật, khoảng $8–12** — bakeoff writer rồi sinh 4 chương vàng + 11 chương
+cho premise `factory/serial/he-thong-tham-dinh.json`. Lệnh đã sẵn sàng và mặc định là dry-run:
+
+```bash
+npm run serial:run -- --premise=factory/serial/he-thong-tham-dinh.json --chapters=4 --apply
+```
+
+Không có `--apply` thì nó không gọi model nào.
 
 ## 6. Nguồn
 
