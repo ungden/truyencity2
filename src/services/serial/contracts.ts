@@ -70,11 +70,27 @@ export const PremiseSchema = z.object({
     name: z.string().trim().min(2).max(60),
     /** Stated the way the reader will see it, not as an internal mechanic. */
     rule: para,
-    /** What it costs or cannot do. A finger with no limit kills anticipation. */
-    limit: para,
+    /**
+     * What the advantage does NOT reach — a boundary on scale, never a punishment.
+     *
+     * This field used to be called `limit` and asked what the advantage "costs".
+     * That wording manufactured exactly what readers have turned against: systems
+     * that bill the protagonist in lifespan, debt, injury or permanent poverty.
+     * Scope keeps the planner honest about what the advantage cannot solve, which
+     * is what preserves anticipation, without ever turning the advantage into the
+     * antagonist.
+     */
+    scope: para,
     /** 6–8 rungs, each changing HOW it is used, never only the number. */
     evolution: z.array(z.object({ id, name: line, changesUse: line })).min(6).max(8),
   }).strict(),
+
+  /**
+   * Where resistance comes from, by contract: people who want what the protagonist
+   * has, or who lose something when he wins. Every cycle's pressure has to be
+   * traceable to this, not to the advantage misfiring.
+   */
+  oppositionEngine: para,
 
   /** The only progression measure code understands. Named rungs, lowest first. */
   tierLadder: z.array(z.object({ id, name: z.string().trim().min(2).max(60) })).min(6).max(20),

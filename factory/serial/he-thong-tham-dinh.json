@@ -8,7 +8,7 @@
   "goldenFinger": {
     "name": "Hệ Thống Thẩm Định Vạn Vật",
     "rule": "Nhìn vào một món đồ là thấy tên thật, niên đại thật và giá trị thật của nó hiện lên thành bảng trước mắt.",
-    "limit": "Mỗi ngày chỉ dùng được số lần bằng cấp bậc hiện tại, và thẩm định phải một món đồ giả sẽ khiến hắn đau đầu dữ dội suốt nhiều giờ.",
+    "scope": "Chỉ đọc được đồ vật, không đọc được ý định của người đang cầm nó, và chỉ khi hắn chạm tay vào. Nó cho biết món đồ đáng bao nhiêu, không cho biết ai sẽ trả.",
     "evolution": [
       { "id": "ev1", "name": "Thẩm định đồ vật", "changesUse": "Chỉ thấy giá thật và niên đại." },
       { "id": "ev2", "name": "Thẩm định lai lịch", "changesUse": "Thấy món đồ từng qua tay những ai." },
@@ -35,6 +35,7 @@
     { "id": "tieu_my", "name": "Tiểu Mỹ", "role": "rival", "agenda": "Chứng minh bằng cấp chính quy hơn con mắt thiên phú.", "antagonistClass": null },
     { "id": "ong_quang", "name": "Ông Quảng", "role": "authority", "agenda": "Giữ cho phiên đấu giá kín của thành phố không bị tai tiếng.", "antagonistClass": null }
   ],
+  "oppositionEngine": "Ai định giá thì người đó cầm quyền chia tiền. Mỗi lần Khang định giá đúng là cắt mất phần của cả một dây chuyền ăn chênh lệch — từ chủ sạp chợ Cũ tới hội thẩm định thành phố đều mất tiền khi hắn thắng, nên họ phải chặn hắn.",
   "arena": "Giới buôn và thẩm định đồ cổ ở một thành phố lớn.",
   "novelty": "Hệ thống định giá được cả con người chứ không chỉ đồ vật.",
   "endingDirection": "Trần Khang lập ra một sàn thẩm định công khai, phá thế độc quyền định giá của các hội kín.",

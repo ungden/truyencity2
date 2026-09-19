@@ -99,9 +99,12 @@ export function buildWriterBrief(input: {
     kimThuChi: {
       ten: premise.goldenFinger.name,
       luat: premise.goldenFinger.rule,
-      gioiHan: premise.goldenFinger.limit,
+      // Scope, not cost. The Writer is told what the advantage cannot reach so it
+      // cannot resolve the chapter for free — never that using it hurts.
+      khongVoiToi: premise.goldenFinger.scope,
       nacHienTai: rung ? `${rung.name} — ${rung.changesUse}` : null,
     },
+    nguonDoiKhang: premise.oppositionEngine,
     chuongSo: chapterNumber,
     apLucChuKy: cycle.pressure,
     nhipChuong: sheet.beats,

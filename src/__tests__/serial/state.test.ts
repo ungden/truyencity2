@@ -5,7 +5,7 @@ import {
 import {
   applyDigest, assertPayoffRotation, overdueHooks, recentPayoffKinds, seedBible, SerialStateError, tierIndex,
 } from '@/services/serial/state';
-import { WRITER_SYSTEM_PROMPT, CYCLE_PLANNER_SYSTEM_PROMPT, JUDGE_SYSTEM_PROMPT } from '@/services/serial/prompts';
+import { WRITER_SYSTEM_PROMPT, CYCLE_PLANNER_SYSTEM_PROMPT, JUDGE_SYSTEM_PROMPT, PREMISE_SYSTEM_PROMPT } from '@/services/serial/prompts';
 import { premise, baseBible, digest, cycle } from './fixtures';
 
 describe('serial contracts', () => {
@@ -14,6 +14,16 @@ describe('serial contracts', () => {
     expect(premise.castSeed.length).toBeGreaterThanOrEqual(6);
     expect(classes.size).toBeGreaterThanOrEqual(2);
     expect(() => PremiseSchema.parse({ ...premise, castSeed: premise.castSeed.slice(0, 3) })).toThrow();
+  });
+
+  test('the advantage is bounded by scope, never billed to the protagonist', () => {
+    // The field this replaced was called `limit` and asked what the advantage cost.
+    // That wording produced systems that charge the protagonist in lifespan, debt or
+    // injury — the thing readers now quit over.
+    expect(premise.goldenFinger).not.toHaveProperty('limit');
+    expect(premise.goldenFinger.scope).toBeTruthy();
+    expect(premise.oppositionEngine).toMatch(/mất tiền khi hắn thắng|đoạt|cắt mất phần/);
+    expect(() => PremiseSchema.parse({ ...premise, oppositionEngine: undefined })).toThrow();
   });
 
   test('the golden finger evolves by changing its use, six to eight times', () => {
@@ -175,6 +185,14 @@ describe('writer prompt encodes the measured Faloo rules', () => {
   test('the judge blocks only on quotable contradiction and never on the reading score', () => {
     expect(JUDGE_SYSTEM_PROMPT).toMatch(/chỉ khi bạn trích được nguyên văn/);
     expect(JUDGE_SYSTEM_PROMPT).toMatch(/không bao giờ chặn chương/);
+  });
+
+  test('the premise prompt bans advantages that punish their owner', () => {
+    expect(PREMISE_SYSTEM_PROMPT).toMatch(/TUYỆT ĐỐI KHÔNG thiết kế kim thủ chỉ quay lại cắn chủ nhân/);
+    expect(PREMISE_SYSTEM_PROMPT).toMatch(/trừ thọ nguyên, rút máu, gánh ngược bệnh tật/);
+    // Tension has to come from people, and the business has to jump rather than crawl.
+    expect(PREMISE_SYSTEM_PROMPT).toMatch(/oppositionEngine mới là nguồn căng thẳng/);
+    expect(PREMISE_SYSTEM_PROMPT).toMatch(/nhảy bậc chứ không bò từng bước/);
   });
 
   test('the cycle planner is forbidden the mechanical vocabulary that produced process fiction', () => {

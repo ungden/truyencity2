@@ -17,7 +17,7 @@ export const premise: Premise = PremiseSchema.parse({
   goldenFinger: {
     name: 'Hệ Thống Thẩm Định Vạn Vật',
     rule: 'Nhìn vào một món đồ là thấy tên thật, niên đại thật và giá trị thật của nó hiện lên thành bảng.',
-    limit: 'Mỗi ngày chỉ dùng được số lần bằng cấp bậc hiện tại, và thẩm định đồ giả sẽ khiến hắn đau đầu dữ dội.',
+    scope: 'Chỉ đọc được đồ vật, không đọc được ý định của người đang cầm nó; và chỉ khi hắn chạm tay vào.',
     evolution: [
       { id: 'ev1', name: 'Thẩm định đồ vật', changesUse: 'Chỉ thấy giá và niên đại.' },
       { id: 'ev2', name: 'Thẩm định lai lịch', changesUse: 'Thấy món đồ từng qua tay ai.' },
@@ -43,6 +43,7 @@ export const premise: Premise = PremiseSchema.parse({
     { id: 'ba_lam', name: 'Bà Lâm', role: 'antagonist', agenda: 'Thâu tóm cả tuyến hàng cổ vật của thành phố.', antagonistClass: 'hội trưởng hội thẩm định' },
     { id: 'tieu_my', name: 'Tiểu Mỹ', role: 'rival', agenda: 'Chứng minh bằng cấp hơn con mắt.' },
   ],
+  oppositionEngine: 'Ai định giá thì người đó cầm quyền chia tiền. Khang định giá đúng là cắt phần của cả một dây chuyền ăn chênh lệch, nên từ chủ sạp tới hội thẩm định đều mất tiền khi hắn thắng.',
   arena: 'Giới buôn và thẩm định đồ cổ ở một thành phố lớn.',
   novelty: 'Hệ thống định giá được cả người chứ không chỉ đồ vật.',
   endingDirection: 'Trần Khang lập ra sàn thẩm định công khai, phá thế độc quyền định giá của các hội kín.',
