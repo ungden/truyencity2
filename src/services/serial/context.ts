@@ -27,6 +27,26 @@ function nameOf(bible: Bible, id: string): string {
   return bible.castSheet.find(entry => entry.id === id)?.name ?? id;
 }
 
+function customerLoopMilestone(cycle: CyclePlan, chapterNumber: number) {
+  const loop = cycle.customerLoop;
+  if (loop.schedule.purchaseChapter === chapterNumber) {
+    return { step: 'purchase', action: loop.purchase, assetId: loop.purchaseAssetId, terms: loop.purchaseTerms };
+  }
+  if (loop.schedule.useToEarnChapter === chapterNumber) {
+    return { step: 'use_to_earn', action: loop.useToEarn, assetId: loop.purchaseAssetId };
+  }
+  if (loop.schedule.publicProofChapter === chapterNumber) {
+    return { step: 'public_proof', action: loop.publicProof, assetId: loop.purchaseAssetId };
+  }
+  if (loop.schedule.returnUpgradeChapter === chapterNumber) {
+    return {
+      step: 'return_upgrade', action: loop.returnUpgrade,
+      assetId: loop.returnUpgradeAssetId, terms: loop.returnUpgradeTerms,
+    };
+  }
+  return null;
+}
+
 /** Positive, bounded ownership state: what can still be used and what recently left the account. */
 export function assetLedgerSlice(bible: Bible, castIds: string[], semanticText = '', includeAll = false) {
   const focusedOwners = new Set(castIds);
@@ -202,6 +222,7 @@ export function buildWriterBrief(input: {
     chuongSo: chapterNumber,
     dongLucChuKy: cycle.pressure,
     vongKhachHangChuKy: cycle.customerLoop,
+    mocVongKhachHangChuongNay: customerLoopMilestone(cycle, chapterNumber),
     nhipChuong: sheet.beats,
     mucTieuCamXuc: sheet.emotionalTarget,
     thuMoiPhaiDatTen: sheet.newNamedThing,
@@ -249,6 +270,7 @@ export function buildJudgeBrief(input: {
     chuong: input.prose,
     leRaPhaiLam: sheet ? { nhip: sheet.beats, camXuc: sheet.emotionalTarget, thuMoi: sheet.newNamedThing, hook: sheet.endHookKind } : null,
     vongKhachHangChuKy: cycle.customerLoop,
+    mocVongKhachHangChuongNay: customerLoopMilestone(cycle, chapterNumber),
     luatPhanUng: premise.voiceSheet.reactionRule,
     worldSlice: relevantWorldSlice({ premise, bible, castIds, chapterNumber, beatText }),
     soTaiSanDauChuong: assetLedger,

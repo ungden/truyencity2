@@ -58,11 +58,13 @@ const books = {
       entryNeed: 'Không có dị năng, bị xem là gánh nặng và cần một con đường sức mạnh tự mình luyện được.',
       purchaseAssetId: 'man_nguu_luyen_the_quyet_nhat_giai_trung_pham',
       purchaseMode: 'first_acquisition',
+      purchaseTerms: { quantity: 1, unit: 'bản', consideration: 'Bốn tinh hạch Nhất giai.' },
       purchase: 'Mua Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm bằng tài sản hoặc phần thu hoạch của chính mình.',
       useToEarn: 'Dùng công pháp gia nhập chuyến săn Bãi Săn Bờ Đông, giết lang canh ổ rồi nhận phần tinh hạch.',
       publicProof: 'Gánh đòn và chia chiến lợi phẩm trước Tro Tàn cùng những người từng coi thường người không dị năng.',
       returnUpgradeAssetId: 'ho_than_phu_nhat_giai_ha_pham',
       returnUpgradeMode: 'new_capability',
+      returnUpgradeTerms: { quantity: 1, unit: 'lá', consideration: 'Tinh hạch tự kiếm trong chuyến săn.' },
       returnUpgrade: 'Mang tinh hạch kiếm được trở lại Song Giới mua Hộ Thân Phù Nhất giai hạ phẩm.',
     },
   },
@@ -73,11 +75,13 @@ const books = {
       entryNeed: 'Xưởng máy thiếu vốn và bản thân cần thực phẩm tự nhiên để giữ trạng thái nghề nghiệp.',
       purchaseAssetId: 'nguon_rau_tuoi_dinh_ky',
       purchaseMode: 'first_acquisition',
+      purchaseTerms: { quantity: 1, unit: 'hợp đồng', consideration: 'Robot kiểm phẩm và công nghệ truy xuất nguồn hàng.' },
       purchase: 'Đổi robot kiểm phẩm cùng công nghệ truy xuất lấy nguồn rau tươi định kỳ.',
       useToEarn: 'Dùng thực phẩm ổn định năng lực, hoàn thiện robot và giành đơn khai phá mới cho xưởng.',
       publicProof: 'Robot phân loại lô thật trước kỹ sư và chủ nông trại, giúp Diệp Ninh được công nhận năng lực nghề.',
       returnUpgradeAssetId: 'nguon_nguyen_lieu_tu_nhien_thuong_pham',
       returnUpgradeMode: 'higher_grade',
+      returnUpgradeTerms: { quantity: 1, unit: 'hợp đồng', consideration: 'Công nghệ thế hệ tiếp theo và tiền cọc dài hạn.' },
       returnUpgrade: 'Quay lại ký hợp đồng nguồn cung phẩm cấp cao hơn và đổi công nghệ thế hệ tiếp theo.',
     },
   },
@@ -311,7 +315,19 @@ async function main(): Promise<void> {
       ? plan.beatSheets.filter(beat => Number((beat as { chapterNumber?: number }).chapterNumber) <= end)
       : [];
     const updated = await db.from('serial_cycles').update({
-      plan: { ...plan, beatSheets, customerLoop: config.customerLoop },
+      plan: {
+        ...plan,
+        beatSheets,
+        customerLoop: {
+          ...config.customerLoop,
+          schedule: {
+            purchaseChapter: Number(plan.startChapter),
+            useToEarnChapter: Number(plan.startChapter) + 1,
+            publicProofChapter: Number(plan.startChapter) + 2,
+            returnUpgradeChapter: Number(plan.startChapter) + 3,
+          },
+        },
+      },
       checkpoint_bible: Number(row.start_chapter) === 1
         ? seedBible({ premise })
         : rebuildBibleFromDigests({

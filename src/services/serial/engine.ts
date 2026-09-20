@@ -217,6 +217,24 @@ export async function planNextCycle(input: {
   usages.push(first.usage);
   const firstCycle = CyclePlanSchema.parse({ ...first.value, editorialNotes: input.editorialNotes ?? [] });
   const assertPlan = (candidate: CyclePlan): void => {
+    if (candidate.beatSheets[0]?.chapterNumber !== input.startChapter) {
+      throw new SerialStateError(
+        'cycle_window_start',
+        `First beat sheet must be chapter ${input.startChapter}, got ${candidate.beatSheets[0]?.chapterNumber ?? 'none'}.`,
+      );
+    }
+    if (input.fixedEndChapter && candidate.plannedEndChapter !== input.fixedEndChapter) {
+      throw new SerialStateError(
+        'cycle_window_end',
+        `Cycle end is fixed at ${input.fixedEndChapter}, got ${candidate.plannedEndChapter}.`,
+      );
+    }
+    if (!input.activeCycle && candidate.startChapter !== input.startChapter) {
+      throw new SerialStateError(
+        'cycle_window_start',
+        `New cycle must start at chapter ${input.startChapter}, got ${candidate.startChapter}.`,
+      );
+    }
     assertPayoffRotation(input.previousCycle, candidate);
     assertCycleAssetCoherence(input.bible, candidate);
   };

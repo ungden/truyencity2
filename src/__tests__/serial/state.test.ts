@@ -50,6 +50,20 @@ describe('serial contracts', () => {
     expect(() => cycle({ plannedEndChapter: 23 })).toThrow(/5-15 chapters/);  // 16
   });
 
+  test('a cycle closes its purchase-to-upgrade loop inside five chapters', () => {
+    const valid = cycle();
+    expect(valid.customerLoop.schedule).toEqual({
+      purchaseChapter: 8, useToEarnChapter: 9, publicProofChapter: 10, returnUpgradeChapter: 11,
+    });
+    expect(() => CyclePlanSchema.parse({
+      ...valid,
+      customerLoop: {
+        ...valid.customerLoop,
+        schedule: { ...valid.customerLoop.schedule, returnUpgradeChapter: 13 },
+      },
+    })).toThrow(/full customer loop/i);
+  });
+
   test('beat sheets are rolling and carry no mechanical state', () => {
     const sheet = cycle().beatSheets[0];
     expect(cycle().beatSheets.length).toBeLessThanOrEqual(3);

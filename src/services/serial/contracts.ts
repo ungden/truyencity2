@@ -438,12 +438,28 @@ export const CyclePlanSchema = z.object({
     entryNeed: line,
     purchaseAssetId: id.describe('ID ổn định của món khách mua ở đầu vòng.'),
     purchaseMode: z.enum(['first_acquisition', 'restock', 'replacement', 'organization_order']),
+    purchaseTerms: z.object({
+      quantity: z.number().positive().max(1_000_000_000),
+      unit: z.string().trim().min(1).max(60),
+      consideration: line.describe('Đối giá cụ thể được trả trên trang: số tiền, tinh hạch, tài nguyên hoặc điều khoản định lượng.'),
+    }).strict(),
     purchase: line,
     useToEarn: line,
     publicProof: line,
     returnUpgradeAssetId: id.describe('ID ổn định của món khách quay lại mua ở cuối vòng.'),
     returnUpgradeMode: z.enum(['higher_grade', 'new_capability', 'organization_scale', 'restock']),
+    returnUpgradeTerms: z.object({
+      quantity: z.number().positive().max(1_000_000_000),
+      unit: z.string().trim().min(1).max(60),
+      consideration: line.describe('Đối giá hoặc tiền cọc cụ thể của lần quay lại.'),
+    }).strict(),
     returnUpgrade: line,
+    schedule: z.object({
+      purchaseChapter: z.number().int().min(1),
+      useToEarnChapter: z.number().int().min(1),
+      publicProofChapter: z.number().int().min(1),
+      returnUpgradeChapter: z.number().int().min(1),
+    }).strict(),
   }).strict(),
   /** Rolling: beats for the next 3 chapters only. */
   beatSheets: z.array(z.object({
@@ -479,6 +495,34 @@ export const CyclePlanSchema = z.object({
       });
     }
   });
+  const schedule = cycle.customerLoop.schedule;
+  if (schedule.purchaseChapter < cycle.startChapter || schedule.purchaseChapter > cycle.startChapter + 1) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['customerLoop', 'schedule', 'purchaseChapter'],
+      message: 'The customer purchase must land in the first two chapters of the cycle.',
+    });
+  }
+  const ordered = [
+    schedule.purchaseChapter,
+    schedule.useToEarnChapter,
+    schedule.publicProofChapter,
+    schedule.returnUpgradeChapter,
+  ];
+  if (ordered.some((chapter, index) => index > 0 && chapter <= ordered[index - 1])) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['customerLoop', 'schedule'],
+      message: 'Purchase, use-to-earn, public proof and return upgrade must land in four consecutive-order chapter slots.',
+    });
+  }
+  if (schedule.returnUpgradeChapter > Math.min(cycle.plannedEndChapter, cycle.startChapter + 4)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['customerLoop', 'schedule', 'returnUpgradeChapter'],
+      message: 'The full customer loop must close within the first five chapters of the cycle.',
+    });
+  }
 });
 export type CyclePlan = z.infer<typeof CyclePlanSchema>;
 

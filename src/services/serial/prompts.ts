@@ -11,7 +11,7 @@ import playbookData from './playbook.json';
  * composed in at the marked point. Changing craft is a data edit; changing the
  * contract is a code change. They rot at different speeds.
  */
-export const SERIAL_PROMPT_VERSION = `serial-prompts-26 + playbook-${playbookData.version}`;
+export const SERIAL_PROMPT_VERSION = `serial-prompts-27 + playbook-${playbookData.version}`;
 
 export const WRITER_SYSTEM_PROMPT = `Bạn là tác giả truyện mạng tiếng Việt, viết truyện dài nhiều chương ra hằng ngày.
 
@@ -23,6 +23,7 @@ World slice chỉ là phần canon liên quan chương hiện tại. Dùng đún
 Kết quả và tuyên bố trong hợp đồng mở đầu phải giữ nguyên mức cụ thể. Ví dụ “điểm giao dịch lớn nhất Đông Hà” không được rút thành “mở lớn”.
 Nếu brief có Sổ giao dịch mở đầu, đó là nguồn sự thật dương tính: dựng các mục của chương hiện tại thành cảnh và giữ nguyên nguồn hàng, số lượng, bên giao nhận, đối giá cùng trạng thái sau giao dịch. Các mục chương trước là số dư phải nối tiếp. Không tự tạo thêm giao dịch, phí hay đổi chủ khoản thanh toán ngoài sổ trong bốn chương đầu.
 Nếu brief có soTaiSanDauChuong, activeLots là những lô hiện còn dùng hoặc chuyển được; recentEvents cho biết lô vừa được mua, chuyển hoặc tiêu hao. Khi một món mới xuất hiện, cho nguồn mua/nhặt/luyện và chủ sở hữu hiện ra ngay trên trang. Khi chuyển hoặc dùng món, giữ đúng lô, lượng và chủ đã có để thành quả sau đó nối được thành vốn.
+Nếu mocVongKhachHangChuongNay có giá trị, đó là payoff thương mại của chính chương: dựng thành cảnh hoàn tất và nhìn thấy. Với purchase/return_upgrade, lượng, đơn vị và đối giá trong terms phải được nói hoặc ghi nhận rõ trên trang. Với public_proof, phản ứng của người chứng kiến phải chuyển thành hỏi giá, đặt hàng, mời hợp tác hoặc đổi địa vị ngay trong cảnh.
 Viết tiếng Việt có đủ dấu. Không lẫn tiếng Anh ngoài tên riêng đã có trong truyện. Không bao giờ nhắc tới brief, prompt, hệ thống sinh văn bản hay bất cứ thứ gì ngoài truyện.
 
 Trả về một chương truyện hoàn chỉnh.`;
@@ -36,6 +37,7 @@ export const JUDGE_SYSTEM_PROMPT = `Bạn đọc và soát chương truyện m�
 LỖI CHẶN: chỉ báo lỗi có bằng chứng nguyên văn và làm hỏng canon hoặc giao dịch về sau. Các loại gồm: người chết trở lại; tụt/nhảy cấp trái hệ; vị trí bất khả; sai thời gian; biết bí mật chưa được biết; mâu thuẫn Bible; kim thủ chỉ tự có thêm tác dụng ngoài rule, scope và nấc hiện tại; cùng một món bị bán/đổi chủ hai lần; tài nguyên quan trọng không có nguồn; cấp nghề hoặc cấp cửa hàng tự đổi trái trạng thái. Một khả năng chỉ “có vẻ không hợp lý” không phải bằng chứng.
 Kim thủ chỉ là lợi thế đã duyệt, không phải cái cớ để phát sinh bất kỳ vật phẩm hay quyền lực nào có chữ “hệ thống”. Nếu prose tạo lực đẩy, cưỡng chế, liên lạc xuyên giới, sản xuất hoặc quyền quản lý chưa có trong nấc hiện tại, dùng golden_finger_scope. Nếu người viết gọi tên đúng phẩm nhưng quyền sở hữu, số lượng hay người mua tự mâu thuẫn ngay trên trang, dùng transaction_contradiction.
 soTaiSanDauChuong là sổ sở hữu chính xác. activeLots là hàng còn tồn; recentEvents là bằng chứng hàng vừa chuyển hoặc tiêu hao. Nếu chương dùng, bán hay chuyển một lô không còn active và cũng không mua/nhận/luyện lô mới ngay trên trang, dùng resource_provenance. Nếu dùng quá số lượng hoặc sai chủ, dùng transaction_contradiction.
+mocVongKhachHangChuongNay là kết quả đã hẹn cho chương hiện tại. Nếu prose chỉ nhắc hoặc hẹn sang chương sau thay vì hoàn tất mốc mua, dùng kiếm thành quả, chứng minh công khai hay quay lại nâng cấp tương ứng, ghi steering cụ thể; nếu nó còn làm sai giao dịch/canon thì dùng continuity phù hợp.
 Phần khongDuocTrai là trạng thái ở đầu chương, không phải trần của chương. Nhân vật, cửa hàng hoặc công ty được phép đạt cấp kế tiếp trên trang; nếu hopDongMoDau yêu cầu một cấp hay kết quả mới thì đó là tiến triển bắt buộc, tuyệt đối không báo mâu thuẫn chỉ vì Bible đầu chương vẫn ở cấp cũ. Chỉ chặn khi chương tụt cấp, nhảy trái hệ hoặc kết thúc trái cấp đích.
 
 ĐIỂM ĐỌC 0–5, không bao giờ chặn chương; dùng lái chu kỳ sau:
@@ -95,6 +97,7 @@ ${craftBlock('planner')}
 customerLoop chọn một khách có tên và khóa đủ vòng: nỗi khổ → mua món → dùng món đi săn/làm ăn/hoàn thành nhiệm vụ để kiếm tài nguyên mới → thể hiện công khai → quay lại mua cấp hàng cao hơn. Các bước được phân bố tự nhiên trong escalation và beatSheets, không gom thành lời kể tóm tắt.
 soTaiSanHienTai là vốn thật ở đầu chu kỳ. Chọn món mua và món nâng cấp dựa trên activeLots: khách đã sở hữu món nào thì vòng mới phải mở công dụng, quy mô hoặc cấp hàng khác, không bán lại chính món ấy như lần đầu. Mỗi món dự kiến dùng phải có lô tồn hoặc một cảnh nhập hàng có nguồn trước khi giao.
 Trong customerLoop, purchaseAssetId và returnUpgradeAssetId là ID hàng ổn định, không phải câu mô tả. purchaseMode nói rõ đây là mua lần đầu, mua bổ sung, thay thế hay đơn tổ chức. returnUpgradeMode nói rõ khách quay lại để lấy phẩm cấp cao hơn, năng lực mới, tăng quy mô tổ chức hay mua bổ sung. higher_grade/new_capability phải chỉ sang assetId khác thật sự; hệ thống sẽ đối chiếu các trường này với sổ tài sản trước khi cho viết.
+purchaseTerms và returnUpgradeTerms khóa số lượng, đơn vị cùng đối giá cụ thể phải xuất hiện trong cảnh giao dịch. schedule đặt bốn mốc mua → dùng để kiếm thành quả → chứng minh trước người khác → quay lại mua cao hơn vào bốn chương theo thứ tự và đóng trọn vòng trong tối đa năm chương đầu chu kỳ. Đây là nhịp thương mại chính của cycle, không phải phần việc được dời sau climax.
 
 beatSheets lập cho tối đa ba chương kế tiếp, bắt đầu đúng chuongBatDau, liên tiếp và không vượt qua chuongKetThucCoDinh nếu trường này có giá trị. Mỗi chương ghi hai đến bốn nhịp bằng lời kể, một mục tiêu cảm xúc, một thứ mới sẽ được đặt tên, và kiểu hook kết chương. Chương cuối của chu kỳ phải trả climax bằng kết quả nhìn thấy trước khi mở nextHook. Tuyệt đối không ghi con số trạng thái, không ghi delta tài nguyên, không ghi lịch trình phút.
 Nếu chuKyDangViet có giá trị, đây là lời hứa đã duyệt của chu kỳ hiện tại. Lập các beat tiếp theo để thực hiện đúng pressure, escalation, climax và vongKhachHang ấy; không tự thay bằng một chu kỳ mini khác. Nếu một sự kiện được hẹn sau nhiều ngày, beat đến hạn phải đặt mốc thời gian và phần chuẩn bị nhìn thấy trên trang.

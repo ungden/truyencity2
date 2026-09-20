@@ -265,6 +265,21 @@ describe('cycle lifecycle', () => {
     })).rejects.toThrow(/repeats the payoff kind/);
   });
 
+  test('a planner whose first beat misses the requested chapter gets one corrective attempt', async () => {
+    const provider = stubProvider({
+      planner: [
+        cycle({ startChapter: 9, plannedEndChapter: 17 }),
+        cycle({ startChapter: 8, plannedEndChapter: 16 }),
+      ],
+    });
+    const result = await planNextCycle({
+      provider, routes: DEFAULT_SERIAL_ROUTES, premise, bible: baseBible(),
+      previousCycle: null, cycleNumber: 2, volumeNumber: 1, startChapter: 8, recentVerdicts: [],
+    });
+    expect(result.cycle.beatSheets[0].chapterNumber).toBe(8);
+    expect(result.usages).toHaveLength(2);
+  });
+
   test('a cycle cannot close early or with an overdue hook', () => {
     const bible = baseBible();
     expect(cycleReadyToClose(bible, cycle({ plannedEndChapter: 16 }))).toEqual({ ready: false, reason: 'At chapter 7 of 16.' });
@@ -303,6 +318,9 @@ describe('context selection', () => {
     expect(brief.worldSlice.progressionSystems.length).toBeGreaterThan(0);
     expect(brief).not.toHaveProperty('worldKernel');
     expect(JSON.stringify(brief)).not.toMatch(/requiredDelta|mechanicUse|storyTimeAfterMinutes/);
+    expect(brief.mocVongKhachHangChuongNay).toEqual(expect.objectContaining({
+      step: 'purchase', assetId: 'ho_than_phu_nhat_giai_ha_pham',
+    }));
   });
 
   test('a missing beat sheet is a programming error, not a silent empty chapter', () => {
