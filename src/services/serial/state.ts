@@ -65,13 +65,19 @@ export function assertBibleCoherence(premise: Premise, bible: Bible): void {
  * The planner owns prose; this check only compares its declared transaction intent
  * with the durable inventory that the named customer actually owns.
  */
-export function assertCycleAssetCoherence(bible: Bible, cycle: CyclePlan): void {
+export function assertCycleAssetCoherence(
+  bible: Bible,
+  cycle: CyclePlan,
+  atChapter = cycle.startChapter,
+): void {
   const loop = cycle.customerLoop;
   const ownedAssetIds = new Set(bible.symbolicCore.activeAssetLots
     .filter(lot => lot.ownerId === loop.customerId)
     .map(lot => lot.assetId));
 
-  if (loop.purchaseMode === 'first_acquisition' && ownedAssetIds.has(loop.purchaseAssetId)) {
+  if (atChapter <= loop.schedule.purchaseChapter
+    && loop.purchaseMode === 'first_acquisition'
+    && ownedAssetIds.has(loop.purchaseAssetId)) {
     fail(
       'customer_already_owns_purchase',
       `${loop.customerId} already owns ${loop.purchaseAssetId}; it cannot be sold again as a first acquisition.`,
@@ -85,7 +91,7 @@ export function assertCycleAssetCoherence(bible: Bible, cycle: CyclePlan): void 
         `${loop.customerId}'s promised upgrade repeats ${loop.purchaseAssetId} instead of naming a distinct asset.`,
       );
     }
-    if (ownedAssetIds.has(loop.returnUpgradeAssetId)) {
+    if (atChapter <= loop.schedule.returnUpgradeChapter && ownedAssetIds.has(loop.returnUpgradeAssetId)) {
       fail(
         'customer_already_owns_upgrade',
         `${loop.customerId} already owns the promised upgrade ${loop.returnUpgradeAssetId}.`,

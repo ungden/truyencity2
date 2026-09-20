@@ -265,6 +265,12 @@ describe('serial state merge', () => {
 
     expect(() => assertCycleAssetCoherence(bible, cycle({ customerLoop: {
       ...baseline,
+      purchaseAssetId: 'man_nguu_luyen_the_quyet_nhat_giai_trung_pham',
+      purchaseMode: 'first_acquisition',
+    } }), 9)).not.toThrow();
+
+    expect(() => assertCycleAssetCoherence(bible, cycle({ customerLoop: {
+      ...baseline,
       purchaseAssetId: 'ho_than_phu_nhat_giai_ha_pham',
       purchaseMode: 'first_acquisition',
       returnUpgradeAssetId: 'ho_than_phu_nhat_giai_ha_pham',

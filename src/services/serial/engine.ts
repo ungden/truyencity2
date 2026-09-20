@@ -96,7 +96,7 @@ export async function writeOneChapter(input: {
 }): Promise<ChapterOutcome> {
   const { provider, routes, premise, bible, cycle, chapterNumber } = input;
   assertBibleCoherence(premise, bible);
-  assertCycleAssetCoherence(bible, cycle);
+  assertCycleAssetCoherence(bible, cycle, chapterNumber);
   const usages: ProviderUsage[] = [];
   const writerBrief = buildWriterBrief({ premise, bible, cycle, chapterNumber, previousChapter: input.previousChapter });
 
@@ -236,7 +236,7 @@ export async function planNextCycle(input: {
       );
     }
     assertPayoffRotation(input.previousCycle, candidate);
-    assertCycleAssetCoherence(input.bible, candidate);
+    assertCycleAssetCoherence(input.bible, candidate, input.startChapter);
   };
   try {
     assertPlan(firstCycle);
