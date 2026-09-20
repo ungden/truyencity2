@@ -10,7 +10,7 @@ import { readFileSync } from 'node:fs';
 import { createClient } from '@supabase/supabase-js';
 import { z } from 'zod';
 import {
-  AssetEventSchema, ChapterDigestSchema, PremiseSchema, type ChapterDigest,
+  AssetEventSchema, BibleSchema, ChapterDigestSchema, PremiseSchema, type ChapterDigest,
 } from '@/services/serial/contracts';
 import { SERIAL_PROMPT_VERSION } from '@/services/serial/prompts';
 import { rebuildBibleFromDigests, seedBible } from '@/services/serial/state';
@@ -25,6 +25,7 @@ if (!snapshotPath) throw new Error('--snapshot=<json> is required.');
 const SnapshotSchema = z.object({
   serialId: z.string().uuid(),
   throughChapter: z.number().int().min(1),
+  replanCurrentCycle: z.boolean().default(false),
   chapters: z.array(z.object({
     chapterNumber: z.number().int().min(1),
     assetEvents: z.array(AssetEventSchema).max(24),
@@ -124,7 +125,39 @@ async function main(): Promise<void> {
     updated_at: new Date().toISOString(),
   }).eq('id', snapshot.serialId);
   if (serialUpdate.error) throw serialUpdate.error;
-  console.log('Asset ledger backfill applied. Prose and publication state were unchanged.');
+
+  if (snapshot.replanCurrentCycle) {
+    const jobUpdate = await db.from('serial_jobs').update({
+      stage: 'plan_cycle',
+      last_error: 'Sổ tài sản lịch sử đã được backfill; lập lại cycle hiện tại từ quyền sở hữu và số dư thật.',
+      next_run_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }).eq('serial_novel_id', snapshot.serialId).eq('status', 'paused');
+    if (jobUpdate.error) throw jobUpdate.error;
+  }
+
+  const [verifiedSerial, verifiedJob] = await Promise.all([
+    db.from('serial_novels').select('bible,prompt_version').eq('id', snapshot.serialId).single(),
+    db.from('serial_jobs').select('status,stage,current_chapter,lease_owner,lease_token,last_error')
+      .eq('serial_novel_id', snapshot.serialId).single(),
+  ]);
+  if (verifiedSerial.error) throw verifiedSerial.error;
+  if (verifiedJob.error) throw verifiedJob.error;
+  const verifiedBible = BibleSchema.parse(verifiedSerial.data.bible);
+  const expectedLots = liveBible.symbolicCore.activeAssetLots.map(lot => lot.lotId).sort();
+  const actualLots = verifiedBible.symbolicCore.activeAssetLots.map(lot => lot.lotId).sort();
+  if (JSON.stringify(expectedLots) !== JSON.stringify(actualLots)) {
+    throw new Error('Production readback does not match the rebuilt asset ledger.');
+  }
+  console.log(JSON.stringify({
+    verified: true,
+    promptVersion: verifiedSerial.data.prompt_version,
+    chapter: verifiedBible.symbolicCore.chapterNumber,
+    activeLots: actualLots.length,
+    job: verifiedJob.data,
+    proseChanged: false,
+    publicationChanged: false,
+  }, null, 2));
 }
 
 main().catch(error => {

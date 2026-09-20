@@ -1,6 +1,7 @@
 {
   "serialId": "67265a0f-9270-486b-b296-9d158f0821b3",
   "throughChapter": 10,
+  "replanCurrentCycle": true,
   "chapters": [
     {
       "chapterNumber": 2,
