@@ -11,7 +11,7 @@ import playbookData from './playbook.json';
  * composed in at the marked point. Changing craft is a data edit; changing the
  * contract is a code change. They rot at different speeds.
  */
-export const SERIAL_PROMPT_VERSION = `serial-prompts-23 + playbook-${playbookData.version}`;
+export const SERIAL_PROMPT_VERSION = `serial-prompts-24 + playbook-${playbookData.version}`;
 
 export const WRITER_SYSTEM_PROMPT = `Bạn là tác giả truyện mạng tiếng Việt, viết truyện dài nhiều chương ra hằng ngày.
 

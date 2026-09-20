@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { StoryModelProvider } from '@/services/story-factory/provider';
-import { editorialNotesFromError, mergeEditorialNotes, mergeRollingCyclePlan, runSerialTick, runSerialTicks, CYCLES_PER_VOLUME } from '@/services/serial/runtime';
+import { editorialNotesFromError, mergeEditorialNotes, mergeRollingCyclePlan, runSerialTick, runSerialTicks, CYCLES_PER_VOLUME, serialFailureDisposition } from '@/services/serial/runtime';
+import { StoryFactoryError } from '@/services/story-factory/contracts';
 import { premise, baseBible, cycle } from './fixtures';
 import { DEFAULT_SERIAL_ROUTES } from '@/services/serial/routes';
 
@@ -28,6 +29,7 @@ function fakeDb(script: Script) {
     const self: Record<string, unknown> = {
       select: () => self,
       eq: () => self,
+      in: () => self,
       not: () => self,
       order: () => self,
       limit: () => self,
@@ -215,7 +217,7 @@ describe('serial runtime', () => {
     expect(bible.recentSummary.length).toBeLessThanOrEqual(3);
   });
 
-  test('a stage that throws releases its lease with a backoff instead of holding it', async () => {
+  test('an invalid stage releases its lease and pauses instead of retrying the same bug forever', async () => {
     const { db, writes } = fakeDb({
       rows: {},
       rpc: { claim_serial_job: job({ stage: 'nonsense' }) },
@@ -226,9 +228,42 @@ describe('serial runtime', () => {
     expect(result.status).toBe('failed');
     expect(result.detail).toMatch(/Unknown serial stage nonsense/);
     const release = writes.find(write => write.table === 'serial_jobs');
-    expect(release?.value).toMatchObject({ status: 'ready', lease_token: null });
+    expect(release?.value).toMatchObject({ status: 'paused', lease_token: null, retry_count: 1 });
     // Backed off rather than retried immediately.
     expect(new Date(release?.value.next_run_at as string).getTime()).toBeGreaterThan(before + 4 * 60_000);
+  });
+
+  test('configuration and schema errors pause; transient errors have a cross-tick budget', () => {
+    expect(serialFailureDisposition(new StoryFactoryError('infra_blocked', 'Bad key', { providerCredential: true }), 1)).toBe('paused');
+    expect(serialFailureDisposition(new StoryFactoryError('infra_blocked', 'Bad output', { issues: ['wrong id'] }), 1)).toBe('paused');
+    expect(serialFailureDisposition(new Error('Connection timed out'), 1)).toBe('ready');
+    expect(serialFailureDisposition(new Error('Connection timed out'), 3)).toBe('paused');
+  });
+
+  test('planning receives failed verdicts with newest feedback first', async () => {
+    const verdict = (note: string) => ({
+      continuity: [], scorecard: { opening: 4, anticipation: 4, payoff: 4, newness: 4, endHook: 4 },
+      craft: { protagonistAgency: 4, sceneLife: 4, worldLogic: 4, dialogueNaturalness: 4, structuralFreshness: 4 },
+      repetition: [], aiFlavor: [], steering: [note],
+    });
+    const { db } = fakeDb({ rows: {
+      serial_novels: novelRow(),
+      serial_cycles: { id: 'cy1', cycle_number: 2, volume_number: 1, start_chapter: 8, end_chapter: 16, plan: cycle() },
+      serial_runs: [
+        { status: 'failed', verdict: verdict('Mới: sửa nguồn hàng đã bị chấm sai.') },
+        { status: 'committed', verdict: verdict('Cũ: mở cơ hội mua bán tiếp theo.') },
+      ],
+    }, rpc: { claim_serial_job: job({ stage: 'plan_cycle' }) } });
+    const prompts: string[] = [];
+    const provider = { async json(args: { prompt: string }) {
+      prompts.push(args.prompt);
+      return { value: cycle(), usage: { model: 'test', inputTokens: 1, outputTokens: 1, costUsd: 0 } };
+    } } as unknown as StoryModelProvider;
+    const result = await runSerialTick({ db, provider });
+    expect(result.status).toBe('completed');
+    expect(prompts).toHaveLength(1);
+    expect(prompts[0].indexOf('Mới:')).toBeLessThan(prompts[0].indexOf('Cũ:'));
+    expect(prompts[0]).toContain('Mới: sửa nguồn hàng đã bị chấm sai.');
   });
 
   test('draining stops at the first idle claim', async () => {

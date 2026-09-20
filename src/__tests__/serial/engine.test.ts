@@ -134,7 +134,7 @@ describe('chapter loop', () => {
     expect(provider.calls).toEqual(['writer', 'judge', 'writer', 'judge', 'extractor']);
   });
 
-  test('a contradiction that survives repair and rewrite replans instead of parking', async () => {
+  test('a surviving contradiction returns its evidence without another blind full rewrite', async () => {
     const provider = stubProvider({
       writer: [draft(), draft(), draft()],
       judge: [
@@ -147,12 +147,13 @@ describe('chapter loop', () => {
 
     expect(result.status).toBe('needs_replan');
     if (result.status !== 'needs_replan') return;
-    expect(result.reason).toMatch(/beat sheet is the problem/);
+    expect(result.reason).toMatch(/Reconcile the supplied canon and beat/);
     expect(result.reason).toContain(finding[0].kind);
     expect(result.reason).toContain(finding[0].quote);
     expect(result.findings).toHaveLength(1);
-    // Three writer calls and three judge calls, and it never reached the extractor.
-    expect(provider.calls.filter(call => call === 'writer')).toHaveLength(3);
+    expect(result.verdict.continuity).toEqual(finding);
+    expect(result.attempts).toBe(2);
+    expect(provider.calls.filter(call => call === 'writer')).toHaveLength(2);
     expect(provider.calls).not.toContain('extractor');
   });
 

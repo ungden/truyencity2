@@ -3,6 +3,7 @@ import type { StoryModelProvider, ProviderUsage } from '@/services/story-factory
 import { ChapterDraftSchema, type ChapterDraft, type Premise } from './contracts';
 import { normalizeChapterDraft } from './agents';
 import { craftBlock } from './playbook';
+import { applyEditorialPatch, containsQuote, EditorialPatchSchema, factsForChapter, type EditorialFact, type EditorialFeedback } from './editorial-policy';
 
 const score = z.number().int().min(0).max(5);
 
@@ -18,6 +19,7 @@ export const EditorialReviewSchema = z.object({
     continuity: score,
   }).strict(),
   issues: z.array(z.object({
+    target: z.enum(['prose', 'context']).default('prose'),
     severity: z.enum(['blocking', 'important', 'minor']),
     quote: z.string().trim().min(4).max(400),
     explain: z.string().trim().min(4).max(600),
@@ -33,10 +35,17 @@ export interface EditorialRewriteInput {
   chapter: ChapterDraft;
   previousTail: string;
   nextHead: string;
-  canonicalDigest: unknown;
-  plannedBeat: unknown;
+  /** Historical inputs are retained for callers but never treated as reviewed canon. */
+  canonicalDigest?: unknown;
+  plannedBeat?: unknown;
   direction: string[];
   priorCritique?: EditorialReview;
+  canon?: EditorialFact[];
+  reviewFocus?: EditorialFeedback[];
+  /** Reuse the current candidate after a failed audit; repair it rather than regenerating it. */
+  mode?: 'rewrite' | 'repair';
+  resume?: EditorialRewriteResult;
+  onCheckpoint?: (result: EditorialRewriteResult) => void;
   model: string;
 }
 
@@ -47,9 +56,12 @@ export interface EditorialRewriteResult {
   attempts: number;
   usages: ProviderUsage[];
   costUsd: number;
+  decision: 'accepted' | 'needs_review' | 'context_review' | 'repair_rejected';
+  history: Array<{ chapter: ChapterDraft; review: EditorialReview; action: string }>;
+  diagnostics: string[];
 }
 
-export const EDITORIAL_REWRITE_SYSTEM_PROMPT = `Bạn là biên tập viên kiêm tác giả truyện mạng thương mại tiếng Việt. Bạn đang viết lại một chương đã đúng canon nhưng đọc còn máy móc.
+export const EDITORIAL_REWRITE_SYSTEM_PROMPT = `Bạn là biên tập viên kiêm tác giả truyện mạng thương mại tiếng Việt. Bạn biên tập chương theo canon đã duyệt và mục tiêu cảnh cụ thể.
 
 Mục tiêu là cùng một sự thật truyện trở thành một chương sống:
 - Một người muốn một kết quả cụ thể; lựa chọn và hành động của họ đẩy cảnh đi.
@@ -62,7 +74,7 @@ Mục tiêu là cùng một sự thật truyện trở thành một chương s�
 - Khi chương nằm trong một vòng khách hàng, dựng phần việc thật của vòng: khách mua đúng món, dùng nó để săn/kiếm tiền/thăng cấp, phô ra kết quả trước người từng coi thường hoặc người hiểu giá, rồi mang tài nguyên và địa vị mới trở lại mua món cao hơn. Không kể tóm tắt cả vòng và không để khách chỉ giàu lên mà không đổi năng lực hoặc vị thế.
 - Cửa xuyên và người có quyền đi qua phải đúng nguyên văn luật kim thủ chỉ.
 
-Giữ nguyên các sự thật trong canonicalDigest, số hàng, bên giao nhận, cấp bậc, người biết bí mật, kết quả đã ảnh hưởng chương sau và tiêu đề được cấp. Có thể thay toàn bộ cách dựng cảnh, lời thoại, thứ tự chi tiết và góc nhìn để chương tự nhiên hơn. Dùng tiếng Việt có dấu, đoạn ngắn, giàu thoại và hành động. Thân chương khoảng 1.400–2.100 từ.
+Canon đã duyệt là nguồn sự thật về giao dịch và tiến triển. Chỉ đạo chương xác định cảnh cần viết; đoạn nối hai bên cung cấp ngữ cảnh. Bản cũ là nguyên liệu biên tập. Giữ tên chương cùng các sự thật đã duyệt, dựng chúng thành lựa chọn, hành động và kết quả. Dùng tiếng Việt có dấu, đoạn ngắn, giàu thoại và hành động. Thân chương khoảng 1.400–2.100 từ.
 
 ${craftBlock('writer')}
 
@@ -73,14 +85,14 @@ export const EDITORIAL_REVIEW_SYSTEM_PROMPT = `Bạn là tổng biên tập đ�
 Chấm 0–5 tám mặt: vai trò chủ động của main, sức sống cảnh, logic thế giới, thoại tự nhiên, cấu trúc mới, đà đi lên của khách hàng, payoff và continuity. Điểm 4 nghĩa là có thể đăng; 5 chỉ dành cho chương thật sự nổi bật.
 
 Một chương đạt khi:
-- mọi sự thật trong canonicalDigest và nối cảnh hai bên được giữ;
+- sự thật trong canon đã duyệt và nối cảnh hai bên được giữ;
 - luật cửa xuyên, cấp bậc, giao dịch và quyền sở hữu hợp logic;
 - lời hẹn trọng tâm được trả bằng kết quả nhìn thấy;
 - chương đọc như truyện, không như dashboard, biên bản, bài thuyết trình hay prompt được nhân vật đọc thành lời;
 - phản ứng xuất phát từ lợi ích riêng, không phải đám đông đồng thanh để xác nhận checklist.
 - nếu brief giao một mắt xích của vòng khách hàng thì mắt xích ấy phải xảy ra trên trang và tạo vốn, sức mạnh hoặc địa vị cho lần mua kế tiếp.
 
-Mỗi issue phải trích nguyên văn và đưa hướng sửa dương tính: cảnh nào, ai muốn gì, hành động nào nên gánh thông tin. Chỉ dùng blocking cho mâu thuẫn canon/logic làm hỏng chương sau; important cho lỗi văn làm mất hứng đọc; minor cho tiểu tiết.`;
+Mỗi issue có target: prose khi lỗi nằm trong chương đang chấm, context khi các nguồn được cấp mâu thuẫn nhau. Với prose, quote phải có nguyên văn trong chính bảnVietLai. Nêu hướng sửa dương tính và hệ quả đối với trải nghiệm đọc. Chỉ dùng blocking cho mâu thuẫn canon/logic làm hỏng chương sau; important cho lỗi văn làm mất hứng đọc; minor cho tiểu tiết. Chấm mắt xích khách hàng được giao cho chương này trong toàn vòng; một chương săn hàng có thể đạt 4 dù cảnh mua nâng cấp nằm ở chương sau. Điểm là đánh giá, mỗi vấn đề cần sửa có một issue cụ thể.`;
 
 const totalCost = (usages: ProviderUsage[]): number => Number(
   usages.reduce((sum, usage) => sum + usage.costUsd, 0).toFixed(6),
@@ -95,7 +107,7 @@ export function editorialReviewPasses(review: EditorialReview, chapter: ChapterD
     && wordCount <= 2_300;
 }
 
-const brief = (input: EditorialRewriteInput, critique?: EditorialReview) => ({
+const brief = (input: EditorialRewriteInput) => ({
   truyen: {
     tieuDe: input.premise.title,
     readerFantasy: input.premise.readerFantasy,
@@ -105,12 +117,10 @@ const brief = (input: EditorialRewriteInput, critique?: EditorialReview) => ({
   chuongSo: input.chapterNumber,
   tieuDeGiuNguyen: input.chapter.title,
   banCu: input.chapter.content,
-  suThatPhaiGiu: input.canonicalDigest,
-  nhipKeHoach: input.plannedBeat,
+  canonDaDuyet: factsForChapter(input.canon ?? [], input.chapterNumber),
   chiDaoBienTap: input.direction,
   doanCuoiChuongTruoc: input.previousTail,
   doanDauChuongSau: input.nextHead,
-  phanBienBanTruoc: critique ?? input.priorCritique ?? null,
 });
 
 async function reviewDraft(
@@ -123,11 +133,14 @@ async function reviewDraft(
     system: EDITORIAL_REVIEW_SYSTEM_PROMPT,
     prompt: JSON.stringify({
       chuongSo: input.chapterNumber,
-      canonicalDigest: input.canonicalDigest,
+      readerFantasy: input.premise.readerFantasy,
+      kimThuChi: { ten: input.premise.goldenFinger.name, luat: input.premise.goldenFinger.rule, phamVi: input.premise.goldenFinger.scope },
+      canonDaDuyet: factsForChapter(input.canon ?? [], input.chapterNumber),
       chiDaoBienTap: input.direction,
       doanCuoiChuongTruoc: input.previousTail,
       doanDauChuongSau: input.nextHead,
       banVietLai: chapter,
+      diemCanKiemTuLanTruoc: input.reviewFocus ?? [],
     }, null, 1),
     schema: EditorialReviewSchema,
     temperature: 0.2,
@@ -140,45 +153,89 @@ export async function rewriteChapterEditorially(
   provider: StoryModelProvider,
   input: EditorialRewriteInput,
 ): Promise<EditorialRewriteResult> {
-  const usages: ProviderUsage[] = [];
-  const first = await provider.json({
-    model: input.model,
-    system: EDITORIAL_REWRITE_SYSTEM_PROMPT,
-    prompt: JSON.stringify(brief(input), null, 1),
-    schema: ChapterDraftSchema,
-    temperature: 0.9,
-    timeoutMs: 240_000,
-  });
-  usages.push(first.usage);
-  let chapter = normalizeChapterDraft({ ...first.value, title: input.chapter.title });
-  let reviewed = await reviewDraft(provider, input, chapter);
-  usages.push(reviewed.usage);
-
-  if (!editorialReviewPasses(reviewed.review, chapter)) {
-    const second = await provider.json({
+  // Validate the source contract before any paid call. Digests/old beats are derived
+  // from the superseded prose and deliberately do not enter the editorial prompt.
+  factsForChapter(input.canon ?? [], input.chapterNumber);
+  const usages: ProviderUsage[] = [...(input.resume?.usages ?? [])];
+  const diagnostics: string[] = [...(input.resume?.diagnostics ?? [])];
+  const history: EditorialRewriteResult['history'] = [...(input.resume?.history ?? [])];
+  let attempts = input.resume?.attempts ?? 0;
+  let chapter = input.resume?.chapter ?? input.chapter;
+  if (!input.resume && input.mode !== 'repair') {
+    const first = await provider.json({
       model: input.model,
       system: EDITORIAL_REWRITE_SYSTEM_PROMPT,
-      prompt: JSON.stringify({
-        ...brief(input, reviewed.review),
-        banVietLaiLanDau: chapter,
-        yeuCau: 'Viết lại toàn chương theo phản biện. Giữ canon, nhưng dựng lại cảnh để các lỗi quan trọng biến mất.',
-      }, null, 1),
+      prompt: JSON.stringify(brief(input), null, 1),
       schema: ChapterDraftSchema,
-      temperature: 0.8,
+      temperature: 0.9,
+      timeoutMs: 240_000,
+    });
+    usages.push(first.usage);
+    chapter = normalizeChapterDraft({ ...first.value, title: input.chapter.title });
+    attempts++;
+  }
+  let reviewed: { review: EditorialReview };
+  if (input.resume) {
+    reviewed = { review: EditorialReviewSchema.parse(input.resume.review) };
+  } else {
+    const firstReview = await reviewDraft(provider, input, chapter);
+    reviewed = firstReview;
+    usages.push(firstReview.usage);
+    history.push({ chapter, review: reviewed.review, action: input.mode === 'repair' ? 'review_existing' : 'rewrite' });
+  }
+  const result = (decision: EditorialRewriteResult['decision']): EditorialRewriteResult => ({
+    chapter, review: reviewed.review, accepted: decision === 'accepted', attempts,
+    usages: [...usages], costUsd: totalCost(usages), decision, history: [...history], diagnostics: [...diagnostics],
+  });
+  input.onCheckpoint?.(result('needs_review'));
+  if (editorialReviewPasses(reviewed.review, chapter)) return result('accepted');
+
+  const issues = reviewed.review.issues.filter(issue => issue.severity !== 'minor');
+  if (issues.some(issue => issue.target === 'context' || !containsQuote(chapter.content, issue.quote))) {
+    diagnostics.push('Review requires context/evidence correction before prose repair.');
+    return result('context_review');
+  }
+  // Low scores without an actionable diagnosis cannot justify another generation.
+  if (issues.length === 0) return result('needs_review');
+  const original = { chapter, reviewed };
+  try {
+    const second = await provider.json({
+      model: input.model,
+      system: 'Bạn sửa các đoạn được chỉ ra trong một chương đã viết. Trả edits gồm before nguyên văn liên tiếp và duy nhất trong chương, after là đoạn thay thế. Giữ nguyên những cảnh đã tốt và sửa hệ quả trực tiếp của lỗi trong cùng đoạn. Phạm vi sửa tối đa 35% chương. Canon đã duyệt là nguồn sự thật.',
+      prompt: JSON.stringify({
+        canonDaDuyet: factsForChapter(input.canon ?? [], input.chapterNumber),
+        kimThuChi: { ten: input.premise.goldenFinger.name, luat: input.premise.goldenFinger.rule, phamVi: input.premise.goldenFinger.scope },
+        chiDaoBienTap: input.direction,
+        banVietLai: chapter,
+        loiCanSua: issues,
+      }, null, 1),
+      schema: EditorialPatchSchema,
+      temperature: 0.3,
       timeoutMs: 240_000,
     });
     usages.push(second.usage);
-    chapter = normalizeChapterDraft({ ...second.value, title: input.chapter.title });
-    reviewed = await reviewDraft(provider, input, chapter);
-    usages.push(reviewed.usage);
+    attempts++;
+    chapter = applyEditorialPatch(chapter, second.value);
+    const repairedReview = await reviewDraft(provider, input, chapter);
+    reviewed = repairedReview;
+    usages.push(repairedReview.usage);
+    history.push({ chapter, review: reviewed.review, action: 'targeted_patch' });
+    const burden = (review: EditorialReview) => review.issues.reduce((sum, issue) =>
+      sum + (issue.severity === 'blocking' ? 100 : issue.severity === 'important' ? 10 : 0), 0);
+    const average = (review: EditorialReview) => Object.values(review.scores).reduce((a, b) => a + b, 0) / 8;
+    if (burden(reviewed.review) > burden(original.reviewed.review)
+      || (burden(reviewed.review) === burden(original.reviewed.review)
+        && average(reviewed.review) <= average(original.reviewed.review))) {
+      chapter = original.chapter;
+      reviewed = original.reviewed;
+      diagnostics.push('Repair did not improve the review; retained the previous candidate.');
+      return result('repair_rejected');
+    }
+  } catch (error) {
+    chapter = original.chapter;
+    reviewed = original.reviewed;
+    diagnostics.push(error instanceof Error ? error.message : String(error));
+    return result('repair_rejected');
   }
-
-  return {
-    chapter,
-    review: reviewed.review,
-    accepted: editorialReviewPasses(reviewed.review, chapter),
-    attempts: usages.length > 2 ? 2 : 1,
-    usages,
-    costUsd: totalCost(usages),
-  };
+  return result(editorialReviewPasses(reviewed.review, chapter) ? 'accepted' : 'needs_review');
 }

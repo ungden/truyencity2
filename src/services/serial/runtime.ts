@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { ZodError } from 'zod';
 import type { ProviderUsage, StoryModelProvider } from '@/services/story-factory/provider';
 import { geminiProvider } from '@/services/story-factory/provider';
 import { StoryFactoryError } from '@/services/story-factory/contracts';
@@ -8,6 +9,7 @@ import {
 } from './contracts';
 import { SERIAL_PROMPT_VERSION } from './prompts';
 import { auditFourChapterOpening, foldVolume, planNextCycle, writeOneChapter } from './engine';
+import { SerialStateError } from './state';
 
 /**
  * The state machine. One stage per claim, lease-guarded, every mutation through an RPC.
@@ -15,8 +17,8 @@ import { auditFourChapterOpening, foldVolume, planNextCycle, writeOneChapter } f
  * There is no blocked status to recover from. A chapter that will not come out right
  * replans its cycle; a cycle that will not come out right twice pauses the story for a
  * person to read it. Premise approval and the chapter-four opening review are the two
- * launch gates; after launch, a twice-replanned cycle is the only human interruption.
- * In every case the job is to read, not to repair state by hand.
+ * launch gates. Deterministic input/configuration failures pause for correction;
+ * transient failures have a durable retry budget across cron invocations.
  */
 
 /** Chapters are private until their whole cycle publishes, so a volume is ten cycles. */
@@ -24,6 +26,15 @@ export const CYCLES_PER_VOLUME = 10;
 /** Leave room for a write + judge + extract sequence inside one invocation. */
 export const TICK_BUDGET_MS = 240_000;
 const LEASE_MINUTES = 15;
+
+export function serialFailureDisposition(error: unknown, retryCount: number): 'paused' | 'ready' {
+  const evidence = error instanceof StoryFactoryError && error.evidence && typeof error.evidence === 'object'
+    ? error.evidence as { providerCredential?: boolean; issues?: unknown } : null;
+  const message = error instanceof Error ? error.message : String(error);
+  if (error instanceof ZodError || error instanceof SerialStateError || evidence?.providerCredential
+    || evidence?.issues || /structured-output JSON contract|application schema validation|Unknown serial stage/.test(message)) return 'paused';
+  return retryCount >= 3 ? 'paused' : 'ready';
+}
 
 export const editorialNotesFromError = (value: string | null): string[] => value
   ? value.split(/\s+\|\s+/).map(note => note.trim().slice(0, 1_200)).filter(Boolean).slice(0, 8)
@@ -68,6 +79,7 @@ interface SerialJobRow {
   stage: SerialStage;
   current_chapter: number;
   current_cycle_id: string | null;
+  retry_count: number;
   lease_token: string;
   daily_target: number;
   consecutive_replans: number;
@@ -112,6 +124,7 @@ async function loadNovel(db: SupabaseClient, id: string): Promise<{
 async function releaseLease(db: SupabaseClient, job: SerialJobRow, patch: Record<string, unknown>): Promise<void> {
   const { error } = await db.from('serial_jobs').update({
     lease_owner: null, lease_token: null, lease_until: null,
+    retry_count: 0,
     updated_at: new Date().toISOString(), ...patch,
   }).eq('id', job.id).eq('lease_token', job.lease_token);
   if (error) throw error;
@@ -153,12 +166,13 @@ async function stagePlanCycle(
     .select('verdict')
     .eq('serial_novel_id', job.serial_novel_id)
     .eq('kind', 'chapter')
-    .in('status', ['committed', 'published'])
+    .in('status', ['committed', 'published', 'failed', 'replanned'])
     .not('verdict', 'is', null)
     .order('finished_at', { ascending: false })
     .limit(8);
   if (recentRunsError) throw recentRunsError;
-  const recentVerdicts = (recentRunRows ?? []).flatMap(row => {
+  // collectSteering expects chronological input and prioritizes its newest entries.
+  const recentVerdicts = [...(recentRunRows ?? [])].reverse().flatMap(row => {
     const parsed = JudgeVerdictSchema.safeParse((row as { verdict: unknown }).verdict);
     return parsed.success ? [parsed.data] : [];
   });
@@ -280,10 +294,12 @@ async function stageWrite(
   });
 
   if (outcome.status === 'needs_replan') {
-    await db.from('serial_runs').update({
+    const savedFailure = await db.from('serial_runs').update({
       status: 'failed', usage: outcome.usages, cost_usd: outcome.costUsd,
+      verdict: outcome.verdict, attempts: outcome.attempts,
       error: outcome.reason, finished_at: new Date().toISOString(),
     }).eq('id', runId);
+    if (savedFailure.error) throw savedFailure.error;
     const { data, error } = await db.rpc('replan_serial_cycle', {
       p_job_id: job.id, p_lease_token: job.lease_token,
       p_cycle_id: job.current_cycle_id, p_reason: outcome.reason,
@@ -432,16 +448,17 @@ export async function runSerialTick(input: {
       default: throw new Error(`Unknown serial stage ${String(job.stage)}`);
     }
   } catch (stageError) {
-    // Transport and provider failures are transient by default: back off and retry the
-    // same stage. Nothing here can put a story into a state only a person can leave.
+    // A malformed contract/key will not heal by rerunning the same paid stage.
     const message = stageError instanceof Error ? stageError.message : String(stageError);
     const evidence = stageError instanceof StoryFactoryError && stageError.evidence && typeof stageError.evidence === 'object'
       ? stageError.evidence as { issues?: unknown; usage?: ProviderUsage }
       : null;
     const issueText = evidence?.issues ? ` ${JSON.stringify(evidence.issues).slice(0, 320)}` : '';
     const detail = `${message}${issueText}`;
+    const retryCount = (job.retry_count ?? 0) + 1;
     await releaseLease(db, job, {
-      status: 'ready',
+      status: serialFailureDisposition(stageError, retryCount),
+      retry_count: retryCount,
       next_run_at: new Date(Date.now() + 5 * 60_000).toISOString(),
       last_error: detail.slice(0, 500),
     });

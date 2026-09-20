@@ -14,10 +14,8 @@ import { applyDigest, assertPayoffRotation, overdueHooks, SerialStateError } fro
 /**
  * The chapter loop and the cycle lifecycle.
  *
- * Failure policy, in one sentence: a chapter never parks. A contradiction buys one
- * targeted repair, then one clean rewrite, and if it still contradicts, the beat sheet
- * was wrong and the cycle gets replanned. The old engine had four `*_blocked` statuses
- * that waited for a human; every production job is sitting in one of them right now.
+ * A cited contradiction buys one repair. Surviving evidence goes back to planning;
+ * regenerating the chapter with the same context does not diagnose the source.
  */
 
 export interface ChapterCommitted {
@@ -38,6 +36,8 @@ export interface ChapterNeedsReplan {
   findings: JudgeVerdict['continuity'];
   usages: ProviderUsage[];
   costUsd: number;
+  verdict: JudgeVerdict;
+  attempts: number;
 }
 
 export type ChapterOutcome = ChapterCommitted | ChapterNeedsReplan;
@@ -122,26 +122,14 @@ export async function writeOneChapter(input: {
     attempts += 1;
   }
 
-  // One clean rewrite, with the surviving findings in front of it.
-  if (verdict.continuity.length > 0) {
-    const rewritten = await writeChapter({
-      provider, routes, premise,
-      writerBrief: { ...writerBrief, loiCanTranh: verdict.continuity },
-    });
-    usages.push(rewritten.usage);
-    draft = rewritten.value;
-    verdict = await judge(draft);
-    attempts += 1;
-  }
-
   if (verdict.continuity.length > 0) {
     const evidence = verdict.continuity.map(finding =>
       `${finding.kind}: ${finding.explain} Quote: ${finding.quote}`
     ).join(' | ');
     return {
       status: 'needs_replan', chapterNumber,
-      reason: `Chapter still contradicts canon after a repair and a rewrite; the beat sheet is the problem. ${evidence}`.slice(0, 4_000),
-      findings: verdict.continuity, usages, costUsd: totalCost(usages),
+      reason: `Contradiction survived one repair. Reconcile the supplied canon and beat before writing again. ${evidence}`.slice(0, 4_000),
+      findings: verdict.continuity, verdict, attempts, usages, costUsd: totalCost(usages),
     };
   }
 
@@ -175,7 +163,7 @@ export async function writeOneChapter(input: {
       return {
         status: 'needs_replan', chapterNumber,
         reason: `State merge rejected the digest after one extractor repair (${repairError.rule}): ${repairError.message}`,
-        findings: [], usages, costUsd: totalCost(usages),
+        findings: [], verdict, attempts, usages, costUsd: totalCost(usages),
       };
     }
   }
