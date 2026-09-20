@@ -3,7 +3,7 @@ import type { ProviderUsage, StoryModelProvider } from '@/services/story-factory
 import { geminiProvider } from '@/services/story-factory/provider';
 import { StoryFactoryError } from '@/services/story-factory/contracts';
 import {
-  BibleSchema, CyclePlanSchema, PremiseSchema, SerialRoutesSchema, scorecardAverage,
+  BibleSchema, CyclePlanSchema, JudgeVerdictSchema, PremiseSchema, SerialRoutesSchema, scorecardAverage,
   type Bible, type CyclePlan, type Premise, type SerialRoutes,
 } from './contracts';
 import { SERIAL_PROMPT_VERSION } from './prompts';
@@ -46,13 +46,15 @@ export function mergeRollingCyclePlan(input: {
   startChapter: number;
   endChapter: number;
 }): CyclePlan {
+  const beatSheets = input.rolling.beatSheets
+    .filter(sheet => sheet.chapterNumber <= input.endChapter);
   return CyclePlanSchema.parse({
     ...input.active,
     cycleNumber: input.cycleNumber,
     volumeNumber: input.volumeNumber,
     startChapter: input.startChapter,
     plannedEndChapter: input.endChapter,
-    beatSheets: input.rolling.beatSheets,
+    beatSheets,
     editorialNotes: mergeEditorialNotes(input.rolling.editorialNotes, input.active.editorialNotes),
   });
 }
@@ -147,6 +149,19 @@ async function stagePlanCycle(
   const extending = job.current_cycle_id !== null;
   const previous = lastCycle && !extending ? CyclePlanSchema.safeParse(lastCycle.plan) : null;
   const active = lastCycle && extending ? CyclePlanSchema.safeParse(lastCycle.plan) : null;
+  const { data: recentRunRows, error: recentRunsError } = await db.from('serial_runs')
+    .select('verdict')
+    .eq('serial_novel_id', job.serial_novel_id)
+    .eq('kind', 'chapter')
+    .in('status', ['committed', 'published'])
+    .not('verdict', 'is', null)
+    .order('finished_at', { ascending: false })
+    .limit(8);
+  if (recentRunsError) throw recentRunsError;
+  const recentVerdicts = (recentRunRows ?? []).flatMap(row => {
+    const parsed = JudgeVerdictSchema.safeParse((row as { verdict: unknown }).verdict);
+    return parsed.success ? [parsed.data] : [];
+  });
 
   let planned: Awaited<ReturnType<typeof planNextCycle>>;
   try {
@@ -160,7 +175,8 @@ async function stagePlanCycle(
         ? (lastCycle?.volume_number as number)
         : Math.floor((((lastCycle?.cycle_number as number | undefined) ?? 0)) / CYCLES_PER_VOLUME) + 1,
       startChapter: job.current_chapter + 1,
-      recentVerdicts: [],
+      fixedEndChapter: extending ? (lastCycle?.end_chapter as number | undefined) : undefined,
+      recentVerdicts,
       editorialNotes: mergeEditorialNotes(
         editorialNotesFromError(job.last_error),
         active?.success ? active.data.editorialNotes : [],

@@ -371,6 +371,15 @@ export const CyclePlanSchema = z.object({
   aftermath: para,
   /** The expectation this cycle leaves burning for the next one. */
   nextHook: para,
+  /** The repeat-purchase engine: a customer becomes stronger, earns, shows it, then upgrades. */
+  customerLoop: z.object({
+    customerId: id,
+    entryNeed: line,
+    purchase: line,
+    useToEarn: line,
+    publicProof: line,
+    returnUpgrade: line,
+  }).strict(),
   /** Rolling: beats for the next 3 chapters only. */
   beatSheets: z.array(z.object({
     chapterNumber: z.number().int().min(1),
@@ -389,6 +398,22 @@ export const CyclePlanSchema = z.object({
   if (span < 5 || span > 15) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['plannedEndChapter'], message: 'A cycle spans 5-15 chapters.' });
   }
+  cycle.beatSheets.forEach((sheet, index) => {
+    if (index > 0 && sheet.chapterNumber !== cycle.beatSheets[index - 1].chapterNumber + 1) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['beatSheets', index, 'chapterNumber'],
+        message: 'Rolling beat sheets must cover consecutive chapters.',
+      });
+    }
+    if (sheet.chapterNumber > cycle.plannedEndChapter) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['beatSheets', index, 'chapterNumber'],
+        message: 'A beat sheet cannot sit beyond plannedEndChapter.',
+      });
+    }
+  });
 });
 export type CyclePlan = z.infer<typeof CyclePlanSchema>;
 
@@ -450,9 +475,27 @@ export const JudgeVerdictSchema = z.object({
     /** Is there something specific worth reading next? */
     endHook: score,
   }).strict(),
+  craft: z.object({
+    /** Does the protagonist choose, act, work or gain something only they can carry forward? */
+    protagonistAgency: score,
+    /** Does the chapter play as a lived scene rather than a report, ledger or product demo? */
+    sceneLife: score,
+    /** Do travel, technology, causality and institutions obey the supplied world rules? */
+    worldLogic: score,
+    /** Do people speak from immediate wants in distinct voices instead of stating the theme? */
+    dialogueNaturalness: score,
+    /** Is the reward structure materially different from the recent chapters? */
+    structuralFreshness: score,
+  }).strict(),
   repetition: z.array(z.object({ quote: z.string().trim().min(4).max(400), repeatsChapter: z.number().int().min(1), note: line }).strict()).max(6),
   /** 排比三连 · 空洞抒情 · 万能过渡 · 万能形容词 · 情感标签 */
-  aiFlavor: z.array(z.object({ quote: z.string().trim().min(4).max(400), kind: z.enum(['parallel_triple', 'empty_lyricism', 'generic_transition', 'generic_adjective', 'emotion_label']) }).strict()).max(10),
+  aiFlavor: z.array(z.object({
+    quote: z.string().trim().min(4).max(400),
+    kind: z.enum([
+      'parallel_triple', 'empty_lyricism', 'generic_transition', 'generic_adjective', 'emotion_label',
+      'report_prose', 'theme_spoken', 'crowd_chorus',
+    ]),
+  }).strict()).max(10),
   /** Free-form direction for the next cycle plan. Never applied to this chapter. */
   steering: z.array(line).max(5),
 }).strict();
@@ -496,7 +539,11 @@ export const CHAPTER_WORD_RANGE = { min: 1_600, max: 2_600 } as const;
 
 export function scorecardAverage(verdict: JudgeVerdict): number {
   const s = verdict.scorecard;
-  return (s.opening + s.anticipation + s.payoff + s.newness + s.endHook) / 5;
+  const c = verdict.craft;
+  return (
+    s.opening + s.anticipation + s.payoff + s.newness + s.endHook
+    + c.protagonistAgency + c.sceneLife + c.worldLogic + c.dialogueNaturalness + c.structuralFreshness
+  ) / 10;
 }
 
 // ------------------------------------------------------------- Model output

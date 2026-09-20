@@ -1,5 +1,5 @@
 {
-  "version": "2026-09-19.6",
+  "version": "2026-09-20.2",
   "note": "Craft that dates. Code owns contracts; this file owns taste. Edit here, not in prompts.ts.",
   "payoffKinds": [
     {
@@ -146,6 +146,30 @@
       "text": "CHI TIẾT NGHỀ VÀ KỸ THUẬT\nChọn chi tiết giúp độc giả hiểu món này quý ở đâu, nhân vật dùng khéo thế nào và kết quả hơn người ra sao. Một chi tiết đủ để tin, rồi trở lại hành động và phản ứng."
     },
     {
+      "id": "scene_has_one_center",
+      "role": "writer",
+      "status": "active",
+      "observedAt": "2026-09-20",
+      "evidence": "Biên tập trực tiếp hai pilot Song Xuyên, chương 1-10",
+      "text": "MỖI CHƯƠNG CÓ MỘT CẢNH TRỌNG TÂM\nĐặt một người đang muốn một kết quả cụ thể vào tình huống buộc họ phải chọn, làm hoặc trả giá bằng công sức. Hợp đồng, bảng số liệu, kiểm định và cấp bậc chỉ là đạo cụ làm lựa chọn ấy sắc hơn. Thành quả phải nảy ra từ hành động trên trang, không nảy ra từ lời thuyết trình."
+    },
+    {
+      "id": "proof_changes_behavior",
+      "role": "writer",
+      "status": "active",
+      "observedAt": "2026-09-20",
+      "evidence": "Biên tập trực tiếp hai pilot Song Xuyên, chương 1-10",
+      "text": "CHỨNG MINH BẰNG BIẾN CHUYỂN\nChọn một bằng chứng quyết định: một đòn đánh, một món ăn có hiệu quả, một lô hàng được cứu, một người lên cấp, một khách đổi thái độ. Người hiểu nghề gọi đúng giá trị rồi hành động theo lợi ích riêng: giành mua, nhượng bộ, đổi phe, đặt cược hoặc ra tay. Mỗi người phản ứng khác nhau; chính hành vi sau khi thấy kết quả mới là tiếng hô lớn nhất."
+    },
+    {
+      "id": "dialogue_is_immediate_desire",
+      "role": "writer",
+      "status": "active",
+      "observedAt": "2026-09-20",
+      "evidence": "Biên tập trực tiếp hai pilot Song Xuyên, chương 1-10",
+      "text": "LỜI THOẠI CÓ VIỆC ĐỂ LÀM\nNhân vật nói để mua, bán, dụ, ép, khoe, che, xin, từ chối hoặc giữ thứ thuộc về mình. Ý nghĩa lớn để độc giả tự rút ra từ lựa chọn và kết quả. Mỗi nhân vật dùng từ theo nghề, địa vị và cái họ sợ mất; đám đông là nhiều lợi ích va nhau, không phải một dàn đồng ca."
+    },
+    {
       "id": "end_on_expectation",
       "role": "writer",
       "status": "active",
@@ -216,6 +240,30 @@
       "observedAt": "2026-09-19",
       "evidence": "docs/FALOO_CRAFT.md §4b; https://b.faloo.com/1324795_3.html",
       "text": "CHU KỲ LÀ MỘT LỜI HỨA ĐƯỢC THỰC HIỆN\nTrong 5–15 chương, pressure là cơ hội, tham vọng hoặc đối kháng; escalation là 3–6 bước làm kết quả đáng mong hơn. Chọn nhịp: khám phá → thử thành công → đơn hàng lớn; thể hiện → chấn động; hoặc đối đầu → nghiền ép → thu phục. Có phần thưởng dọc đường và kết quả dùng được ở vòng sau."
+    },
+    {
+      "id": "payoff_debt_is_paid_first",
+      "role": "planner",
+      "status": "active",
+      "observedAt": "2026-09-20",
+      "evidence": "Biên tập trực tiếp pilot Rau Tươi, chương 9-10",
+      "text": "TRẢ LỜI HỨA ĐANG NỢ TRƯỚC\nNếu chương trước đã hẹn một cuộc nghiệm thu, giao hàng, tỷ thí, mở thưởng hoặc đối chất, chương kế tiếp phải cho sự kiện ấy xảy ra và trả kết quả nhìn thấy trước khi mở lời hẹn mới. Beat cuối nằm trong ranh giới chu kỳ phải thực hiện climax của chu kỳ; không đặt phần thắng thật ra ngoài plannedEndChapter."
+    },
+    {
+      "id": "two_worlds_and_protagonist_advance",
+      "role": "planner",
+      "status": "active",
+      "observedAt": "2026-09-20",
+      "evidence": "Biên tập trực tiếp hai pilot Song Xuyên, chương 1-10",
+      "text": "GIỮ ĐÚNG LỜI HỨA SONG XUYÊN\nTrong mỗi cửa sổ ba chương, giá trị phải quay được ít nhất một vòng giữa hai thế giới hoặc mở một công dụng mới của hàng đã đổi. Nhân vật chính đồng thời phải có một việc chỉ hắn quyết định được và nhận một bước tiến dùng được: tay nghề, thực lực, nguồn hàng, quyền giao dịch hoặc khách hàng mới. Đồng minh được hưởng cú thắng của họ, nhưng truyện vẫn cho thấy vì sao hành động của main làm vòng tiếp theo lớn hơn."
+    },
+    {
+      "id": "customer_returns_stronger",
+      "role": "planner",
+      "status": "active",
+      "observedAt": "2026-09-20",
+      "evidence": "Chỉ đạo biên tập trực tiếp của người dùng, 2026-09-20",
+      "text": "VÒNG KHÁCH HÀNG ĐI LÊN\nChọn ít nhất một khách làm trục phụ của chu kỳ: họ đến vì một nỗi khổ cụ thể, bỏ tài nguyên mua một món, dùng món đó mạnh lên hoặc mở nghề, tự đi săn/làm ăn/hoàn thành nhiệm vụ để kiếm phần thưởng cấp cao hơn, công khai thể hiện trước người từng coi thường, rồi quay lại cửa hàng với tiền và địa vị mới để hỏi món đắt hơn. Mỗi lần quay lại phải đổi cấp hàng, quy mô đơn hoặc thân phận khách; không dùng lại cùng một màn kiểm tra."
     },
     {
       "id": "opponents_keep_their_will",

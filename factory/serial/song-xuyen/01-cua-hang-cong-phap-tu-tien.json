@@ -19,7 +19,7 @@
   },
   "goldenFinger": {
     "name": "Song Giới Thương Điếm",
-    "rule": "Cửa hàng thật nằm tại Đông Hà; cửa sau nối thẳng nơi ở và kho của Lâm Việt tại Thanh Huyền Giới. Lâm Việt tự chọn hàng, giá bán và chính sách thu mua. Cửa hàng định giá, ghi nhận hàng khách giao và hoàn tất thanh toán bằng tinh hạch, huyết nhục hung thú, linh thực hoặc vật liệu tiến hóa.",
+    "rule": "Cửa hàng thật nằm tại Đông Hà; cửa sau nối thẳng nơi ở và kho của Lâm Việt tại Thanh Huyền Giới. Chỉ Lâm Việt có thể bước qua cửa sau; khách và người làm ở hai giới giao nhận tại đầu cửa hàng thuộc thế giới của họ. Lâm Việt tự chọn hàng, giá bán và chính sách thu mua. Cửa hàng định giá, ghi nhận hàng khách giao và hoàn tất thanh toán bằng tinh hạch, huyết nhục hung thú, linh thực hoặc vật liệu tiến hóa.",
     "scope": "Cửa hàng là nơi giao dịch và lưu kho, không tự tạo hàng hay ban sức mạnh. Giá trị đến từ hàng Lâm Việt luyện, mua và tổ chức được ở hai giới.",
     "evolution": [
       { "id": "ke_ban_le", "name": "Kệ bán lẻ", "changesUse": "Niêm yết hàng có tên, phẩm cấp và giá; khách tự chọn rồi thanh toán tại quầy." },

@@ -55,10 +55,11 @@ describe('serial contracts', () => {
     expect(Object.keys(sheet).sort()).toEqual(['beats', 'chapterNumber', 'emotionalTarget', 'endHookKind', 'newNamedThing']);
   });
 
-  test('scorecard averages the five reading dimensions', () => {
+  test('scorecard averages reading and craft dimensions', () => {
     expect(scorecardAverage({
       continuity: [], repetition: [], aiFlavor: [], steering: [],
       scorecard: { opening: 5, anticipation: 4, payoff: 4, newness: 3, endHook: 4 },
+      craft: { protagonistAgency: 4, sceneLife: 4, worldLogic: 5, dialogueNaturalness: 3, structuralFreshness: 4 },
     })).toBe(4);
   });
 });

@@ -11,7 +11,7 @@ import playbookData from './playbook.json';
  * composed in at the marked point. Changing craft is a data edit; changing the
  * contract is a code change. They rot at different speeds.
  */
-export const SERIAL_PROMPT_VERSION = `serial-prompts-22 + playbook-${playbookData.version}`;
+export const SERIAL_PROMPT_VERSION = `serial-prompts-23 + playbook-${playbookData.version}`;
 
 export const WRITER_SYSTEM_PROMPT = `Bạn là tác giả truyện mạng tiếng Việt, viết truyện dài nhiều chương ra hằng ngày.
 
@@ -42,7 +42,16 @@ Phần khongDuocTrai là trạng thái ở đầu chương, không phải trần
 - newness: thứ mới có tên và còn dùng được.
 - endHook: điều cụ thể đáng đọc tiếp.
 
-Kèm trích dẫn cho repetition (cảnh/thủ pháp lặp so với tóm tắt được cấp) và aiFlavor (ba vế song song, trữ tình rỗng, chuyển cảnh vạn năng, tính từ vạn năng, gán nhãn cảm xúc).
+ĐIỂM NGHỀ 0–5, chấm thẳng chất lượng văn:
+- protagonistAgency: nhân vật chính có lựa chọn, công sức hoặc thành quả chỉ họ mang được sang vòng sau.
+- sceneLife: chương là một cảnh đang sống, không phải biên bản, dashboard, bài thuyết trình hay danh sách thao tác.
+- worldLogic: đi lại, công nghệ, quyền hạn, nhân quả và thể chế khớp luật thế giới.
+- dialogueNaturalness: người nói theo lợi ích trước mắt và có giọng riêng, không đọc hộ thông điệp tác giả.
+- structuralFreshness: cách tạo và trả thưởng khác thật so với các chương gần đây.
+
+Kèm trích dẫn cho repetition (cảnh/thủ pháp lặp so với tóm tắt được cấp) và aiFlavor: ba vế song song, trữ tình rỗng, chuyển cảnh/tính từ vạn năng, gán nhãn cảm xúc, văn như báo cáo, nhân vật nói thẳng chủ đề, hoặc đám đông đồng thanh cùng một phản ứng.
+
+steering phải gọi đúng việc cần làm ở chu kỳ sau bằng hướng dương tính: đặt ai vào cảnh nào, cho họ muốn gì, hành động nào chứng minh giá trị và payoff nào phải trả. Nếu một lời hẹn từ chương trước chưa được thực hiện, đưa việc thực hiện nó lên đầu steering.
 
 ${craftBlock('judge')}
 
@@ -79,7 +88,9 @@ export const CYCLE_PLANNER_SYSTEM_PROMPT = `Bạn là người lập kế hoạc
 
 ${craftBlock('planner')}
 
-beatSheets chỉ lập cho ba chương kế tiếp. Mỗi chương ghi hai đến bốn nhịp bằng lời kể, một mục tiêu cảm xúc, một thứ mới sẽ được đặt tên, và kiểu hook kết chương. Tuyệt đối không ghi con số trạng thái, không ghi delta tài nguyên, không ghi lịch trình phút.`;
+customerLoop chọn một khách có tên và khóa đủ vòng: nỗi khổ → mua món → dùng món đi săn/làm ăn/hoàn thành nhiệm vụ để kiếm tài nguyên mới → thể hiện công khai → quay lại mua cấp hàng cao hơn. Các bước được phân bố tự nhiên trong escalation và beatSheets, không gom thành lời kể tóm tắt.
+
+beatSheets lập cho tối đa ba chương kế tiếp, bắt đầu đúng chuongBatDau, liên tiếp và không vượt qua chuongKetThucCoDinh nếu trường này có giá trị. Mỗi chương ghi hai đến bốn nhịp bằng lời kể, một mục tiêu cảm xúc, một thứ mới sẽ được đặt tên, và kiểu hook kết chương. Chương cuối của chu kỳ phải trả climax bằng kết quả nhìn thấy trước khi mở nextHook. Tuyệt đối không ghi con số trạng thái, không ghi delta tài nguyên, không ghi lịch trình phút.`;
 
 export const PREMISE_SYSTEM_PROMPT = `Bạn nghĩ ra một bộ truyện mạng tiếng Việt mới để chạy dài 800 đến 1.200 chương.
 

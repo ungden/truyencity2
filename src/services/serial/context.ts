@@ -177,6 +177,7 @@ export function buildWriterBrief(input: {
     nguonDoiKhang: premise.oppositionEngine,
     chuongSo: chapterNumber,
     dongLucChuKy: cycle.pressure,
+    vongKhachHangChuKy: cycle.customerLoop,
     nhipChuong: sheet.beats,
     mucTieuCamXuc: sheet.emotionalTarget,
     thuMoiPhaiDatTen: sheet.newNamedThing,
@@ -221,6 +222,7 @@ export function buildJudgeBrief(input: {
     tieuDe: input.title,
     chuong: input.prose,
     leRaPhaiLam: sheet ? { nhip: sheet.beats, camXuc: sheet.emotionalTarget, thuMoi: sheet.newNamedThing, hook: sheet.endHookKind } : null,
+    vongKhachHangChuKy: cycle.customerLoop,
     luatPhanUng: premise.voiceSheet.reactionRule,
     worldSlice: relevantWorldSlice({ premise, bible, castIds, chapterNumber, beatText }),
     hopDongMoDau: premise.worldKernel.openingContract.find(item => item.chapterNumber === chapterNumber) ?? null,
@@ -309,6 +311,7 @@ export function buildCyclePlannerBrief(input: {
   cycleNumber: number;
   volumeNumber: number;
   startChapter: number;
+  fixedEndChapter?: number;
   steering: string[];
 }) {
   const { premise, bible } = input;
@@ -327,6 +330,7 @@ export function buildCyclePlannerBrief(input: {
     chuKySo: input.cycleNumber,
     quyenSo: input.volumeNumber,
     chuongBatDau: input.startChapter,
+    chuongKetThucCoDinh: input.fixedEndChapter ?? null,
     trangThaiHienTai: mustNotContradict(bible, premise, bible.symbolicCore.cast.map(member => member.id)),
     nhanVat: bible.castSheet,
     boiCanh: bible.world,
@@ -338,6 +342,7 @@ export function buildCyclePlannerBrief(input: {
         loaiSuong: input.previousCycle.climax.payoffKind,
         ketQua: input.previousCycle.climax.result,
         hookDeLai: input.previousCycle.nextHook,
+        vongKhachHang: input.previousCycle.customerLoop,
       }
       : null,
     // Two code-owned constraints the planner cannot argue with.

@@ -202,6 +202,7 @@ export async function planNextCycle(input: {
   cycleNumber: number;
   volumeNumber: number;
   startChapter: number;
+  fixedEndChapter?: number;
   recentVerdicts: JudgeVerdict[];
   editorialNotes?: string[];
 }): Promise<{ cycle: CyclePlan; usages: ProviderUsage[]; costUsd: number }> {
@@ -213,6 +214,7 @@ export async function planNextCycle(input: {
     cycleNumber: input.cycleNumber,
     volumeNumber: input.volumeNumber,
     startChapter: input.startChapter,
+    fixedEndChapter: input.fixedEndChapter,
     steering: [...new Set([...(input.editorialNotes ?? []), ...collectSteering(input.recentVerdicts)])].slice(0, 8),
   });
 
@@ -270,13 +272,21 @@ export function foldVolume(input: { bible: Bible; volumeNumber: number; summary?
 
 /** Rolling read quality, the number the operator dashboard shows instead of a block count. */
 export function readingHealth(verdicts: JudgeVerdict[]): {
-  chapters: number; average: number; weakest: keyof JudgeVerdict['scorecard'] | null;
+  chapters: number;
+  average: number;
+  weakest: keyof JudgeVerdict['scorecard'] | keyof JudgeVerdict['craft'] | null;
 } {
   if (verdicts.length === 0) return { chapters: 0, average: 0, weakest: null };
-  const keys = ['opening', 'anticipation', 'payoff', 'newness', 'endHook'] as const;
-  const totals = keys.map(key => ({
-    key, total: verdicts.reduce((sum, verdict) => sum + verdict.scorecard[key], 0),
-  }));
+  const readingKeys = ['opening', 'anticipation', 'payoff', 'newness', 'endHook'] as const;
+  const craftKeys = ['protagonistAgency', 'sceneLife', 'worldLogic', 'dialogueNaturalness', 'structuralFreshness'] as const;
+  const totals = [
+    ...readingKeys.map(key => ({
+      key, total: verdicts.reduce((sum, verdict) => sum + verdict.scorecard[key], 0),
+    })),
+    ...craftKeys.map(key => ({
+      key, total: verdicts.reduce((sum, verdict) => sum + verdict.craft[key], 0),
+    })),
+  ];
   const average = verdicts.reduce((sum, verdict) => sum + scorecardAverage(verdict), 0) / verdicts.length;
   const weakest = totals.reduce((low, item) => (item.total < low.total ? item : low), totals[0]);
   return { chapters: verdicts.length, average: Number(average.toFixed(2)), weakest: weakest.key };

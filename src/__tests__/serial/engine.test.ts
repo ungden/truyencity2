@@ -26,6 +26,7 @@ const draft = (over: Partial<ChapterDraft> = {}): ChapterDraft => ({
 const cleanVerdict = (over: Partial<JudgeVerdict> = {}): JudgeVerdict => ({
   continuity: [],
   scorecard: { opening: 4, anticipation: 4, payoff: 4, newness: 4, endHook: 5 },
+  craft: { protagonistAgency: 4, sceneLife: 4, worldLogic: 4, dialogueNaturalness: 4, structuralFreshness: 4 },
   repetition: [], aiFlavor: [], steering: ['Cho Bảy Thạch ra tay thật thay vì chỉ đứng nhìn.'],
   ...over,
 });
@@ -388,6 +389,6 @@ describe('context selection', () => {
     expect(readingHealth([
       cleanVerdict({ scorecard: { opening: 5, anticipation: 2, payoff: 4, newness: 4, endHook: 5 } }),
       cleanVerdict({ scorecard: { opening: 4, anticipation: 1, payoff: 4, newness: 5, endHook: 5 } }),
-    ])).toEqual({ chapters: 2, average: 3.9, weakest: 'anticipation' });
+    ])).toEqual({ chapters: 2, average: 3.95, weakest: 'anticipation' });
   });
 });

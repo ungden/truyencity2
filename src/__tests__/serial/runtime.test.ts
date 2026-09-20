@@ -112,6 +112,27 @@ describe('serial runtime', () => {
     });
   });
 
+  test('rolling plans drop beat sheets beyond the immutable cycle end', () => {
+    const active = cycle({
+      cycleNumber: 1, volumeNumber: 1, startChapter: 1, plannedEndChapter: 10,
+    });
+    const rolling = cycle({
+      cycleNumber: 1, volumeNumber: 1, startChapter: 9, plannedEndChapter: 13,
+      beatSheets: [9, 10, 11].map(chapterNumber => ({
+        chapterNumber,
+        beats: ['Đưa lời hứa lên sân khấu', 'Trả kết quả nhìn thấy'],
+        emotionalTarget: 'Thỏa mãn vì lời hứa được thực hiện.',
+        newNamedThing: `Mốc ${chapterNumber}`,
+        endHookKind: 'reward' as const,
+      })),
+    });
+
+    const merged = mergeRollingCyclePlan({
+      active, rolling, cycleNumber: 1, volumeNumber: 1, startChapter: 1, endChapter: 10,
+    });
+    expect(merged.beatSheets.map(sheet => sheet.chapterNumber)).toEqual([9, 10]);
+  });
+
   test('an empty queue is idle and costs nothing', async () => {
     const { db, rpcCalls } = fakeDb({ rows: {}, rpc: { claim_serial_job: null } });
     await expect(runSerialTick({ db, provider: unusedProvider })).resolves.toEqual({ status: 'idle' });

@@ -64,16 +64,26 @@ export const digest = (
 export const cycle = (
   over: Partial<Omit<CyclePlan, 'climax'>> & { climax?: Partial<CyclePlan['climax']> } = {},
 ): CyclePlan => {
-  const { climax, ...rest } = over;
+  const { climax, beatSheets, ...rest } = over;
+  const startChapter = rest.startChapter ?? 8;
+  const plannedEndChapter = rest.plannedEndChapter ?? 16;
   return CyclePlanSchema.parse({
     schemaVersion: 1,
-    cycleNumber: 2, volumeNumber: 1, startChapter: 8, plannedEndChapter: 16,
+    cycleNumber: 2, volumeNumber: 1, startChapter, plannedEndChapter,
     pressure: 'Tô Vãn mở cơ hội ký hợp đồng Thành Vệ trong lúc Cao Nguyên muốn giữ độc quyền tinh hạch.',
     escalation: ['Lâm Việt trình lô phù', 'Đội săn công khai kết quả dùng thử', 'Hai bên tranh quyền ưu tiên'],
     aftermath: 'Cửa hàng có khách tổ chức đầu tiên, Cao Nguyên buộc phải nâng quy mô cạnh tranh.',
     nextHook: 'Hàn Dược Sư gửi giá mua một loại tinh hạch chưa ai ở Đông Hà coi trọng.',
-    beatSheets: [{
-      chapterNumber: 8,
+    customerLoop: {
+      customerId: 'bay_thach',
+      entryNeed: 'Bảy Thạch cần một món giúp đội sống qua cuộc săn.',
+      purchase: 'Hắn mua phù hộ thân của Lâm Việt.',
+      useToEarn: 'Đội dùng phù hạ hung thú và giữ trọn chiến lợi phẩm.',
+      publicProof: 'Bảy Thạch mang xác thú qua chợ trước mặt đội từng cười mình.',
+      returnUpgrade: 'Hắn quay lại đặt pháp khí cho cả đội.',
+    },
+    beatSheets: beatSheets ?? [{
+      chapterNumber: startChapter,
       beats: ['Lâm Việt trình lô phù trước Thành Vệ', 'Tô Vãn và Cao Nguyên cùng hô giá'],
       emotionalTarget: 'Hả hê vì quy mô giao dịch tăng cấp.',
       newNamedThing: 'Hợp đồng Thành Vệ Đông Hà',
