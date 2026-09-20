@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { StoryModelProvider } from '@/services/story-factory/provider';
-import { runSerialTick, runSerialTicks, CYCLES_PER_VOLUME } from '@/services/serial/runtime';
+import { editorialNotesFromError, mergeEditorialNotes, runSerialTick, runSerialTicks, CYCLES_PER_VOLUME } from '@/services/serial/runtime';
 import { premise, baseBible, cycle } from './fixtures';
 import { DEFAULT_SERIAL_ROUTES } from '@/services/serial/routes';
 
@@ -69,10 +69,32 @@ const unusedProvider = {
 } as unknown as StoryModelProvider;
 
 describe('serial runtime', () => {
+  test('audit feedback is split into bounded writer-visible notes', () => {
+    const notes = editorialNotesFromError(`Opening audit failed: ${'a'.repeat(1_300)} | Ch.3 source missing`);
+    expect(notes).toHaveLength(2);
+    expect(notes[0]).toHaveLength(1_200);
+    expect(notes[1]).toBe('Ch.3 source missing');
+  });
+
+  test('rolling plans inherit editorial notes after the job error is cleared', () => {
+    expect(mergeEditorialNotes(['lỗi mới'], ['nguồn hàng phải có người giao', 'lỗi mới']))
+      .toEqual(['lỗi mới', 'nguồn hàng phải có người giao']);
+  });
+
   test('an empty queue is idle and costs nothing', async () => {
     const { db, rpcCalls } = fakeDb({ rows: {}, rpc: { claim_serial_job: null } });
     await expect(runSerialTick({ db, provider: unusedProvider })).resolves.toEqual({ status: 'idle' });
     expect(rpcCalls.map(call => call.fn)).toEqual(['claim_serial_job']);
+  });
+
+  test('the PostgREST literal null shape is also an empty queue', async () => {
+    const { db } = fakeDb({ rows: {}, rpc: { claim_serial_job: 'null' } });
+    await expect(runSerialTick({ db, provider: unusedProvider })).resolves.toEqual({ status: 'idle' });
+  });
+
+  test('a null composite row from PostgREST is also an empty queue', async () => {
+    const { db } = fakeDb({ rows: {}, rpc: { claim_serial_job: { id: null, stage: null } } });
+    await expect(runSerialTick({ db, provider: unusedProvider })).resolves.toEqual({ status: 'idle' });
   });
 
   test('the write stage returns to planning when the rolling beats run out', async () => {

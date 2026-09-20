@@ -9,11 +9,17 @@ import {
 export const dynamic = 'force-dynamic';
 
 const actionSchema = z.object({
-  action: z.enum(['approve', 'pause', 'resume']),
+  action: z.enum(['approve', 'restart_opening', 'release', 'pause', 'resume']),
   jobId: z.string().uuid(),
 }).strict();
 
-interface RunRow { scorecard_avg: number | null; cost_usd: number | null; serial_novel_id: string }
+interface RunRow {
+  scorecard_avg: number | null;
+  cost_usd: number | null;
+  serial_novel_id: string;
+  chapter_number: number | null;
+  opening_audit: { passed?: boolean; summary?: string; findings?: unknown[] } | null;
+}
 
 export async function GET(request: NextRequest) {
   if (!(await isAuthorizedAdmin(request))) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -27,7 +33,7 @@ export async function GET(request: NextRequest) {
       novels!serial_jobs_novel_id_fkey(title, slug, hidden, chapter_count)
     `).order('updated_at', { ascending: false }),
     db.from('serial_runs')
-      .select('serial_novel_id,scorecard_avg,cost_usd')
+      .select('serial_novel_id,chapter_number,scorecard_avg,cost_usd,opening_audit')
       .eq('kind', 'chapter').not('scorecard_avg', 'is', null)
       .order('started_at', { ascending: false }).limit(200),
   ]);
@@ -65,6 +71,7 @@ export async function GET(request: NextRequest) {
     return {
       ...job,
       openingChapters: (openingResult.data ?? []).filter(chapter => chapter.novel_id === job.novel_id),
+      openingAudit: runs.find(run => run.chapter_number === 4 && run.opening_audit)?.opening_audit ?? null,
       readingScore: scores.length ? Number((scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(2)) : null,
       last10Usd: Number(runs.reduce((sum, run) => sum + Number(run.cost_usd ?? 0), 0).toFixed(3)),
     };
@@ -92,6 +99,23 @@ export async function POST(request: NextRequest) {
   if (lookupError) return NextResponse.json({ error: lookupError.message }, { status: 404 });
 
   const now = new Date().toISOString();
+  if (parsed.data.action === 'restart_opening' || parsed.data.action === 'release') {
+    const fn = parsed.data.action === 'restart_opening' ? 'restart_serial_opening' : 'release_serial_novel';
+    const args = parsed.data.action === 'restart_opening'
+      ? { p_job_id: job.id, p_reason: 'Opening rejected from the admin review.' }
+      : { p_job_id: job.id };
+    const { data, error } = await db.rpc(fn, args);
+    if (error) return NextResponse.json({ error: error.message }, { status: 409 });
+    return NextResponse.json({ ok: true, action: parsed.data.action, jobId: job.id, result: data });
+  }
+  if (parsed.data.action === 'resume') {
+    if (job.status !== 'paused') {
+      return NextResponse.json({ error: 'Only a paused job can be resumed.' }, { status: 409 });
+    }
+    const { data, error } = await db.rpc('resume_serial_job', { p_job_id: job.id });
+    if (error) return NextResponse.json({ error: error.message }, { status: 409 });
+    return NextResponse.json({ ok: true, action: parsed.data.action, jobId: job.id, result: data });
+  }
   if (parsed.data.action === 'approve') {
     const approval = job.status === 'awaiting_approval'
       ? { approved_at: now, approved_by: 'admin', updated_at: now }
@@ -103,9 +127,6 @@ export async function POST(request: NextRequest) {
     }
     const approved = await db.from('serial_novels').update(approval).eq('id', job.serial_novel_id);
     if (approved.error) return NextResponse.json({ error: approved.error.message }, { status: 500 });
-  }
-  if (parsed.data.action === 'resume' && job.status !== 'paused') {
-    return NextResponse.json({ error: 'Only a paused job can be resumed.' }, { status: 409 });
   }
   if (parsed.data.action === 'pause' && ['awaiting_approval', 'opening_review'].includes(job.status)) {
     return NextResponse.json({ error: 'A review gate cannot be replaced by pause.' }, { status: 409 });

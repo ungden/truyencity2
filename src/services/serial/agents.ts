@@ -1,12 +1,12 @@
 import type { StoryModelProvider, ProviderUsage } from '@/services/story-factory/provider';
 import {
-  ChapterDigestSchema, ChapterDraftSchema, CyclePlanSchema, JudgeVerdictSchema, PremiseSchema,
-  type ChapterDigest, type ChapterDraft, type CyclePlan, type JudgeVerdict, type Premise,
+  ChapterDigestSchema, ChapterDraftSchema, CyclePlanSchema, JudgeVerdictSchema, OpeningAuditSchema, PremiseSchema,
+  type ChapterDigest, type ChapterDraft, type CyclePlan, type JudgeVerdict, type OpeningAudit, type Premise,
   type SerialRoutes,
 } from './contracts';
 import {
   CYCLE_PLANNER_SYSTEM_PROMPT, EXTRACTOR_SYSTEM_PROMPT, JUDGE_SYSTEM_PROMPT,
-  PREMISE_SYSTEM_PROMPT, WRITER_SYSTEM_PANEL_RULE, WRITER_SYSTEM_PROMPT,
+  OPENING_AUDITOR_SYSTEM_PROMPT, PREMISE_SYSTEM_PROMPT, WRITER_SYSTEM_PANEL_RULE, WRITER_SYSTEM_PROMPT,
 } from './prompts';
 
 /**
@@ -21,6 +21,26 @@ export const SUPPORT_TIMEOUT_MS = 120_000;
 const brief = (value: unknown): string => JSON.stringify(value, null, 1);
 
 export interface AgentResult<T> { value: T; usage: ProviderUsage }
+
+const comparableTitle = (value: string): string => value
+  .normalize('NFKC')
+  .toLowerCase()
+  .replace(/^#{1,6}\s*/, '')
+  .replace(/^chương\s+\d+\s*:\s*/u, '')
+  .replace(/[“”"'‘’`*_#:\s]/gu, '');
+
+/** Remove a model-emitted Markdown heading that merely repeats the structured title. */
+export function normalizeChapterDraft(draft: ChapterDraft): ChapterDraft {
+  const title = draft.title.replace(/^chương\s+\d+\s*:\s*/iu, '').trim();
+  const lines = draft.content.split(/\r?\n/);
+  const first = lines[0]?.trim() ?? '';
+  const headingLike = /^#{1,6}\s+/.test(first) || /^chương\s+\d+\s*:/iu.test(first);
+  if (headingLike && comparableTitle(first) === comparableTitle(title)) {
+    while (lines.length > 1 && lines[1].trim() === '') lines.splice(1, 1);
+    lines.shift();
+  }
+  return ChapterDraftSchema.parse({ ...draft, title, content: lines.join('\n').trim() });
+}
 
 export async function writeChapter(input: {
   provider: StoryModelProvider;
@@ -39,7 +59,7 @@ export async function writeChapter(input: {
     temperature: 1,
     timeoutMs: CHAPTER_TIMEOUT_MS,
   });
-  return { value: result.value, usage: result.usage };
+  return { value: normalizeChapterDraft(result.value), usage: result.usage };
 }
 
 /**
@@ -68,6 +88,22 @@ Trả về toàn bộ chương sau khi sửa.`;
     schema: ChapterDraftSchema,
     temperature: 1,
     timeoutMs: CHAPTER_TIMEOUT_MS,
+  });
+  return { value: normalizeChapterDraft(result.value), usage: result.usage };
+}
+
+export async function auditOpening(input: {
+  provider: StoryModelProvider;
+  routes: SerialRoutes;
+  auditBrief: unknown;
+}): Promise<AgentResult<OpeningAudit>> {
+  const result = await input.provider.json({
+    model: input.routes.judge,
+    system: OPENING_AUDITOR_SYSTEM_PROMPT,
+    prompt: brief(input.auditBrief),
+    schema: OpeningAuditSchema,
+    temperature: 0,
+    timeoutMs: SUPPORT_TIMEOUT_MS,
   });
   return { value: result.value, usage: result.usage };
 }

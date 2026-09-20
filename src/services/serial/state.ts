@@ -22,10 +22,13 @@ export class SerialStateError extends Error {
 
 const fail = (rule: string, message: string): never => { throw new SerialStateError(rule, message); };
 
-/** Rung index in the premise ladder, or -1. Progression is only ever measured here. */
-export function tierIndex(premise: Premise, tierId: string | null): number {
-  if (!tierId) return -1;
-  return premise.tierLadder.findIndex(tier => tier.id === tierId);
+export function progressionRankIndex(premise: Premise, systemId: string, rankId: string): number {
+  const system = premise.worldKernel.progressionSystems.find(item => item.id === systemId);
+  return system?.ranks.findIndex(rank => rank.id === rankId) ?? -1;
+}
+
+export function goldenFingerRungIndex(premise: Premise, rungId: string): number {
+  return premise.goldenFinger.evolution.findIndex(rung => rung.id === rungId);
 }
 
 /**
@@ -47,15 +50,34 @@ export function applyDigest(input: {
 
   const cast = new Map(core.cast.map(member => [member.id, { ...member }]));
   const sheets = new Map(bible.castSheet.map(entry => [entry.id, { ...entry }]));
+  const locationIds = new Set(premise.worldKernel.worlds.flatMap(world => world.locations.map(location => location.id)));
+  const systems = new Map(premise.worldKernel.progressionSystems.map(system => [system.id, system]));
+  const canonicalWorldEntities = new Map(premise.worldKernel.worlds.flatMap(world => [
+    { id: world.id, name: world.name },
+    ...world.locations.map(location => ({ id: location.id, name: location.name })),
+    ...world.factions.map(faction => ({ id: faction.id, name: faction.name })),
+  ]).map(entity => [entity.id, entity]));
+  const progressions = new Map(core.progressions.map(state => [
+    `${state.subjectId}:${state.systemId}:${state.trackId ?? ''}`,
+    { ...state },
+  ]));
 
   // 2. New cast arrives with a sheet, and cannot collide with a known id.
   for (const arrival of digest.coreChanges.newCast) {
     if (cast.has(arrival.id)) fail('cast_collision', `Chapter ${digest.chapterNumber} re-introduces existing character ${arrival.id}.`);
+    if (!locationIds.has(arrival.locationId)) fail('unknown_location', `Chapter ${digest.chapterNumber} introduces ${arrival.id} at unknown location ${arrival.locationId}.`);
     cast.set(arrival.id, {
-      id: arrival.id, alive: true, tierId: null, locationId: core.mc.locationId,
+      id: arrival.id, alive: true, locationId: arrival.locationId,
       lastSeenChapter: digest.chapterNumber, knowsFinger: false,
     });
     sheets.set(arrival.id, { id: arrival.id, name: arrival.name, sheet: arrival.sheet });
+    for (const state of arrival.startingProgressions) {
+      const system = systems.get(state.systemId) ?? fail('unknown_progression_system', `Unknown progression system ${state.systemId}.`);
+      if (!system.ranks.some(rank => rank.id === state.rankId)) fail('unknown_progression_rank', `Unknown rank ${state.rankId}.`);
+      if (state.trackId && !system.tracks.some(track => track.id === state.trackId)) fail('unknown_progression_track', `Unknown track ${state.trackId}.`);
+      if (state.minorStageId && !system.minorStages.some(stage => stage.id === state.minorStageId)) fail('unknown_minor_stage', `Unknown minor stage ${state.minorStageId}.`);
+      progressions.set(`${arrival.id}:${state.systemId}:${state.trackId ?? ''}`, { subjectId: arrival.id, ...state });
+    }
   }
 
   // 3. The dead stay dead. Killing someone already dead is a contradiction too.
@@ -66,25 +88,67 @@ export function applyDigest(input: {
     member.lastSeenChapter = digest.chapterNumber;
   }
 
-  // 4. Rank never regresses, and never moves for someone who is dead.
-  for (const change of digest.coreChanges.tierChanges) {
-    const member = cast.get(change.characterId) ?? fail('unknown_character', `Chapter ${digest.chapterNumber} ranks unknown character ${change.characterId}.`);
-    if (!member.alive) fail('dead_stays_dead', `Chapter ${digest.chapterNumber} changes the rank of dead character ${change.characterId}.`);
-    const next = tierIndex(premise, change.toTierId);
-    if (next < 0) fail('unknown_tier', `Tier ${change.toTierId} is not on the ladder.`);
-    if (next < tierIndex(premise, member.tierId)) {
-      fail('tier_regression', `Chapter ${digest.chapterNumber} demotes ${change.characterId} without a ladder reason.`);
+  // 4. Each progression axis advances independently, using only canonical ids and one step at a time.
+  const knownSubjects = new Set([
+    ...cast.keys(),
+    ...premise.worldKernel.progressionSubjects.map(subject => subject.id),
+  ]);
+  for (const change of digest.coreChanges.progressionChanges) {
+    if (!knownSubjects.has(change.subjectId)) fail('unknown_progression_subject', `Chapter ${digest.chapterNumber} progresses unknown subject ${change.subjectId}.`);
+    const member = cast.get(change.subjectId);
+    if (member && !member.alive) fail('dead_stays_dead', `Chapter ${digest.chapterNumber} progresses dead character ${change.subjectId}.`);
+    const system = systems.get(change.systemId) ?? fail('unknown_progression_system', `Unknown progression system ${change.systemId}.`);
+    const nextRank = system.ranks.findIndex(rank => rank.id === change.toRankId);
+    if (nextRank < 0) fail('unknown_progression_rank', `Rank ${change.toRankId} is not in ${change.systemId}.`);
+    if (change.trackId && !system.tracks.some(track => track.id === change.trackId)) fail('unknown_progression_track', `Track ${change.trackId} is not in ${change.systemId}.`);
+    const nextMinor = change.toMinorStageId ? system.minorStages.findIndex(stage => stage.id === change.toMinorStageId) : -1;
+    if (change.toMinorStageId && nextMinor < 0) fail('unknown_minor_stage', `Minor stage ${change.toMinorStageId} is not in ${change.systemId}.`);
+    const key = `${change.subjectId}:${change.systemId}:${change.trackId ?? ''}`;
+    const previous = progressions.get(key);
+    if (previous) {
+      const previousRank = system.ranks.findIndex(rank => rank.id === previous.rankId);
+      if (nextRank < previousRank) fail('progression_regression', `${change.subjectId} regresses in ${change.systemId}.`);
+      if (nextRank > previousRank + 1) fail('progression_skip', `${change.subjectId} skips a rank in ${change.systemId}.`);
+      if (nextRank === previousRank && system.minorStages.length > 0) {
+        const previousMinor = previous.minorStageId ? system.minorStages.findIndex(stage => stage.id === previous.minorStageId) : -1;
+        if (nextMinor < previousMinor) fail('progression_regression', `${change.subjectId} regresses a minor stage in ${change.systemId}.`);
+        if (nextMinor > previousMinor + 1) fail('progression_skip', `${change.subjectId} skips a minor stage in ${change.systemId}.`);
+      }
+    } else {
+      if (nextRank !== 0) fail('progression_skip', `${change.subjectId} must enter ${change.systemId} at its first rank.`);
+      if (system.minorStages.length > 0 && nextMinor > 0) fail('progression_skip', `${change.subjectId} must enter ${change.systemId} at its first minor stage.`);
     }
-    member.tierId = change.toTierId;
-    member.lastSeenChapter = digest.chapterNumber;
+    progressions.set(key, {
+      subjectId: change.subjectId, systemId: change.systemId, trackId: change.trackId,
+      rankId: change.toRankId, minorStageId: change.toMinorStageId,
+    });
+    if (member) member.lastSeenChapter = digest.chapterNumber;
+  }
+
+  let goldenFingerRungId = core.mc.goldenFingerRungId;
+  if (digest.coreChanges.goldenFingerRungChange) {
+    const previous = goldenFingerRungIndex(premise, goldenFingerRungId);
+    const next = goldenFingerRungIndex(premise, digest.coreChanges.goldenFingerRungChange.toRungId);
+    if (next < 0) fail('unknown_golden_finger_rung', `Unknown golden finger rung ${digest.coreChanges.goldenFingerRungChange.toRungId}.`);
+    if (next < previous) fail('golden_finger_regression', 'Golden finger rung cannot regress.');
+    if (next > previous + 1) fail('golden_finger_skip', 'Golden finger rung must advance sequentially.');
+    goldenFingerRungId = digest.coreChanges.goldenFingerRungChange.toRungId;
   }
 
   // 5. The dead do not travel.
   for (const move of digest.coreChanges.moved) {
     const member = cast.get(move.characterId) ?? fail('unknown_character', `Chapter ${digest.chapterNumber} moves unknown character ${move.characterId}.`);
     if (!member.alive) fail('dead_stays_dead', `Chapter ${digest.chapterNumber} moves dead character ${move.characterId}.`);
+    if (!locationIds.has(move.toLocationId)) fail('unknown_location', `Chapter ${digest.chapterNumber} moves ${move.characterId} to unknown location ${move.toLocationId}.`);
     member.locationId = move.toLocationId;
     member.lastSeenChapter = digest.chapterNumber;
+  }
+
+  const revealedWorld = new Map(bible.world.map(entry => [entry.id, { ...entry }]));
+  for (const revealed of digest.coreChanges.worldFactsRevealed) {
+    const entity = canonicalWorldEntities.get(revealed.id)
+      ?? fail('unknown_world_entity', `Chapter ${digest.chapterNumber} reveals unknown world entity ${revealed.id}.`);
+    revealedWorld.set(revealed.id, { id: revealed.id, name: entity.name, note: revealed.note });
   }
 
   // 6. Knowing the secret is one-way: a reveal cannot be un-revealed.
@@ -115,11 +179,13 @@ export function applyDigest(input: {
     storyDay: core.storyDay + digest.coreChanges.storyDayDelta,
     chapterNumber: digest.chapterNumber,
     mc: {
-      tierId: mc?.tierId ?? core.mc.tierId,
+      characterId: core.mc.characterId,
       locationId: mc?.locationId ?? core.mc.locationId,
       keyAssetIds: core.mc.keyAssetIds,
+      goldenFingerRungId,
     },
     cast: [...cast.values()],
+    progressions: [...progressions.values()],
     openHooks: hooks,
   };
 
@@ -127,6 +193,7 @@ export function applyDigest(input: {
     ...bible,
     symbolicCore,
     castSheet: [...sheets.values()],
+    world: [...revealedWorld.values()],
     // 9. Recent memory is a window, not an archive. Volume summaries carry the rest.
     recentSummary: [...bible.recentSummary, {
       chapterNumber: digest.chapterNumber,
@@ -199,24 +266,32 @@ export function recentPayoffKinds(bible: Bible): PayoffKind[] {
  * launch cannot begin from state nobody read: everyone is alive, nobody has risen,
  * nobody knows the secret, and no hook is owed yet.
  */
-export function seedBible(input: { premise: Premise; startLocationId: string; startLocationNote: string }): Bible {
+export function seedBible(input: { premise: Premise }): Bible {
   const { premise } = input;
   const protagonist = premise.castSeed.find(member => member.role === 'protagonist')
     ?? fail('no_protagonist', 'Premise has no character with role "protagonist".');
   return BibleSchema.parse({
-    schemaVersion: 1,
+    schemaVersion: 2,
     symbolicCore: {
       storyDay: 0,
       chapterNumber: 0,
-      mc: { tierId: premise.tierLadder[0].id, locationId: input.startLocationId, keyAssetIds: [] },
+      mc: {
+        characterId: protagonist.id,
+        locationId: protagonist.startLocationId,
+        keyAssetIds: premise.worldKernel.progressionSubjects.filter(subject => subject.kind === 'asset').map(subject => subject.id),
+        goldenFingerRungId: premise.goldenFinger.evolution[0].id,
+      },
       cast: premise.castSeed.map(member => ({
         id: member.id,
         alive: true,
-        tierId: member.id === protagonist.id ? premise.tierLadder[0].id : null,
-        locationId: input.startLocationId,
+        locationId: member.startLocationId,
         lastSeenChapter: 0,
         knowsFinger: member.id === protagonist.id,
       })),
+      progressions: [
+        ...premise.castSeed.flatMap(member => member.startingProgressions.map(state => ({ subjectId: member.id, ...state }))),
+        ...premise.worldKernel.progressionSubjects.flatMap(subject => subject.startingProgressions.map(state => ({ subjectId: subject.id, ...state }))),
+      ],
       openHooks: [],
     },
     castSheet: premise.castSeed.map(member => ({
@@ -224,7 +299,9 @@ export function seedBible(input: { premise: Premise; startLocationId: string; st
       name: member.name,
       sheet: `${member.role} — ${member.agenda}${member.antagonistClass ? ` (${member.antagonistClass})` : ''}`,
     })),
-    world: [{ id: input.startLocationId, name: input.startLocationId, note: input.startLocationNote }],
+    // Complete canon stays in worldKernel; the living list starts empty and grows only
+    // when an Extractor records an entity actually shown on the page.
+    world: [],
     recentSummary: [],
     volumeSummaries: [],
     styleMemory: [],

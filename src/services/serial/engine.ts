@@ -1,13 +1,13 @@
 import type { ProviderUsage, StoryModelProvider } from '@/services/story-factory/provider';
 import {
-  BibleSchema, scorecardAverage,
+  BibleSchema, CyclePlanSchema, scorecardAverage,
   type Bible, type ChapterDigest, type ChapterDraft, type CyclePlan, type JudgeVerdict,
-  type Premise, type SerialRoutes,
+  OpeningAuditSchema, type OpeningAudit, type Premise, type SerialRoutes,
 } from './contracts';
-import { extractDigest, judgeChapter, planCycle, reviseChapter, writeChapter } from './agents';
+import { auditOpening, extractDigest, judgeChapter, planCycle, reviseChapter, writeChapter } from './agents';
 import {
   buildCyclePlannerBrief, buildExtractorBrief, buildJudgeBrief, buildWriterBrief,
-  collectSteering, refreshStyleMemory,
+  buildOpeningAuditBrief, collectSteering, refreshStyleMemory,
 } from './context';
 import { applyDigest, assertPayoffRotation, overdueHooks, SerialStateError } from './state';
 
@@ -44,6 +44,44 @@ export type ChapterOutcome = ChapterCommitted | ChapterNeedsReplan;
 
 const totalCost = (usages: ProviderUsage[]): number =>
   Number(usages.reduce((sum, usage) => sum + usage.costUsd, 0).toFixed(6));
+
+export async function auditFourChapterOpening(input: {
+  provider: StoryModelProvider;
+  routes: SerialRoutes;
+  premise: Premise;
+  chapters: Array<{ chapterNumber: number; title: string; content: string }>;
+}): Promise<{ audit: OpeningAudit; usages: ProviderUsage[]; costUsd: number }> {
+  if (input.chapters.length !== 4 || input.chapters.some((chapter, index) => chapter.chapterNumber !== index + 1)) {
+    throw new Error('Opening audit requires chapters 1-4 in order.');
+  }
+  const result = await auditOpening({
+    provider: input.provider,
+    routes: input.routes,
+    auditBrief: buildOpeningAuditBrief({ premise: input.premise, chapters: input.chapters }),
+  });
+  const formatFindings = input.chapters.flatMap(chapter => {
+    const firstLine = chapter.content.split(/\r?\n/, 1)[0]?.trim() ?? '';
+    const numberedTitle = /^chương\s+\d+\s*:/iu.test(chapter.title);
+    const repeatedHeading = (/^#{1,6}\s+/.test(firstLine) || /^chương\s+\d+\s*:/iu.test(firstLine))
+      && firstLine.includes(chapter.title);
+    if (!numberedTitle && !repeatedHeading) return [];
+    return [{
+      kind: 'format_duplicate_title' as const,
+      chapterNumber: chapter.chapterNumber,
+      quote: numberedTitle ? chapter.title : firstLine,
+      explain: 'Số chương hoặc tiêu đề bị lặp trong dữ liệu mà giao diện sẽ tự hiển thị.',
+      repair: 'Chỉ giữ tên chương trong trường title và mở thân chương bằng câu truyện đầu tiên.',
+    }];
+  });
+  const audit = OpeningAuditSchema.parse(formatFindings.length === 0
+    ? result.value
+    : {
+      passed: false,
+      summary: `Có ${formatFindings.length} lỗi định dạng tiêu đề xác định bằng code. ${result.value.summary}`,
+      findings: [...formatFindings, ...result.value.findings].slice(0, 12),
+    });
+  return { audit, usages: [result.usage], costUsd: result.usage.costUsd };
+}
 
 export async function writeOneChapter(input: {
   provider: StoryModelProvider;
@@ -97,16 +135,20 @@ export async function writeOneChapter(input: {
   }
 
   if (verdict.continuity.length > 0) {
+    const evidence = verdict.continuity.map(finding =>
+      `${finding.kind}: ${finding.explain} Quote: ${finding.quote}`
+    ).join(' | ');
     return {
       status: 'needs_replan', chapterNumber,
-      reason: 'Chapter still contradicts canon after a repair and a rewrite; the beat sheet is the problem.',
+      reason: `Chapter still contradicts canon after a repair and a rewrite; the beat sheet is the problem. ${evidence}`.slice(0, 4_000),
       findings: verdict.continuity, usages, costUsd: totalCost(usages),
     };
   }
 
-  const extracted = await extractDigest({
+  const extractorBrief = buildExtractorBrief({ premise, bible, chapterNumber, title: draft.title, prose: draft.content });
+  let extracted = await extractDigest({
     provider, routes,
-    extractorBrief: buildExtractorBrief({ premise, bible, chapterNumber, title: draft.title, prose: draft.content }),
+    extractorBrief,
   });
   usages.push(extracted.usage);
 
@@ -114,14 +156,28 @@ export async function writeOneChapter(input: {
   try {
     nextBible = applyDigest({ premise, bible, digest: extracted.value });
   } catch (error) {
-    // The prose passed the reader but the extracted state is impossible. Treat it the
-    // same way: replan rather than commit a Bible we know is wrong.
     if (!(error instanceof SerialStateError)) throw error;
-    return {
-      status: 'needs_replan', chapterNumber,
-      reason: `State merge rejected the digest (${error.rule}): ${error.message}`,
-      findings: [], usages, costUsd: totalCost(usages),
-    };
+    // The prose already passed. Give the cheap extractor one visible, bounded repair
+    // against the deterministic merge error before throwing away an entire private cycle.
+    extracted = await extractDigest({
+      provider, routes,
+      extractorBrief: {
+        ...extractorBrief,
+        loiMerge: { rule: error.rule, message: error.message },
+        yeuCauSua: 'Chỉ sửa digest cho khớp các id hợp lệ; không bịa sự kiện và không thay đổi nội dung chương.',
+      },
+    });
+    usages.push(extracted.usage);
+    try {
+      nextBible = applyDigest({ premise, bible, digest: extracted.value });
+    } catch (repairError) {
+      if (!(repairError instanceof SerialStateError)) throw repairError;
+      return {
+        status: 'needs_replan', chapterNumber,
+        reason: `State merge rejected the digest after one extractor repair (${repairError.rule}): ${repairError.message}`,
+        findings: [], usages, costUsd: totalCost(usages),
+      };
+    }
   }
 
   return {
@@ -147,6 +203,7 @@ export async function planNextCycle(input: {
   volumeNumber: number;
   startChapter: number;
   recentVerdicts: JudgeVerdict[];
+  editorialNotes?: string[];
 }): Promise<{ cycle: CyclePlan; usages: ProviderUsage[]; costUsd: number }> {
   const usages: ProviderUsage[] = [];
   const plannerBrief = buildCyclePlannerBrief({
@@ -156,14 +213,15 @@ export async function planNextCycle(input: {
     cycleNumber: input.cycleNumber,
     volumeNumber: input.volumeNumber,
     startChapter: input.startChapter,
-    steering: collectSteering(input.recentVerdicts),
+    steering: [...new Set([...(input.editorialNotes ?? []), ...collectSteering(input.recentVerdicts)])].slice(0, 8),
   });
 
   const first = await planCycle({ provider: input.provider, routes: input.routes, plannerBrief });
   usages.push(first.usage);
+  const firstCycle = CyclePlanSchema.parse({ ...first.value, editorialNotes: input.editorialNotes ?? [] });
   try {
-    assertPayoffRotation(input.previousCycle, first.value);
-    return { cycle: first.value, usages, costUsd: totalCost(usages) };
+    assertPayoffRotation(input.previousCycle, firstCycle);
+    return { cycle: firstCycle, usages, costUsd: totalCost(usages) };
   } catch (error) {
     if (!(error instanceof SerialStateError)) throw error;
     const retry = await planCycle({
@@ -171,8 +229,9 @@ export async function planNextCycle(input: {
       plannerBrief: { ...plannerBrief, loiVuaMacPhai: error.message },
     });
     usages.push(retry.usage);
-    assertPayoffRotation(input.previousCycle, retry.value);
-    return { cycle: retry.value, usages, costUsd: totalCost(usages) };
+    const retryCycle = CyclePlanSchema.parse({ ...retry.value, editorialNotes: input.editorialNotes ?? [] });
+    assertPayoffRotation(input.previousCycle, retryCycle);
+    return { cycle: retryCycle, usages, costUsd: totalCost(usages) };
   }
 }
 

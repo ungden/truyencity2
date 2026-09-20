@@ -1,16 +1,15 @@
 import { SerialRoutesSchema } from './contracts';
 
 /**
- * Starting routes, inherited from the story-factory bakeoff of 2026-08-02 and due to be
- * re-run: that bakeoff scored literary process prose, and this engine asks for something
- * else — short paragraphs, casual register, running internal monologue, a hook every
- * chapter. Treat these as the incumbent to beat, not as a settled answer.
+ * Launch route for the Song Xuyên pilot. The original Gemini support route could not
+ * authenticate on the production host; this all-OpenAI route was credential-smoked before
+ * the first chapter and gets its own version so no running novel changes models silently.
  */
 export const DEFAULT_SERIAL_ROUTES = SerialRoutesSchema.parse({
-  premise: 'gemini-3.1-pro-preview',
-  planner: 'gemini-3.1-pro-preview',
+  premise: 'gpt-5.6-terra',
+  planner: 'gpt-5.6-terra',
   writer: 'gpt-5.6-terra',
-  judge: 'gemini-3.1-pro-preview',
-  extractor: 'gemini-3.5-flash',
-  routeVersion: 'serial-incumbent-2026-09-19.1',
+  judge: 'gpt-5.6-terra',
+  extractor: 'gpt-5.6-luna',
+  routeVersion: 'serial-openai-2026-09-19.1',
 });

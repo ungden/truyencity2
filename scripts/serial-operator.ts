@@ -2,9 +2,12 @@
  * Operator CLI for the serial engine.
  *
  *   npm run serial:operator -- status
- *   npm run serial:operator -- seed --premise=factory/serial/he-thong-tham-dinh.json --apply
+ *   npm run serial:operator -- seed --premise=factory/serial/song-xuyen/01-cua-hang-cong-phap-tu-tien.json --apply
  *   npm run serial:operator -- read --job-id=<id> --chapter=1
  *   npm run serial:operator -- approve --job-id=<id> --apply
+ *   npm run serial:operator -- restart-opening --job-id=<id> --apply
+ *   npm run serial:operator -- release --job-id=<id> --apply
+ *   npm run serial:operator -- reroute --job-id=<id> --apply
  *   npm run serial:operator -- pause|resume --job-id=<id> --apply
  *
  * Every mutating command is a dry run without --apply. `approve` handles the two launch
@@ -17,6 +20,7 @@ import { PremiseSchema } from '@/services/serial/contracts';
 import { DEFAULT_SERIAL_ROUTES } from '@/services/serial/routes';
 import { SERIAL_PROMPT_VERSION } from '@/services/serial/prompts';
 import { seedBible } from '@/services/serial/state';
+import { runSerialTicks, TICK_BUDGET_MS } from '@/services/serial/runtime';
 
 dotenv.config({ path: '.env.runtime', quiet: true });
 dotenv.config({ path: '.env.local', quiet: true });
@@ -76,30 +80,35 @@ async function seed(): Promise<void> {
   if (!premisePath) throw new Error('seed requires --premise=<file.json>');
   const premise = PremiseSchema.parse(JSON.parse(readFileSync(premisePath, 'utf8')));
   const slug = value('slug') ?? slugify(premise.title);
-  const startLocationId = value('start-location') ?? 'noi_bat_dau';
-
   console.log(JSON.stringify({
     dryRun: !apply, title: premise.title, slug, lane: premise.lane,
     goldenFinger: premise.goldenFinger.name, cast: premise.castSeed.length,
+    worlds: premise.worldKernel.worlds.map(world => world.name),
+    progressionSystems: premise.worldKernel.progressionSystems.length,
+    openingContract: premise.worldKernel.openingContract.map(item => item.chapterNumber),
     routes: DEFAULT_SERIAL_ROUTES.routeVersion,
   }, null, 2));
   if (!apply) return;
+
+  const existing = await db.from('novels').select('id,title').eq('slug', slug).maybeSingle();
+  if (existing.error) throw existing.error;
+  if (existing.data) {
+    throw new Error(`Slug ${slug} already belongs to ${existing.data.title} (${existing.data.id}); seed is intentionally idempotent.`);
+  }
 
   // The novel starts hidden. It becomes visible only when an operator releases it.
   const novel = await db.from('novels').insert({
     title: premise.title,
     slug,
-    description: premise.blurb,
-    genres: [premise.lane],
+    description: premise.presentation.shortDescription,
+    cover_url: premise.presentation.coverPath,
+    genres: premise.presentation.tags,
     hidden: true,
     status: 'Đang ra',
   }).select('id').single();
   if (novel.error) throw novel.error;
 
-  const bible = seedBible({
-    premise, startLocationId,
-    startLocationNote: value('start-note') ?? premise.arena,
-  });
+  const bible = seedBible({ premise });
 
   const serialNovel = await db.from('serial_novels').insert({
     novel_id: novel.data.id,
@@ -152,6 +161,17 @@ async function setStatus(next: 'ready' | 'paused', label: string): Promise<void>
   const job = await db.from('serial_jobs')
     .select('serial_novel_id,status,current_chapter').eq('id', jobId).single();
   if (job.error) throw job.error;
+  if (label === 'resume') {
+    if (job.data.status !== 'paused') {
+      throw new Error('resume requires a paused job; it cannot bypass a review gate.');
+    }
+    console.log(JSON.stringify({ dryRun: !apply, command: label, jobId }, null, 2));
+    if (!apply) return;
+    const { data, error } = await db.rpc('resume_serial_job', { p_job_id: jobId });
+    if (error) throw error;
+    console.log(JSON.stringify(data, null, 2));
+    return;
+  }
   const patch: Record<string, unknown> = {
     status: next, lease_owner: null, lease_token: null, lease_until: null,
     next_run_at: new Date().toISOString(), last_error: null, updated_at: new Date().toISOString(),
@@ -174,9 +194,6 @@ async function setStatus(next: 'ready' | 'paused', label: string): Promise<void>
     const approved = await db.from('serial_novels').update(approval.patch).eq('id', job.data.serial_novel_id);
     if (approved.error) throw approved.error;
   } else {
-    if (label === 'resume' && job.data.status !== 'paused') {
-      throw new Error('resume requires a paused job; it cannot bypass a review gate.');
-    }
     if (label === 'pause' && ['awaiting_approval', 'opening_review'].includes(job.data.status)) {
       throw new Error('pause cannot replace a premise or opening review gate.');
     }
@@ -188,16 +205,91 @@ async function setStatus(next: 'ready' | 'paused', label: string): Promise<void>
   console.log(`${label}: ok`);
 }
 
+async function launchAction(kind: 'restart-opening' | 'release'): Promise<void> {
+  const jobId = value('job-id');
+  if (!jobId) throw new Error(`${kind} requires --job-id`);
+  console.log(JSON.stringify({ dryRun: !apply, command: kind, jobId }, null, 2));
+  if (!apply) return;
+  const fn = kind === 'restart-opening' ? 'restart_serial_opening' : 'release_serial_novel';
+  const args = kind === 'restart-opening'
+    ? { p_job_id: jobId, p_reason: value('reason') ?? 'Opening rejected by human review.' }
+    : { p_job_id: jobId };
+  const { data, error } = await db.rpc(fn, args);
+  if (error) throw error;
+  console.log(JSON.stringify(data, null, 2));
+}
+
+async function tick(): Promise<void> {
+  const budgetMs = Number(value('budget-ms') ?? TICK_BUDGET_MS);
+  if (!Number.isInteger(budgetMs) || budgetMs < 1_000 || budgetMs > 900_000) {
+    throw new Error('tick --budget-ms must be an integer from 1000 to 900000.');
+  }
+  console.log(JSON.stringify({ dryRun: !apply, command: 'tick', budgetMs }, null, 2));
+  if (!apply) return;
+  const result = await runSerialTicks({ db, budgetMs, owner: `serial-operator-${process.pid}` });
+  console.log(JSON.stringify(result, null, 2));
+}
+
+async function reroute(): Promise<void> {
+  const jobId = value('job-id');
+  if (!jobId) throw new Error('reroute requires --job-id');
+  const job = await db.from('serial_jobs')
+    .select('serial_novel_id,current_chapter,current_cycle_id,status').eq('id', jobId).single();
+  if (job.error) throw job.error;
+  if (job.data.current_chapter !== 0) {
+    throw new Error('reroute is allowed only before chapter 1.');
+  }
+  console.log(JSON.stringify({
+    dryRun: !apply, command: 'reroute', jobId,
+    routeVersion: DEFAULT_SERIAL_ROUTES.routeVersion,
+    routes: DEFAULT_SERIAL_ROUTES,
+  }, null, 2));
+  if (!apply) return;
+  const updated = await db.from('serial_novels').update({
+    routes: DEFAULT_SERIAL_ROUTES,
+    route_version: DEFAULT_SERIAL_ROUTES.routeVersion,
+    prompt_version: SERIAL_PROMPT_VERSION,
+    updated_at: new Date().toISOString(),
+  }).eq('id', job.data.serial_novel_id);
+  if (updated.error) throw updated.error;
+  const cleared = await db.from('serial_jobs').update({
+    last_error: null, retry_count: 0, next_run_at: new Date().toISOString(), updated_at: new Date().toISOString(),
+  }).eq('id', jobId);
+  if (cleared.error) throw cleared.error;
+  console.log('reroute: ok');
+}
+
+async function setDailyTarget(): Promise<void> {
+  const jobId = value('job-id');
+  const dailyTarget = Number(value('daily-target'));
+  if (!jobId) throw new Error('quota requires --job-id');
+  if (!Number.isInteger(dailyTarget) || dailyTarget < 1 || dailyTarget > 12) {
+    throw new Error('quota --daily-target must be an integer from 1 to 12.');
+  }
+  console.log(JSON.stringify({ dryRun: !apply, command: 'quota', jobId, dailyTarget }, null, 2));
+  if (!apply) return;
+  const { error } = await db.from('serial_jobs').update({
+    daily_target: dailyTarget, next_run_at: new Date().toISOString(), updated_at: new Date().toISOString(),
+  }).eq('id', jobId).neq('status', 'running');
+  if (error) throw error;
+  console.log('quota: ok');
+}
+
 async function main(): Promise<void> {
   switch (command) {
     case 'status': return status();
     case 'seed': return seed();
     case 'read': return read();
     case 'approve': return setStatus('ready', 'approve');
+    case 'restart-opening': return launchAction('restart-opening');
+    case 'release': return launchAction('release');
+    case 'tick': return tick();
+    case 'reroute': return reroute();
+    case 'quota': return setDailyTarget();
     case 'pause': return setStatus('paused', 'pause');
     case 'resume': return setStatus('ready', 'resume');
     default:
-      console.error('Commands: status | seed | read | approve | pause | resume');
+      console.error('Commands: status | seed | read | approve | restart-opening | release | reroute | quota | tick | pause | resume');
       process.exit(1);
   }
 }

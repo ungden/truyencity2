@@ -1,11 +1,17 @@
 import type { ProviderUsage, StoryModelProvider } from '@/services/story-factory/provider';
-import type { ChapterDigest, ChapterDraft, CyclePlan, JudgeVerdict } from '@/services/serial/contracts';
+import type { ChapterDigest, ChapterDraft, CyclePlan, JudgeVerdict, OpeningAudit } from '@/services/serial/contracts';
 import { DEFAULT_SERIAL_ROUTES } from '@/services/serial/routes';
 import {
-  cycleReadyToClose, foldVolume, planNextCycle, readingHealth, writeOneChapter,
+  auditFourChapterOpening, cycleReadyToClose, foldVolume, planNextCycle, readingHealth, writeOneChapter,
 } from '@/services/serial/engine';
-import { buildWriterBrief, collectSteering, refreshStyleMemory, relevantCast } from '@/services/serial/context';
+import { normalizeChapterDraft } from '@/services/serial/agents';
+import { buildCyclePlannerBrief, buildExtractorBrief, buildJudgeBrief, buildWriterBrief, collectSteering, refreshStyleMemory, relevantCast } from '@/services/serial/context';
+import { seedBible } from '@/services/serial/state';
 import { premise, baseBible, cycle } from './fixtures';
+import {
+  CYCLE_PLANNER_SYSTEM_PROMPT, EXTRACTOR_SYSTEM_PROMPT, JUDGE_SYSTEM_PROMPT,
+  OPENING_AUDITOR_SYSTEM_PROMPT, WRITER_SYSTEM_PROMPT,
+} from '@/services/serial/prompts';
 
 const usage = (model: string, costUsd = 0.02): ProviderUsage => ({
   model, inputTokens: 1_000, outputTokens: 1_000, costUsd, finishReason: 'STOP',
@@ -38,7 +44,7 @@ const goodDigest: ChapterDigest = {
   endedOn: 'Bà Lâm cho người mời hắn lên hội quán.',
   newNamedThings: ['Hội quán Thẩm Định Đông Thành'],
   coreChanges: {
-    storyDayDelta: 1, died: [], tierChanges: [], moved: [], newCast: [],
+    storyDayDelta: 1, died: [], progressionChanges: [], goldenFingerRungChange: null, moved: [], worldFactsRevealed: [], newCast: [],
     hooksPlanted: [], hooksPaid: [], learnedFinger: [],
   },
 };
@@ -52,26 +58,29 @@ function stubProvider(script: {
   judge?: JudgeVerdict[];
   extractor?: ChapterDigest[];
   planner?: CyclePlan[];
+  auditor?: OpeningAudit[];
 }): StoryModelProvider & { calls: string[] } {
   const queues = {
     writer: [...(script.writer ?? [])],
     judge: [...(script.judge ?? [])],
     extractor: [...(script.extractor ?? [])],
     planner: [...(script.planner ?? [])],
+    auditor: [...(script.auditor ?? [])],
   };
   const calls: string[] = [];
-  const roleOf = (model: string): keyof typeof queues => {
-    if (model === DEFAULT_SERIAL_ROUTES.writer) return 'writer';
-    if (model === DEFAULT_SERIAL_ROUTES.extractor) return 'extractor';
-    return 'judge'; // judge and planner share a model; disambiguated by queue below
+  const roleOf = (system: string): keyof typeof queues => {
+    if (system.startsWith(WRITER_SYSTEM_PROMPT)) return 'writer';
+    if (system === EXTRACTOR_SYSTEM_PROMPT) return 'extractor';
+    if (system === CYCLE_PLANNER_SYSTEM_PROMPT) return 'planner';
+    if (system === JUDGE_SYSTEM_PROMPT) return 'judge';
+    if (system === OPENING_AUDITOR_SYSTEM_PROMPT) return 'auditor';
+    throw new Error('unknown test agent system prompt');
   };
   return {
     calls,
     async text() { throw new Error('unused'); },
-    async json<T>(input: { model: string }): Promise<{ value: T; usage: ProviderUsage }> {
-      let role = roleOf(input.model);
-      if (role === 'judge' && queues.judge.length === 0 && queues.planner.length > 0) role = 'planner';
-      if (role === 'judge' && queues.planner.length > 0 && queues.judge.length === 0) role = 'planner';
+    async json<T>(input: { model: string; system: string }): Promise<{ value: T; usage: ProviderUsage }> {
+      const role = roleOf(input.system);
       calls.push(role);
       const queue = queues[role];
       const next = queue.shift();
@@ -87,6 +96,15 @@ const chapterInput = (provider: StoryModelProvider) => ({
 });
 
 describe('chapter loop', () => {
+  test('structured title owns the heading and duplicate Markdown is stripped', () => {
+    const normalized = normalizeChapterDraft(draft({
+      title: '“Đông Hà lớn nhất, ta mới vừa bắt đầu!”',
+      content: `## Chương 4: “Đông Hà lớn nhất, ta mới vừa bắt đầu!”\n\n${'x'.repeat(900)}`,
+    }));
+    expect(normalized.title).toBe('“Đông Hà lớn nhất, ta mới vừa bắt đầu!”');
+    expect(normalized.content).toBe('x'.repeat(900));
+  });
+
   test('a clean chapter commits in one attempt and advances the Bible', async () => {
     const provider = stubProvider({ writer: [draft()], judge: [cleanVerdict()], extractor: [goodDigest] });
     const result = await writeOneChapter(chapterInput(provider));
@@ -129,6 +147,8 @@ describe('chapter loop', () => {
     expect(result.status).toBe('needs_replan');
     if (result.status !== 'needs_replan') return;
     expect(result.reason).toMatch(/beat sheet is the problem/);
+    expect(result.reason).toContain(finding[0].kind);
+    expect(result.reason).toContain(finding[0].quote);
     expect(result.findings).toHaveLength(1);
     // Three writer calls and three judge calls, and it never reached the extractor.
     expect(provider.calls.filter(call => call === 'writer')).toHaveLength(3);
@@ -136,15 +156,31 @@ describe('chapter loop', () => {
   });
 
   test('prose the reader accepts but state cannot absorb replans rather than committing a wrong Bible', async () => {
+    const invalid = { ...goodDigest, coreChanges: { ...goodDigest.coreChanges, hooksPaid: ['hook_khong_ton_tai'] } };
     const provider = stubProvider({
       writer: [draft()], judge: [cleanVerdict()],
-      extractor: [{ ...goodDigest, coreChanges: { ...goodDigest.coreChanges, hooksPaid: ['hook_khong_ton_tai'] } }],
+      extractor: [invalid, invalid],
     });
     const result = await writeOneChapter(chapterInput(provider));
 
     expect(result.status).toBe('needs_replan');
     if (result.status !== 'needs_replan') return;
     expect(result.reason).toMatch(/unknown_hook/);
+    expect(provider.calls.filter(call => call === 'extractor')).toHaveLength(2);
+  });
+
+  test('a bad extractor id gets one cheap repair without rewriting valid prose', async () => {
+    const provider = stubProvider({
+      writer: [draft()], judge: [cleanVerdict()],
+      extractor: [
+        { ...goodDigest, coreChanges: { ...goodDigest.coreChanges, worldFactsRevealed: [{ id: 'doi_tam_thoi', note: 'Một đội vừa ký đơn.' }] } },
+        goodDigest,
+      ],
+    });
+    const result = await writeOneChapter(chapterInput(provider));
+    expect(result.status).toBe('committed');
+    expect(provider.calls.filter(call => call === 'writer')).toHaveLength(1);
+    expect(provider.calls.filter(call => call === 'extractor')).toHaveLength(2);
   });
 
   test('worn phrases the judge quoted come back as the next chapter ban list', async () => {
@@ -160,6 +196,43 @@ describe('chapter loop', () => {
   });
 });
 
+describe('four-chapter opening audit', () => {
+  const chapters = Array.from({ length: 4 }, (_, index) => ({
+    chapterNumber: index + 1,
+    title: `Mở hàng lần ${index + 1}`,
+    content: 'Một giao dịch có nguồn hàng và thanh toán rõ ràng. '.repeat(30),
+  }));
+
+  test('requires a named supplier and consideration, not a floating system receipt', () => {
+    expect(OPENING_AUDITOR_SYSTEM_PROMPT).toContain('không cho biết thu từ ai và đổi lấy gì không đủ chứng minh nguồn');
+    expect(OPENING_AUDITOR_SYSTEM_PROMPT).toContain('vượt quá giá niêm yết');
+    expect(OPENING_AUDITOR_SYSTEM_PROMPT).toContain('Sổ giao dịch chuẩn');
+  });
+
+  test('runs once over all four chapters and records a clean pass', async () => {
+    const provider = stubProvider({ auditor: [{ passed: true, summary: 'Mạch giao dịch khép kín.', findings: [] }] });
+    const result = await auditFourChapterOpening({ provider, routes: DEFAULT_SERIAL_ROUTES, premise, chapters });
+    expect(result.audit.passed).toBe(true);
+    expect(result.costUsd).toBeCloseTo(0.02, 5);
+    expect(provider.calls).toEqual(['auditor']);
+  });
+
+  test('refuses a partial bundle before spending a model call', async () => {
+    const provider = stubProvider({});
+    await expect(auditFourChapterOpening({ provider, routes: DEFAULT_SERIAL_ROUTES, premise, chapters: chapters.slice(1) }))
+      .rejects.toThrow(/requires chapters 1-4 in order/);
+    expect(provider.calls).toEqual([]);
+  });
+
+  test('deterministic formatting evidence cannot be waved through by the model', async () => {
+    const provider = stubProvider({ auditor: [{ passed: true, summary: 'Không thấy lỗi ngữ nghĩa.', findings: [] }] });
+    const malformed = chapters.map((chapter, index) => index === 0 ? { ...chapter, title: 'Chương 1: Mở hàng' } : chapter);
+    const result = await auditFourChapterOpening({ provider, routes: DEFAULT_SERIAL_ROUTES, premise, chapters: malformed });
+    expect(result.audit.passed).toBe(false);
+    expect(result.audit.findings[0]).toMatchObject({ kind: 'format_duplicate_title', chapterNumber: 1 });
+  });
+});
+
 describe('cycle lifecycle', () => {
   test('a planner that repeats the previous payoff gets one corrective attempt', async () => {
     const previous = cycle({ cycleNumber: 1, startChapter: 1, plannedEndChapter: 7, climax: { payoffKind: 'nghich_tap' } });
@@ -172,8 +245,10 @@ describe('cycle lifecycle', () => {
     const result = await planNextCycle({
       provider, routes: DEFAULT_SERIAL_ROUTES, premise, bible: baseBible(),
       previousCycle: previous, cycleNumber: 2, volumeNumber: 1, startChapter: 8, recentVerdicts: [cleanVerdict()],
+      editorialNotes: ['Nêu tên đội giao thịt và khoản đối giá ngay trên trang.'],
     });
     expect(result.cycle.climax.payoffKind).toBe('tri_thang');
+    expect(result.cycle.editorialNotes).toEqual(['Nêu tên đội giao thịt và khoản đối giá ngay trên trang.']);
     expect(result.usages).toHaveLength(2);
   });
 
@@ -194,7 +269,7 @@ describe('cycle lifecycle', () => {
 
     const atEnd = { ...bible, symbolicCore: { ...bible.symbolicCore, chapterNumber: 16 } };
     expect(cycleReadyToClose(atEnd, cycle({ plannedEndChapter: 16 })))
-      .toEqual({ ready: false, reason: 'Overdue hooks: hook_giay_to.' });
+      .toEqual({ ready: false, reason: 'Overdue hooks: hook_dao_van.' });
 
     const paid = {
       ...atEnd,
@@ -219,8 +294,12 @@ describe('context selection', () => {
     });
     expect(brief.nhipChuong).toHaveLength(2);
     expect(brief.khongDuocTrai.daChet).toEqual([]);
-    expect(brief.khongDuocTrai.nhanVatChinh.capBac).toBe('Thợ xem');
-    expect(brief.kieuHookKetChuong).toBe('threat');
+    expect(brief.khongDuocTrai.nhanVatChinh.tienTrien).toEqual(expect.arrayContaining([
+      expect.objectContaining({ he: 'Cảnh giới Tu Tiên', cap: 'Luyện Khí tầng bốn' }),
+    ]));
+    expect(brief.kieuHookKetChuong).toBe('opportunity');
+    expect(brief.worldSlice.progressionSystems.length).toBeGreaterThan(0);
+    expect(brief).not.toHaveProperty('worldKernel');
     expect(JSON.stringify(brief)).not.toMatch(/requiredDelta|mechanicUse|storyTimeAfterMinutes/);
   });
 
@@ -230,10 +309,51 @@ describe('context selection', () => {
     })).toThrow(/no beat sheet for chapter 99/);
   });
 
+  test('writer, judge and extractor receive a chapter slice while planner alone owns the full kernel', () => {
+    const bible = seedBible({ premise });
+    const opening = cycle({
+      startChapter: 1,
+      plannedEndChapter: 5,
+      editorialNotes: ['Mọi lô hàng phải có người giao và đối giá rõ.'],
+      beatSheets: [{
+        chapterNumber: 1,
+        beats: ['Hứa An dùng Tịnh Mạch Đan trước phố', 'Khách gọi phẩm cấp rồi tranh mua'],
+        emotionalTarget: 'Giá trị cửa hàng được công khai.',
+        newNamedThing: 'Tịnh Mạch Đan Nhất giai hạ phẩm',
+        endHookKind: 'reward',
+      }],
+    });
+    const writer = buildWriterBrief({ premise, bible, cycle: opening, chapterNumber: 1, previousChapter: null });
+    const judge = buildJudgeBrief({ premise, bible, cycle: opening, chapterNumber: 1, title: 'Đây là đan dược?', prose: 'Hứa An gọi tên Tịnh Mạch Đan.' });
+    const extractor = buildExtractorBrief({ premise, bible, chapterNumber: 1, title: 'Đây là đan dược?', prose: 'Hứa An gọi tên Tịnh Mạch Đan.' });
+    for (const brief of [writer, judge, extractor]) {
+      expect(brief).not.toHaveProperty('worldKernel');
+      expect(JSON.stringify(brief)).not.toContain('Độ Thành Thạo');
+      expect(JSON.stringify(brief)).toContain('Tịnh Mạch Đan');
+    }
+    expect(extractor.thucTheTheGioiHopLe.every(entity => /^[a-z0-9_]+$/.test(entity.id))).toBe(true);
+    expect(extractor.nacKimThuChiHienTai?.id).toBe('ke_ban_le');
+    expect(extractor.nacKeTiepDuyNhat?.id).toBe('kho_thu_mua');
+    expect(writer.ghiChuBienTap).toEqual(['Mọi lô hàng phải có người giao và đối giá rõ.']);
+    expect(writer.soGiaoDichMoDau).toEqual(
+      premise.worldKernel.openingLedger.filter(entry => entry.chapterNumber === 1),
+    );
+  });
+
+  test('planner receives the open payoff registry as exact ids', () => {
+    const brief = buildCyclePlannerBrief({
+      premise, bible: baseBible(), previousCycle: null,
+      cycleNumber: 2, volumeNumber: 1, startChapter: 8, steering: [],
+    });
+    expect(brief.loaiSuongHopLe).toContain('tri_thang');
+    expect(brief.loaiSuongHopLe).toContain('chan_dong');
+    expect(brief.loaiSuongHopLe).not.toContain('deal');
+  });
+
   test('relevant cast prefers the protagonist, then whoever the beats name', () => {
-    const ids = relevantCast(baseBible(), premise, 'Bảy Thạch chặn hắn ngay cổng chợ');
-    expect(ids[0]).toBe('khang');
-    expect(ids).toContain('chu_tiem');
+    const ids = relevantCast(baseBible(), premise, 'Cao Nguyên chặn hắn ngay cổng chợ');
+    expect(ids[0]).toBe('lam_viet');
+    expect(ids).toContain('cao_nguyen');
   });
 
   test('steering is deduplicated newest-first and style memory merges old and new', () => {

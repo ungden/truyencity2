@@ -5,7 +5,7 @@
  * It never touches Supabase and never publishes: this is the phase-1 rig for reading
  * fifteen chapters and deciding whether the redesign is worth building a runtime for.
  *
- *   npm run serial:run -- --premise=factory/serial/he-thong-tham-dinh.json --chapters=4
+ *   npm run serial:run -- --premise=factory/serial/song-xuyen/01-cua-hang-cong-phap-tu-tien.json --chapters=4
  *   npm run serial:run -- --premise=... --chapters=15 --apply
  *
  * Without --apply it makes no provider calls at all: it validates the premise, seeds the
@@ -38,12 +38,7 @@ async function main(): Promise<void> {
   const outDir = arg('out') ?? join('factory', 'serial', 'runs', new Date().toISOString().replace(/[:.]/g, '-'));
 
   const premise = PremiseSchema.parse(JSON.parse(readFileSync(premisePath, 'utf8')));
-  const startLocationId = arg('start-location') ?? 'noi_bat_dau';
-  let bible: Bible = seedBible({
-    premise,
-    startLocationId,
-    startLocationNote: arg('start-note') ?? premise.arena,
-  });
+  let bible: Bible = seedBible({ premise });
 
   console.log(JSON.stringify({
     apply,
@@ -51,7 +46,8 @@ async function main(): Promise<void> {
     lane: premise.lane,
     goldenFinger: premise.goldenFinger.name,
     cast: premise.castSeed.length,
-    ladder: premise.tierLadder.map(tier => tier.name),
+    progressionSystems: premise.worldKernel.progressionSystems.map(system => system.name),
+    gradeSystems: premise.worldKernel.gradeSystems.map(system => system.name),
     chapters,
     routes: DEFAULT_SERIAL_ROUTES,
     promptVersion: SERIAL_PROMPT_VERSION,

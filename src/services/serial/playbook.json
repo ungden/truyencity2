@@ -1,5 +1,5 @@
 {
-  "version": "2026-09-19.5",
+  "version": "2026-09-19.6",
   "note": "Craft that dates. Code owns contracts; this file owns taste. Edit here, not in prompts.ts.",
   "payoffKinds": [
     {
@@ -106,12 +106,12 @@
   ],
   "rules": [
     {
-      "id": "open_on_pressure",
+      "id": "open_on_desire",
       "role": "writer",
       "status": "active",
       "observedAt": "2026-09-19",
       "evidence": "https://b.faloo.com/1455340_1.html",
-      "text": "MỞ CHƯƠNG — ba đoạn đầu\nVào thẳng một tình huống đang có áp lực, hoặc một câu hỏi chưa ai trả lời. Chậm nhất đến đoạn thứ ba đã phải có người nói hoặc người làm.\nTuyệt đối không mở chương bằng thời tiết, mùi, ánh sáng, cảnh vật, hồi tưởng, kiểm kê dụng cụ hay giới thiệu thân thế."
+      "text": "MỞ CHƯƠNG\nVào thẳng việc độc giả muốn thấy tiếp: mở món quà, thử năng lực, chốt giao dịch, gặp người mới hoặc xử lý đối thủ. Ba đoạn đầu có hành động hoặc lời thoại làm tình huống tiến lên."
     },
     {
       "id": "backstory_three_lines",
@@ -127,7 +127,7 @@
       "status": "active",
       "observedAt": "2026-09-19",
       "evidence": "docs/FALOO_CRAFT.md §2",
-      "text": "MỖI CHƯƠNG PHẢI THÊM MỘT THỨ MỚI CÓ TÊN\nMột năng lực, một nhân vật, một phe, một địa danh, một bậc cấp, một mối đe doạ, một con số định mệnh — nhưng nó phải được gọi bằng tên riêng và phải còn dùng lại được về sau. Chương nào không thêm được gì có tên thì chương đó chưa đáng tồn tại: hãy dồn biến cố lại cho tới khi có."
+      "text": "MỖI CHƯƠNG PHẢI THÊM MỘT THỨ MỚI CÓ TÊN\nCho năng lực, nhân vật, phe, địa danh hoặc phẩm giai mới xuất hiện qua diễn biến và còn dùng được về sau."
     },
     {
       "id": "paragraph_rhythm",
@@ -143,15 +143,15 @@
       "status": "active",
       "observedAt": "2026-09-19",
       "evidence": "docs/FALOO_CRAFT.md §7",
-      "text": "CHI TIẾT NGHỀ VÀ KỸ THUẬT\nChỉ giữ khi nó buộc nhân vật phải chọn, phải trả giá, hoặc tạo ra lợi thế trước một người khác. Một chi tiết đủ để tin là dừng. Tuyệt đối không biến chương thành hướng dẫn thao tác, quy trình hay báo cáo công việc."
+      "text": "CHI TIẾT NGHỀ VÀ KỸ THUẬT\nChọn chi tiết giúp độc giả hiểu món này quý ở đâu, nhân vật dùng khéo thế nào và kết quả hơn người ra sao. Một chi tiết đủ để tin, rồi trở lại hành động và phản ứng."
     },
     {
-      "id": "end_hook_mandatory",
+      "id": "end_on_expectation",
       "role": "writer",
       "status": "active",
       "observedAt": "2026-09-19",
       "evidence": "https://b.faloo.com/1455340_1.html",
-      "text": "KẾT CHƯƠNG — bắt buộc\nBa bốn đoạn cuối phải là một trong ba thứ: một mối đe doạ mới bước vào, một câu hỏi được đặt thẳng ra, hoặc một lời tuyên bố. Không bao giờ kết bằng câu tổng kết êm ả hay một nhịp thở phào."
+      "text": "KẾT CHƯƠNG\nTrả trọn khoảnh khắc đáng hưởng, rồi để độc giả nhìn thấy điều muốn đọc tiếp: phần thưởng sắp mở, khách lớn tìm đến, người sắp chứng kiến thực lực, bí mật, lời hẹn hoặc đối thủ ra tay. Chọn móc câu từ diễn biến vừa xảy ra."
     },
     {
       "id": "chapter_title_is_a_line",
@@ -170,12 +170,12 @@
       "text": "KHI CÚ THẮNG KHÔNG PHẢI CỦA NHÂN VẬT CHÍNH\nNếu brief ghi cú trả thưởng do người khác thực hiện, hãy viết cảnh đó bằng góc nhìn của người đó và để họ hưởng trọn khoảnh khắc — đừng cắt về nhân vật chính để bình luận.\nĐộc giả đã biết sức mạnh ấy từ đâu ra; người trong cảnh thì chưa. Khoảng chênh đó chính là cái sướng, và nó hỏng ngay khi lời kể giải thích ra.\nNhân vật chính xuất hiện ngắn, làm một việc bình thường, không giải thích gì. Để phản ứng của người khác nói thay."
     },
     {
-      "id": "no_self_punishing_power",
-      "role": "premise",
+      "id": "reader_promise",
+      "role": "shared",
       "status": "active",
       "observedAt": "2026-09-19",
-      "evidence": "https://maliangwriter.com/blog/web-novel-trends-2026-mid-year/",
-      "text": "TUYỆT ĐỐI KHÔNG thiết kế kim thủ chỉ quay lại cắn chủ nhân nó. Cấm: trừ thọ nguyên, rút máu, gánh ngược bệnh tật, phạt lên thân thể, nợ chồng nợ, nghèo vĩnh viễn, mỗi lần dùng là mỗi lần trả giá. Độc giả bây giờ bỏ truyện vì mấy thứ đó.\nscope, nếu có, là thứ kim thủ chỉ KHÔNG với tới — không bao giờ là cái giá nó bắt trả. Và xem luật asymmetry_is_the_engine: phần lớn trường hợp nên để trống."
+      "evidence": "docs/FALOO_CRAFT.md §4b — lựa chọn biên tập của người dùng, 2026-09-19",
+      "text": "LỜI HỨA VỚI ĐỘC GIẢ\nTheo readerFantasy: lợi thế tạo thành quả, thành quả tích lũy thành vốn cho tham vọng lớn hơn. Gây mong chờ bằng công dụng, phần thưởng và phản ứng. Đối kháng theo lợi ích va chạm; độ khó theo tình huống."
     },
     {
       "id": "opposition_is_people",
@@ -183,7 +183,7 @@
       "status": "active",
       "observedAt": "2026-09-19",
       "evidence": "docs/FALOO_CRAFT.md §4b",
-      "text": "oppositionEngine mới là nguồn căng thẳng: những kẻ muốn đoạt thứ nhân vật đang có, hoặc mất phần khi nhân vật thắng. Mọi áp lực về sau phải truy được về đây."
+      "text": "oppositionEngine nêu ai đang giữ thứ nhân vật muốn, ai mất phần khi hắn thành công và họ có thể làm gì. Họ hành động vì lợi ích riêng; mỗi lần giải quyết mở thêm chỗ đứng cho nhân vật."
     },
     {
       "id": "discover_dont_brief",
@@ -191,15 +191,15 @@
       "status": "active",
       "observedAt": "2026-09-19",
       "evidence": "https://wangwen666.com/post/196.html",
-      "text": "Đừng để một hệ thống hiện ra giải thích hết năng lực ngay từ đầu — độc giả đọc câu đầu là đoán ra nửa sau. Hãy để nhân vật và độc giả cùng dò ra ranh giới của nó."
+      "text": "Để nhân vật và độc giả cùng khám phá công dụng của năng lực qua những lần dùng có kết quả: nhận ra giá trị, thử một ứng dụng, rồi nhìn thấy cơ hội lớn hơn."
     },
     {
       "id": "business_jumps",
       "role": "premise",
       "status": "active",
       "observedAt": "2026-09-19",
-      "evidence": "https://maliangwriter.com/blog/web-novel-trends-2026-mid-year/",
-      "text": "Làm ăn buôn bán phải nhảy bậc chứ không bò từng bước: mỗi chu kỳ đổi hẳn quy mô và đối thủ. \"Phát triển dần dần\" là lý do độc giả 2026 bỏ dòng kinh thương."
+      "evidence": "docs/FALOO_CRAFT.md §4b — lựa chọn nhịp kinh thương của dự án",
+      "text": "Kinh doanh tích lũy rồi mở rộng: một giao dịch đem lại tiền, uy tín, đối tác hoặc công nghệ để làm thương vụ lớn hơn. Chọn bước nhảy đáng kể về khách hàng, sản phẩm hay thị trường khi cơ hội chín muồi."
     },
     {
       "id": "activate_in_chapter_one",
@@ -210,12 +210,12 @@
       "text": "Kim thủ chỉ phải kích hoạt ngay trong chương một và cho một kết quả nhìn thấy được ngay chương một. Nó tiến hoá qua sáu đến tám nấc, mỗi nấc đổi cách dùng chứ không chỉ đổi con số."
     },
     {
-      "id": "cycle_is_pressure_then_release",
+      "id": "cycle_fulfills_desire",
       "role": "planner",
       "status": "active",
       "observedAt": "2026-09-19",
-      "evidence": "https://www.jianshu.com/p/6565b9c59568",
-      "text": "Một chu kỳ là một vòng cảm xúc trọn vẹn dài 5 đến 15 chương: dồn nén, leo thang, rồi bung ra.\nBắt đầu bằng việc nhân vật chính bị từ chối, bị lấy mất hoặc bị đe doạ một thứ cụ thể. Đẩy nó xấu đi qua ba đến sáu bước. Rồi trả thưởng bằng một kết quả vật chất nhìn thấy được, trước mặt những người có lợi ích trong đó."
+      "evidence": "docs/FALOO_CRAFT.md §4b; https://b.faloo.com/1324795_3.html",
+      "text": "CHU KỲ LÀ MỘT LỜI HỨA ĐƯỢC THỰC HIỆN\nTrong 5–15 chương, pressure là cơ hội, tham vọng hoặc đối kháng; escalation là 3–6 bước làm kết quả đáng mong hơn. Chọn nhịp: khám phá → thử thành công → đơn hàng lớn; thể hiện → chấn động; hoặc đối đầu → nghiền ép → thu phục. Có phần thưởng dọc đường và kết quả dùng được ở vòng sau."
     },
     {
       "id": "opponents_keep_their_will",
@@ -223,7 +223,7 @@
       "status": "active",
       "observedAt": "2026-09-19",
       "evidence": "story_factory_runs window_review verdicts, ch 70/85",
-      "text": "Người thua phải giữ được ý chí và đổi chiến thuật, không quỳ lạy, không sụp đổ nhân cách. Đối thủ phải theo đuổi lợi ích riêng của họ chứ không chỉ làm nền cho nhân vật chính.\nKhi chuyển sang chu kỳ mới, đối thủ phải đổi giai cấp — một kẻ cũ đổi chiêu không tính là leo thang.\nKhông kéo dài một cuộc đối đầu mà độc giả đang mong giải quyết dứt điểm."
+      "text": "Đối thủ có lợi ích và hành động cụ thể. Kết cục theo thực lực và lựa chọn của họ: bị loại, chịu thua, quy phục hoặc còn lực để trở lại. Giải quyết cuộc đối đầu khi đã đủ cho cú thắng; đấu trường lớn hơn có người chơi và lợi ích mới."
     },
     {
       "id": "broker_stance",
@@ -239,7 +239,7 @@
       "status": "active",
       "observedAt": "2026-09-19",
       "evidence": "https://www.sohu.com/a/876257711_122129349",
-      "text": "ĐỘNG CƠ LÀ CHÊNH LỆCH, KHÔNG PHẢI CƠ CHẾ.\nThứ hiếm bên này là thứ tầm thường bên kia, và ngược lại. Chỉ riêng điều đó đã đủ nuôi cả bộ truyện: nhân vật mua rẻ bán đắt, giàu lên, mạnh lên, dựng thế lực. Hãy nói thẳng hai chiều hàng hoá và dừng lại.\nKHÔNG gắn thêm điều kiện vặt lên cánh cửa: không đồng hồ đếm ngược, không hạn mức, không khung giờ, không 'phải có mã vận đơn', không luật lệ rườm rà cho việc đi lại. Mỗi điều kiện thêm vào là một chương nói về việc quản lý điều kiện đó — đúng thứ đã giết năm bộ truyện cũ.\nscope được phép để trống. Chỉ ghi khi nó là sự thật tự nhiên của hai thế giới (bên kia không có điện nên đồ điện tử vô dụng), không bao giờ là luật do tác giả áp đặt lên cái cổng.\nCái ngăn nhân vật không phải là cổng, mà là người: bên kia cũng có chủ, có giá, có kẻ đang nắm tuyến hàng."
+      "text": "SONG XUYÊN: GIÁ TRỊ CHÊNH LỆCH GIỮA HAI THẾ GIỚI\nCửa xuyên là phương tiện đi lại tự do. Thứ thường bên này giải nhu cầu lớn bên kia; hàng đổi về lại mở năng lực, sản phẩm hoặc thế lực mới. Nêu hai chiều giá trị và người hưởng lợi. scope để null khi premise đã đủ rõ; nếu dùng, chỉ mô tả phạm vi chức năng."
     },
     {
       "id": "economy_must_close",
@@ -287,7 +287,7 @@
       "status": "active",
       "observedAt": "2026-09-19",
       "evidence": "https://www.zhihu.com/question/373347616",
-      "text": "XUNG ĐỘT PHẢI ĐỔI CHIỀU, KHÔNG PHẢI ĐỔI CỠ.\nThang bốn bậc: sinh tồn (thú dữ, du côn) → quy tắc (chấp pháp, tông môn) → lý niệm (hiền giả, kẻ cách mạng) → tự thân (tâm ma).\nCứ đánh mãi ở một bậc rồi tăng con số là chồng số, không phải leo thang — đó là lý do một bộ chết ở chương 500. Mỗi quyển phải nhích lên một bậc hoặc ít nhất chạm vào bậc trên.\nVà phải có đường ngầm: một tuyến gieo từ sớm, nổi lên giữa truyện, nhập vào tuyến chính ở cuối."
+      "text": "MỞ RỘNG ĐẤU TRƯỜNG TỪ THÀNH QUẢ\nconflictLadder là bốn hướng để chọn theo truyện: survival — có chỗ đứng; rules — tác động luật chơi; ideology — xây trật tự mình muốn; self — chọn tham vọng và cách sống. Đường ngầm gieo sớm, nhập tuyến chính để mở khám phá mới."
     }
   ],
   "genreCanon": {

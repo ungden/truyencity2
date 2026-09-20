@@ -259,25 +259,27 @@ Tất cả là JSON có trường prose, kích thước nhỏ, đọc được b
   toàn dân lãnh chúa / …), `readerFantasy` (độc giả muốn *cảm thấy* gì).
 - `goldenFinger`: tên, luật hoạt động như độc giả sẽ thấy, **đường tiến hoá** 6–8 nấc (mỗi nấc
   đổi *cách dùng*, không chỉ số to hơn), giới hạn/giá phải trả.
-- `tierLadder`: thang cảnh giới/tài sản/địa vị **có tên** (ví dụ: thợ phụ → chủ xưởng → chủ
-  đội tàu → …; Luyện Khí → Trúc Cơ → …). Đây là thước đo tiến độ duy nhất code cần hiểu.
+- `worldKernel`: canon hoàn chỉnh bất biến gồm hai thế giới, địa điểm/phe phái,
+  `progressionSystems`, `gradeSystems`, `equivalences`, `economyLoops`, `launchProducts`
+  và hợp đồng bốn chương mở đầu. Cảnh giới, nghề, cửa hàng và công ty là các trục riêng.
 - `endingDirection`, `voiceSheet` (giọng, POV, cấm kỵ, từ vựng riêng, **quy tắc tên chương:
   một câu thoại/câu cảm có cú**), `taboos`.
-- `castSeed`: 6–10 nhân vật khởi đầu **có agenda riêng**, trong đó ≥ 2 đối thủ ở hai giai cấp.
+- `castSeed`: 6–10 nhân vật khởi đầu **có agenda riêng**, địa điểm đầu, các trạng thái tiến
+  triển đầu và 3–5 mốc đi lên có tên; trong đó ≥ 2 đối thủ ở hai giai cấp.
 
 **`Bible`** — sống, 3–6k token, là thứ *mọi* prompt đều nhận.
-- `symbolicCore` (code sở hữu, kiểm cứng): `storyDate`, `mc: {tier, location, keyAssets[]}`,
-  `cast[]: {id, alive, tier, location, lastSeenChapter}`, `openHooks[]: {id, plantedChapter,
-  dueBy, status}`.
+- `symbolicCore` (code sở hữu, kiểm cứng): `storyDay`, `mc: {characterId, locationId,
+  keyAssetIds[], goldenFingerRungId}`, `cast[]`, `progressions[]: {subjectId, systemId,
+  trackId?, rankId, minorStageId?}`, `openHooks[]`.
 - `castSheet`: mỗi nhân vật 3–5 dòng — vai trò, muốn gì, bí mật, quan hệ với MC, đã biết gì
   về kim thủ chỉ (**ranh giới thông tin**).
-- `world`: phe phái, địa điểm, luật kim thủ chỉ *đã lộ tới đâu*, luật thế giới đã dùng.
+- `world`: chỉ các phe phái, địa điểm và luật *đã xuất hiện*; canon đầy đủ ở `worldKernel`.
 - `recentSummary`: 10 chương gần nhất, mỗi chương 1–2 dòng + loại 爽点 đã dùng + kết chương.
 - `volumeSummaries`: mỗi quyển đã qua một đoạn 150–300 chữ.
 - `styleMemory`: khuôn câu/motif đã dùng nhiều (từ telemetry tiếng Việt hiện có), để tránh.
 
 **`VolumePlan`** (quyển, 100–200 chương, động — viết lại ở mỗi ranh giới quyển).
-- Giai cấp đối thủ, đấu trường, trạng thái vào → ra (theo `tierLadder`), 4–8 chu kỳ với
+- Giai cấp đối thủ, đấu trường, trạng thái vào → ra theo từng progression system, 4–8 chu kỳ với
   loại 爽点 chủ đạo, các hook phải trả trong quyển, 2–3 nhân vật mới bắt buộc xuất hiện, nấc
   kim thủ chỉ sẽ mở.
 
@@ -304,7 +306,7 @@ Tất cả là JSON có trường prose, kích thước nhỏ, đọc được b
 4. fix    chỉ khi có hard finding: 1 lần sửa có đích, rồi judge lại continuity (không chấm lại 爽)
 5. digest Extractor (flash) → ChapterDigest
 6. merge  code: symbolicCore (deterministic) + castSheet/recentSummary (LLM merge, flash)
-          luật cứng: chết không sống lại; tier không tụt nếu digest không ghi lý do;
+          luật cứng: chết không sống lại; mỗi progression chỉ dùng ID canon và tiến tuần tự;
           storyDate đơn điệu; hook id tồn tại; cast mới phải có sheet.
 7. commit chương ở trạng thái draft trong cửa sổ chu kỳ; lưu scorecard + digest
 ```
@@ -364,11 +366,10 @@ thực tế xuống dưới $0,15 chủ yếu nhờ **không còn 46% plan hỏn
 
 ### 3.7 Concept Lab rút gọn
 
-9 call → **3 call**: hai generator độc lập sinh `Premise` theo văn phạm Faloo cho lane được
-chọn (tiêu đề, hook, kim thủ chỉ + đường tiến hoá, tierLadder, castSeed, mô tả bán hàng), một
-judge chọn và sửa. Thêm **một bước người duyệt** (bạn đọc Premise 1 trang, gật hoặc lắc) — rẻ
-hơn mọi validator và chính là chỗ con người có giá trị nhất. Giữ `FALOO_MARKET_PROFILE.md`
-làm văn phạm sản phẩm.
+9 call → **3 call**: hai generator độc lập sinh gói `Premise` + `worldKernel` theo văn phạm
+Faloo cho lane được chọn, một judge chọn và sửa. Thêm **một bước người duyệt** toàn gói trước
+khi chi model cho chương; bốn chương mở đầu có cổng duyệt riêng. Giữ
+`FALOO_MARKET_PROFILE.md` làm văn phạm sản phẩm.
 
 ### 3.8 Xoá gì, giữ gì
 
@@ -430,14 +431,15 @@ Hai ràng buộc không được quên:
 
 ### Việc còn lại cần bạn gật một tiếng
 
-Giai đoạn 1a đã xong và đã push. Toàn bộ vòng lặp chương chạy được với provider giả trong
-test, nên chính sách thất bại đã được kiểm chứng mà không tốn đồng nào.
+World Kernel v2, Bible đa trục và hai package production đã hoàn tất trong source. Toàn bộ
+vòng lặp chương chạy được với provider giả trong test, nên chính sách thất bại đã được kiểm
+chứng mà không tốn đồng nào.
 
-Còn lại là **1b: chạy thật, khoảng $8–12** — bakeoff writer rồi sinh 4 chương vàng + 11 chương
-cho premise `factory/serial/he-thong-tham-dinh.json`. Lệnh đã sẵn sàng và mặc định là dry-run:
+Còn lại là **1b: sau khi duyệt package, chạy thật** — sinh bốn chương vàng và dừng ở cổng
+đọc trước khi viết tiếp. Lệnh đã sẵn sàng và mặc định là dry-run:
 
 ```bash
-npm run serial:run -- --premise=factory/serial/he-thong-tham-dinh.json --chapters=4 --apply
+npm run serial:run -- --premise=factory/serial/song-xuyen/01-cua-hang-cong-phap-tu-tien.json --chapters=4 --apply
 ```
 
 Không có `--apply` thì nó không gọi model nào.

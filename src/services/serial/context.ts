@@ -1,5 +1,6 @@
 import type { Bible, ChapterDigest, CyclePlan, JudgeVerdict, PayoffKind, Premise } from './contracts';
-import { overdueHooks, recentPayoffKinds, tierIndex } from './state';
+import { payoffKindIds } from './playbook';
+import { overdueHooks, recentPayoffKinds } from './state';
 
 /**
  * What each role is allowed to see.
@@ -50,24 +51,82 @@ export function relevantCast(bible: Bible, premise: Premise, beatText: string): 
 /** The small, hard surface. Short on purpose: a Writer that reads it will obey it. */
 export function mustNotContradict(bible: Bible, premise: Premise, castIds: string[]) {
   const core = bible.symbolicCore;
-  const tierName = (tierId: string | null) =>
-    premise.tierLadder.find(tier => tier.id === tierId)?.name ?? null;
+  const progressionName = (subjectId: string) => core.progressions
+    .filter(state => state.subjectId === subjectId)
+    .map(state => {
+      const system = premise.worldKernel.progressionSystems.find(item => item.id === state.systemId);
+      return {
+        he: system?.name ?? state.systemId,
+        nhanh: system?.tracks.find(track => track.id === state.trackId)?.name ?? null,
+        cap: system?.ranks.find(rank => rank.id === state.rankId)?.name ?? state.rankId,
+        tieuCanh: system?.minorStages.find(stage => stage.id === state.minorStageId)?.name ?? null,
+      };
+    });
   return {
     ngayTruyen: core.storyDay,
     nhanVatChinh: {
-      capBac: tierName(core.mc.tierId),
+      tienTrien: progressionName(core.mc.characterId),
       dangO: core.mc.locationId,
+      nacKimThuChi: core.mc.goldenFingerRungId,
     },
     daChet: core.cast.filter(member => !member.alive).map(member => nameOf(bible, member.id)),
     viTri: core.cast
       .filter(member => member.alive && castIds.includes(member.id))
-      .map(member => ({ ten: nameOf(bible, member.id), capBac: tierName(member.tierId), dangO: member.locationId })),
+      .map(member => ({ ten: nameOf(bible, member.id), tienTrien: progressionName(member.id), dangO: member.locationId })),
     bietBiMat: core.cast
       .filter(member => member.knowsFinger)
       .map(member => nameOf(bible, member.id)),
     phucButConNo: core.openHooks
       .filter(hook => hook.status === 'open' || hook.status === 'moving')
       .map(hook => ({ noiDung: hook.what, hanChuong: hook.dueByChapter })),
+  };
+}
+
+/** Canon slice for one chapter. Planner receives the whole kernel; other roles do not. */
+export function relevantWorldSlice(input: {
+  premise: Premise;
+  bible: Bible;
+  castIds: string[];
+  chapterNumber: number;
+  beatText: string;
+}) {
+  const { premise, bible, castIds, chapterNumber } = input;
+  const kernel = premise.worldKernel;
+  const opening = kernel.openingContract.find(contract => contract.chapterNumber === chapterNumber);
+  const semanticText = `${input.beatText} ${opening ? Object.values(opening).join(' ') : ''}`.toLowerCase();
+  const protagonistId = premise.castSeed.find(member => member.role === 'protagonist')?.id;
+  const focusedCastIds = new Set(castIds.filter(castId => {
+    const name = nameOf(bible, castId).toLowerCase();
+    return castId === protagonistId || (name.length > 1 && semanticText.includes(name));
+  }));
+  const locationIds = new Set(
+    bible.symbolicCore.cast.filter(member => focusedCastIds.has(member.id)).map(member => member.locationId),
+  );
+  const worlds = kernel.worlds.map(world => ({
+    id: world.id,
+    name: world.name,
+    civilizationState: world.civilizationState,
+    locations: world.locations.filter(location => locationIds.has(location.id)
+      || semanticText.includes(location.name.toLowerCase())),
+    factions: world.factions.filter(faction => semanticText.includes(faction.name.toLowerCase())),
+  })).filter(world => world.locations.length > 0 || world.factions.length > 0);
+
+  const productIds = new Set(kernel.launchProducts
+    .filter(product => product.introducedChapter === chapterNumber
+      || semanticText.includes(product.name.toLowerCase()))
+    .map(product => product.id));
+  const products = kernel.launchProducts.filter(product => productIds.has(product.id));
+  const systemIds = new Set(bible.symbolicCore.progressions
+    .filter(state => focusedCastIds.has(state.subjectId) || bible.symbolicCore.mc.keyAssetIds.includes(state.subjectId))
+    .map(state => state.systemId));
+  const gradeIds = new Set(products.map(product => product.gradeSystemId));
+  return {
+    worlds,
+    progressionSystems: kernel.progressionSystems.filter(system => systemIds.has(system.id)),
+    gradeSystems: kernel.gradeSystems.filter(system => gradeIds.has(system.id)),
+    equivalences: kernel.equivalences.filter(item => systemIds.has(item.leftSystemId) || systemIds.has(item.rightSystemId)),
+    economyLoops: kernel.economyLoops.filter(loop => worlds.some(world => world.id === loop.fromWorldId || world.id === loop.toWorldId)),
+    launchProducts: products,
   };
 }
 
@@ -84,38 +143,47 @@ export function buildWriterBrief(input: {
 
   const beatText = [sheet.newNamedThing, sheet.emotionalTarget, ...sheet.beats, cycle.pressure].join(' ');
   const castIds = relevantCast(bible, premise, beatText);
-  const rung = premise.goldenFinger.evolution[
-    Math.max(0, Math.min(premise.goldenFinger.evolution.length - 1, tierIndex(premise, bible.symbolicCore.mc.tierId)))
-  ];
+  const rung = premise.goldenFinger.evolution.find(item => item.id === bible.symbolicCore.mc.goldenFingerRungId);
+  const worldSlice = relevantWorldSlice({ premise, bible, castIds, chapterNumber, beatText });
+  const openingContract = premise.worldKernel.openingContract.find(item => item.chapterNumber === chapterNumber) ?? null;
 
   return {
-    truyen: { tieuDe: premise.title, dauTruong: premise.arena },
+    truyen: { tieuDe: premise.title, dauTruong: premise.arena, readerFantasy: premise.readerFantasy },
     giong: {
       ngoiKe: premise.voiceSheet.pov,
       vanPhong: premise.voiceSheet.register,
       luatDatTenChuong: premise.voiceSheet.chapterTitleRule,
+      luatPhanUng: premise.voiceSheet.reactionRule,
       camKy: premise.voiceSheet.taboos,
     },
     kimThuChi: {
       ten: premise.goldenFinger.name,
       luat: premise.goldenFinger.rule,
-      // Scope, not cost. The Writer is told what the advantage cannot reach so it
-      // cannot resolve the chapter for free — never that using it hurts.
+      // Optional functional scope from the approved premise.
       khongVoiToi: premise.goldenFinger.scope,
       nacHienTai: rung ? `${rung.name} — ${rung.changesUse}` : null,
     },
     nguonDoiKhang: premise.oppositionEngine,
     chuongSo: chapterNumber,
-    apLucChuKy: cycle.pressure,
+    dongLucChuKy: cycle.pressure,
     nhipChuong: sheet.beats,
     mucTieuCamXuc: sheet.emotionalTarget,
     thuMoiPhaiDatTen: sheet.newNamedThing,
     kieuHookKetChuong: sheet.endHookKind,
+    ghiChuBienTap: cycle.editorialNotes,
+    soGiaoDichMoDau: chapterNumber <= 4
+      ? premise.worldKernel.openingLedger.filter(entry => entry.chapterNumber <= chapterNumber)
+      : [],
     nhanVatLienQuan: castIds.map(id => ({
       ten: nameOf(bible, id),
       hoSo: bible.castSheet.find(entry => entry.id === id)?.sheet ?? '',
     })),
-    boiCanh: bible.world.map(entry => ({ ten: entry.name, ghiChu: entry.note })),
+    boiCanh: worldSlice.worlds.flatMap(world => world.locations.map(location => ({
+      ten: location.name,
+      ghiChu: bible.world.find(entry => entry.id === location.id)?.note ?? location.note,
+    }))),
+    worldSlice,
+    hopDongMoDau: openingContract,
     khongDuocTrai: mustNotContradict(bible, premise, castIds),
     doanCuoiChuongTruoc: previousTail(input.previousChapter),
     tieuDeGanDay: bible.recentSummary.map(entry => entry.title),
@@ -133,12 +201,18 @@ export function buildJudgeBrief(input: {
 }) {
   const { premise, bible, cycle, chapterNumber } = input;
   const sheet = cycle.beatSheets.find(item => item.chapterNumber === chapterNumber);
-  const castIds = bible.symbolicCore.cast.map(member => member.id);
+  const beatText = sheet ? [sheet.newNamedThing, sheet.emotionalTarget, ...sheet.beats].join(' ') : '';
+  const castIds = relevantCast(bible, premise, `${beatText} ${input.prose}`);
   return {
+    readerFantasy: premise.readerFantasy,
+    kimThuChi: { ten: premise.goldenFinger.name, luat: premise.goldenFinger.rule, phamVi: premise.goldenFinger.scope },
     chuongSo: chapterNumber,
     tieuDe: input.title,
     chuong: input.prose,
     leRaPhaiLam: sheet ? { nhip: sheet.beats, camXuc: sheet.emotionalTarget, thuMoi: sheet.newNamedThing, hook: sheet.endHookKind } : null,
+    luatPhanUng: premise.voiceSheet.reactionRule,
+    worldSlice: relevantWorldSlice({ premise, bible, castIds, chapterNumber, beatText }),
+    hopDongMoDau: premise.worldKernel.openingContract.find(item => item.chapterNumber === chapterNumber) ?? null,
     khongDuocTrai: mustNotContradict(bible, premise, castIds),
     tomTatChuongTruoc: bible.recentSummary,
     cumTuDaMon: bible.styleMemory,
@@ -152,17 +226,53 @@ export function buildExtractorBrief(input: {
   title: string;
   prose: string;
 }) {
+  const castIds = relevantCast(input.bible, input.premise, input.prose);
+  const slice = relevantWorldSlice({
+    premise: input.premise, bible: input.bible, castIds,
+    chapterNumber: input.chapterNumber, beatText: input.prose,
+  });
+  const currentRungIndex = input.premise.goldenFinger.evolution.findIndex(
+    rung => rung.id === input.bible.symbolicCore.mc.goldenFingerRungId,
+  );
   return {
     chuongSo: input.chapterNumber,
     tieuDe: input.title,
     chuong: input.prose,
     // Exact ids the extractor must reuse rather than invent, so the merge can bind them.
     nhanVatDaBiet: input.bible.castSheet.map(entry => ({ id: entry.id, ten: entry.name })),
-    capBacHopLe: input.premise.tierLadder.map(tier => ({ id: tier.id, ten: tier.name })),
-    diaDiemDaBiet: input.bible.world.map(entry => ({ id: entry.id, ten: entry.name })),
+    heTienTrienLienQuan: slice.progressionSystems,
+    phamCapLienQuan: slice.gradeSystems,
+    nacKimThuChiHopLe: input.premise.goldenFinger.evolution,
+    nacKimThuChiHienTai: input.premise.goldenFinger.evolution[currentRungIndex] ?? null,
+    nacKeTiepDuyNhat: input.premise.goldenFinger.evolution[currentRungIndex + 1] ?? null,
+    diaDiemHopLe: slice.worlds.flatMap(world => world.locations.map(location => ({ id: location.id, ten: location.name }))),
+    thucTheTheGioiHopLe: slice.worlds.flatMap(world => [
+      { id: world.id, ten: world.name, loai: 'the_gioi' },
+      ...world.locations.map(location => ({ id: location.id, ten: location.name, loai: 'dia_diem' })),
+      ...world.factions.map(faction => ({ id: faction.id, ten: faction.name, loai: 'phe_phai' })),
+    ]),
     phucButDangMo: input.bible.symbolicCore.openHooks
       .filter(hook => hook.status !== 'paid' && hook.status !== 'dropped')
       .map(hook => ({ id: hook.id, noiDung: hook.what })),
+  };
+}
+
+export function buildOpeningAuditBrief(input: {
+  premise: Premise;
+  chapters: Array<{ chapterNumber: number; title: string; content: string }>;
+}) {
+  return {
+    truyen: {
+      tieuDe: input.premise.title,
+      readerFantasy: input.premise.readerFantasy,
+      kimThuChi: input.premise.goldenFinger,
+      camKy: input.premise.voiceSheet.taboos,
+    },
+    vongKinhTe: input.premise.worldKernel.economyLoops,
+    hangMoMan: input.premise.worldKernel.launchProducts,
+    hopDongBonChuong: input.premise.worldKernel.openingContract,
+    soGiaoDichChuan: input.premise.worldKernel.openingLedger,
+    chuong: input.chapters,
   };
 }
 
@@ -181,11 +291,13 @@ export function buildCyclePlannerBrief(input: {
     truyen: {
       tieuDe: premise.title,
       dauTruong: premise.arena,
-      fantasyDocGia: premise.readerFantasy,
+      readerFantasy: premise.readerFantasy,
       huongKetThuc: premise.endingDirection,
     },
     kimThuChi: premise.goldenFinger,
-    thangCapBac: premise.tierLadder,
+    nguonDoiKhang: premise.oppositionEngine,
+    worldKernel: premise.worldKernel,
+    luatPhanUng: premise.voiceSheet.reactionRule,
     chuKySo: input.cycleNumber,
     quyenSo: input.volumeNumber,
     chuongBatDau: input.startChapter,
@@ -196,13 +308,14 @@ export function buildCyclePlannerBrief(input: {
     tomTatCacQuyen: bible.volumeSummaries,
     chuKyTruoc: input.previousCycle
       ? {
-        apLuc: input.previousCycle.pressure,
+        dongLuc: input.previousCycle.pressure,
         loaiSuong: input.previousCycle.climax.payoffKind,
         ketQua: input.previousCycle.climax.result,
         hookDeLai: input.previousCycle.nextHook,
       }
       : null,
     // Two code-owned constraints the planner cannot argue with.
+    loaiSuongHopLe: payoffKindIds(),
     loaiSuongKhongDuocDung: input.previousCycle ? [input.previousCycle.climax.payoffKind] : [],
     loaiSuongDaDungGanDay: used,
     phucButQuaHan: overdueHooks(bible, input.startChapter),

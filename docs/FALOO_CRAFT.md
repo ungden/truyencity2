@@ -124,49 +124,42 @@ Quy định Faloo: nộp sách phải có sẵn ≥ 4 chương, biên tập **ch
 
 ---
 
-## 4b. Kim thủ chỉ không được cắn chủ nhân nó
+## 4b. Lợi thế thực hiện lời hứa với độc giả
 
-Bổ sung 19/09 sau một lượt audit. Đây là chỗ dễ sai nhất và tôi đã sai đúng vào đó.
+Chỉnh gốc ngày 19/09 theo lựa chọn biên tập của người dùng: sảng văn tích lũy thành quả.
+Đây là định hướng của dự án, không phải kết luận rằng mọi truyện Trung Quốc cùng một gu.
 
-Bằng chứng hai chiều:
+Đọc trực tiếp phần mở đầu công khai của *修仙双穿末日，修魔的我开心坏了*:
+[chương 3](https://b.faloo.com/1324795_3.html) dùng tài nguyên bên kia để giải nút thắt tu luyện,
+rồi phát hiện lợi ích thêm về thể chất và tư chất; [chương 4](https://b.faloo.com/1324795_4.html)
+tiếp tục mở công dụng. Truyện có khó khăn và giới hạn, nhưng đoạn hấp dẫn ở đây là cách
+lợi thế hóa giải chúng và cộng thêm phần thưởng. *双穿乱世：我以米饭养死士*
+[chương 2](https://b.faloo.com/1547827_2.html) trả khoản nợ mở màn, để lại vốn tái đầu tư,
+rồi đưa thế lực ngoài vào làm đối kháng. Các ví dụ này minh họa thủ pháp, không chứng minh
+doanh số hay một quy luật toàn thị trường.
 
-- **Faloo**: nhân vật chính hầu như không chịu thiệt thật. *"传统网文可能第二十章主角刚刚觉醒，
-  而飞卢风通常在第一章便获得武功绝学，第二章已经进入元婴期"* — chương 1 có tuyệt học, chương 2
-  đã Nguyên Anh. Xung đột giải quyết bằng *"主角只需要一巴掌！啪！"*.
-- **Xu hướng 2026**: `系统金手指开挂` bị chê *"太模板化了"*; và quan trọng hơn cho dòng song xuyên —
-  `种田经商慢慢发育` bị loại thẳng vì *"节奏跟不上了"* (nhịp không theo kịp). **"Làm ăn dần dần"
-  là lý do độc giả bỏ dòng kinh thương.**
-- **Phía ngược lại**, sách dạy nghề vẫn nói *"没有代价的超能力，写出来一定无聊"* — nhưng câu đầy
-  đủ là *"代价越克制"*: càng tiết chế càng tốt.
+Thiết kế bắt đầu từ điều độc giả muốn hưởng: khám phá giá trị, thắng giao dịch, lên cấp,
+có đồng minh, được công nhận, tự chọn mục tiêu lớn hơn. Kim thủ chỉ là công cụ thực hiện
+lời hứa ấy. Thành quả trở thành vốn cho vòng sau; đối kháng có người và lợi ích cụ thể.
+`scope` là phạm vi chức năng tùy chọn, có thể để `null`.
 
-Cách hoà giải, và là luật của TruyenCity:
+期待感 là mong một kết quả đáng muốn. Chờ mở phần thưởng, chờ người khác thấy thực lực,
+chờ đơn hàng lớn đều tạo kỳ vọng. Dồn nén rồi giải tỏa là một cách dùng, bên cạnh khám phá
+→ thành công → phản ứng → cơ hội mới. Độ khó theo tình huống và lời hứa của bộ truyện.
 
-| Kiểu giới hạn | Ví dụ | Dùng? |
-|---|---|---|
-| **Phạm vi** — thứ năng lực không với tới | chỉ mở 0h–4h · chỉ chuyển vật vô tri · chỉ đọc được đồ, không đọc được người | ✅ bắt buộc |
-| **Đối kháng ngoài** — kẻ muốn đoạt, kẻ mất phần khi main thắng | hội thẩm định mất quyền chia tiền | ✅ đây mới là nguồn căng thẳng |
-| **Trừng phạt chủ nhân** — năng lực quay lại cắn main | trừ thọ nguyên · gánh ngược bệnh · phạt lên thân thể · nợ chồng nợ · nghèo vĩnh viễn | ❌ cấm |
-
-Giới hạn phạm vi làm nhân vật phải **tính toán**. Giới hạn trừng phạt chỉ làm độc giả **khó chịu**.
-Cả hai đều ngăn năng lực giải quyết mọi thứ miễn phí; chỉ một cái khiến người ta đọc tiếp.
-
-Thêm hai luật từ cùng lượt audit:
-
-- **Phát hiện, đừng thuyết minh.** *"发现式而非灌输式"* — để nhân vật và độc giả cùng dò ra ranh
-  giới. Một hệ thống hiện ra đọc hết bảng năng lực ở chương 1 là đọc câu đầu đoán được nửa sau.
-- **Kinh doanh nhảy bậc, không bò.** Mỗi chu kỳ đổi hẳn quy mô và giai cấp đối thủ.
+Premise, Planner, Writer và Judge cùng đọc một định hướng này. Sửa định nghĩa nhịp truyện
+và tiêu chí chấm tại nguồn; thay chỉ dẫn cũ thay vì bồi thêm ngoại lệ phủ định nó.
 
 ## 5. Leo thang dài hạn
 
-- **Chu kỳ cảm xúc**: 小不爽 → 小爽 → 小不爽 → 小爽 … → 大不爽 → 大爽. Thiết kế đại cao trào
-  trước, rồi lấp chu kỳ nhỏ vào giữa. Một tiểu cao trào mỗi ~10.000 chữ (≈ 4–6 chương).
+- **Chu kỳ cảm xúc**: chọn lời hứa và cú trả thưởng lớn, xen thành công, khám phá, phản ứng
+  hoặc đối đầu theo tình huống. Kết quả nhỏ dọc đường làm kết quả lớn đáng mong hơn.
 - **15 loại 爽点 để xoay vòng**: vả mặt · nghịch tập · nghiền ép · giấu mạnh lộ mạnh · phá vây ·
   trí thắng · kho báu hiện thế · được công nhận · cứu nguy · kỳ ngộ · đột phá cấp bậc · kẻ mạnh
   trở về · tuyệt địa phản kích · tình trường đắc ý · lực vãn cuồng lan.
   **Luật code: không lặp loại chủ đạo ở hai chu kỳ liền nhau.**
-- **Đối thủ leo theo giai cấp**, không phải một kẻ đổi chiêu. Đây chính xác là lỗi window
-  review đã bắt được ở ta: *"Ba Hồng chỉ xuất hiện để châm chọc rồi đứng nhìn (ch 82, 84, 85)"*
-  và *"Tôn Sách chỉ đứng quan sát rồi tự nguyện quy phục"*.
+- **Đấu trường mở rộng** từ thành quả: khách hàng, tổ chức, thị trường hoặc đối thủ mới.
+  Một đối thủ đã thua có thể kết thúc vai trò; người trở lại cần lợi ích và hành động thật.
 - **Kim thủ chỉ tiến hoá 6–8 nấc**, mỗi nấc đổi **cách dùng**, không chỉ đổi số.
 - **冲突不要拖** — không kéo dài một cuộc đối đầu khi kỳ vọng độc giả đòi giải quyết dứt điểm.
 

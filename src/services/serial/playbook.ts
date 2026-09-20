@@ -28,7 +28,7 @@ export type CraftRole = (typeof CRAFT_ROLES)[number];
 
 const CraftRuleSchema = z.object({
   id: z.string().trim().regex(/^[a-z0-9_]{3,48}$/),
-  role: z.enum(CRAFT_ROLES),
+  role: z.enum(['shared', ...CRAFT_ROLES]),
   status: z.enum(['active', 'retired']),
   /** When the evidence behind this rule was last checked, not when it was written. */
   observedAt: z.string().trim().regex(/^\d{4}-\d{2}-\d{2}$/),
@@ -66,10 +66,10 @@ export function playbook(): Playbook {
 }
 
 export function activeRules(role: CraftRole): CraftRule[] {
-  return playbook().rules.filter(rule => rule.role === role && rule.status === 'active');
+  return playbook().rules.filter(rule => (rule.role === 'shared' || rule.role === role) && rule.status === 'active');
 }
 
-/** The rules for one role, joined into the block a prompt appends. */
+/** Shared editorial direction and role-specific craft, each included once. */
 export function craftBlock(role: CraftRole): string {
   return activeRules(role).map(rule => rule.text).join('\n\n');
 }
@@ -91,7 +91,7 @@ export function isPayoffKind(value: string): boolean {
 
 /** Rules whose evidence has not been rechecked in `days`. Surfaced by `npm run craft:audit`. */
 export function staleRules(days = 120, now = new Date()): Array<CraftRule & { ageDays: number }> {
-  return activeRules('writer').concat(activeRules('premise'), activeRules('planner'), activeRules('judge'))
+  return playbook().rules.filter(rule => rule.status === 'active')
     .map(rule => ({
       ...rule,
       ageDays: Math.floor((now.getTime() - new Date(rule.observedAt).getTime()) / 86_400_000),

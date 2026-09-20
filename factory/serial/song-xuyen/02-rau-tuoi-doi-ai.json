@@ -1,0 +1,239 @@
+{
+  "schemaVersion": 2,
+  "lane": "he_thong_do_thi",
+  "title": "Song Xuyên Tương Lai: Ta Dùng Rau Tươi Đổi Lấy AI",
+  "hook": "Ba trăm năm sau, một giỏ cà chua trồng đất được gọi là nguyên liệu thượng phẩm, đủ đổi lấy trợ lý AI vượt trước thời đại.",
+  "blurb": "Trần Khải tiếp quản tiệm tạp hóa Khải Minh đang thua lỗ tại Vân Cảng. Cánh cửa kho sau lại mở vào một cửa hàng bỏ trống ở Tân Hải Thành ba trăm năm sau, nơi đất sạch và giống cây tự nhiên đã bị khai thác đến gần tuyệt chủng, dân thường sống bằng dịch dinh dưỡng còn thực phẩm tươi là tài nguyên giúp người tiến hóa. Giỏ cà chua đầu tiên khiến cả khu phố tương lai gọi đúng phẩm cấp rồi tranh giá; kỹ sư Diệp Ninh đổi trợ lý AI Tinh Hỏa thế hệ I để mua trọn. Trần Khải dùng công nghệ đó giành hợp đồng phần mềm đầu tiên ở hiện đại, còn rau quả của hắn giúp Cơ Giới Sư, Nguyên Thực Sư, Cơ Giáp Sư và Dược Tề Sư vượt nghề, mở xưởng, lập đội rồi phá trần giai cấp. Mỗi khách đi lên mang về công nghệ thế hệ cao hơn; Khải âm thầm dựng các công ty sản phẩm mới cho tới khi hàng Khải Minh có mặt khắp thế giới.",
+  "readerFantasy": "Lấy thực phẩm tươi bình thường ở hiện đại đổi công nghệ tương lai, nhìn chuyên gia gọi phẩm cấp rồi tranh nguồn cung; khách và main cùng leo nghề, địa vị và quy mô doanh nghiệp.",
+  "presentation": {
+    "coverPath": "/covers/serial-pilots/rau-tuoi-doi-ai.webp",
+    "tagline": "Một giỏ rau tươi, đổi cả thế hệ công nghệ.",
+    "shortDescription": "Kho sau tiệm tạp hóa của Trần Khải thông tới Tân Hải Thành ba trăm năm sau, nơi thực phẩm tự nhiên quý hơn máy móc. Từ giỏ cà chua đổi lấy Tinh Hỏa AI, hắn biến từng công nghệ tương lai thành sản phẩm mới và âm thầm dựng tập đoàn ở hiện đại.",
+    "tags": ["Song Xuyên", "Tương Lai", "Kinh Doanh", "AI", "Tiến Hóa", "Sảng Văn"],
+    "sellingPoints": [
+      "Rau quả tươi có phẩm cấp rõ ràng, khiến kỹ sư, đầu bếp và đội khai phá công khai gọi giá rồi tranh nguồn cung.",
+      "Mỗi dòng công nghệ đổi về phải trình diễn được, bán được và mở ra một cấp doanh nghiệp mới ở hiện đại.",
+      "Khách tương lai không chỉ giàu lên: họ tăng nghề, sở hữu xưởng, lập đội khai phá, mở viện riêng và phá trần khu dân cư thấp.",
+      "Vòng giao dịch đi lên hai chiều: khách càng mạnh mang về công nghệ càng cao; công ty của Khải càng lớn tổ chức được nguồn thực phẩm càng hiếm."
+    ]
+  },
+  "goldenFinger": {
+    "name": "Kho Hàng Ba Trăm Năm",
+    "rule": "Kho sau tiệm Khải Minh nối cố định với một cửa hàng bỏ trống ở Tân Hải Thành sau ba trăm năm. Trần Khải tự mang hàng, niêm yết giá và ký đổi trực tiếp; tài sản hai đầu thuộc về người giao dịch sau khi chốt.",
+    "scope": "Cánh cửa chỉ nối hai cửa hàng và không tự sản xuất, kiểm định hay bán hàng. Lợi thế đến từ nguồn cung, khả năng nhìn ra nhu cầu và việc biến công nghệ đổi được thành sản phẩm thương mại ở hiện đại.",
+    "evolution": [
+      { "id": "quay_doi_le", "name": "Quầy đổi lẻ", "changesUse": "Đổi từng lô thực phẩm lấy thiết bị hoặc phần mềm có thể trình diễn." },
+      { "id": "kho_lanh_hai_thoi_dai", "name": "Kho lạnh hai thời đại", "changesUse": "Duy trì phẩm chất và gom đơn đều thay vì giao dịch ngẫu nhiên." },
+      { "id": "hop_dong_nguon_cung", "name": "Hợp đồng nguồn cung", "changesUse": "Chốt định lượng, phẩm cấp và công nghệ thanh toán theo kỳ." },
+      { "id": "mang_nong_trai_truy_xuat", "name": "Mạng nông trại truy xuất", "changesUse": "Tổ chức nhiều nông trại hiện đại cùng cung ứng lô chuẩn hóa." },
+      { "id": "trung_tam_lien_thanh", "name": "Trung tâm liên thành", "changesUse": "Phân phối thực phẩm và nhận công nghệ từ nhiều khu tương lai." },
+      { "id": "tap_doan_hai_thoi_dai", "name": "Tập đoàn hai thời đại", "changesUse": "Đồng phát triển giống cây, dược tề, robot và AI thành chuỗi sản phẩm toàn cầu." }
+    ]
+  },
+  "conflictLadder": {
+    "survival": "Khải cần cứu tiệm trước kỳ thanh toán, còn khách tương lai cần nguyên liệu thật để tiến nghề và đủ sức rời tầng dân cư thấp.",
+    "rules": "Tập đoàn dinh dưỡng giữ giấy chứng nhận nguồn thực phẩm; liên minh công nghệ kiểm soát quyền dùng AI và dây chuyền sản xuất.",
+    "ideology": "Tài nguyên tự nhiên và công nghệ nên là đặc quyền duy trì huyết thống tập đoàn hay hàng hóa giúp người có năng lực phá trần xuất thân.",
+    "self": "Từ chủ tiệm chỉ muốn trả nợ, Trần Khải chọn xây một hệ doanh nghiệp đủ lớn để tự đặt tiêu chuẩn sản phẩm cho cả hai thời đại."
+  },
+  "hiddenThread": "Kho dữ liệu của Tinh Hỏa lưu những bản đồ đất sạch đã bị xóa khỏi lịch sử Tân Hải Thành. Khi khách hàng của Khải từ chủ xưởng và đầu bếp leo thành chủ đội, chủ chuỗi, họ phát hiện sự khô kiệt không hoàn toàn tự nhiên mà là kết quả của một hệ thống độc quyền giống và dinh dưỡng; đường ngầm nhập tuyến công ty vào khoảng giữa truyện.",
+  "payoffStance": "mixed",
+  "oppositionEngine": "Thực phẩm tươi của Khải làm mất giá dịch dinh dưỡng độc quyền ở tương lai; sản phẩm AI, robot và vật liệu hắn thương mại hóa lấy hợp đồng của các công ty hiện đại. Đối thủ leo từ quản lý khu phố tới tập đoàn vì mỗi vòng giao dịch thành công tạo ra người mua mạnh hơn, doanh nghiệp lớn hơn và thị trường bị chia lại.",
+  "castSeed": [
+    {
+      "id": "tran_khai", "name": "Trần Khải", "role": "protagonist", "agenda": "Biến tiệm Khải Minh thành nguồn cung tương lai và dựng công ty công nghệ toàn cầu.", "antagonistClass": null, "startLocationId": "tiem_khai_minh",
+      "startingProgressions": [],
+      "milestones": [
+        { "name": "Hợp đồng phần mềm đầu tiên", "progressionTarget": { "systemId": "cap_cong_ty_ai", "trackId": null, "rankId": "hop_dong_dau", "minorStageId": null }, "socialResult": "Có dòng tiền độc lập ngoài tiệm tạp hóa." },
+        { "name": "Công ty AI Khải Minh", "progressionTarget": { "systemId": "cap_cong_ty_ai", "trackId": null, "rankId": "cong_ty_ai", "minorStageId": null }, "socialResult": "Tự tuyển đội kỹ thuật và phát hành dòng sản phẩm riêng." },
+        { "name": "Tập đoàn sản phẩm toàn cầu", "progressionTarget": { "systemId": "cap_cong_ty_ai", "trackId": null, "rankId": "tap_doan_toan_cau", "minorStageId": null }, "socialResult": "Bán AI, robot và công nghệ sinh học khắp thế giới hiện đại." }
+      ]
+    },
+    {
+      "id": "diep_ninh", "name": "Diệp Ninh", "role": "ally", "agenda": "Dùng thực phẩm thật để tăng nghề, giành lại xưởng robot và sở hữu khu công nghiệp.", "antagonistClass": null, "startLocationId": "cua_hang_tan_hai",
+      "startingProgressions": [
+        { "systemId": "tien_hoa_tuong_lai", "trackId": null, "rankId": "nhat_giai", "minorStageId": "hau_ky" },
+        { "systemId": "nghe_tuong_lai", "trackId": "co_gioi_su", "rankId": "nhi_tinh", "minorStageId": null },
+        { "systemId": "duong_su_nghiep", "trackId": "duong_diep_ninh", "rankId": "moc_1", "minorStageId": null }
+      ],
+      "milestones": [
+        { "name": "Chủ xưởng robot", "progressionTarget": { "systemId": "duong_su_nghiep", "trackId": "duong_diep_ninh", "rankId": "moc_2", "minorStageId": null }, "socialResult": "Tự sản xuất công nghệ để đổi nguyên liệu thay vì bán sáng chế rẻ." },
+        { "name": "Chủ đội khai phá", "progressionTarget": { "systemId": "duong_su_nghiep", "trackId": "duong_diep_ninh", "rankId": "moc_3", "minorStageId": null }, "socialResult": "Có quyền tiếp cận phế tích công nghệ và tài nguyên ngoài thành." },
+        { "name": "Chủ khu công nghiệp", "progressionTarget": { "systemId": "duong_su_nghiep", "trackId": "duong_diep_ninh", "rankId": "moc_4", "minorStageId": null }, "socialResult": "Phá trần xuất thân dân khu thấp, trở thành nhà cung cấp chiến lược của Khải." }
+      ]
+    },
+    {
+      "id": "la_chinh", "name": "La Chính", "role": "ally", "agenda": "Dùng nguyên liệu tự nhiên tạo món bồi dưỡng và mở chuỗi nhà hàng của riêng mình.", "antagonistClass": null, "startLocationId": "pho_ha_tang",
+      "startingProgressions": [
+        { "systemId": "nghe_tuong_lai", "trackId": "nguyen_thuc_su", "rankId": "nhat_tinh", "minorStageId": null },
+        { "systemId": "duong_su_nghiep", "trackId": "duong_la_chinh", "rankId": "moc_1", "minorStageId": null }
+      ],
+      "milestones": [
+        { "name": "Nhị tinh Nguyên Thực Sư", "progressionTarget": { "systemId": "nghe_tuong_lai", "trackId": "nguyen_thuc_su", "rankId": "nhi_tinh", "minorStageId": null }, "socialResult": "Được quyền đứng tên món bồi dưỡng thay vì làm thuê." },
+        { "name": "Chủ nhà hàng", "progressionTarget": { "systemId": "duong_su_nghiep", "trackId": "duong_la_chinh", "rankId": "moc_2", "minorStageId": null }, "socialResult": "Ký nguồn cung trực tiếp với Khải." },
+        { "name": "Chủ chuỗi bồi dưỡng", "progressionTarget": { "systemId": "duong_su_nghiep", "trackId": "duong_la_chinh", "rankId": "moc_4", "minorStageId": null }, "socialResult": "Đưa thực phẩm thật tới nhiều tầng dân cư và nắm mạng khách riêng." }
+      ]
+    },
+    {
+      "id": "tong_kieu", "name": "Tống Kiêu", "role": "ally", "agenda": "Từ Cơ Giáp Sư hợp đồng trở thành đội trưởng khai phá tự chủ.", "antagonistClass": null, "startLocationId": "tram_khai_pha",
+      "startingProgressions": [
+        { "systemId": "nghe_tuong_lai", "trackId": "co_giap_su", "rankId": "nhat_tinh", "minorStageId": null },
+        { "systemId": "tien_hoa_tuong_lai", "trackId": null, "rankId": "nhat_giai", "minorStageId": "trung_ky" },
+        { "systemId": "duong_su_nghiep", "trackId": "duong_tong_kieu", "rankId": "moc_1", "minorStageId": null }
+      ],
+      "milestones": [
+        { "name": "Tiến Hóa Giả Nhị giai", "progressionTarget": { "systemId": "tien_hoa_tuong_lai", "trackId": null, "rankId": "nhi_giai", "minorStageId": "so_ky" }, "socialResult": "Đủ chuẩn điều khiển cơ giáp khai phá hạng nặng." },
+        { "name": "Chủ tiểu đội", "progressionTarget": { "systemId": "duong_su_nghiep", "trackId": "duong_tong_kieu", "rankId": "moc_2", "minorStageId": null }, "socialResult": "Tự chọn nhiệm vụ và chia chiến lợi phẩm." },
+        { "name": "Đoàn khai phá độc lập", "progressionTarget": { "systemId": "duong_su_nghiep", "trackId": "duong_tong_kieu", "rankId": "moc_4", "minorStageId": null }, "socialResult": "Mang công nghệ phế tích về đổi nguồn cung dài hạn." }
+      ]
+    },
+    {
+      "id": "ha_van", "name": "Hạ Vân", "role": "ally", "agenda": "Tạo dược tề từ hoạt chất tự nhiên rồi mở viện nghiên cứu không phụ thuộc tập đoàn.", "antagonistClass": null, "startLocationId": "vien_dinh_duong",
+      "startingProgressions": [
+        { "systemId": "nghe_tuong_lai", "trackId": "duoc_te_su", "rankId": "nhat_tinh", "minorStageId": null },
+        { "systemId": "duong_su_nghiep", "trackId": "duong_ha_van", "rankId": "moc_1", "minorStageId": null }
+      ],
+      "milestones": [
+        { "name": "Dược tề Nhị giai", "progressionTarget": { "systemId": "nghe_tuong_lai", "trackId": "duoc_te_su", "rankId": "nhi_tinh", "minorStageId": null }, "socialResult": "Sở hữu công thức đủ gọi vốn độc lập." },
+        { "name": "Trưởng phòng riêng", "progressionTarget": { "systemId": "duong_su_nghiep", "trackId": "duong_ha_van", "rankId": "moc_2", "minorStageId": null }, "socialResult": "Được tự quyết nguyên liệu và tuyển cộng sự." },
+        { "name": "Viện trưởng độc lập", "progressionTarget": { "systemId": "duong_su_nghiep", "trackId": "duong_ha_van", "rankId": "moc_4", "minorStageId": null }, "socialResult": "Phá độc quyền kiểm nghiệm của tập đoàn dinh dưỡng." }
+      ]
+    },
+    {
+      "id": "bao_cuong", "name": "Bào Cường", "role": "antagonist", "agenda": "Giữ độc quyền dịch dinh dưỡng và giấy chứng nhận thực phẩm ở Tân Hải Thành.", "antagonistClass": "tập đoàn dinh dưỡng tương lai", "startLocationId": "vien_dinh_duong",
+      "startingProgressions": [{ "systemId": "tien_hoa_tuong_lai", "trackId": null, "rankId": "tu_giai", "minorStageId": "so_ky" }],
+      "milestones": [
+        { "name": "Mua đứt nguồn cà chua", "progressionTarget": null, "socialResult": "Ra giá cao để buộc Khải thành nhà cung cấp kín." },
+        { "name": "Khóa chứng nhận", "progressionTarget": null, "socialResult": "Dùng quy tắc ngăn nhà hàng của La Chính bán món bồi dưỡng." },
+        { "name": "Mất tầng khách trẻ", "progressionTarget": null, "socialResult": "Khách hàng có đường lên riêng khiến hệ phân phối độc quyền tan rã." }
+      ]
+    },
+    {
+      "id": "pham_khoa", "name": "Phạm Khoa", "role": "antagonist", "agenda": "Mua hoặc chặn mọi sản phẩm AI mới trước khi nó đe dọa tập đoàn Vạn Tượng ở hiện đại.", "antagonistClass": "tập đoàn công nghệ hiện đại", "startLocationId": "khu_cong_nghe_van_cang",
+      "startingProgressions": [],
+      "milestones": [
+        { "name": "Đề nghị mua Tinh Hỏa", "progressionTarget": null, "socialResult": "Dùng giá và thương hiệu kéo Trần Khải vào hệ sinh thái Vạn Tượng." },
+        { "name": "Chiến tranh hợp đồng", "progressionTarget": null, "socialResult": "Ép nhà cung cấp phần cứng không phục vụ công ty Khải Minh." },
+        { "name": "Buộc phải hợp tác", "progressionTarget": null, "socialResult": "Công nghệ thế hệ mới khiến Vạn Tượng phải mua giấy phép theo giá của Khải." }
+      ]
+    }
+  ],
+  "worldKernel": {
+    "worlds": [
+      {
+        "id": "van_cang_hien_dai", "name": "Vân Cảng hiện đại", "civilizationState": "Một đô thị cảng của thế giới song song có chuỗi bán lẻ, phần mềm và vốn đầu tư phát triển bình thường. Thực phẩm tươi phổ biến nhưng tiệm nhỏ bị sàn lớn ép biên lợi nhuận; công nghệ tương lai có thể thương mại hóa qua sản phẩm từng thế hệ.",
+        "locations": [
+          { "id": "tiem_khai_minh", "name": "Tiệm tạp hóa Khải Minh", "note": "Tiệm nhỏ và kho sau của Trần Khải, đầu hiện đại của cửa xuyên." },
+          { "id": "khu_cong_nghe_van_cang", "name": "Khu Công Nghệ Vân Cảng", "note": "Nơi công ty, khách hàng phần mềm và quỹ đầu tư cạnh tranh hợp đồng." },
+          { "id": "nong_trai_thanh_ngoai", "name": "Nông trại thành ngoại", "note": "Nguồn rau quả trồng đất có thể truy xuất mà Khải sẽ tổ chức thành mạng cung ứng." }
+        ],
+        "factions": [
+          { "id": "cong_ty_khai_minh", "name": "Công ty Khải Minh", "agenda": "Biến công nghệ đổi được thành dòng sản phẩm có khả năng trình diễn và doanh thu thật." },
+          { "id": "tap_doan_van_tuong", "name": "Tập đoàn Vạn Tượng", "agenda": "Giữ thị phần AI doanh nghiệp và mua đứt hoặc chặn đối thủ mới." }
+        ]
+      },
+      {
+        "id": "tan_hai_tuong_lai", "name": "Tân Hải Thành ba trăm năm sau", "civilizationState": "Khai thác quá độ khiến đất sạch, hạt giống và hệ sinh thái tự nhiên gần cạn. Dân tầng thấp dùng dịch dinh dưỡng; nguyên liệu tươi vừa là xa xỉ vừa cung cấp hoạt tính tiến hóa. Nghề nghiệp và cấp tiến hóa quyết định quyền cư trú, công việc và khả năng sở hữu xưởng.",
+        "locations": [
+          { "id": "cua_hang_tan_hai", "name": "Cửa hàng bỏ trống Tân Hải", "note": "Đầu tương lai của kho sau, nằm giữa khu dân cư hạ tầng." },
+          { "id": "pho_ha_tang", "name": "Phố Hạ Tầng", "note": "Khu thợ nghề, quán dịch dinh dưỡng và chợ linh kiện đông người." },
+          { "id": "tram_khai_pha", "name": "Trạm Khai Phá", "note": "Nơi Cơ Giáp Sư nhận nhiệm vụ ngoài thành và chia công nghệ phế tích." },
+          { "id": "vien_dinh_duong", "name": "Viện Dinh Dưỡng Tân Hải", "note": "Cơ quan kiểm nghiệm nằm dưới ảnh hưởng tập đoàn độc quyền." }
+        ],
+        "factions": [
+          { "id": "tap_doan_thien_vi", "name": "Tập đoàn Thiên Vị", "agenda": "Độc quyền dịch dinh dưỡng, chứng nhận thực phẩm và giống cây nhân tạo." },
+          { "id": "lien_minh_khai_pha", "name": "Liên Minh Khai Phá", "agenda": "Thu hồi công nghệ ngoài thành và kiểm soát giấy phép đội khai phá." }
+        ]
+      }
+    ],
+    "progressionSystems": [
+      {
+        "id": "tien_hoa_tuong_lai", "name": "Tiến Hóa Cá Nhân", "kind": "realm", "subjectType": "character", "tracks": [],
+        "ranks": [{ "id": "nhat_giai", "name": "Nhất giai Tiến Hóa Giả", "note": null }, { "id": "nhi_giai", "name": "Nhị giai Tiến Hóa Giả", "note": null }, { "id": "tam_giai", "name": "Tam giai Tiến Hóa Giả", "note": null }, { "id": "tu_giai", "name": "Tứ giai Siêu Phàm Giả", "note": null }, { "id": "ngu_giai", "name": "Ngũ giai Siêu Phàm Giả", "note": null }, { "id": "luc_giai", "name": "Lục giai Siêu Phàm Giả", "note": null }, { "id": "that_giai", "name": "Thất giai Thiên Nhân", "note": null }, { "id": "bat_giai", "name": "Bát giai Thiên Nhân", "note": null }, { "id": "cuu_giai", "name": "Cửu giai Thiên Nhân", "note": null }],
+        "minorStages": [{ "id": "so_ky", "name": "Sơ kỳ", "note": null }, { "id": "trung_ky", "name": "Trung kỳ", "note": null }, { "id": "hau_ky", "name": "Hậu kỳ", "note": null }, { "id": "dinh_phong", "name": "Đỉnh phong", "note": null }]
+      },
+      {
+        "id": "nghe_tuong_lai", "name": "Nghề Nghiệp Tương Lai", "kind": "profession", "subjectType": "character",
+        "tracks": [{ "id": "duoc_te_su", "name": "Dược Tề Sư", "note": null }, { "id": "thuc_vat_su", "name": "Thực Vật Sư", "note": null }, { "id": "nguyen_thuc_su", "name": "Nguyên Thực Sư", "note": null }, { "id": "co_gioi_su", "name": "Cơ Giới Sư", "note": null }, { "id": "co_giap_su", "name": "Cơ Giáp Sư", "note": null }],
+        "ranks": [{ "id": "nhat_tinh", "name": "Nhất tinh", "note": null }, { "id": "nhi_tinh", "name": "Nhị tinh", "note": null }, { "id": "tam_tinh", "name": "Tam tinh", "note": null }, { "id": "tu_tinh", "name": "Tứ tinh", "note": null }, { "id": "ngu_tinh", "name": "Ngũ tinh", "note": null }, { "id": "luc_tinh", "name": "Lục tinh", "note": null }, { "id": "that_tinh", "name": "Thất tinh", "note": null }, { "id": "bat_tinh", "name": "Bát tinh", "note": null }, { "id": "cuu_tinh", "name": "Cửu tinh", "note": null }], "minorStages": []
+      },
+      {
+        "id": "duong_su_nghiep", "name": "Đường Sự Nghiệp Khách Hàng", "kind": "organization", "subjectType": "character",
+        "tracks": [{ "id": "duong_diep_ninh", "name": "Xưởng robot đến khu công nghiệp", "note": null }, { "id": "duong_la_chinh", "name": "Nhà hàng đến chuỗi bồi dưỡng", "note": null }, { "id": "duong_tong_kieu", "name": "Cơ Giáp Sư đến đoàn khai phá", "note": null }, { "id": "duong_ha_van", "name": "Nghiên cứu viên đến viện trưởng", "note": null }],
+        "ranks": [{ "id": "moc_1", "name": "Khởi nghiệp cá nhân", "note": null }, { "id": "moc_2", "name": "Tự chủ cơ sở", "note": null }, { "id": "moc_3", "name": "Tự chủ đội ngũ", "note": null }, { "id": "moc_4", "name": "Chủ thế lực ngành", "note": null }], "minorStages": []
+      },
+      {
+        "id": "cap_cua_hang", "name": "Cấp Nguồn Cung Khải Minh", "kind": "business", "subjectType": "asset", "tracks": [],
+        "ranks": [{ "id": "quay_doi_le", "name": "Quầy đổi lẻ", "note": null }, { "id": "kho_lanh_hai_thoi_dai", "name": "Kho lạnh hai thời đại", "note": null }, { "id": "hop_dong_nguon_cung", "name": "Hợp đồng nguồn cung", "note": null }, { "id": "mang_nong_trai_truy_xuat", "name": "Mạng nông trại truy xuất", "note": null }, { "id": "trung_tam_lien_thanh", "name": "Trung tâm liên thành", "note": null }, { "id": "tap_doan_hai_thoi_dai", "name": "Tập đoàn hai thời đại", "note": null }], "minorStages": []
+      },
+      {
+        "id": "cap_cong_ty_ai", "name": "Địa vị Công ty AI", "kind": "business", "subjectType": "company", "tracks": [],
+        "ranks": [{ "id": "chua_co_doanh_thu", "name": "Chưa có doanh thu", "note": null }, { "id": "hop_dong_dau", "name": "Hợp đồng đầu tiên", "note": null }, { "id": "studio_san_pham", "name": "Studio sản phẩm", "note": null }, { "id": "cong_ty_ai", "name": "Công ty AI", "note": null }, { "id": "mang_quoc_gia", "name": "Mạng sản phẩm toàn quốc", "note": null }, { "id": "tap_doan_toan_cau", "name": "Tập đoàn toàn cầu", "note": null }], "minorStages": []
+      }
+    ],
+    "progressionSubjects": [
+      { "id": "nguon_cung_khai_minh", "name": "Nguồn cung Khải Minh", "kind": "asset", "startLocationId": "tiem_khai_minh", "startingProgressions": [{ "systemId": "cap_cua_hang", "trackId": null, "rankId": "quay_doi_le", "minorStageId": null }] },
+      { "id": "khai_minh_ai", "name": "Khải Minh AI", "kind": "company", "startLocationId": "khu_cong_nghe_van_cang", "startingProgressions": [{ "systemId": "cap_cong_ty_ai", "trackId": null, "rankId": "chua_co_doanh_thu", "minorStageId": null }] }
+    ],
+    "gradeSystems": [
+      {
+        "id": "nguyen_lieu_tu_nhien", "name": "Phẩm chất nguyên liệu tự nhiên", "categories": ["Rau", "Quả", "Ngũ cốc", "Thịt", "Dược liệu", "Hạt giống"], "tiers": [],
+        "qualities": [{ "id": "ha_pham", "name": "Hạ phẩm", "note": null }, { "id": "trung_pham", "name": "Trung phẩm", "note": null }, { "id": "thuong_pham", "name": "Thượng phẩm", "note": null }, { "id": "cuc_pham", "name": "Cực phẩm", "note": null }],
+        "note": "Đánh giá bằng độ tươi, hoạt tính tự nhiên và khả năng bồi dưỡng; người hiểu nghề gọi đúng phẩm."
+      },
+      {
+        "id": "thanh_pham_tien_hoa", "name": "Thành phẩm tiến hóa", "categories": ["Món bồi dưỡng", "Dược tề", "Chế phẩm thực vật"],
+        "tiers": [{ "id": "san_pham_nhat_giai", "name": "Nhất giai", "note": null }, { "id": "san_pham_nhi_giai", "name": "Nhị giai", "note": null }, { "id": "san_pham_tam_giai", "name": "Tam giai", "note": null }, { "id": "san_pham_tu_giai", "name": "Tứ giai", "note": null }, { "id": "san_pham_ngu_giai", "name": "Ngũ giai", "note": null }, { "id": "san_pham_luc_giai", "name": "Lục giai", "note": null }, { "id": "san_pham_that_giai", "name": "Thất giai", "note": null }, { "id": "san_pham_bat_giai", "name": "Bát giai", "note": null }, { "id": "san_pham_cuu_giai", "name": "Cửu giai", "note": null }],
+        "qualities": [{ "id": "ha_pham", "name": "Hạ phẩm", "note": null }, { "id": "trung_pham", "name": "Trung phẩm", "note": null }, { "id": "thuong_pham", "name": "Thượng phẩm", "note": null }, { "id": "cuc_pham", "name": "Cực phẩm", "note": null }],
+        "note": "Tên đầy đủ gồm giai và phẩm, xác nhận bằng thiết bị đo hiệu quả tiến hóa."
+      },
+      {
+        "id": "the_he_cong_nghe", "name": "Dòng và thế hệ công nghệ", "categories": ["Tinh Hỏa AI", "Robot công nghiệp", "Kho lạnh", "Cảm biến sinh học", "Vật liệu cơ giáp"],
+        "tiers": [{ "id": "the_he_1", "name": "Thế hệ I", "note": "Mỗi dòng phải biểu diễn được năng lực đầu tiên." }, { "id": "the_he_2", "name": "Thế hệ II", "note": "Mở thêm một năng lực đo được." }, { "id": "the_he_3", "name": "Thế hệ III", "note": "Mở thêm năng lực triển khai quy mô." }, { "id": "the_he_4", "name": "Thế hệ IV", "note": null }, { "id": "the_he_5", "name": "Thế hệ V", "note": null }, { "id": "the_he_6", "name": "Thế hệ VI", "note": null }, { "id": "the_he_7", "name": "Thế hệ VII", "note": null }, { "id": "the_he_8", "name": "Thế hệ VIII", "note": null }, { "id": "the_he_9", "name": "Thế hệ IX", "note": null }],
+        "qualities": [], "note": "Công nghệ luôn gọi theo dòng sản phẩm cộng thế hệ; thế hệ sau phải có năng lực mới có thể trình diễn."
+      }
+    ],
+    "equivalences": [
+      { "leftSystemId": "nghe_tuong_lai", "leftRankId": "nhi_tinh", "rightSystemId": "duong_su_nghiep", "rightRankId": "moc_2", "note": "Nghề Nhị tinh đủ nền tảng chuyên môn để tự chủ cơ sở nếu có vốn và nguồn hàng, nhưng không tự động cấp địa vị." },
+      { "leftSystemId": "tien_hoa_tuong_lai", "leftRankId": "nhi_giai", "rightSystemId": "duong_su_nghiep", "rightRankId": "moc_3", "note": "Nhị giai thường đủ chuẩn dẫn đội ngoài thành, nhưng quyền sở hữu đội vẫn cần hợp đồng và thành tích." }
+    ],
+    "economyLoops": [
+      { "id": "hien_dai_sang_tuong_lai", "name": "Nguồn thực phẩm tự nhiên", "fromWorldId": "van_cang_hien_dai", "toWorldId": "tan_hai_tuong_lai", "goods": ["Rau quả tươi", "Ngũ cốc", "Thịt sạch", "Dược liệu", "Hạt giống"], "buyer": "Diệp Ninh, La Chính, Tống Kiêu, Hạ Vân, nhà hàng và đội khai phá mua theo phẩm cấp.", "settlement": "Công nghệ, giấy phép sử dụng, thiết bị hoặc hợp đồng cung ứng tương lai được đổi theo lô.", "reinvestment": "Khải mở mạng nông trại truy xuất, kho lạnh và chuẩn hóa nguồn hàng; khách dùng nguyên liệu tăng nghề, lập xưởng, nhà hàng, đội và viện riêng." },
+      { "id": "tuong_lai_sang_hien_dai", "name": "Công nghệ thương mại hóa", "fromWorldId": "tan_hai_tuong_lai", "toWorldId": "van_cang_hien_dai", "goods": ["AI", "Robot", "Cảm biến", "Vật liệu", "Quy trình sản xuất"], "buyer": "Doanh nghiệp Vân Cảng mua sản phẩm được Trần Khải đóng gói thành dịch vụ và thiết bị hợp pháp.", "settlement": "Doanh thu hiện đại ở lại công ty, còn công nghệ được định giá như hàng thanh toán cho nguồn cung tương lai.", "reinvestment": "Tiền hợp đồng tuyển kỹ sư, mở công ty, mua nông trại và nhà máy; năng lực sản phẩm tăng theo từng thế hệ có màn trình diễn rõ." }
+    ],
+    "launchProducts": [
+      { "id": "ca_chua_dat_sach", "name": "Cà chua trồng đất", "category": "Quả", "gradeSystemId": "nguyen_lieu_tu_nhien", "tierId": null, "qualityId": "thuong_pham", "effect": "Cung cấp hoạt tính tự nhiên đã hiếm, giúp nghề và trạng thái tiến hóa hấp thu dinh dưỡng thật.", "targetBuyer": "Diệp Ninh, Nguyên Thực Sư và cư dân Tân Hải có nhu cầu bồi dưỡng.", "introducedChapter": 1 },
+      { "id": "tinh_hoa_ai_1", "name": "Tinh Hỏa AI thế hệ I", "category": "Tinh Hỏa AI", "gradeSystemId": "the_he_cong_nghe", "tierId": "the_he_1", "qualityId": null, "effect": "Tự phân loại yêu cầu, dựng quy trình xử lý đơn và tạo bản demo trợ lý bán hàng có thể đo thời gian tiết kiệm.", "targetBuyer": "Tiệm Khải Minh và doanh nghiệp vừa tại Vân Cảng.", "introducedChapter": 1 },
+      { "id": "tro_ly_don_hang_khai_minh", "name": "Trợ lý đơn hàng Khải Minh", "category": "Tinh Hỏa AI", "gradeSystemId": "the_he_cong_nghe", "tierId": "the_he_1", "qualityId": null, "effect": "Đóng gói Tinh Hỏa thành sản phẩm xử lý đơn hàng, tồn kho và phản hồi khách hàng cho doanh nghiệp hiện đại.", "targetBuyer": "Nhà bán lẻ Vân Cảng cần giảm thời gian vận hành.", "introducedChapter": 2 },
+      { "id": "mon_bo_duong_ca_chua", "name": "Hồng Ngọc Bồi Dưỡng", "category": "Món bồi dưỡng", "gradeSystemId": "thanh_pham_tien_hoa", "tierId": "san_pham_nhat_giai", "qualityId": "thuong_pham", "effect": "Món của La Chính giữ trọn hoạt tính cà chua và hỗ trợ Tiến Hóa Giả Nhất giai củng cố khí huyết.", "targetBuyer": "Nhà hàng, đội khai phá và Tiến Hóa Giả Tân Hải.", "introducedChapter": 3 },
+      { "id": "robot_phan_loai_1", "name": "Robot phân loại thế hệ I", "category": "Robot công nghiệp", "gradeSystemId": "the_he_cong_nghe", "tierId": "the_he_1", "qualityId": null, "effect": "Nhận dạng, phân luồng và đóng kiện hàng tự động trong màn trình diễn tại quầy.", "targetBuyer": "Kho hàng hiện đại và các đội khai phá cần tự động hóa hậu cần.", "introducedChapter": 4 }
+    ],
+    "openingContract": [
+      { "chapterNumber": 1, "proves": "Cửa kho nối hai thời đại và thực phẩm tươi có giá trị cấp bậc thật ở Tân Hải Thành.", "namedLevelOrGrade": "Cà chua thượng phẩm nguyên liệu; Tinh Hỏa AI thế hệ I.", "visibleResult": "Máy kiểm định sáng mức thượng phẩm; Diệp Ninh ăn một quả rồi chỉ số ổn định tăng ngay trước đám đông.", "witnessReaction": "Kỹ sư và khách gọi đúng thượng phẩm, hô giá, hỏi nguồn trồng đất và chen nhau xin mua.", "commercialAction": "Diệp Ninh đổi giấy phép Tinh Hỏa AI thế hệ I để mua cả giỏ và đặt cọc lô sau." },
+      { "chapterNumber": 2, "proves": "Công nghệ đổi được có thể tạo sản phẩm và doanh thu thật ở hiện đại.", "namedLevelOrGrade": "Trợ lý đơn hàng Khải Minh dùng lõi Tinh Hỏa thế hệ I.", "visibleResult": "AI xử lý tồn đơn của một nhà bán lẻ trong màn demo và chốt số liệu nhanh hơn đội cũ.", "witnessReaction": "Chủ doanh nghiệp công khai hỏi giá, kỹ sư gọi tên năng lực tự dựng quy trình rồi đổi thái độ với Khải.", "commercialAction": "Khải ký hợp đồng phần mềm đầu tiên và dùng tiền đặt cọc nâng nguồn rau sạch." },
+      { "chapterNumber": 3, "proves": "Nguyên liệu của Khải giúp khách tăng nghề và tạo hàng hóa cấp cao hơn, mở đường phá giai cấp.", "namedLevelOrGrade": "Hồng Ngọc Bồi Dưỡng Nhất giai thượng phẩm; La Chính Nhất tinh Nguyên Thực Sư.", "visibleResult": "Thiết bị kiểm định xác nhận món đạt Nhất giai thượng phẩm trước toàn nhà hàng.", "witnessReaction": "Bếp trưởng gọi đủ giai phẩm; các nhà hàng hô điều kiện, giành quyền ký nguồn cà chua và mời La Chính đứng tên món.", "commercialAction": "La Chính ký nguồn cung trực tiếp, nhận chia lợi nhuận và đặt mục tiêu lên Nhị tinh." },
+      { "chapterNumber": 4, "proves": "Khách hàng có đường đi lên cụ thể và quay lại trả công nghệ lớn hơn; cửa hàng chuyển từ đổi lẻ sang hợp đồng.", "namedLevelOrGrade": "Diệp Ninh Cơ Giới Sư Nhị tinh, chủ xưởng robot; nguồn cung bước vào hợp đồng dài hạn.", "visibleResult": "Diệp Ninh đưa robot mẫu do xưởng riêng hoàn thành tới quầy và trình diễn năng lực phân loại tự động.", "witnessReaction": "Thợ khu phố gọi cô là chủ xưởng, người từng ép giá lập tức xin hợp tác và khách hỏi quyền mua robot.", "commercialAction": "Diệp Ninh ký hợp đồng dài hạn đổi công nghệ; Khải tuyên bố mục tiêu ổn định nguồn cung tương lai và lập công ty AI đầu tiên." }
+    ],
+    "openingLedger": [
+      { "id": "mo_dau_01_nguon_ca_chua", "chapterNumber": 1, "kind": "acquisition", "asset": "Cà chua trồng đất có truy xuất", "quantity": "12 kilôgam", "from": "Nông trại Đồi Gió", "to": "Trần Khải", "consideration": "Khải mua theo hóa đơn ba trăm sáu mươi nghìn đồng, ba mươi nghìn đồng mỗi kilôgam.", "resultingStatus": "Tiệm Khải Minh có đúng mười hai kilôgam cà chua trước khi mở cửa kho tương lai." },
+      { "id": "mo_dau_02_doi_tinh_hoa", "chapterNumber": 1, "kind": "sale", "asset": "12 kilôgam cà chua thượng phẩm nguyên liệu", "quantity": "Toàn bộ 12 kilôgam", "from": "Trần Khải", "to": "Diệp Ninh", "consideration": "Diệp Ninh chuyển một giấy phép thương mại vĩnh viễn cho Tinh Hỏa AI thế hệ I, giới hạn một doanh nghiệp do Khải sở hữu.", "resultingStatus": "Cà chua lô đầu đã giao hết; Khải sở hữu giấy phép Tinh Hỏa AI thế hệ I, không có khoản tiền hay hàng còn treo." },
+      { "id": "mo_dau_03_hop_dong_phan_mem", "chapterNumber": 2, "kind": "sale", "asset": "Trợ lý đơn hàng Khải Minh dùng lõi Tinh Hỏa thế hệ I", "quantity": "1 hợp đồng triển khai", "from": "Công ty Khải Minh của Trần Khải", "to": "Chuỗi bán lẻ Hải Đăng", "consideration": "Giá hợp đồng sáu mươi triệu đồng; Hải Đăng trả trước mười tám triệu, bốn mươi hai triệu còn lại trả khi nghiệm thu.", "resultingStatus": "Khải có hợp đồng phần mềm đầu tiên và mười tám triệu đồng tiền cọc doanh thu hiện đại." },
+      { "id": "mo_dau_04_dau_tu_nguon_rau", "chapterNumber": 2, "kind": "acquisition", "asset": "Rau quả sạch theo lô", "quantity": "300 kilôgam quyền lấy hàng", "from": "Nông trại Đồi Gió", "to": "Trần Khải", "consideration": "Khải dùng chín triệu đồng từ tiền cọc Hải Đăng để đặt lô, giá bình quân ba mươi nghìn đồng mỗi kilôgam.", "resultingStatus": "Khải còn chín triệu tiền cọc chưa dùng và có quyền nhận ba trăm kilôgam rau quả có truy xuất." },
+      { "id": "mo_dau_05_nguon_la_chinh", "chapterNumber": 3, "kind": "sale", "asset": "Cà chua trồng đất thượng phẩm nguyên liệu", "quantity": "30 kilôgam lấy từ quyền hàng Nông trại Đồi Gió", "from": "Trần Khải", "to": "La Chính", "consideration": "La Chính trả bằng mười phần trăm doanh thu món Hồng Ngọc Bồi Dưỡng trong bảy ngày thử bán, đối soát công khai mỗi ngày.", "resultingStatus": "Quyền hàng của Khải còn hai trăm bảy mươi kilôgam; La Chính có ba mươi kilôgam để chế biến và hợp đồng chia doanh thu bảy ngày bắt đầu." },
+      { "id": "mo_dau_06_hop_dong_la_chinh", "chapterNumber": 3, "kind": "order", "asset": "Cà chua trồng đất thượng phẩm nguyên liệu", "quantity": "30 kilôgam mỗi tuần trong 8 tuần", "from": "Trần Khải", "to": "Nhà hàng của La Chính", "consideration": "Tiếp tục mức chia mười phần trăm doanh thu riêng của món Hồng Ngọc Bồi Dưỡng; lô ba mươi kilôgam thử nghiệm được tính là tuần đầu.", "resultingStatus": "Hai bên có lịch giao tám tuần rõ ràng; còn bảy tuần, tổng hai trăm mười kilôgam chưa giao." },
+      { "id": "mo_dau_07_robot_diep_ninh", "chapterNumber": 4, "kind": "transfer", "asset": "Robot phân loại thế hệ I và giấy phép sản xuất", "quantity": "1 robot mẫu và 1 giấy phép cho công ty Khải Minh", "from": "Xưởng robot Diệp Ninh", "to": "Trần Khải", "consideration": "Đổi lấy tám mươi kilôgam rau quả sạch mỗi tuần trong tám tuần; không phát sinh phí công nghệ khác.", "resultingStatus": "Khải sở hữu robot mẫu cùng quyền sản xuất; nghĩa vụ nguồn hàng là sáu trăm bốn mươi kilôgam, giao theo tám đợt." },
+      { "id": "mo_dau_08_hop_dong_diep_ninh", "chapterNumber": 4, "kind": "order", "asset": "Rau quả sạch có truy xuất", "quantity": "80 kilôgam mỗi tuần trong 8 tuần", "from": "Trần Khải", "to": "Xưởng robot Diệp Ninh", "consideration": "Thanh toán cho robot và giấy phép ở mục mo_dau_07; đợt đầu chỉ giao khi Khải nhận bổ sung nguồn ngoài hai trăm bảy mươi kilôgam đang dành cho hợp đồng La Chính.", "resultingStatus": "Hợp đồng dài hạn được ký nhưng không chiếm dụng hay bán trùng lượng hàng đã cam kết cho La Chính." }
+    ]
+  },
+  "arena": "Tiệm tạp hóa và công ty công nghệ ở Vân Cảng hiện đại nối với khu nghề nghiệp, nhà hàng, viện nghiên cứu và đội khai phá Tân Hải Thành ba trăm năm sau.",
+  "novelty": "Thực phẩm tươi không chỉ đổi lấy tiền mà trở thành vốn tăng nghề giúp khách tương lai sở hữu xưởng, chuỗi, đoàn và viện; chính họ sản xuất công nghệ ngày càng cao cho main.",
+  "endingDirection": "Trần Khải dựng tập đoàn hai thời đại, dùng mạng khách hàng đã phá trần giai cấp để khôi phục đất sạch và giống tự nhiên ở tương lai, đồng thời đưa các dòng AI, robot và công nghệ sinh học Khải Minh ra toàn cầu hiện đại.",
+  "voiceSheet": {
+    "pov": "third_limited",
+    "register": "Nam tần đô thị thương mại, nhiều đối thoại, đấu giá và màn trình diễn sản phẩm. Mỗi công nghệ phải cho thấy năng lực mới; mỗi khách hàng có cấp nghề, địa vị và cơ sở riêng để tiến lên.",
+    "chapterTitleRule": "Lấy một câu hô giá, gọi phẩm cấp, xin hợp tác hoặc tuyên bố tham vọng trong chương làm tiêu đề.",
+    "showsSystemPanel": false,
+    "reactionRule": "Khi phẩm cấp, nghề hay thế hệ công nghệ được chứng minh, chuyên gia phải gọi đúng tên; đám đông công khai kinh ngạc, hỏi dồn hoặc tranh giá, rồi phản ứng biến thành hợp đồng, đặt hàng, lời mời, đầu tư hay thay đổi địa vị của người vừa chứng minh.",
+    "taboos": ["Không để khách chỉ giàu lên mà không đổi nghề hoặc địa vị", "Không biến Trần Khải thành chúa cứu thế", "Không cho công nghệ thế hệ mới chỉ đổi tên mà không có năng lực trình diễn", "Không làm mọi nhân vật chủ chốt lạnh lùng", "Không dùng địa danh, cơ quan hay tập đoàn có thật"]
+  }
+}

@@ -1,12 +1,13 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { ProviderUsage, StoryModelProvider } from '@/services/story-factory/provider';
 import { geminiProvider } from '@/services/story-factory/provider';
+import { StoryFactoryError } from '@/services/story-factory/contracts';
 import {
   BibleSchema, CyclePlanSchema, PremiseSchema, SerialRoutesSchema, scorecardAverage,
   type Bible, type CyclePlan, type Premise, type SerialRoutes,
 } from './contracts';
 import { SERIAL_PROMPT_VERSION } from './prompts';
-import { foldVolume, planNextCycle, writeOneChapter } from './engine';
+import { auditFourChapterOpening, foldVolume, planNextCycle, writeOneChapter } from './engine';
 
 /**
  * The state machine. One stage per claim, lease-guarded, every mutation through an RPC.
@@ -24,6 +25,13 @@ export const CYCLES_PER_VOLUME = 10;
 export const TICK_BUDGET_MS = 240_000;
 const LEASE_MINUTES = 15;
 
+export const editorialNotesFromError = (value: string | null): string[] => value
+  ? value.split(/\s+\|\s+/).map(note => note.trim().slice(0, 1_200)).filter(Boolean).slice(0, 8)
+  : [];
+
+export const mergeEditorialNotes = (fresh: string[], inherited: string[]): string[] =>
+  [...new Set([...fresh, ...inherited])].slice(0, 8);
+
 export type SerialStage = 'plan_cycle' | 'write' | 'publish_cycle' | 'fold_volume';
 
 interface SerialJobRow {
@@ -36,6 +44,7 @@ interface SerialJobRow {
   lease_token: string;
   daily_target: number;
   consecutive_replans: number;
+  last_error: string | null;
 }
 
 interface SerialNovelRow {
@@ -112,19 +121,41 @@ async function stagePlanCycle(
 
   const extending = job.current_cycle_id !== null;
   const previous = lastCycle && !extending ? CyclePlanSchema.safeParse(lastCycle.plan) : null;
+  const active = lastCycle && extending ? CyclePlanSchema.safeParse(lastCycle.plan) : null;
 
-  const planned = await planNextCycle({
-    provider, routes, premise, bible,
-    previousCycle: previous?.success ? previous.data : null,
-    cycleNumber: extending
-      ? (lastCycle?.cycle_number as number)
-      : ((lastCycle?.cycle_number as number | undefined) ?? 0) + 1,
-    volumeNumber: extending
-      ? (lastCycle?.volume_number as number)
-      : Math.floor((((lastCycle?.cycle_number as number | undefined) ?? 0)) / CYCLES_PER_VOLUME) + 1,
-    startChapter: job.current_chapter + 1,
-    recentVerdicts: [],
-  });
+  let planned: Awaited<ReturnType<typeof planNextCycle>>;
+  try {
+    planned = await planNextCycle({
+      provider, routes, premise, bible,
+      previousCycle: previous?.success ? previous.data : null,
+      cycleNumber: extending
+        ? (lastCycle?.cycle_number as number)
+        : ((lastCycle?.cycle_number as number | undefined) ?? 0) + 1,
+      volumeNumber: extending
+        ? (lastCycle?.volume_number as number)
+        : Math.floor((((lastCycle?.cycle_number as number | undefined) ?? 0)) / CYCLES_PER_VOLUME) + 1,
+      startChapter: job.current_chapter + 1,
+      recentVerdicts: [],
+      editorialNotes: mergeEditorialNotes(
+        editorialNotesFromError(job.last_error),
+        active?.success ? active.data.editorialNotes : [],
+      ),
+    });
+  } catch (error) {
+    const evidence = error instanceof StoryFactoryError && error.evidence && typeof error.evidence === 'object'
+      ? error.evidence as { usage?: ProviderUsage; issues?: unknown }
+      : null;
+    if (evidence?.usage) {
+      await db.from('serial_runs').insert({
+        serial_novel_id: job.serial_novel_id, cycle_id: null, kind: 'plan_cycle', status: 'failed',
+        usage: [evidence.usage], cost_usd: evidence.usage.costUsd,
+        route_version: routes.routeVersion, prompt_version: SERIAL_PROMPT_VERSION,
+        error: JSON.stringify(evidence.issues ?? null).slice(0, 2_000),
+        finished_at: new Date().toISOString(),
+      });
+    }
+    throw error;
+  }
 
   const cycleId = extending && job.current_cycle_id
     ? job.current_cycle_id
@@ -133,7 +164,7 @@ async function stagePlanCycle(
   if (extending) {
     // Rolling beats only: the cycle keeps its number, span and checkpoint.
     const { error } = await db.from('serial_cycles')
-      .update({ plan: planned.cycle, updated_at: new Date().toISOString() })
+      .update({ plan: planned.cycle, status: 'writing', updated_at: new Date().toISOString() })
       .eq('id', cycleId);
     if (error) throw error;
   }
@@ -210,6 +241,49 @@ async function stageWrite(
     };
   }
 
+  let commitUsages = outcome.usages;
+  let commitCostUsd = outcome.costUsd;
+  if (chapterNumber === 4) {
+    const { data: earlier, error: earlierError } = await db.from('chapters')
+      .select('chapter_number,title,content')
+      .eq('novel_id', job.novel_id)
+      .gte('chapter_number', 1).lte('chapter_number', 3)
+      .eq('publication_state', 'draft')
+      .order('chapter_number', { ascending: true });
+    if (earlierError) throw earlierError;
+    const chapters = [
+      ...((earlier ?? []) as Array<{ chapter_number: number; title: string; content: string }>).map(chapter => ({
+        chapterNumber: chapter.chapter_number, title: chapter.title, content: chapter.content,
+      })),
+      { chapterNumber: 4, title: outcome.chapter.title, content: outcome.chapter.content },
+    ];
+    const audited = await auditFourChapterOpening({ provider, routes, premise, chapters });
+    commitUsages = [...outcome.usages, ...audited.usages];
+    commitCostUsd = Number((outcome.costUsd + audited.costUsd).toFixed(6));
+    const savedAudit = await db.from('serial_runs').update({ opening_audit: audited.audit }).eq('id', runId);
+    if (savedAudit.error) throw savedAudit.error;
+
+    if (!audited.audit.passed) {
+      const reason = `Opening audit failed: ${audited.audit.findings.map(finding =>
+        `Ch.${finding.chapterNumber} ${finding.kind}: ${finding.explain} Repair: ${finding.repair}`
+      ).join(' | ')}`.slice(0, 4_000);
+      await db.from('serial_runs').update({
+        status: 'failed', usage: commitUsages, cost_usd: commitCostUsd,
+        error: reason, finished_at: new Date().toISOString(),
+      }).eq('id', runId);
+      const { data, error } = await db.rpc('replan_serial_cycle', {
+        p_job_id: job.id, p_lease_token: job.lease_token,
+        p_cycle_id: job.current_cycle_id, p_reason: reason,
+      });
+      if (error) throw error;
+      return {
+        status: 'completed', jobId: job.id, stage: 'write', chapterNumber,
+        detail: `Opening audit rejected the draft${(data as { paused?: boolean } | null)?.paused ? ' and paused for a read' : ''}: ${audited.audit.summary}`,
+        costUsd: commitCostUsd,
+      };
+    }
+  }
+
   const nextStage: SerialStage = chapterNumber >= cycle.plannedEndChapter ? 'publish_cycle' : 'write';
   const { data: commit, error } = await db.rpc('commit_serial_chapter', {
     p_job_id: job.id, p_lease_token: job.lease_token, p_run_id: runId,
@@ -217,7 +291,7 @@ async function stageWrite(
     p_title: outcome.chapter.title, p_content: outcome.chapter.content,
     p_bible: outcome.bible, p_verdict: outcome.verdict, p_digest: outcome.digest,
     p_scorecard_avg: scorecardAverage(outcome.verdict),
-    p_usage: outcome.usages, p_cost_usd: outcome.costUsd, p_attempts: outcome.attempts,
+    p_usage: commitUsages, p_cost_usd: commitCostUsd, p_attempts: outcome.attempts,
     p_next_stage: nextStage,
   });
   if (error) throw error;
@@ -226,7 +300,7 @@ async function stageWrite(
   return {
     status: 'completed', jobId: job.id, stage: 'write', chapterNumber,
     detail: `"${outcome.chapter.title}" (${outcome.attempts} attempt${outcome.attempts > 1 ? 's' : ''})${needsOpeningReview ? '; paused for opening review' : ''}`,
-    costUsd: outcome.costUsd,
+    costUsd: commitCostUsd,
   };
 }
 
@@ -282,7 +356,16 @@ export async function runSerialTick(input: {
     p_route_version: null,
   });
   if (error) throw error;
-  if (!claimed) return { status: 'idle' };
+  // PostgREST can serialize a SQL NULL RPC result as the literal string "null".
+  // Treat both shapes as an empty queue before attempting to read job fields.
+  if (
+    !claimed
+    || claimed === 'null'
+    || typeof claimed !== 'object'
+    || !('id' in claimed)
+    || typeof claimed.id !== 'string'
+    || claimed.id.length === 0
+  ) return { status: 'idle' };
   const job = claimed as SerialJobRow;
 
   try {
@@ -297,12 +380,20 @@ export async function runSerialTick(input: {
     // Transport and provider failures are transient by default: back off and retry the
     // same stage. Nothing here can put a story into a state only a person can leave.
     const message = stageError instanceof Error ? stageError.message : String(stageError);
+    const evidence = stageError instanceof StoryFactoryError && stageError.evidence && typeof stageError.evidence === 'object'
+      ? stageError.evidence as { issues?: unknown; usage?: ProviderUsage }
+      : null;
+    const issueText = evidence?.issues ? ` ${JSON.stringify(evidence.issues).slice(0, 320)}` : '';
+    const detail = `${message}${issueText}`;
     await releaseLease(db, job, {
       status: 'ready',
       next_run_at: new Date(Date.now() + 5 * 60_000).toISOString(),
-      last_error: message.slice(0, 500),
+      last_error: detail.slice(0, 500),
     });
-    return { status: 'failed', jobId: job.id, stage: job.stage, detail: message };
+    return {
+      status: 'failed', jobId: job.id, stage: job.stage, detail,
+      costUsd: evidence?.usage?.costUsd,
+    };
   }
 }
 

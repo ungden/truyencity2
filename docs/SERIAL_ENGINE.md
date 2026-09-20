@@ -1,8 +1,14 @@
 # Serial engine
 
 The replacement for the story factory. It writes web serials in the Faloo mould: short
-cycles of pressure and release, a golden finger that evolves, a named rank ladder, and a
+cycles of desire and payoff, a golden finger that evolves, named multi-axis progression, and a
 hook at the end of every chapter.
+
+Craft direction is shared by Premise, Planner, Writer and Judge through the playbook's
+`shared` role. Gains fund the next ambition; anticipation can come from opportunity,
+discovery, reactions or opposition. The persisted `pressure` field now names the cycle's
+motivation and `escalation` its steps toward a desirable result. Existing cycles remain
+readable; positive hook kinds (`opportunity`, `reward`, `reveal`) are also available.
 
 Design rationale: [`REDESIGN_PLAN.md`](REDESIGN_PLAN.md). Chapter craft, measured from real
 Faloo chapters: [`FALOO_CRAFT.md`](FALOO_CRAFT.md). The old system it replaces is documented
@@ -38,16 +44,25 @@ Readers never see a partial cycle. Chapters land in `chapters` with
 | `CyclePlan` | `serial_cycles.plan` | Cycle planner |
 | `ChapterDigest`, `JudgeVerdict` | `serial_runs` | Extractor and Judge |
 
-The Bible splits in two. `symbolicCore` holds only what a reader would catch a
-contradiction in — who is dead, which named rung someone holds, where they stand, what day
-it is, which hooks are still open — and is machine-checked by ten rules in `state.ts`.
-Everything else is prose the models read and rewrite.
+The approved `Premise` is schema v2: the commercial page and an immutable `worldKernel`
+travel as one approval package. The kernel holds both worlds, locations, factions,
+progression and grade systems, equivalences, economy loops, launch products, cast paths and
+the four-chapter opening contract.
+
+The living Bible is deliberately smaller. `symbolicCore.progressions[]` tracks a subject,
+system, optional track, rank and minor stage, so realm, profession, store, company and
+customer ability can move independently. `mc.goldenFingerRungId` is explicit and never
+derived from cultivation. The Bible's `world` contains only locations and rules already
+shown in prose; it is not a copy of the complete kernel.
 
 ## What the Writer sees
 
 Beats for this chapter, the golden finger's current rung, the relevant cast sheets, the
-last 800 words of the previous chapter, worn-out phrases to avoid, and `khongDuocTrai` —
-the short do-not-contradict list. It may invent everything else.
+last 800 words of the previous chapter, worn-out phrases to avoid, `khongDuocTrai`, and a
+chapter-specific world slice. The slice contains only relevant worlds/locations,
+progression systems, grade systems, products and economy loops. Chapters 1–4 also receive
+their one opening-contract row and the reaction rule. Only the cycle planner receives the
+complete World Kernel.
 
 That is the inversion against the old engine, which handed the Writer a ledger of required
 deltas and asked it to dramatise them. `architecture` tests assert the brief contains no
@@ -111,7 +126,7 @@ A low reading score never blocks anything. It flows into the next cycle plan as 
 
 Launching is deliberately two decisions, not one:
 
-1. `awaiting_approval`: a person reads the one-page Premise. Approval allows spending to
+1. `awaiting_approval`: a person reads the Premise and World Kernel as one package. Approval allows spending to
    plan and write, but nothing is public.
 2. `opening_review`: chapter four commits atomically with this status. The cron cannot
    claim chapter five. `/admin/serial` renders all four private drafts; a second approval
@@ -123,21 +138,17 @@ publication side effect.
 
 ## Song Xuyên catalog
 
-Ten production-shaped premises live under `factory/serial/song-xuyen/`. They carry full
-cast, six-step advantage evolution, four conflict dimensions, a hidden line and an explicit
-payoff stance. `src/services/serial/catalog.ts` adds review-only evidence that does not
-belong in the immutable Premise: chapter-one proof, the named buyer at each end, and where
-the other world's currency stays as working capital.
+Exactly two production packages live under `factory/serial/song-xuyen/`:
+`cua-hang-cong-phap-tu-tien` and `rau-tuoi-doi-ai`. Each JSON contains the whole immutable
+approval package; the catalog adds no parallel review facts that could drift away from it.
 
 ```bash
-npm run serial:premises                         # validate and list all ten, no credentials
-npm run serial:premises -- --id=phe-dan-thuc-tinh
-npm run serial:operator -- seed --premise=factory/serial/song-xuyen/03-phe-dan-thuc-tinh.json
+npm run serial:premises                         # validate and list both, no credentials
+npm run serial:premises -- --id=cua-hang-cong-phap-tu-tien
+npm run serial:operator -- seed --premise=factory/serial/song-xuyen/01-cua-hang-cong-phap-tu-tien.json
 ```
 
-The first three pilot candidates are `phe-dan-thuc-tinh`, `hang-ma-phap-khi`, and
-`tiep-van-cuu-chin-thanh`. Ranking is a review order only; it does not seed, approve, call a
-provider or spend money.
+Listing, validating and dry-running a seed do not approve, call a provider or spend money.
 
 ## Tables and RPCs
 
@@ -157,6 +168,11 @@ npm run serial:operator -- status                                    # every sto
 npm run serial:operator -- seed --premise=<file.json> --apply        # create a hidden novel + job
 npm run serial:operator -- approve --job-id=<id> --apply             # approve premise, then later opening
 npm run serial:operator -- read --job-id=<id> --chapter=1            # read one of the four private drafts
+npm run serial:operator -- tick --budget-ms=240000 --apply           # run the queue locally, explicit spending gate
+npm run serial:operator -- reroute --job-id=<id> --apply             # before chapter 1 only; never changes a running story silently
+npm run serial:operator -- quota --job-id=<id> --daily-target=4 --apply
+npm run serial:operator -- restart-opening --job-id=<id> --apply     # discard four private drafts and restart chapter 1
+npm run serial:operator -- release --job-id=<id> --apply             # unhide only after opening approval + cycle 1 publish
 npm run serial:operator -- pause|resume --job-id=<id> --apply
 ```
 
@@ -168,14 +184,14 @@ statuses.
 Offline rig, no database and no publishing:
 
 ```bash
-npm run serial:run -- --premise=factory/serial/he-thong-tham-dinh.json --chapters=4
+npm run serial:run -- --premise=factory/serial/song-xuyen/01-cua-hang-cong-phap-tu-tien.json --chapters=4
 npm run serial:run -- --premise=... --chapters=15 --apply     # the only form that spends
 ```
 
 ## Environment
 
 ```
-SERIAL_ENGINE_ENABLED=true     # required for the cron to do anything
+SERIAL_ENGINE_ENABLED=true     # required for the cron to do anything; explicit CLI tick is still gated by --apply
 CRON_SECRET                    # same secret as every other cron
 NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, GEMINI_API_KEY, OPENAI_API_KEY
 ```
@@ -187,6 +203,6 @@ start a stage it cannot finish. Enabling Fluid on the Vercel project allows rais
 
 ## Status
 
-Phases 1a and 3 of the plan are built, along with the ten-premise Song Xuyên catalog and the
-two launch gates. Catalog entries are source data only: none is seeded, approved or charged
-by adding it to the repository. The next spending decision is still a four-chapter pilot.
+World Kernel v2, multi-axis Bible progression, the two-package Song Xuyên catalog and both
+launch gates are built. Catalog entries are source data only: none is seeded, approved or
+charged by adding it to the repository. The next spending decision is still a four-chapter pilot.

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { isPayoffKind } from './playbook';
+import { payoffKindIds } from './playbook';
 
 /**
  * Artifacts for the serial engine.
@@ -7,7 +7,7 @@ import { isPayoffKind } from './playbook';
  * The rule that shapes every schema here: the Writer may invent freely, and is
  * constrained only by what a reader could catch. So durable state splits in two.
  * `symbolicCore` is a short, machine-checked list of facts a contradiction would
- * be obvious on — who is dead, what tier someone holds, where they stand, what
+ * be obvious on — who is dead, what named progression someone holds, where they stand, what
  * day it is, which hooks are still open. Everything else is prose the models read
  * and rewrite. The previous engine tried to make the whole world machine-checked;
  * it produced arithmetically perfect chapters in which nothing happened.
@@ -20,12 +20,13 @@ const line = z.string().trim().min(1).max(400);
 const para = z.string().trim().min(1).max(1_200);
 
 /**
- * A satisfaction beat, by id. Deliberately NOT an enum: the closed list of fifteen could
- * not express "an ally wins using something the protagonist gave them", which is a named,
- * popular stream. Kinds live in playbook.json, so a new one is a data edit.
+ * A satisfaction beat, by id. The registry still lives in playbook.json, but it is
+ * materialized as an enum when the process starts so structured-output providers see
+ * the exact legal ids instead of guessing a Vietnamese display name.
  */
-export const PayoffKindSchema = z.string().trim().regex(/^[a-z0-9_]{2,32}$/)
-  .refine(isPayoffKind, value => ({ message: `Unknown payoff kind "${value}". Add it to playbook.json.` }));
+const payoffIds = payoffKindIds();
+if (payoffIds.length === 0) throw new Error('playbook payoffKinds cannot be empty');
+export const PayoffKindSchema = z.enum(payoffIds as [string, ...string[]]);
 export type PayoffKind = string;
 
 /** Who is on stage for the payoff. A broker premise wins through other people. */
@@ -49,49 +50,60 @@ export type Lane = (typeof LANES)[number];
  * no — the same gate Faloo's 责编 applies to the golden finger and the opening
  * before a book enters the library.
  */
+const RankSchema = z.object({ id, name: z.string().trim().min(1).max(80), note: line.nullable().default(null) }).strict();
+const ProgressionRefSchema = z.object({
+  systemId: id,
+  trackId: id.nullable().default(null),
+  rankId: id,
+  minorStageId: id.nullable().default(null),
+}).strict();
+
+export const ProgressionStateSchema = ProgressionRefSchema.extend({ subjectId: id }).strict();
+export type ProgressionState = z.infer<typeof ProgressionStateSchema>;
+
+const MilestoneSchema = z.object({
+  name: line,
+  progressionTarget: ProgressionRefSchema.nullable().default(null),
+  socialResult: line,
+}).strict();
+
 export const PremiseSchema = z.object({
-  schemaVersion: z.literal(1),
+  schemaVersion: z.literal(2),
   lane: z.enum(LANES),
   /** `ĐẤU TRƯỜNG: nhân vật + lợi thế + payoff`, the measured Faloo formula. */
   title: z.string().trim().min(12).max(120),
   /** One line a reader decides on. */
   hook: line,
-  /** Bán hàng: áp lực → lợi thế → payoff đầu → leo thang. Never world history first. */
+  /** Desire/opportunity → advantage → first payoff → larger promise. */
   blurb: z.string().trim().min(200).max(1_200),
   /** What the reader is here to feel. Not a plot summary. */
   readerFantasy: line,
+
+  /** Reader-facing launch material approved together with the premise. */
+  presentation: z.object({
+    coverPath: z.string().trim().regex(/^\/covers\/[a-z0-9_\-/]+\.webp$/),
+    tagline: z.string().trim().min(8).max(120),
+    shortDescription: z.string().trim().min(100).max(500),
+    tags: z.array(z.string().trim().min(2).max(32)).min(4).max(10),
+    sellingPoints: z.array(line).min(3).max(6),
+  }).strict(),
 
   goldenFinger: z.object({
     name: z.string().trim().min(2).max(60),
     /** Stated the way the reader will see it, not as an internal mechanic. */
     rule: para,
-    /**
-     * What the advantage does NOT reach — a boundary on scale, never a punishment.
-     *
-     * This field used to be called `limit` and asked what the advantage "costs".
-     * That wording manufactured exactly what readers have turned against: systems
-     * that bill the protagonist in lifespan, debt, injury or permanent poverty.
-     * Scope keeps the planner honest about what the advantage cannot solve, which
-     * is what preserves anticipation, without ever turning the advantage into the
-     * antagonist.
-     */
+    /** Optional functional scope of the established advantage. */
     scope: para.nullable().default(null),
     /** 6–8 rungs, each changing HOW it is used, never only the number. */
     evolution: z.array(z.object({ id, name: line, changesUse: line })).min(6).max(8),
   }).strict(),
 
-  /**
-   * The four dimensions the conflict has to climb, one line each. Comparable serials
-   * die around chapter 300–500 not because the protagonist runs out of power but
-   * because the story runs out of *kinds* of problem, and a bigger number is not a
-   * new problem. The old engine's novels were still fighting the same market rival
-   * at chapter 90 as at chapter 9.
-   */
+  /** Four directions for expansion, selected by the story rather than a fixed sequence. */
   conflictLadder: z.object({
     survival: line,   // beasts, thugs, going hungry
     rules: line,      // enforcers, sects, guilds, the law
     ideology: line,   // who should hold this, and why
-    self: line,       // what winning has made of him
+    self: line.describe('Tham vọng và cách sống nhân vật chủ động chọn khi đã có thành quả.'),
   }).strict(),
 
   /** Planted early, surfaces mid-story, merges with the main line at the end. */
@@ -110,9 +122,6 @@ export const PremiseSchema = z.object({
    */
   oppositionEngine: para,
 
-  /** The only progression measure code understands. Named rungs, lowest first. */
-  tierLadder: z.array(z.object({ id, name: z.string().trim().min(2).max(60) })).min(6).max(20),
-
   /** ≥6 named people at launch, ≥2 antagonists in two different classes. */
   castSeed: z.array(z.object({
     id,
@@ -121,7 +130,85 @@ export const PremiseSchema = z.object({
     /** What they want for themselves, independent of the protagonist. */
     agenda: line,
     antagonistClass: z.string().trim().max(60).nullable().default(null),
+    startLocationId: id,
+    startingProgressions: z.array(ProgressionRefSchema).max(8).default([]),
+    milestones: z.array(MilestoneSchema).min(3).max(5),
   }).strict()).min(6).max(12),
+
+  /** Complete approved canon. The living Bible only stores facts already shown in prose. */
+  worldKernel: z.object({
+    worlds: z.array(z.object({
+      id,
+      name: line,
+      civilizationState: para,
+      locations: z.array(z.object({ id, name: line, note: para }).strict()).min(2).max(20),
+      factions: z.array(z.object({ id, name: line, agenda: para }).strict()).min(2).max(20),
+    }).strict()).length(2),
+    progressionSystems: z.array(z.object({
+      id,
+      name: line,
+      kind: z.enum(['realm', 'profession', 'organization', 'business', 'ability']),
+      subjectType: z.enum(['character', 'asset', 'faction', 'company']),
+      tracks: z.array(RankSchema).max(12).default([]),
+      ranks: z.array(RankSchema).min(2).max(24),
+      minorStages: z.array(RankSchema).max(12).default([]),
+    }).strict()).min(3).max(16),
+    progressionSubjects: z.array(z.object({
+      id,
+      name: line,
+      kind: z.enum(['asset', 'faction', 'company']),
+      startLocationId: id,
+      startingProgressions: z.array(ProgressionRefSchema).min(1).max(8),
+    }).strict()).max(12).default([]),
+    gradeSystems: z.array(z.object({
+      id,
+      name: line,
+      categories: z.array(line).min(1).max(16),
+      tiers: z.array(RankSchema).max(12).default([]),
+      qualities: z.array(RankSchema).max(12).default([]),
+      note: para,
+    }).strict().superRefine((system, ctx) => {
+      if (system.tiers.length === 0 && system.qualities.length === 0) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'A grade system needs tiers or qualities.' });
+      }
+    })).min(2).max(16),
+    equivalences: z.array(z.object({
+      leftSystemId: id, leftRankId: id, rightSystemId: id, rightRankId: id, note: para,
+    }).strict()).max(24).default([]),
+    economyLoops: z.array(z.object({
+      id, name: line, fromWorldId: id, toWorldId: id,
+      goods: z.array(line).min(1).max(12), buyer: line, settlement: line, reinvestment: para,
+    }).strict()).min(2).max(12),
+    launchProducts: z.array(z.object({
+      id, name: line, category: line, gradeSystemId: id,
+      tierId: id.nullable().default(null), qualityId: id.nullable().default(null),
+      effect: para, targetBuyer: line, introducedChapter: z.number().int().min(1).max(4),
+    }).strict()).min(4).max(16),
+    openingContract: z.array(z.object({
+      chapterNumber: z.number().int().min(1).max(4),
+      proves: para,
+      namedLevelOrGrade: line,
+      visibleResult: line,
+      witnessReaction: line,
+      commercialAction: line,
+    }).strict()).length(4),
+    /**
+     * Positive source of truth for the opening's commerce. The Writer turns these
+     * entries into scenes; it does not have to reconstruct an accounting chain from
+     * prose notes or a growing list of prohibitions.
+     */
+    openingLedger: z.array(z.object({
+      id,
+      chapterNumber: z.number().int().min(1).max(4),
+      kind: z.enum(['acquisition', 'sale', 'reservation', 'order', 'settlement', 'transfer']),
+      asset: line,
+      quantity: line,
+      from: line,
+      to: line,
+      consideration: para,
+      resultingStatus: para,
+    }).strict()).min(4).max(24),
+  }).strict(),
 
   /** Legible category the Vietnamese convert reader already knows. Never a borrowed IP. */
   arena: line,
@@ -136,9 +223,68 @@ export const PremiseSchema = z.object({
     chapterTitleRule: para,
     /** Lane has an in-fiction system panel shown to the reader in 【】. */
     showsSystemPanel: z.boolean(),
+    reactionRule: para,
     taboos: z.array(line).max(12).default([]),
   }).strict(),
-}).strict();
+}).strict().superRefine((premise, ctx) => {
+  const unique = (values: string[], path: (string | number)[]) => {
+    if (new Set(values).size !== values.length) ctx.addIssue({ code: z.ZodIssueCode.custom, path, message: 'Ids must be unique.' });
+  };
+  const worlds = premise.worldKernel.worlds;
+  const locations = worlds.flatMap(world => world.locations);
+  const locationIds = new Set(locations.map(location => location.id));
+  const systems = new Map(premise.worldKernel.progressionSystems.map(system => [system.id, system]));
+  const grades = new Map(premise.worldKernel.gradeSystems.map(system => [system.id, system]));
+  unique(worlds.map(world => world.id), ['worldKernel', 'worlds']);
+  unique(locations.map(location => location.id), ['worldKernel', 'worlds']);
+  unique([...systems.keys()], ['worldKernel', 'progressionSystems']);
+  unique([...grades.keys()], ['worldKernel', 'gradeSystems']);
+  unique(premise.castSeed.map(member => member.id), ['castSeed']);
+  unique(premise.worldKernel.progressionSubjects.map(subject => subject.id), ['worldKernel', 'progressionSubjects']);
+  if (premise.castSeed.filter(member => member.role === 'protagonist').length !== 1) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['castSeed'], message: 'Premise needs exactly one protagonist.' });
+  }
+  const antagonistClasses = new Set(premise.castSeed
+    .filter(member => member.role === 'antagonist' && member.antagonistClass)
+    .map(member => member.antagonistClass));
+  if (antagonistClasses.size < 2) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['castSeed'], message: 'Premise needs antagonists from at least two classes.' });
+  const validateProgression = (state: z.infer<typeof ProgressionRefSchema>, path: (string | number)[]) => {
+    const system = systems.get(state.systemId);
+    if (!system) return ctx.addIssue({ code: z.ZodIssueCode.custom, path: [...path, 'systemId'], message: `Unknown progression system ${state.systemId}.` });
+    if (!system.ranks.some(rank => rank.id === state.rankId)) ctx.addIssue({ code: z.ZodIssueCode.custom, path: [...path, 'rankId'], message: `Unknown rank ${state.rankId}.` });
+    if (state.trackId && !system.tracks.some(track => track.id === state.trackId)) ctx.addIssue({ code: z.ZodIssueCode.custom, path: [...path, 'trackId'], message: `Unknown track ${state.trackId}.` });
+    if (state.minorStageId && !system.minorStages.some(stage => stage.id === state.minorStageId)) ctx.addIssue({ code: z.ZodIssueCode.custom, path: [...path, 'minorStageId'], message: `Unknown minor stage ${state.minorStageId}.` });
+  };
+  premise.castSeed.forEach((member, index) => {
+    if (!locationIds.has(member.startLocationId)) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['castSeed', index, 'startLocationId'], message: 'Unknown start location.' });
+    member.startingProgressions.forEach((state, stateIndex) => validateProgression(state, ['castSeed', index, 'startingProgressions', stateIndex]));
+    member.milestones.forEach((milestone, milestoneIndex) => {
+      if (milestone.progressionTarget) validateProgression(milestone.progressionTarget, ['castSeed', index, 'milestones', milestoneIndex, 'progressionTarget']);
+    });
+  });
+  premise.worldKernel.progressionSubjects.forEach((subject, index) => {
+    if (!locationIds.has(subject.startLocationId)) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['worldKernel', 'progressionSubjects', index, 'startLocationId'], message: 'Unknown start location.' });
+    subject.startingProgressions.forEach((state, stateIndex) => validateProgression(state, ['worldKernel', 'progressionSubjects', index, 'startingProgressions', stateIndex]));
+  });
+  premise.worldKernel.equivalences.forEach((item, index) => {
+    for (const side of ['left', 'right'] as const) {
+      const system = systems.get(item[`${side}SystemId`]);
+      if (!system || !system.ranks.some(rank => rank.id === item[`${side}RankId`])) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['worldKernel', 'equivalences', index], message: `Invalid ${side} progression reference.` });
+    }
+  });
+  const worldIds = new Set(worlds.map(world => world.id));
+  premise.worldKernel.economyLoops.forEach((loop, index) => {
+    if (!worldIds.has(loop.fromWorldId) || !worldIds.has(loop.toWorldId)) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['worldKernel', 'economyLoops', index], message: 'Economy loop references an unknown world.' });
+  });
+  premise.worldKernel.launchProducts.forEach((product, index) => {
+    const grade = grades.get(product.gradeSystemId);
+    if (!grade) return ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['worldKernel', 'launchProducts', index, 'gradeSystemId'], message: 'Unknown grade system.' });
+    if (product.tierId && !grade.tiers.some(tier => tier.id === product.tierId)) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['worldKernel', 'launchProducts', index, 'tierId'], message: 'Unknown product tier.' });
+    if (product.qualityId && !grade.qualities.some(quality => quality.id === product.qualityId)) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['worldKernel', 'launchProducts', index, 'qualityId'], message: 'Unknown product quality.' });
+  });
+  const chapters = premise.worldKernel.openingContract.map(item => item.chapterNumber).sort();
+  if (chapters.join(',') !== '1,2,3,4') ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['worldKernel', 'openingContract'], message: 'Opening contract must cover chapters 1, 2, 3 and 4 exactly once.' });
+});
 export type Premise = z.infer<typeof PremiseSchema>;
 
 // ------------------------------------------------------------------ Bible
@@ -148,19 +294,20 @@ export const SymbolicCoreSchema = z.object({
   storyDay: z.number().int().nonnegative(),
   chapterNumber: z.number().int().nonnegative(),
   mc: z.object({
-    tierId: id,
+    characterId: id,
     locationId: id,
     keyAssetIds: z.array(id).max(24),
+    goldenFingerRungId: id,
   }).strict(),
   cast: z.array(z.object({
     id,
     alive: z.boolean(),
-    tierId: id.nullable(),
     locationId: id,
     lastSeenChapter: z.number().int().nonnegative(),
     /** Does this character know about the golden finger? Information boundary. */
     knowsFinger: z.boolean().default(false),
   }).strict()).max(120),
+  progressions: z.array(ProgressionStateSchema).max(480),
   openHooks: z.array(z.object({
     id,
     what: line,
@@ -172,7 +319,7 @@ export const SymbolicCoreSchema = z.object({
 export type SymbolicCore = z.infer<typeof SymbolicCoreSchema>;
 
 export const BibleSchema = z.object({
-  schemaVersion: z.literal(1),
+  schemaVersion: z.literal(2),
   symbolicCore: SymbolicCoreSchema,
   /** 3–5 lines per person. Prose, not fields — the models read and rewrite it. */
   castSheet: z.array(z.object({
@@ -209,10 +356,9 @@ export const CyclePlanSchema = z.object({
   volumeNumber: z.number().int().min(1),
   startChapter: z.number().int().min(1),
   plannedEndChapter: z.number().int().min(1),
-  /** 小不爽 — what is denied, taken or threatened at the start. */
-  pressure: para,
-  /** 3–6 steps that make it worse before it gets better. */
-  escalation: z.array(line).min(3).max(6),
+  /** Legacy field name retained for persisted cycles; motivation may be positive. */
+  pressure: para.describe('Động lực mở chu kỳ: cơ hội, mục tiêu nhân vật muốn đạt hoặc đối kháng cụ thể.'),
+  escalation: z.array(line).min(3).max(6).describe('Các bước làm kết quả đáng mong hơn: khám phá, thành công, phản ứng, mở rộng hoặc đối đầu.'),
   climax: z.object({
     payoffKind: PayoffKindSchema,
     performedBy: z.enum(PERFORMERS).default('protagonist'),
@@ -234,9 +380,10 @@ export const CyclePlanSchema = z.object({
     emotionalTarget: line,
     /** At least one new named thing this chapter introduces. */
     newNamedThing: line,
-    /** threat | question | declaration */
-    endHookKind: z.enum(['threat', 'question', 'declaration']),
+    endHookKind: z.enum(['threat', 'question', 'declaration', 'opportunity', 'reward', 'reveal']),
   }).strict()).min(1).max(3),
+  /** Human/auditor findings carried unchanged into every Writer brief for this replan. */
+  editorialNotes: z.array(para).max(8).default([]),
 }).strict().superRefine((cycle, ctx) => {
   const span = cycle.plannedEndChapter - cycle.startChapter + 1;
   if (span < 5 || span > 15) {
@@ -258,9 +405,17 @@ export const ChapterDigestSchema = z.object({
   coreChanges: z.object({
     storyDayDelta: z.number().int().min(0).max(3_650),
     died: z.array(id).max(8),
-    tierChanges: z.array(z.object({ characterId: id, toTierId: id, why: line }).strict()).max(8),
+    progressionChanges: z.array(z.object({
+      subjectId: id, systemId: id, trackId: id.nullable().default(null),
+      toRankId: id, toMinorStageId: id.nullable().default(null), why: line,
+    }).strict()).max(16),
+    goldenFingerRungChange: z.object({ toRungId: id, why: line }).strict().nullable().default(null),
     moved: z.array(z.object({ characterId: id, toLocationId: id }).strict()).max(24),
-    newCast: z.array(z.object({ id, name: line, sheet: para, role: line }).strict()).max(8),
+    worldFactsRevealed: z.array(z.object({ id, note: para }).strict()).max(8),
+    newCast: z.array(z.object({
+      id, name: line, sheet: para, role: line, locationId: id,
+      startingProgressions: z.array(ProgressionRefSchema).max(8).default([]),
+    }).strict()).max(8),
     hooksPlanted: z.array(z.object({ id, what: line, dueByChapter: z.number().int().min(1) }).strict()).max(6),
     hooksPaid: z.array(id).max(6),
     learnedFinger: z.array(id).max(8),
@@ -279,20 +434,20 @@ const score = z.number().int().min(0).max(5);
  */
 export const JudgeVerdictSchema = z.object({
   continuity: z.array(z.object({
-    kind: z.enum(['dead_returns', 'tier_regressed', 'location_impossible', 'timeline', 'knows_too_much', 'contradicts_bible']),
+    kind: z.enum(['dead_returns', 'progression_regressed', 'location_impossible', 'timeline', 'knows_too_much', 'contradicts_bible']),
     quote: z.string().trim().min(4).max(400),
     explain: line,
   }).strict()).max(10),
   scorecard: z.object({
-    /** Did the chapter open on pressure instead of scenery? */
+    /** Did the opening advance something the reader cares about? */
     opening: score,
-    /** Was something withheld or denied before it was given? */
+    /** How desirable and concrete is the result the reader anticipates? */
     anticipation: score,
     /** Did a payoff land with a named, visible result? */
     payoff: score,
     /** Did at least one new named thing enter? */
     newness: score,
-    /** Did the last lines open a threat, a question or a declaration? */
+    /** Is there something specific worth reading next? */
     endHook: score,
   }).strict(),
   repetition: z.array(z.object({ quote: z.string().trim().min(4).max(400), repeatsChapter: z.number().int().min(1), note: line }).strict()).max(6),
@@ -302,6 +457,40 @@ export const JudgeVerdictSchema = z.object({
   steering: z.array(line).max(5),
 }).strict();
 export type JudgeVerdict = z.infer<typeof JudgeVerdictSchema>;
+
+// ---------------------------------------------------------- Opening audit
+
+/** Objective cross-chapter defects that a per-chapter judge cannot see. */
+export const OpeningAuditFindingSchema = z.object({
+  kind: z.enum([
+    'inventory_arithmetic',
+    'resource_provenance',
+    'transaction_continuity',
+    'timeline',
+    'format_duplicate_title',
+    'opening_contract',
+    'unapproved_cost',
+  ]),
+  chapterNumber: z.number().int().min(1).max(4),
+  quote: z.string().trim().min(4).max(500),
+  explain: line,
+  repair: line,
+}).strict();
+
+export const OpeningAuditSchema = z.object({
+  passed: z.boolean(),
+  summary: line,
+  findings: z.array(OpeningAuditFindingSchema).max(12),
+}).strict().superRefine((audit, ctx) => {
+  if (audit.passed !== (audit.findings.length === 0)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['passed'],
+      message: 'passed must be true exactly when findings is empty.',
+    });
+  }
+});
+export type OpeningAudit = z.infer<typeof OpeningAuditSchema>;
 
 export const CHAPTER_WORD_RANGE = { min: 1_600, max: 2_600 } as const;
 

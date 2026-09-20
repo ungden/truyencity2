@@ -3,20 +3,18 @@ import {
   PremiseSchema, CyclePlanSchema, scorecardAverage, type ChapterDigest,
 } from '@/services/serial/contracts';
 import {
-  applyDigest, assertPayoffRotation, assertStanceHeld, overdueHooks, recentPayoffKinds, seedBible, SerialStateError, tierIndex,
+  applyDigest, assertPayoffRotation, assertStanceHeld, overdueHooks, progressionRankIndex, recentPayoffKinds, seedBible, SerialStateError,
 } from '@/services/serial/state';
 import { WRITER_SYSTEM_PROMPT, CYCLE_PLANNER_SYSTEM_PROMPT, JUDGE_SYSTEM_PROMPT, PREMISE_SYSTEM_PROMPT } from '@/services/serial/prompts';
 import { payoffKindIds, activeRules, staleRules } from '@/services/serial/playbook';
 import { premise, baseBible, digest, cycle } from './fixtures';
 
 describe('serial contracts', () => {
-  test('a premise must climb four dimensions of conflict, not one dimension four times', () => {
-    // Comparable serials die around chapter 300-500 because they run out of kinds of
-    // problem. The old engine's novels were fighting the same market rival at 90 as at 9.
+  test('a premise offers four directions for expansion', () => {
     expect(Object.keys(premise.conflictLadder)).toEqual(['survival', 'rules', 'ideology', 'self']);
     expect(premise.hiddenThread.length).toBeGreaterThan(40);
     expect(() => PremiseSchema.parse({ ...premise, conflictLadder: undefined })).toThrow();
-    expect(CYCLE_PLANNER_SYSTEM_PROMPT).toMatch(/XUNG ĐỘT PHẢI ĐỔI CHIỀU, KHÔNG PHẢI ĐỔI CỠ/);
+    expect(CYCLE_PLANNER_SYSTEM_PROMPT).toMatch(/bốn hướng để chọn theo truyện/);
   });
 
   test('a premise must name six or more cast members with two antagonist classes', () => {
@@ -32,7 +30,7 @@ describe('serial contracts', () => {
     // injury — the thing readers now quit over.
     expect(premise.goldenFinger).not.toHaveProperty('limit');
     expect(premise.goldenFinger.scope).toBeTruthy();
-    expect(premise.oppositionEngine).toMatch(/mất tiền khi hắn thắng|đoạt|cắt mất phần/);
+    expect(premise.oppositionEngine).toMatch(/mất người mua|quyền định giá/);
     expect(() => PremiseSchema.parse({ ...premise, oppositionEngine: undefined })).toThrow();
   });
 
@@ -75,13 +73,13 @@ describe('serial state merge', () => {
   });
 
   test('the dead stay dead across every kind of change', () => {
-    const killed = applyDigest({ premise, bible: baseBible(), digest: digest({ coreChanges: { died: ['chu_tiem'] } }) });
-    expect(killed.symbolicCore.cast.find(c => c.id === 'chu_tiem')?.alive).toBe(false);
+    const killed = applyDigest({ premise, bible: baseBible(), digest: digest({ coreChanges: { died: ['cao_nguyen'] } }) });
+    expect(killed.symbolicCore.cast.find(c => c.id === 'cao_nguyen')?.alive).toBe(false);
 
     for (const change of <Array<Partial<ChapterDigest['coreChanges']>>>[
-      { moved: [{ characterId: 'chu_tiem', toLocationId: 'hoi_quan' }] },
-      { tierChanges: [{ characterId: 'chu_tiem', toTierId: 'tier_dai_su', why: 'thăng chức' }] },
-      { died: ['chu_tiem'] },
+      { moved: [{ characterId: 'cao_nguyen', toLocationId: 'cho_tinh_hach' }] },
+      { progressionChanges: [{ subjectId: 'cao_nguyen', systemId: 'tien_hoa_mat_the', trackId: null, toRankId: 'tam_giai', toMinorStageId: 'so_ky', why: 'thăng cấp' }] },
+      { died: ['cao_nguyen'] },
     ]) {
       expect(() => applyDigest({
         premise, bible: killed,
@@ -90,18 +88,24 @@ describe('serial state merge', () => {
     }
   });
 
-  test('rank never regresses down the named ladder', () => {
-    expect(tierIndex(premise, 'tier_tho_xem')).toBe(1);
+  test('each progression axis advances sequentially and independently', () => {
+    expect(progressionRankIndex(premise, 'tu_tien', 'luyen_khi_4')).toBe(3);
     expect(() => applyDigest({
       premise, bible: baseBible(),
-      digest: digest({ coreChanges: { tierChanges: [{ characterId: 'khang', toTierId: 'tier_hoc_viec', why: 'bị giáng' }] } }),
-    })).toThrow(/demotes khang/);
+      digest: digest({ coreChanges: { progressionChanges: [{ subjectId: 'lam_viet', systemId: 'tu_tien', trackId: null, toRankId: 'luyen_khi_3', toMinorStageId: null, why: 'bị giáng' }] } }),
+    })).toThrow(/regresses/);
 
     const promoted = applyDigest({
       premise, bible: baseBible(),
-      digest: digest({ coreChanges: { tierChanges: [{ characterId: 'khang', toTierId: 'tier_chuong_quay', why: 'thắng phiên đấu' }] } }),
+      digest: digest({ coreChanges: { progressionChanges: [{ subjectId: 'lam_viet', systemId: 'nghe_tu_tien', trackId: 'luyen_dan_su', toRankId: 'nghe_nhat_giai', toMinorStageId: null, why: 'thi nghề thành công' }] } }),
     });
-    expect(promoted.symbolicCore.mc.tierId).toBe('tier_chuong_quay');
+    expect(promoted.symbolicCore.progressions.find(state => state.subjectId === 'lam_viet' && state.systemId === 'nghe_tu_tien')?.rankId).toBe('nghe_nhat_giai');
+    expect(promoted.symbolicCore.progressions.find(state => state.subjectId === 'lam_viet' && state.systemId === 'tu_tien')?.rankId).toBe('luyen_khi_4');
+
+    expect(() => applyDigest({
+      premise, bible: baseBible(),
+      digest: digest({ coreChanges: { progressionChanges: [{ subjectId: 'chu_da', systemId: 'tu_tien', trackId: null, toRankId: 'luyen_khi_3', toMinorStageId: null, why: 'nhảy cấp' }] } }),
+    })).toThrow(/first rank/);
   });
 
   test('a hook can only be paid once, and only after it is planted', () => {
@@ -112,19 +116,19 @@ describe('serial state merge', () => {
 
     const paid = applyDigest({
       premise, bible: baseBible(),
-      digest: digest({ coreChanges: { hooksPaid: ['hook_giay_to'] } }),
+      digest: digest({ coreChanges: { hooksPaid: ['hook_dao_van'] } }),
     });
     expect(paid.symbolicCore.openHooks[0].status).toBe('paid');
     expect(() => applyDigest({
       premise, bible: paid,
-      digest: digest({ chapterNumber: 9, coreChanges: { hooksPaid: ['hook_giay_to'] } }),
+      digest: digest({ chapterNumber: 9, coreChanges: { hooksPaid: ['hook_dao_van'] } }),
     })).toThrow(/already paid/);
   });
 
   test('a hook planted with a deadline in the past is rejected', () => {
     expect(() => applyDigest({
       premise, bible: baseBible(),
-      digest: digest({ coreChanges: { hooksPlanted: [{ id: 'hook_moi', what: 'Người lạ theo dõi Khang.', dueByChapter: 8 }] } }),
+      digest: digest({ coreChanges: { hooksPlanted: [{ id: 'hook_moi', what: 'Người lạ theo dõi Lâm Việt.', dueByChapter: 8 }] } }),
     })).toThrow(/due at chapter 8/);
   });
 
@@ -132,16 +136,32 @@ describe('serial state merge', () => {
     const next = applyDigest({
       premise, bible: baseBible(),
       digest: digest({ coreChanges: {
-        learnedFinger: ['lao_hoa'],
-        newCast: [{ id: 'ba_lam', name: 'Bà Lâm', sheet: 'Hội trưởng hội thẩm định, nói ít, nhớ lâu.', role: 'antagonist' }],
+        learnedFinger: ['han_duoc_su'],
+        newCast: [{ id: 'ba_lam', name: 'Bà Lâm', sheet: 'Thương nhân mới tới Đông Hà.', role: 'antagonist', locationId: 'pho_dong_ha', startingProgressions: [] }],
       } }),
     });
-    expect(next.symbolicCore.cast.find(c => c.id === 'lao_hoa')?.knowsFinger).toBe(true);
-    expect(next.castSheet.find(c => c.id === 'ba_lam')?.sheet).toMatch(/Hội trưởng/);
+    expect(next.symbolicCore.cast.find(c => c.id === 'han_duoc_su')?.knowsFinger).toBe(true);
+    expect(next.castSheet.find(c => c.id === 'ba_lam')?.sheet).toMatch(/Thương nhân/);
     expect(() => applyDigest({
       premise, bible: next,
-      digest: digest({ chapterNumber: 9, coreChanges: { newCast: [{ id: 'ba_lam', name: 'Bà Lâm', sheet: 'Trùng id.', role: 'antagonist' }] } }),
+      digest: digest({ chapterNumber: 9, coreChanges: { newCast: [{ id: 'ba_lam', name: 'Bà Lâm', sheet: 'Trùng id.', role: 'antagonist', locationId: 'pho_dong_ha', startingProgressions: [] }] } }),
     })).toThrow(/re-introduces/);
+  });
+
+  test('the living world records only canonical entities revealed on the page', () => {
+    const seeded = seedBible({ premise });
+    expect(seeded.world).toEqual([]);
+    const next = applyDigest({
+      premise,
+      bible: seeded,
+      digest: digest({ chapterNumber: 1, coreChanges: { worldFactsRevealed: [{ id: 'pho_dong_ha', note: 'Cửa hàng mở quầy trước đám đông Đông Hà.' }] } }),
+    });
+    expect(next.world).toEqual([{ id: 'pho_dong_ha', name: 'Phố Thương Điếm Đông Hà', note: 'Cửa hàng mở quầy trước đám đông Đông Hà.' }]);
+    expect(() => applyDigest({
+      premise,
+      bible: seeded,
+      digest: digest({ chapterNumber: 1, coreChanges: { worldFactsRevealed: [{ id: 'dia_diem_bia', note: 'Không có trong canon.' }] } }),
+    })).toThrow(/unknown world entity/);
   });
 
   test('recent memory stays a ten-chapter window', () => {
@@ -167,32 +187,33 @@ describe('serial pacing rules', () => {
   test('overdue hooks surface before a cycle is allowed to end', () => {
     expect(overdueHooks(baseBible(), 11)).toHaveLength(0);
     expect(overdueHooks(baseBible(), 12)).toEqual([
-      { id: 'hook_giay_to', what: 'Tờ giấy chứng nhận trong đáy hộp chưa ai đọc.', dueByChapter: 12 },
+      { id: 'hook_dao_van', what: 'Đạo văn giống nhau trên hai viên tinh hạch.', dueByChapter: 12 },
     ]);
   });
 
   test('recent payoff kinds come back newest first for the planner to rotate away from', () => {
     expect(recentPayoffKinds(baseBible())).toEqual(['kho_bau', 'va_mat']);
-    // Open registry, not a closed enum: today's craft note added a beat the old
-    // fifteen could not express — an ally winning with something the protagonist gave them.
+    // The registry stays data-owned; the runtime schema exposes its exact ids to the model.
     expect(payoffKindIds()).toContain('hau_truong');
     expect(payoffKindIds().length).toBeGreaterThan(15);
-    expect(() => cycle({ climax: { payoffKind: 'khong_co_trong_playbook' } })).toThrow(/Unknown payoff kind/);
+    expect(() => cycle({ climax: { payoffKind: 'khong_co_trong_playbook' } })).toThrow(/Invalid enum value/);
   });
 });
 
 describe('writer prompt encodes the measured Faloo rules', () => {
   const craft = readFileSync('docs/FALOO_CRAFT.md', 'utf8');
 
-  test('the opening ban, the named-thing rule and the end hook are all stated', () => {
-    expect(WRITER_SYSTEM_PROMPT).toMatch(/không mở chương bằng thời tiết, mùi, ánh sáng/);
+  test('openings and endings center on what readers want to see', () => {
+    expect(WRITER_SYSTEM_PROMPT).toMatch(/việc độc giả muốn thấy tiếp/);
     expect(WRITER_SYSTEM_PROMPT).toMatch(/MỖI CHƯƠNG PHẢI THÊM MỘT THỨ MỚI CÓ TÊN/);
-    expect(WRITER_SYSTEM_PROMPT).toMatch(/một mối đe doạ mới bước vào, một câu hỏi được đặt thẳng ra, hoặc một lời tuyên bố/);
+    expect(WRITER_SYSTEM_PROMPT).toMatch(/phần thưởng sắp mở, khách lớn tìm đến/);
     expect(WRITER_SYSTEM_PROMPT).toMatch(/Tối đa ba dòng cho toàn bộ quá khứ/);
   });
 
   test('the Writer is told what it may not contradict, not what it must recite', () => {
     expect(WRITER_SYSTEM_PROMPT).toMatch(/Bạn được tự do bịa thêm/);
+    expect(WRITER_SYSTEM_PROMPT).toMatch(/trạng thái ở đầu chương/);
+    expect(WRITER_SYSTEM_PROMPT).toMatch(/không phải trần tiến triển/);
     expect(WRITER_SYSTEM_PROMPT).not.toMatch(/requiredChanges|requiredDeltas|delta|ledger/i);
   });
 
@@ -201,17 +222,15 @@ describe('writer prompt encodes the measured Faloo rules', () => {
     expect(JUDGE_SYSTEM_PROMPT).toMatch(/không bao giờ chặn chương/);
   });
 
-  test('the premise prompt bans advantages that punish their owner', () => {
-    expect(PREMISE_SYSTEM_PROMPT).toMatch(/TUYỆT ĐỐI KHÔNG thiết kế kim thủ chỉ quay lại cắn chủ nhân/);
-    expect(PREMISE_SYSTEM_PROMPT).toMatch(/trừ thọ nguyên, rút máu, gánh ngược bệnh tật/);
-    // Tension has to come from people, and the business has to jump rather than crawl.
-    expect(PREMISE_SYSTEM_PROMPT).toMatch(/oppositionEngine mới là nguồn căng thẳng/);
-    expect(PREMISE_SYSTEM_PROMPT).toMatch(/nhảy bậc chứ không bò từng bước/);
+  test('the premise starts from cumulative gains and concrete interests', () => {
+    expect(PREMISE_SYSTEM_PROMPT).toMatch(/thành quả tích lũy thành vốn/);
+    expect(PREMISE_SYSTEM_PROMPT).toMatch(/ai mất phần khi hắn thành công/);
+    expect(PREMISE_SYSTEM_PROMPT).toMatch(/Kinh doanh tích lũy rồi mở rộng/);
   });
 
   test('the cycle planner is forbidden the mechanical vocabulary that produced process fiction', () => {
     expect(CYCLE_PLANNER_SYSTEM_PROMPT).toMatch(/không ghi delta tài nguyên, không ghi lịch trình phút/);
-    expect(CYCLE_PLANNER_SYSTEM_PROMPT).toMatch(/đối thủ phải đổi giai cấp/);
+    expect(CYCLE_PLANNER_SYSTEM_PROMPT).toMatch(/đấu trường lớn hơn có người chơi và lợi ích mới/);
   });
 
   test('the craft document these rules come from is still in the repo', () => {
@@ -223,19 +242,22 @@ describe('writer prompt encodes the measured Faloo rules', () => {
 
 describe('seeding a story', () => {
   test('a launch Bible is derived entirely from the approved premise', () => {
-    const bible = seedBible({ premise, startLocationId: 'cho_cu', startLocationNote: 'Khu chợ đồ cũ lớn nhất thành phố.' });
+    const bible = seedBible({ premise });
     expect(bible.symbolicCore.chapterNumber).toBe(0);
     expect(bible.symbolicCore.storyDay).toBe(0);
-    expect(bible.symbolicCore.mc.tierId).toBe('tier_hoc_viec');
+    expect(bible.symbolicCore.mc.goldenFingerRungId).toBe('ke_ban_le');
+    expect(bible.symbolicCore.progressions.find(state => state.subjectId === 'lam_viet' && state.systemId === 'tu_tien')?.rankId).toBe('luyen_khi_3');
     expect(bible.symbolicCore.cast.every(member => member.alive)).toBe(true);
     expect(bible.symbolicCore.openHooks).toEqual([]);
+    expect(bible.world).toEqual([]);
     // Only the protagonist starts knowing about the advantage.
-    expect(bible.symbolicCore.cast.filter(member => member.knowsFinger).map(member => member.id)).toEqual(['khang']);
+    expect(bible.symbolicCore.cast.filter(member => member.knowsFinger).map(member => member.id)).toEqual(['lam_viet']);
+    expect(new Set(bible.symbolicCore.cast.map(member => member.locationId)).size).toBeGreaterThan(1);
     expect(bible.castSheet).toHaveLength(premise.castSeed.length);
   });
 
   test('the first chapter merges onto a seeded Bible', () => {
-    const seeded = seedBible({ premise, startLocationId: 'cho_cu', startLocationNote: 'Chợ Cũ.' });
+    const seeded = seedBible({ premise });
     const next = applyDigest({ premise, bible: seeded, digest: digest({ chapterNumber: 1 }) });
     expect(next.symbolicCore.chapterNumber).toBe(1);
     expect(next.recentSummary).toHaveLength(1);
@@ -243,7 +265,7 @@ describe('seeding a story', () => {
 
   test('a premise with no protagonist cannot seed a story', () => {
     const headless = { ...premise, castSeed: premise.castSeed.map(m => ({ ...m, role: 'ally' as const })) };
-    expect(() => seedBible({ premise: headless, startLocationId: 'cho_cu', startLocationNote: 'Chợ Cũ.' }))
+    expect(() => seedBible({ premise: headless }))
       .toThrow(/no character with role/);
   });
 });
@@ -279,9 +301,9 @@ describe('craft playbook', () => {
   test('the corrections from this session are recorded as rules with evidence', () => {
     const ids = activeRules('premise').map(rule => rule.id);
     expect(ids).toEqual(expect.arrayContaining([
-      'no_self_punishing_power',   // advantages must not bill their owner
-      'business_jumps',            // commerce jumps a tier per cycle
-      'asymmetry_is_the_engine',   // no gimmick conditions bolted onto the premise
+      'reader_promise',           // one editorial direction shared across roles
+      'business_jumps',           // commerce reinvests gains into larger opportunities
+      'asymmetry_is_the_engine',  // value flows both ways
       'economy_must_close',        // name a real buyer on each side
       'modern_side_is_parallel',   // invented city, no real places to nitpick
       'protagonist_needs_contrast',// a tag and a contrast, visible in chapter one
@@ -292,8 +314,8 @@ describe('craft playbook', () => {
     expect(WRITER_SYSTEM_PROMPT).toMatch(/NGÔN NGỮ KHÔNG BAO GIỜ LÀ MỘT CHỦ ĐỀ/);
     expect(PREMISE_SYSTEM_PROMPT).toMatch(/không phiên dịch/);
     // The shipped seed premise has to obey the rule it ships with.
-    expect(premise.arena).toMatch(/thế giới song song/);
-    expect(PREMISE_SYSTEM_PROMPT).toMatch(/KHÔNG gắn thêm điều kiện vặt/);
+    expect(premise.worldKernel.worlds).toHaveLength(2);
+    expect(PREMISE_SYSTEM_PROMPT).toMatch(/Cửa xuyên là phương tiện đi lại tự do/);
   });
 });
 

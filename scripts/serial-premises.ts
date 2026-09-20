@@ -1,8 +1,8 @@
 /**
- * Read-only catalog check for the ten Song Xuyên premises.
+ * Read-only catalog check for the two approved Song Xuyên pilot packages.
  *
  *   npm run serial:premises
- *   npm run serial:premises -- --id=phe-dan-thuc-tinh
+ *   npm run serial:premises -- --id=cua-hang-cong-phap-tu-tien
  *   npm run serial:premises -- --json
  *
  * This script validates imports through PremiseSchema. It never loads credentials,
@@ -33,6 +33,9 @@ if (process.argv.includes('--json')) {
       payoffStance: item.premise.payoffStance,
       cast: item.premise.castSeed.length,
       evolutionRungs: item.premise.goldenFinger.evolution.length,
+      worlds: item.premise.worldKernel.worlds.map(world => world.name),
+      progressionSystems: item.premise.worldKernel.progressionSystems.length,
+      openingChapters: item.premise.worldKernel.openingContract.map(contract => contract.chapterNumber),
       source: item.sourcePath,
       dryRun: `npm run serial:operator -- seed --premise=${item.sourcePath}`,
     }, null, 2));

@@ -4,6 +4,10 @@ const migration = readFileSync(
   'supabase/migrations/20260919093526_serial_opening_review_gate.sql',
   'utf8',
 );
+const auditMigration = readFileSync(
+  'supabase/migrations/20260919205759_serial_opening_audit.sql',
+  'utf8',
+);
 const runtime = readFileSync('src/services/serial/runtime.ts', 'utf8');
 const adminRoute = readFileSync('src/app/api/admin/serial/route.ts', 'utf8');
 const operator = readFileSync('scripts/serial-operator.ts', 'utf8');
@@ -13,6 +17,16 @@ describe('chapter-four human review gate', () => {
     expect(migration).toMatch(/opening_reviewed_at timestamptz/);
     expect(migration).toMatch(/opening_reviewed_by text/);
     expect(migration).toMatch(/'opening_review'/);
+  });
+
+  test('chapter four is audited across the full opening before it can enter review', () => {
+    expect(auditMigration).toMatch(/ADD COLUMN IF NOT EXISTS opening_audit jsonb/);
+    const auditAt = runtime.indexOf('auditFourChapterOpening');
+    const commitAt = runtime.indexOf("db.rpc('commit_serial_chapter'");
+    expect(auditAt).toBeGreaterThan(0);
+    expect(commitAt).toBeGreaterThan(auditAt);
+    expect(runtime).toMatch(/Opening audit failed/);
+    expect(runtime).toMatch(/rpc\('replan_serial_cycle'/);
   });
 
   test('chapter four enters opening review in the same transaction that commits it', () => {
