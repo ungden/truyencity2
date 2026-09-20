@@ -3,7 +3,8 @@ import {
   PremiseSchema, CyclePlanSchema, scorecardAverage, type ChapterDigest,
 } from '@/services/serial/contracts';
 import {
-  applyDigest, assertPayoffRotation, assertStanceHeld, overdueHooks, progressionRankIndex, recentPayoffKinds, seedBible, SerialStateError,
+  applyDigest, assertBibleCoherence, assertPayoffRotation, assertStanceHeld, overdueHooks, progressionRankIndex,
+  rebuildBibleFromDigests, recentPayoffKinds, seedBible, SerialStateError,
 } from '@/services/serial/state';
 import { WRITER_SYSTEM_PROMPT, CYCLE_PLANNER_SYSTEM_PROMPT, JUDGE_SYSTEM_PROMPT, PREMISE_SYSTEM_PROMPT } from '@/services/serial/prompts';
 import { payoffKindIds, activeRules, staleRules } from '@/services/serial/playbook';
@@ -174,6 +175,21 @@ describe('serial state merge', () => {
     expect(bible.recentSummary[0].chapterNumber).toBe(11);
     expect(bible.symbolicCore.chapterNumber).toBe(20);
   });
+
+  test('a stale store checkpoint is rejected before planning or writing', () => {
+    const stale = baseBible();
+    stale.symbolicCore.mc.goldenFingerRungId = 'kho_thu_mua';
+    expect(() => assertBibleCoherence(premise, stale)).toThrow(/golden finger is kho_thu_mua/);
+  });
+
+  test('replaying chapter digests rebuilds deterministic state', () => {
+    const first = digest({ chapterNumber: 1, title: 'Một', summary: 'Mở cửa hàng.', coreChanges: { storyDayDelta: 1 } });
+    const second = digest({ chapterNumber: 2, title: 'Hai', summary: 'Bán lô tiếp.', coreChanges: { storyDayDelta: 2 } });
+    const rebuilt = rebuildBibleFromDigests({ premise, digests: [first, second], throughChapter: 2 });
+    expect(rebuilt.symbolicCore.chapterNumber).toBe(2);
+    expect(rebuilt.symbolicCore.storyDay).toBe(3);
+    expect(rebuilt.recentSummary.map(item => item.title)).toEqual(['Một', 'Hai']);
+  });
 });
 
 describe('serial pacing rules', () => {
@@ -219,7 +235,9 @@ describe('writer prompt encodes the measured Faloo rules', () => {
   });
 
   test('the judge blocks only on quotable contradiction and never on the reading score', () => {
-    expect(JUDGE_SYSTEM_PROMPT).toMatch(/chỉ khi bạn trích được nguyên văn/);
+    expect(JUDGE_SYSTEM_PROMPT).toMatch(/chỉ báo lỗi có bằng chứng nguyên văn/);
+    expect(JUDGE_SYSTEM_PROMPT).toMatch(/golden_finger_scope/);
+    expect(JUDGE_SYSTEM_PROMPT).toMatch(/transaction_contradiction/);
     expect(JUDGE_SYSTEM_PROMPT).toMatch(/không bao giờ chặn chương/);
   });
 

@@ -9,7 +9,7 @@ import {
   buildCyclePlannerBrief, buildExtractorBrief, buildJudgeBrief, buildWriterBrief,
   buildOpeningAuditBrief, collectSteering, refreshStyleMemory,
 } from './context';
-import { applyDigest, assertPayoffRotation, overdueHooks, SerialStateError } from './state';
+import { applyDigest, assertBibleCoherence, assertPayoffRotation, overdueHooks, SerialStateError } from './state';
 
 /**
  * The chapter loop and the cycle lifecycle.
@@ -93,6 +93,7 @@ export async function writeOneChapter(input: {
   previousChapter: string | null;
 }): Promise<ChapterOutcome> {
   const { provider, routes, premise, bible, cycle, chapterNumber } = input;
+  assertBibleCoherence(premise, bible);
   const usages: ProviderUsage[] = [];
   const writerBrief = buildWriterBrief({ premise, bible, cycle, chapterNumber, previousChapter: input.previousChapter });
 
@@ -187,6 +188,7 @@ export async function planNextCycle(input: {
   premise: Premise;
   bible: Bible;
   previousCycle: CyclePlan | null;
+  activeCycle?: CyclePlan | null;
   cycleNumber: number;
   volumeNumber: number;
   startChapter: number;
@@ -194,11 +196,13 @@ export async function planNextCycle(input: {
   recentVerdicts: JudgeVerdict[];
   editorialNotes?: string[];
 }): Promise<{ cycle: CyclePlan; usages: ProviderUsage[]; costUsd: number }> {
+  assertBibleCoherence(input.premise, input.bible);
   const usages: ProviderUsage[] = [];
   const plannerBrief = buildCyclePlannerBrief({
     premise: input.premise,
     bible: input.bible,
     previousCycle: input.previousCycle,
+    activeCycle: input.activeCycle ?? null,
     cycleNumber: input.cycleNumber,
     volumeNumber: input.volumeNumber,
     startChapter: input.startChapter,

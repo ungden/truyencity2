@@ -31,6 +31,44 @@ export function goldenFingerRungIndex(premise: Premise, rungId: string): number 
   return premise.goldenFinger.evolution.findIndex(rung => rung.id === rungId);
 }
 
+/** Catch stale editorial checkpoints before a planner or writer can spend on them. */
+export function assertBibleCoherence(premise: Premise, bible: Bible): void {
+  const rungIds = premise.goldenFinger.evolution.map(rung => rung.id);
+  if (!rungIds.includes(bible.symbolicCore.mc.goldenFingerRungId)) {
+    fail('unknown_golden_finger_rung', `Bible has unknown golden finger rung ${bible.symbolicCore.mc.goldenFingerRungId}.`);
+  }
+  for (const subject of premise.worldKernel.progressionSubjects.filter(item => item.kind === 'asset')) {
+    for (const initial of subject.startingProgressions) {
+      const system = premise.worldKernel.progressionSystems.find(item => item.id === initial.systemId);
+      if (!system || system.ranks.map(rank => rank.id).join('|') !== rungIds.join('|')) continue;
+      const state = bible.symbolicCore.progressions.find(item => item.subjectId === subject.id
+        && item.systemId === initial.systemId && item.trackId === initial.trackId)
+        ?? fail('missing_asset_progression', `${subject.id} has no ${initial.systemId} progression state.`);
+      if (state.rankId !== bible.symbolicCore.mc.goldenFingerRungId) {
+        fail('golden_finger_asset_mismatch',
+          `${subject.id} is ${state.rankId}, but golden finger is ${bible.symbolicCore.mc.goldenFingerRungId}.`);
+      }
+    }
+  }
+}
+
+export function rebuildBibleFromDigests(input: {
+  premise: Premise;
+  digests: ChapterDigest[];
+  throughChapter?: number;
+}): Bible {
+  const through = input.throughChapter ?? Math.max(0, ...input.digests.map(item => item.chapterNumber));
+  const byChapter = new Map(input.digests.map(digest => [digest.chapterNumber, digest]));
+  let bible = seedBible({ premise: input.premise });
+  for (let chapterNumber = 1; chapterNumber <= through; chapterNumber++) {
+    const digest = byChapter.get(chapterNumber)
+      ?? fail('missing_digest', `Cannot rebuild Bible: chapter ${chapterNumber} has no digest.`);
+    bible = applyDigest({ premise: input.premise, bible, digest });
+  }
+  assertBibleCoherence(input.premise, bible);
+  return bible;
+}
+
 /**
  * Deterministic merge of a chapter digest into the Bible. No model runs here: given the
  * same Bible and digest this returns the same Bible, which is what makes a rerun safe.
@@ -41,6 +79,7 @@ export function applyDigest(input: {
   digest: ChapterDigest;
 }): Bible {
   const { premise, bible, digest } = input;
+  assertBibleCoherence(premise, bible);
   const core = bible.symbolicCore;
 
   // 1. Chapters land in order. A gap means a lost commit, not a story event.
@@ -189,7 +228,7 @@ export function applyDigest(input: {
     openHooks: hooks,
   };
 
-  return BibleSchema.parse({
+  const next = BibleSchema.parse({
     ...bible,
     symbolicCore,
     castSheet: [...sheets.values()],
@@ -203,6 +242,8 @@ export function applyDigest(input: {
       endedOn: digest.endedOn,
     }].slice(-10),
   });
+  assertBibleCoherence(premise, next);
+  return next;
 }
 
 /**
@@ -270,7 +311,7 @@ export function seedBible(input: { premise: Premise }): Bible {
   const { premise } = input;
   const protagonist = premise.castSeed.find(member => member.role === 'protagonist')
     ?? fail('no_protagonist', 'Premise has no character with role "protagonist".');
-  return BibleSchema.parse({
+  const bible = BibleSchema.parse({
     schemaVersion: 2,
     symbolicCore: {
       storyDay: 0,
@@ -306,4 +347,6 @@ export function seedBible(input: { premise: Premise }): Bible {
     volumeSummaries: [],
     styleMemory: [],
   });
+  assertBibleCoherence(premise, bible);
+  return bible;
 }

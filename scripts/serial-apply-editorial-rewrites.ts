@@ -10,6 +10,7 @@ import { createClient } from '@supabase/supabase-js';
 import { z } from 'zod';
 import { BibleSchema, ChapterDigestSchema, PremiseSchema } from '@/services/serial/contracts';
 import { SERIAL_PROMPT_VERSION } from '@/services/serial/prompts';
+import { rebuildBibleFromDigests, seedBible } from '@/services/serial/state';
 
 dotenv.config({ path: '.env.runtime', quiet: true });
 dotenv.config({ path: '.env.local', quiet: true });
@@ -135,6 +136,21 @@ function patchDigest(book: 'mat-the' | 'rau-tuoi', chapterNumber: number, raw: u
     if (chapterNumber === 8 && !changes.hooksPaid.includes('tieng_dap_tram_trong_bai_bun')) {
       changes.hooksPaid.push('tieng_dap_tram_trong_bai_bun');
     }
+    if (chapterNumber === 5) {
+      changes.goldenFingerRungChange = {
+        toRungId: 'kho_thu_mua',
+        why: 'Lâm Việt công khai danh mục thu mua, đổi phiếu thủ công của Tro Tàn thành điểm và mở Kho thu mua.',
+      };
+      changes.progressionChanges = [
+        ...changes.progressionChanges.filter((p: JsonRecord) =>
+          !(p.subjectId === 'song_gioi_thuong_diem' && p.systemId === 'cap_thuong_diem')),
+        {
+          subjectId: 'song_gioi_thuong_diem', systemId: 'cap_thuong_diem', trackId: null,
+          toRankId: 'kho_thu_mua', toMinorStageId: null,
+          why: 'Cửa hàng chuyển từ Kệ bán lẻ sang Kho thu mua sau khi nhận và định giá lô hàng có nguồn.',
+        },
+      ];
+    }
     if (chapterNumber === 9) {
       changes.progressionChanges = [
         ...changes.progressionChanges.filter((p: JsonRecord) => !(p.subjectId === 'lam_viet' && p.systemId === 'nghe_tu_tien')),
@@ -199,9 +215,11 @@ async function main(): Promise<void> {
   const config = books[bundle.book];
   const premise = PremiseSchema.parse(JSON.parse(readFileSync(config.premisePath, 'utf8')));
 
-  const [jobResult, serialResult, chaptersBefore, runsBefore] = await Promise.all([
-    db.from('serial_jobs').select('id,status,lease_owner,lease_token,lease_until')
-      .eq('serial_novel_id', bundle.serialNovelId).single(),
+  const jobResult = await db.from('serial_jobs')
+    .select('id,status,current_chapter,lease_owner,lease_token,lease_until')
+    .eq('serial_novel_id', bundle.serialNovelId).single();
+  if (jobResult.error) throw jobResult.error;
+  const [serialResult, chaptersBefore, runsBefore] = await Promise.all([
     db.from('serial_novels').select('id,novel_id,premise,bible')
       .eq('id', bundle.serialNovelId).single(),
     db.from('chapters').select('id,chapter_number,title,content')
@@ -211,9 +229,9 @@ async function main(): Promise<void> {
     db.from('serial_runs').select('id,chapter_number,digest,finished_at')
       .eq('serial_novel_id', bundle.serialNovelId).eq('kind', 'chapter')
       .in('status', ['committed', 'published']).not('digest', 'is', null)
-      .gte('chapter_number', 2).lte('chapter_number', 10).order('finished_at', { ascending: false }),
+      .gte('chapter_number', 1).lte('chapter_number', jobResult.data?.current_chapter ?? 10)
+      .order('finished_at', { ascending: false }),
   ]);
-  if (jobResult.error) throw jobResult.error;
   if (serialResult.error) throw serialResult.error;
   if (chaptersBefore.error) throw chaptersBefore.error;
   if (runsBefore.error) throw runsBefore.error;
@@ -229,14 +247,19 @@ async function main(): Promise<void> {
     }
   }
 
-  const patchedBible = patchBible(bundle.book, serialResult.data.bible);
   const latestRunByChapter = new Map<number, { id: string; digest: unknown }>();
   for (const run of runsBefore.data ?? []) {
     if (run.chapter_number && !latestRunByChapter.has(run.chapter_number)) {
       latestRunByChapter.set(run.chapter_number, { id: run.id, digest: run.digest });
     }
   }
-  for (const [chapterNumber, run] of latestRunByChapter) patchDigest(bundle.book, chapterNumber, run.digest);
+  const patchedDigests = [...latestRunByChapter.entries()].map(([chapterNumber, run]) =>
+    patchDigest(bundle.book, chapterNumber, run.digest));
+  const patchedBible = rebuildBibleFromDigests({
+    premise,
+    digests: patchedDigests.map(digest => ChapterDigestSchema.parse(digest)),
+    throughChapter: jobResult.data.current_chapter,
+  });
   if (dryRun) {
     console.log(JSON.stringify({
       dryRun: true,
@@ -270,7 +293,7 @@ async function main(): Promise<void> {
   });
   if (applyError) throw applyError;
 
-  const cycleRows = await db.from('serial_cycles').select('id,plan')
+  const cycleRows = await db.from('serial_cycles').select('id,plan,start_chapter')
     .eq('serial_novel_id', bundle.serialNovelId);
   if (cycleRows.error) throw cycleRows.error;
   for (const row of cycleRows.data ?? []) {
@@ -281,6 +304,13 @@ async function main(): Promise<void> {
       : [];
     const updated = await db.from('serial_cycles').update({
       plan: { ...plan, beatSheets, customerLoop: config.customerLoop },
+      checkpoint_bible: Number(row.start_chapter) === 1
+        ? seedBible({ premise })
+        : rebuildBibleFromDigests({
+          premise,
+          digests: patchedDigests.map(digest => ChapterDigestSchema.parse(digest)),
+          throughChapter: Number(row.start_chapter) - 1,
+        }),
       updated_at: new Date().toISOString(),
     }).eq('id', row.id);
     if (updated.error) throw updated.error;

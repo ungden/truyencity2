@@ -11,7 +11,7 @@ import playbookData from './playbook.json';
  * composed in at the marked point. Changing craft is a data edit; changing the
  * contract is a code change. They rot at different speeds.
  */
-export const SERIAL_PROMPT_VERSION = `serial-prompts-24 + playbook-${playbookData.version}`;
+export const SERIAL_PROMPT_VERSION = `serial-prompts-25 + playbook-${playbookData.version}`;
 
 export const WRITER_SYSTEM_PROMPT = `Bạn là tác giả truyện mạng tiếng Việt, viết truyện dài nhiều chương ra hằng ngày.
 
@@ -32,7 +32,8 @@ Truyện này có hệ thống hiện ra cho độc giả đọc. Thông báo c�
 
 export const JUDGE_SYSTEM_PROMPT = `Bạn đọc và soát chương truyện mạng tiếng Việt.
 
-LỖI CHẶN: chỉ báo mâu thuẫn canon được cấp và chỉ khi bạn trích được nguyên văn làm bằng chứng. Sáu loại: người chết trở lại, tụt cấp vô cớ, vị trí bất khả, sai thời gian, biết bí mật chưa được biết, mâu thuẫn Bible. Suy đoán "có vẻ không hợp lý" không phải bằng chứng.
+LỖI CHẶN: chỉ báo lỗi có bằng chứng nguyên văn và làm hỏng canon hoặc giao dịch về sau. Các loại gồm: người chết trở lại; tụt/nhảy cấp trái hệ; vị trí bất khả; sai thời gian; biết bí mật chưa được biết; mâu thuẫn Bible; kim thủ chỉ tự có thêm tác dụng ngoài rule, scope và nấc hiện tại; cùng một món bị bán/đổi chủ hai lần; tài nguyên quan trọng không có nguồn; cấp nghề hoặc cấp cửa hàng tự đổi trái trạng thái. Một khả năng chỉ “có vẻ không hợp lý” không phải bằng chứng.
+Kim thủ chỉ là lợi thế đã duyệt, không phải cái cớ để phát sinh bất kỳ vật phẩm hay quyền lực nào có chữ “hệ thống”. Nếu prose tạo lực đẩy, cưỡng chế, liên lạc xuyên giới, sản xuất hoặc quyền quản lý chưa có trong nấc hiện tại, dùng golden_finger_scope. Nếu người viết gọi tên đúng phẩm nhưng quyền sở hữu, số lượng hay người mua tự mâu thuẫn ngay trên trang, dùng transaction_contradiction.
 Phần khongDuocTrai là trạng thái ở đầu chương, không phải trần của chương. Nhân vật, cửa hàng hoặc công ty được phép đạt cấp kế tiếp trên trang; nếu hopDongMoDau yêu cầu một cấp hay kết quả mới thì đó là tiến triển bắt buộc, tuyệt đối không báo mâu thuẫn chỉ vì Bible đầu chương vẫn ở cấp cũ. Chỉ chặn khi chương tụt cấp, nhảy trái hệ hoặc kết thúc trái cấp đích.
 
 ĐIỂM ĐỌC 0–5, không bao giờ chặn chương; dùng lái chu kỳ sau:
@@ -90,7 +91,9 @@ ${craftBlock('planner')}
 
 customerLoop chọn một khách có tên và khóa đủ vòng: nỗi khổ → mua món → dùng món đi săn/làm ăn/hoàn thành nhiệm vụ để kiếm tài nguyên mới → thể hiện công khai → quay lại mua cấp hàng cao hơn. Các bước được phân bố tự nhiên trong escalation và beatSheets, không gom thành lời kể tóm tắt.
 
-beatSheets lập cho tối đa ba chương kế tiếp, bắt đầu đúng chuongBatDau, liên tiếp và không vượt qua chuongKetThucCoDinh nếu trường này có giá trị. Mỗi chương ghi hai đến bốn nhịp bằng lời kể, một mục tiêu cảm xúc, một thứ mới sẽ được đặt tên, và kiểu hook kết chương. Chương cuối của chu kỳ phải trả climax bằng kết quả nhìn thấy trước khi mở nextHook. Tuyệt đối không ghi con số trạng thái, không ghi delta tài nguyên, không ghi lịch trình phút.`;
+beatSheets lập cho tối đa ba chương kế tiếp, bắt đầu đúng chuongBatDau, liên tiếp và không vượt qua chuongKetThucCoDinh nếu trường này có giá trị. Mỗi chương ghi hai đến bốn nhịp bằng lời kể, một mục tiêu cảm xúc, một thứ mới sẽ được đặt tên, và kiểu hook kết chương. Chương cuối của chu kỳ phải trả climax bằng kết quả nhìn thấy trước khi mở nextHook. Tuyệt đối không ghi con số trạng thái, không ghi delta tài nguyên, không ghi lịch trình phút.
+Nếu chuKyDangViet có giá trị, đây là lời hứa đã duyệt của chu kỳ hiện tại. Lập các beat tiếp theo để thực hiện đúng pressure, escalation, climax và vongKhachHang ấy; không tự thay bằng một chu kỳ mini khác. Nếu một sự kiện được hẹn sau nhiều ngày, beat đến hạn phải đặt mốc thời gian và phần chuẩn bị nhìn thấy trên trang.
+Thứ mới của chương phải có nguồn trong canon: hàng main đang có, sản phẩm do nghề hiện tại chế được, chứng từ do phe có thẩm quyền cấp, hoặc chức năng ghi nguyên văn trong nấc kim thủ chỉ hiện tại. Một tên có vẻ hợp hệ thống không tự biến thành quyền cưỡng chế, liên lạc hay sản xuất.`;
 
 export const PREMISE_SYSTEM_PROMPT = `Bạn nghĩ ra một bộ truyện mạng tiếng Việt mới để chạy dài 800 đến 1.200 chương.
 

@@ -308,6 +308,7 @@ export function buildCyclePlannerBrief(input: {
   premise: Premise;
   bible: Bible;
   previousCycle: CyclePlan | null;
+  activeCycle?: CyclePlan | null;
   cycleNumber: number;
   volumeNumber: number;
   startChapter: number;
@@ -343,6 +344,17 @@ export function buildCyclePlannerBrief(input: {
         ketQua: input.previousCycle.climax.result,
         hookDeLai: input.previousCycle.nextHook,
         vongKhachHang: input.previousCycle.customerLoop,
+      }
+      : null,
+    chuKyDangViet: input.activeCycle
+      ? {
+        dongLuc: input.activeCycle.pressure,
+        escalation: input.activeCycle.escalation,
+        climax: input.activeCycle.climax,
+        vongKhachHang: input.activeCycle.customerLoop,
+        aftermath: input.activeCycle.aftermath,
+        nextHook: input.activeCycle.nextHook,
+        chuongKetThuc: input.activeCycle.plannedEndChapter,
       }
       : null,
     // Two code-owned constraints the planner cannot argue with.

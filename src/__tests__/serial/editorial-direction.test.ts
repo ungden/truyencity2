@@ -71,4 +71,18 @@ describe('reader-led editorial direction', () => {
     expect(planner.nguonDoiKhang).toBe(premise.oppositionEngine);
     expect(writer.dongLucChuKy).toBe(plan.pressure);
   });
+
+  test('a rolling planner receives the active cycle promise it must finish', () => {
+    const active = cycle();
+    const planner = buildCyclePlannerBrief({
+      premise, bible: baseBible(), previousCycle: null, activeCycle: active,
+      cycleNumber: active.cycleNumber, volumeNumber: active.volumeNumber,
+      startChapter: active.startChapter + 2, steering: [],
+    });
+    expect(planner.chuKyDangViet).toEqual(expect.objectContaining({
+      dongLuc: active.pressure,
+      vongKhachHang: active.customerLoop,
+      chuongKetThuc: active.plannedEndChapter,
+    }));
+  });
 });

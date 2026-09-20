@@ -459,7 +459,11 @@ const score = z.number().int().min(0).max(5);
  */
 export const JudgeVerdictSchema = z.object({
   continuity: z.array(z.object({
-    kind: z.enum(['dead_returns', 'progression_regressed', 'location_impossible', 'timeline', 'knows_too_much', 'contradicts_bible']),
+    kind: z.enum([
+      'dead_returns', 'progression_regressed', 'location_impossible', 'timeline',
+      'knows_too_much', 'contradicts_bible', 'golden_finger_scope',
+      'transaction_contradiction', 'resource_provenance', 'progression_contradiction',
+    ]),
     quote: z.string().trim().min(4).max(400),
     explain: line,
   }).strict()).max(10),

@@ -182,6 +182,7 @@ async function stagePlanCycle(
     planned = await planNextCycle({
       provider, routes, premise, bible,
       previousCycle: previous?.success ? previous.data : null,
+      activeCycle: active?.success ? active.data : null,
       cycleNumber: extending
         ? (lastCycle?.cycle_number as number)
         : ((lastCycle?.cycle_number as number | undefined) ?? 0) + 1,
