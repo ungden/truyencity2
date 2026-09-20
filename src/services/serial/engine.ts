@@ -239,7 +239,9 @@ export async function planNextCycle(input: {
       const recentModes = new Set(input.activeCycle.beatSheets
         .filter(sheet => sheet.chapterNumber < input.startChapter && sheet.chapterNumber >= input.startChapter - 3)
         .map(sheet => sheet.sceneMode));
-      const scheduledChapters = new Set(Object.values(candidate.customerLoop.schedule));
+      // The rolling merge keeps the approved loop, not the planner's temporary
+      // replacement fields. Validate exemptions against that same durable promise.
+      const scheduledChapters = new Set(Object.values(input.activeCycle.customerLoop.schedule));
       const repeated = candidate.beatSheets.find(sheet =>
         recentModes.has(sheet.sceneMode) && !scheduledChapters.has(sheet.chapterNumber));
       if (repeated) {

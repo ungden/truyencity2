@@ -299,11 +299,11 @@ describe('cycle lifecycle', () => {
     });
     const provider = stubProvider({ planner: [
       cycle({
-        startChapter: 11, plannedEndChapter: 18,
+        startChapter: 14, plannedEndChapter: 18,
         beatSheets: [makeBeat(14, 'transaction'), makeBeat(15, 'hunt'), makeBeat(16, 'investigation')],
       }),
       cycle({
-        startChapter: 11, plannedEndChapter: 18,
+        startChapter: 14, plannedEndChapter: 18,
         beatSheets: [makeBeat(14, 'transaction'), makeBeat(15, 'investigation'), makeBeat(16, 'crafting')],
       }),
     ] });
