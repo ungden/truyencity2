@@ -32,6 +32,31 @@ export const editorialNotesFromError = (value: string | null): string[] => value
 export const mergeEditorialNotes = (fresh: string[], inherited: string[]): string[] =>
   [...new Set([...fresh, ...inherited])].slice(0, 8);
 
+/**
+ * A rolling plan supplies only the next beat-sheet window. The cycle promise and
+ * its database bounds were fixed when the cycle opened; letting a later planner
+ * replace them makes the finish line recede forever and can orphan draft chapters
+ * outside serial_cycles.end_chapter.
+ */
+export function mergeRollingCyclePlan(input: {
+  active: CyclePlan;
+  rolling: CyclePlan;
+  cycleNumber: number;
+  volumeNumber: number;
+  startChapter: number;
+  endChapter: number;
+}): CyclePlan {
+  return CyclePlanSchema.parse({
+    ...input.active,
+    cycleNumber: input.cycleNumber,
+    volumeNumber: input.volumeNumber,
+    startChapter: input.startChapter,
+    plannedEndChapter: input.endChapter,
+    beatSheets: input.rolling.beatSheets,
+    editorialNotes: mergeEditorialNotes(input.rolling.editorialNotes, input.active.editorialNotes),
+  });
+}
+
 export type SerialStage = 'plan_cycle' | 'write' | 'publish_cycle' | 'fold_volume';
 
 interface SerialJobRow {
@@ -114,7 +139,7 @@ async function stagePlanCycle(
   const { premise, bible, routes } = await loadNovel(db, job.serial_novel_id);
 
   const { data: lastCycle, error: lastError } = await db.from('serial_cycles')
-    .select('id,cycle_number,volume_number,plan,status')
+    .select('id,cycle_number,volume_number,start_chapter,end_chapter,plan,status')
     .eq('serial_novel_id', job.serial_novel_id)
     .order('cycle_number', { ascending: false }).limit(1).maybeSingle();
   if (lastError) throw lastError;
@@ -155,6 +180,20 @@ async function stagePlanCycle(
       });
     }
     throw error;
+  }
+
+  if (extending && active?.success && lastCycle) {
+    planned = {
+      ...planned,
+      cycle: mergeRollingCyclePlan({
+        active: active.data,
+        rolling: planned.cycle,
+        cycleNumber: lastCycle.cycle_number as number,
+        volumeNumber: lastCycle.volume_number as number,
+        startChapter: lastCycle.start_chapter as number,
+        endChapter: lastCycle.end_chapter as number,
+      }),
+    };
   }
 
   const cycleId = extending && job.current_cycle_id

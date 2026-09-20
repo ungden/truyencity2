@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { StoryModelProvider } from '@/services/story-factory/provider';
-import { editorialNotesFromError, mergeEditorialNotes, runSerialTick, runSerialTicks, CYCLES_PER_VOLUME } from '@/services/serial/runtime';
+import { editorialNotesFromError, mergeEditorialNotes, mergeRollingCyclePlan, runSerialTick, runSerialTicks, CYCLES_PER_VOLUME } from '@/services/serial/runtime';
 import { premise, baseBible, cycle } from './fixtures';
 import { DEFAULT_SERIAL_ROUTES } from '@/services/serial/routes';
 
@@ -79,6 +79,37 @@ describe('serial runtime', () => {
   test('rolling plans inherit editorial notes after the job error is cleared', () => {
     expect(mergeEditorialNotes(['lỗi mới'], ['nguồn hàng phải có người giao', 'lỗi mới']))
       .toEqual(['lỗi mới', 'nguồn hàng phải có người giao']);
+  });
+
+  test('rolling plans replace only beats and cannot move a cycle boundary', () => {
+    const active = cycle({
+      cycleNumber: 1, volumeNumber: 1, startChapter: 1, plannedEndChapter: 10,
+      pressure: 'Lời hứa ban đầu của chu kỳ.',
+      editorialNotes: ['giữ nguồn hàng rõ'],
+    });
+    const rolling = cycle({
+      cycleNumber: 1, volumeNumber: 1, startChapter: 10, plannedEndChapter: 16,
+      pressure: 'Planner vô tình đổi lời hứa.',
+      editorialNotes: ['khóa sổ đúng giá'],
+      beatSheets: [{
+        chapterNumber: 10,
+        beats: ['Khép trận bãi săn', 'Chốt hợp đồng'],
+        emotionalTarget: 'Chu kỳ kết thúc bằng thành quả nhìn thấy.',
+        newNamedThing: 'Hợp đồng bãi săn',
+        endHookKind: 'reward',
+      }],
+    });
+
+    const merged = mergeRollingCyclePlan({
+      active, rolling, cycleNumber: 1, volumeNumber: 1, startChapter: 1, endChapter: 10,
+    });
+    expect(merged).toMatchObject({
+      startChapter: 1,
+      plannedEndChapter: 10,
+      pressure: 'Lời hứa ban đầu của chu kỳ.',
+      beatSheets: rolling.beatSheets,
+      editorialNotes: ['khóa sổ đúng giá', 'giữ nguồn hàng rõ'],
+    });
   });
 
   test('an empty queue is idle and costs nothing', async () => {
