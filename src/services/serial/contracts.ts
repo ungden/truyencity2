@@ -61,6 +61,64 @@ const ProgressionRefSchema = z.object({
 export const ProgressionStateSchema = ProgressionRefSchema.extend({ subjectId: id }).strict();
 export type ProgressionState = z.infer<typeof ProgressionStateSchema>;
 
+/** A reader-visible lot that can be owned, transferred or consumed across chapters. */
+export const AssetLotSchema = z.object({
+  lotId: id,
+  assetId: id,
+  assetName: line,
+  ownerId: id,
+  ownerName: line,
+  quantity: z.number().positive().max(1_000_000_000_000),
+  unit: z.string().trim().min(1).max(60),
+  fungible: z.boolean(),
+  provenance: line,
+  acquiredChapter: z.number().int().nonnegative(),
+  updatedChapter: z.number().int().nonnegative(),
+}).strict();
+export type AssetLot = z.infer<typeof AssetLotSchema>;
+
+/**
+ * Extracted in prose order. For acquire, eventId becomes the new lot id. For
+ * transfer, sourceLotId is debited and eventId becomes the recipient lot id.
+ * Consume closes or reduces sourceLotId and creates no new lot.
+ */
+const AssetEventBaseSchema = z.object({
+  eventId: id,
+  kind: z.enum(['acquire', 'transfer', 'consume']),
+  assetId: id,
+  assetName: line,
+  quantity: z.number().positive().max(1_000_000_000_000),
+  unit: z.string().trim().min(1).max(60),
+  fungible: z.boolean(),
+  sourceLotId: id.nullable().default(null),
+  fromOwnerId: id.nullable().default(null),
+  fromOwnerName: line.nullable().default(null),
+  toOwnerId: id.nullable().default(null),
+  toOwnerName: line.nullable().default(null),
+  note: line,
+}).strict();
+
+const validateAssetEvent = (event: z.infer<typeof AssetEventBaseSchema>, ctx: z.RefinementCtx) => {
+  const issue = (message: string) => ctx.addIssue({ code: z.ZodIssueCode.custom, message });
+  if (event.kind === 'acquire' && (event.sourceLotId || !event.toOwnerId || !event.toOwnerName)) {
+    issue('Acquire creates a new lot for a named owner and has no sourceLotId.');
+  }
+  if (event.kind === 'transfer' && (!event.sourceLotId || !event.fromOwnerId || !event.toOwnerId || !event.toOwnerName)) {
+    issue('Transfer requires a source lot plus named source and destination owners.');
+  }
+  if (event.kind === 'consume' && (!event.sourceLotId || !event.fromOwnerId || event.toOwnerId || event.toOwnerName)) {
+    issue('Consume requires a source lot and its owner, and creates no destination owner.');
+  }
+};
+
+export const AssetEventSchema = AssetEventBaseSchema.superRefine(validateAssetEvent);
+export type AssetEvent = z.infer<typeof AssetEventSchema>;
+
+export const RecordedAssetEventSchema = AssetEventBaseSchema.extend({
+  chapterNumber: z.number().int().min(1),
+}).strict().superRefine(validateAssetEvent);
+export type RecordedAssetEvent = z.infer<typeof RecordedAssetEventSchema>;
+
 const MilestoneSchema = z.object({
   name: line,
   progressionTarget: ProgressionRefSchema.nullable().default(null),
@@ -308,6 +366,9 @@ export const SymbolicCoreSchema = z.object({
     knowsFinger: z.boolean().default(false),
   }).strict()).max(120),
   progressions: z.array(ProgressionStateSchema).max(480),
+  /** Current spendable/usable lots plus a bounded cross-chapter audit trail. */
+  activeAssetLots: z.array(AssetLotSchema).max(240).default([]),
+  recentAssetEvents: z.array(RecordedAssetEventSchema).max(120).default([]),
   openHooks: z.array(z.object({
     id,
     what: line,
@@ -375,9 +436,13 @@ export const CyclePlanSchema = z.object({
   customerLoop: z.object({
     customerId: id,
     entryNeed: line,
+    purchaseAssetId: id.describe('ID ổn định của món khách mua ở đầu vòng.'),
+    purchaseMode: z.enum(['first_acquisition', 'restock', 'replacement', 'organization_order']),
     purchase: line,
     useToEarn: line,
     publicProof: line,
+    returnUpgradeAssetId: id.describe('ID ổn định của món khách quay lại mua ở cuối vòng.'),
+    returnUpgradeMode: z.enum(['higher_grade', 'new_capability', 'organization_scale', 'restock']),
     returnUpgrade: line,
   }).strict(),
   /** Rolling: beats for the next 3 chapters only. */
@@ -434,6 +499,7 @@ export const ChapterDigestSchema = z.object({
       subjectId: id, systemId: id, trackId: id.nullable().default(null),
       toRankId: id, toMinorStageId: id.nullable().default(null), why: line,
     }).strict()).max(16),
+    assetEvents: z.array(AssetEventSchema).max(24).default([]),
     goldenFingerRungChange: z.object({ toRungId: id, why: line }).strict().nullable().default(null),
     moved: z.array(z.object({ characterId: id, toLocationId: id }).strict()).max(24),
     worldFactsRevealed: z.array(z.object({ id, note: para }).strict()).max(8),

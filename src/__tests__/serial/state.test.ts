@@ -3,7 +3,7 @@ import {
   PremiseSchema, CyclePlanSchema, scorecardAverage, type ChapterDigest,
 } from '@/services/serial/contracts';
 import {
-  applyDigest, assertBibleCoherence, assertPayoffRotation, assertStanceHeld, overdueHooks, progressionRankIndex,
+  applyDigest, assertBibleCoherence, assertCycleAssetCoherence, assertPayoffRotation, assertStanceHeld, overdueHooks, progressionRankIndex,
   rebuildBibleFromDigests, recentPayoffKinds, seedBible, SerialStateError,
 } from '@/services/serial/state';
 import { WRITER_SYSTEM_PROMPT, CYCLE_PLANNER_SYSTEM_PROMPT, JUDGE_SYSTEM_PROMPT, PREMISE_SYSTEM_PROMPT } from '@/services/serial/prompts';
@@ -190,6 +190,104 @@ describe('serial state merge', () => {
     expect(rebuilt.symbolicCore.storyDay).toBe(3);
     expect(rebuilt.recentSummary.map(item => item.title)).toEqual(['Một', 'Hai']);
   });
+
+  test('asset lots move and disappear deterministically across chapters', () => {
+    const acquired = applyDigest({
+      premise,
+      bible: baseBible(),
+      digest: digest({ coreChanges: { assetEvents: [{
+        eventId: 'c8_nhap_ho_than_01', kind: 'acquire', assetId: 'ho_than_phu',
+        assetName: 'Hộ Thân Phù số 01', quantity: 1, unit: 'lá', fungible: false,
+        sourceLotId: null, fromOwnerId: null, fromOwnerName: 'Quầy phù Thanh Lô',
+        toOwnerId: 'bach_tan', toOwnerName: 'Bạch Tẫn', note: 'Bạch Tẫn mua một lá có nguồn tại quầy.',
+      }] } }),
+    });
+    expect(acquired.symbolicCore.activeAssetLots).toEqual(expect.arrayContaining([
+      expect.objectContaining({ lotId: 'c8_nhap_ho_than_01', ownerId: 'bach_tan', quantity: 1 }),
+    ]));
+
+    const consumed = applyDigest({
+      premise,
+      bible: acquired,
+      digest: digest({ chapterNumber: 9, coreChanges: { assetEvents: [{
+        eventId: 'c9_dung_ho_than_01', kind: 'consume', assetId: 'ho_than_phu',
+        assetName: 'Hộ Thân Phù số 01', quantity: 1, unit: 'lá', fungible: false,
+        sourceLotId: 'c8_nhap_ho_than_01', fromOwnerId: 'bach_tan', fromOwnerName: 'Bạch Tẫn',
+        toOwnerId: null, toOwnerName: null, note: 'Lá phù kích phát rồi vỡ.',
+      }] } }),
+    });
+    expect(consumed.symbolicCore.activeAssetLots).toHaveLength(0);
+    expect(consumed.symbolicCore.recentAssetEvents.at(-1)).toEqual(expect.objectContaining({
+      eventId: 'c9_dung_ho_than_01', kind: 'consume', chapterNumber: 9,
+    }));
+    expect(() => applyDigest({
+      premise,
+      bible: consumed,
+      digest: digest({ chapterNumber: 10, coreChanges: { assetEvents: [{
+        eventId: 'c10_dung_lai_ho_than_01', kind: 'consume', assetId: 'ho_than_phu',
+        assetName: 'Hộ Thân Phù số 01', quantity: 1, unit: 'lá', fungible: false,
+        sourceLotId: 'c8_nhap_ho_than_01', fromOwnerId: 'bach_tan', fromOwnerName: 'Bạch Tẫn',
+        toOwnerId: null, toOwnerName: null, note: 'Dùng lại lá đã vỡ.',
+      }] } }),
+    })).toThrow(/unavailable lot/);
+  });
+
+  test('a customer loop cannot sell an owned asset as a first purchase or fake the same item as an upgrade', () => {
+    const bible = baseBible();
+    bible.symbolicCore.activeAssetLots = [{
+      lotId: 'c4_bach_nhan_man_nguu',
+      assetId: 'man_nguu_luyen_the_quyet_nhat_giai_trung_pham',
+      assetName: 'Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm',
+      ownerId: 'bay_thach', ownerName: 'Bảy Thạch', quantity: 1, unit: 'bản', fungible: false,
+      provenance: 'Đã mua và nhận ở chương 4.', acquiredChapter: 4, updatedChapter: 4,
+    }];
+    const baseline = cycle().customerLoop;
+
+    expect(() => assertCycleAssetCoherence(bible, cycle({ customerLoop: {
+      ...baseline,
+      purchaseAssetId: 'man_nguu_luyen_the_quyet_nhat_giai_trung_pham',
+      purchaseMode: 'first_acquisition',
+    } }))).toThrow(/already owns/);
+
+    expect(() => assertCycleAssetCoherence(bible, cycle({ customerLoop: {
+      ...baseline,
+      purchaseAssetId: 'ho_than_phu_nhat_giai_ha_pham',
+      purchaseMode: 'first_acquisition',
+      returnUpgradeAssetId: 'ho_than_phu_nhat_giai_ha_pham',
+      returnUpgradeMode: 'higher_grade',
+    } }))).toThrow(/repeats/);
+
+    expect(() => assertCycleAssetCoherence(bible, cycle({ customerLoop: {
+      ...baseline,
+      purchaseAssetId: 'ho_than_phu_nhat_giai_ha_pham',
+      purchaseMode: 'first_acquisition',
+      returnUpgradeAssetId: 'ho_than_phu_nhat_giai_trung_pham',
+      returnUpgradeMode: 'higher_grade',
+    } }))).not.toThrow();
+  });
+
+  test('asset transfers cannot overspend a lot or debit the wrong owner', () => {
+    const acquired = applyDigest({
+      premise, bible: baseBible(),
+      digest: digest({ coreChanges: { assetEvents: [{
+        eventId: 'c8_nhap_hach_diem', kind: 'acquire', assetId: 'hach_diem_song_gioi',
+        assetName: 'Hạch điểm Song Giới', quantity: 4, unit: 'điểm', fungible: true,
+        sourceLotId: null, fromOwnerId: null, fromOwnerName: 'Song Giới Thương Điếm',
+        toOwnerId: 'bach_tan', toOwnerName: 'Bạch Tẫn', note: 'Điểm săn đã đối chiếu.',
+      }] } }),
+    });
+    const transfer = (quantity: number, fromOwnerId = 'bach_tan') => digest({
+      chapterNumber: 9,
+      coreChanges: { assetEvents: [{
+        eventId: 'c9_tra_hach_diem', kind: 'transfer' as const, assetId: 'hach_diem_song_gioi',
+        assetName: 'Hạch điểm Song Giới', quantity, unit: 'điểm', fungible: true,
+        sourceLotId: 'c8_nhap_hach_diem', fromOwnerId, fromOwnerName: 'Bạch Tẫn',
+        toOwnerId: 'lam_viet', toOwnerName: 'Lâm Việt', note: 'Thanh toán tại quầy.',
+      }] },
+    });
+    expect(() => applyDigest({ premise, bible: acquired, digest: transfer(5) })).toThrow(/needs 5 điểm/);
+    expect(() => applyDigest({ premise, bible: acquired, digest: transfer(4, 'phan_kha') })).toThrow(/belongs to bach_tan/);
+  });
 });
 
 describe('serial pacing rules', () => {
@@ -238,6 +336,7 @@ describe('writer prompt encodes the measured Faloo rules', () => {
     expect(JUDGE_SYSTEM_PROMPT).toMatch(/chỉ báo lỗi có bằng chứng nguyên văn/);
     expect(JUDGE_SYSTEM_PROMPT).toMatch(/golden_finger_scope/);
     expect(JUDGE_SYSTEM_PROMPT).toMatch(/transaction_contradiction/);
+    expect(JUDGE_SYSTEM_PROMPT).toMatch(/activeLots là hàng còn tồn/);
     expect(JUDGE_SYSTEM_PROMPT).toMatch(/không bao giờ chặn chương/);
   });
 

@@ -14,6 +14,8 @@ import { overdueHooks, recentPayoffKinds } from './state';
 
 const RELEVANT_CAST_LIMIT = 10;
 const PREVIOUS_TAIL_WORDS = 800;
+const ASSET_LOT_SLICE_LIMIT = 40;
+const ASSET_EVENT_SLICE_LIMIT = 50;
 
 export function previousTail(previousChapter: string | null, words = PREVIOUS_TAIL_WORDS): string {
   if (!previousChapter) return '';
@@ -23,6 +25,27 @@ export function previousTail(previousChapter: string | null, words = PREVIOUS_TA
 
 function nameOf(bible: Bible, id: string): string {
   return bible.castSheet.find(entry => entry.id === id)?.name ?? id;
+}
+
+/** Positive, bounded ownership state: what can still be used and what recently left the account. */
+export function assetLedgerSlice(bible: Bible, castIds: string[], semanticText = '', includeAll = false) {
+  const focusedOwners = new Set(castIds);
+  const haystack = semanticText.toLowerCase();
+  const relevantAssetIds = new Set(bible.symbolicCore.activeAssetLots
+    .filter(lot => focusedOwners.has(lot.ownerId)
+      || haystack.includes(lot.assetName.toLowerCase())
+      || haystack.includes(lot.ownerName.toLowerCase())
+      || includeAll)
+    .map(lot => lot.assetId));
+  const activeLots = bible.symbolicCore.activeAssetLots
+    .filter(lot => focusedOwners.has(lot.ownerId) || relevantAssetIds.has(lot.assetId))
+    .slice(-ASSET_LOT_SLICE_LIMIT);
+  const recentEvents = bible.symbolicCore.recentAssetEvents
+    .filter(event => includeAll || relevantAssetIds.has(event.assetId)
+      || (event.fromOwnerId ? focusedOwners.has(event.fromOwnerId) : false)
+      || (event.toOwnerId ? focusedOwners.has(event.toOwnerId) : false))
+    .slice(-ASSET_EVENT_SLICE_LIMIT);
+  return { activeLots, recentEvents };
 }
 
 /**
@@ -156,6 +179,7 @@ export function buildWriterBrief(input: {
   const castIds = relevantCast(bible, premise, beatText);
   const rung = premise.goldenFinger.evolution.find(item => item.id === bible.symbolicCore.mc.goldenFingerRungId);
   const worldSlice = relevantWorldSlice({ premise, bible, castIds, chapterNumber, beatText });
+  const assetLedger = assetLedgerSlice(bible, castIds, beatText);
   const openingContract = premise.worldKernel.openingContract.find(item => item.chapterNumber === chapterNumber) ?? null;
 
   return {
@@ -195,6 +219,7 @@ export function buildWriterBrief(input: {
       ghiChu: bible.world.find(entry => entry.id === location.id)?.note ?? location.note,
     }))),
     worldSlice,
+    soTaiSanDauChuong: assetLedger,
     hopDongMoDau: openingContract,
     khongDuocTrai: mustNotContradict(bible, premise, castIds),
     doanCuoiChuongTruoc: previousTail(input.previousChapter),
@@ -215,6 +240,7 @@ export function buildJudgeBrief(input: {
   const sheet = cycle.beatSheets.find(item => item.chapterNumber === chapterNumber);
   const beatText = sheet ? [sheet.newNamedThing, sheet.emotionalTarget, ...sheet.beats].join(' ') : '';
   const castIds = relevantCast(bible, premise, `${beatText} ${input.prose}`);
+  const assetLedger = assetLedgerSlice(bible, castIds, `${beatText} ${input.prose}`);
   return {
     readerFantasy: premise.readerFantasy,
     kimThuChi: { ten: premise.goldenFinger.name, luat: premise.goldenFinger.rule, phamVi: premise.goldenFinger.scope },
@@ -225,6 +251,7 @@ export function buildJudgeBrief(input: {
     vongKhachHangChuKy: cycle.customerLoop,
     luatPhanUng: premise.voiceSheet.reactionRule,
     worldSlice: relevantWorldSlice({ premise, bible, castIds, chapterNumber, beatText }),
+    soTaiSanDauChuong: assetLedger,
     hopDongMoDau: premise.worldKernel.openingContract.find(item => item.chapterNumber === chapterNumber) ?? null,
     khongDuocTrai: mustNotContradict(bible, premise, castIds),
     tomTatChuongTruoc: bible.recentSummary,
@@ -247,6 +274,7 @@ export function buildExtractorBrief(input: {
   const currentRungIndex = input.premise.goldenFinger.evolution.findIndex(
     rung => rung.id === input.bible.symbolicCore.mc.goldenFingerRungId,
   );
+  const assetLedger = assetLedgerSlice(input.bible, castIds, input.prose);
   return {
     chuongSo: input.chapterNumber,
     tieuDe: input.title,
@@ -282,6 +310,11 @@ export function buildExtractorBrief(input: {
     phucButDangMo: input.bible.symbolicCore.openHooks
       .filter(hook => hook.status !== 'paid' && hook.status !== 'dropped')
       .map(hook => ({ id: hook.id, noiDung: hook.what })),
+    soTaiSanDauChuong: assetLedger,
+    chuSoHuuTaiSanDaBiet: [
+      ...input.bible.castSheet.map(entry => ({ id: entry.id, ten: entry.name })),
+      ...input.premise.worldKernel.worlds.flatMap(world => world.factions.map(faction => ({ id: faction.id, ten: faction.name }))),
+    ],
   };
 }
 
@@ -333,6 +366,11 @@ export function buildCyclePlannerBrief(input: {
     chuongBatDau: input.startChapter,
     chuongKetThucCoDinh: input.fixedEndChapter ?? null,
     trangThaiHienTai: mustNotContradict(bible, premise, bible.symbolicCore.cast.map(member => member.id)),
+    soTaiSanHienTai: assetLedgerSlice(bible, bible.symbolicCore.cast.map(member => member.id), [
+      input.activeCycle?.customerLoop.purchase,
+      input.activeCycle?.customerLoop.useToEarn,
+      input.activeCycle?.customerLoop.returnUpgrade,
+    ].filter(Boolean).join(' '), true),
     nhanVat: bible.castSheet,
     boiCanh: bible.world,
     tomTatGanDay: bible.recentSummary,

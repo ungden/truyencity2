@@ -77,9 +77,13 @@ export const cycle = (
     customerLoop: {
       customerId: 'bay_thach',
       entryNeed: 'Bảy Thạch cần một món giúp đội sống qua cuộc săn.',
+      purchaseAssetId: 'ho_than_phu_nhat_giai_ha_pham',
+      purchaseMode: 'first_acquisition',
       purchase: 'Hắn mua phù hộ thân của Lâm Việt.',
       useToEarn: 'Đội dùng phù hạ hung thú và giữ trọn chiến lợi phẩm.',
       publicProof: 'Bảy Thạch mang xác thú qua chợ trước mặt đội từng cười mình.',
+      returnUpgradeAssetId: 'ho_than_phu_nhat_giai_trung_pham',
+      returnUpgradeMode: 'higher_grade',
       returnUpgrade: 'Hắn quay lại đặt pháp khí cho cả đội.',
     },
     beatSheets: beatSheets ?? [{

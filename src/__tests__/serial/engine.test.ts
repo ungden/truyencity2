@@ -5,7 +5,7 @@ import {
   auditFourChapterOpening, cycleReadyToClose, foldVolume, planNextCycle, readingHealth, writeOneChapter,
 } from '@/services/serial/engine';
 import { normalizeChapterDraft } from '@/services/serial/agents';
-import { buildCyclePlannerBrief, buildExtractorBrief, buildJudgeBrief, buildWriterBrief, collectSteering, refreshStyleMemory, relevantCast } from '@/services/serial/context';
+import { assetLedgerSlice, buildCyclePlannerBrief, buildExtractorBrief, buildJudgeBrief, buildWriterBrief, collectSteering, refreshStyleMemory, relevantCast } from '@/services/serial/context';
 import { seedBible } from '@/services/serial/state';
 import { premise, baseBible, cycle } from './fixtures';
 import {
@@ -45,7 +45,7 @@ const goodDigest: ChapterDigest = {
   endedOn: 'Bà Lâm cho người mời hắn lên hội quán.',
   newNamedThings: ['Hội quán Thẩm Định Đông Thành'],
   coreChanges: {
-    storyDayDelta: 1, died: [], progressionChanges: [], goldenFingerRungChange: null, moved: [], worldFactsRevealed: [], newCast: [],
+    storyDayDelta: 1, died: [], progressionChanges: [], assetEvents: [], goldenFingerRungChange: null, moved: [], worldFactsRevealed: [], newCast: [],
     hooksPlanted: [], hooksPaid: [], learnedFinger: [],
   },
 };
@@ -366,6 +366,28 @@ describe('context selection', () => {
     expect(brief.loaiSuongHopLe).toContain('tri_thang');
     expect(brief.loaiSuongHopLe).toContain('chan_dong');
     expect(brief.loaiSuongHopLe).not.toContain('deal');
+  });
+
+  test('chapter roles receive only the relevant active and recently consumed asset lots', () => {
+    const bible = baseBible();
+    bible.symbolicCore.activeAssetLots = [{
+      lotId: 'c7_ho_than_01', assetId: 'ho_than_phu', assetName: 'Hộ Thân Phù số 01',
+      ownerId: 'lam_viet', ownerName: 'Lâm Việt', quantity: 1, unit: 'lá', fungible: false,
+      provenance: 'Mua tại quầy phù.', acquiredChapter: 7, updatedChapter: 7,
+    }];
+    bible.symbolicCore.recentAssetEvents = [{
+      chapterNumber: 7, eventId: 'c7_dung_ho_than_00', kind: 'consume',
+      assetId: 'ho_than_phu', assetName: 'Hộ Thân Phù số 00', quantity: 1, unit: 'lá', fungible: false,
+      sourceLotId: 'c6_ho_than_00', fromOwnerId: 'lam_viet', fromOwnerName: 'Lâm Việt',
+      toOwnerId: null, toOwnerName: null, note: 'Lá phù đã kích phát rồi vỡ.',
+    }];
+    const slice = assetLedgerSlice(bible, ['lam_viet'], 'Hộ Thân Phù');
+    expect(slice.activeLots.map(lot => lot.lotId)).toEqual(['c7_ho_than_01']);
+    expect(slice.recentEvents.map(event => event.eventId)).toEqual(['c7_dung_ho_than_00']);
+    const extractor = buildExtractorBrief({
+      premise, bible, chapterNumber: 8, title: 'Dùng phù', prose: 'Lâm Việt giao Hộ Thân Phù số 01.',
+    });
+    expect(extractor.soTaiSanDauChuong.activeLots[0].lotId).toBe('c7_ho_than_01');
   });
 
   test('relevant cast prefers the protagonist, then whoever the beats name', () => {

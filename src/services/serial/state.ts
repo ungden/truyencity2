@@ -1,5 +1,5 @@
 import {
-  type Bible, type ChapterDigest, type CyclePlan, type Premise, type SymbolicCore,
+  type AssetEvent, type AssetLot, type Bible, type ChapterDigest, type CyclePlan, type Premise, type SymbolicCore,
   BibleSchema, type PayoffKind,
 } from './contracts';
 
@@ -50,6 +50,121 @@ export function assertBibleCoherence(premise: Premise, bible: Bible): void {
       }
     }
   }
+  const lotIds = new Set<string>();
+  for (const lot of bible.symbolicCore.activeAssetLots) {
+    if (lotIds.has(lot.lotId)) fail('duplicate_asset_lot', `Asset lot ${lot.lotId} appears more than once.`);
+    lotIds.add(lot.lotId);
+    if (lot.updatedChapter > bible.symbolicCore.chapterNumber || lot.acquiredChapter > lot.updatedChapter) {
+      fail('asset_lot_timeline', `Asset lot ${lot.lotId} has an impossible chapter timeline.`);
+    }
+  }
+}
+
+/**
+ * Reject a commercially impossible customer loop before any chapter call is made.
+ * The planner owns prose; this check only compares its declared transaction intent
+ * with the durable inventory that the named customer actually owns.
+ */
+export function assertCycleAssetCoherence(bible: Bible, cycle: CyclePlan): void {
+  const loop = cycle.customerLoop;
+  const ownedAssetIds = new Set(bible.symbolicCore.activeAssetLots
+    .filter(lot => lot.ownerId === loop.customerId)
+    .map(lot => lot.assetId));
+
+  if (loop.purchaseMode === 'first_acquisition' && ownedAssetIds.has(loop.purchaseAssetId)) {
+    fail(
+      'customer_already_owns_purchase',
+      `${loop.customerId} already owns ${loop.purchaseAssetId}; it cannot be sold again as a first acquisition.`,
+    );
+  }
+
+  if (['higher_grade', 'new_capability'].includes(loop.returnUpgradeMode)) {
+    if (loop.returnUpgradeAssetId === loop.purchaseAssetId) {
+      fail(
+        'customer_upgrade_repeats_purchase',
+        `${loop.customerId}'s promised upgrade repeats ${loop.purchaseAssetId} instead of naming a distinct asset.`,
+      );
+    }
+    if (ownedAssetIds.has(loop.returnUpgradeAssetId)) {
+      fail(
+        'customer_already_owns_upgrade',
+        `${loop.customerId} already owns the promised upgrade ${loop.returnUpgradeAssetId}.`,
+      );
+    }
+  }
+}
+
+const sameQuantity = (left: number, right: number): boolean => Math.abs(left - right) < 1e-9;
+
+function applyAssetEvents(input: {
+  chapterNumber: number;
+  lots: AssetLot[];
+  priorEvents: Bible['symbolicCore']['recentAssetEvents'];
+  events: AssetEvent[];
+}): { lots: AssetLot[]; recentEvents: Bible['symbolicCore']['recentAssetEvents'] } {
+  const lots = new Map(input.lots.map(lot => [lot.lotId, { ...lot }]));
+  const knownEventIds = new Set(input.priorEvents.map(event => event.eventId));
+  const recorded = [...input.priorEvents];
+
+  for (const event of input.events) {
+    if (!event.eventId.startsWith(`c${input.chapterNumber}_`)) {
+      fail('asset_event_id', `Asset event ${event.eventId} must start with c${input.chapterNumber}_.`);
+    }
+    if (knownEventIds.has(event.eventId) || lots.has(event.eventId)) {
+      fail('asset_event_collision', `Asset event/lot id ${event.eventId} already exists.`);
+    }
+    knownEventIds.add(event.eventId);
+
+    if (event.kind === 'acquire') {
+      lots.set(event.eventId, {
+        lotId: event.eventId,
+        assetId: event.assetId,
+        assetName: event.assetName,
+        ownerId: event.toOwnerId!,
+        ownerName: event.toOwnerName!,
+        quantity: event.quantity,
+        unit: event.unit,
+        fungible: event.fungible,
+        provenance: event.note,
+        acquiredChapter: input.chapterNumber,
+        updatedChapter: input.chapterNumber,
+      });
+    } else {
+      const source = lots.get(event.sourceLotId!)
+        ?? fail('asset_lot_unavailable', `Chapter ${input.chapterNumber} uses unavailable lot ${event.sourceLotId}.`);
+      if (source.ownerId !== event.fromOwnerId) {
+        fail('asset_owner_mismatch', `Lot ${source.lotId} belongs to ${source.ownerId}, not ${event.fromOwnerId}.`);
+      }
+      if (source.assetId !== event.assetId || source.unit !== event.unit || source.fungible !== event.fungible) {
+        fail('asset_identity_mismatch', `Event ${event.eventId} does not match source lot ${source.lotId}.`);
+      }
+      if (event.quantity > source.quantity && !sameQuantity(event.quantity, source.quantity)) {
+        fail('asset_overspend', `Event ${event.eventId} needs ${event.quantity} ${event.unit}; lot ${source.lotId} has ${source.quantity}.`);
+      }
+      const remaining = source.quantity - event.quantity;
+      if (remaining <= 1e-9) lots.delete(source.lotId);
+      else lots.set(source.lotId, { ...source, quantity: remaining, updatedChapter: input.chapterNumber });
+
+      if (event.kind === 'transfer') {
+        lots.set(event.eventId, {
+          lotId: event.eventId,
+          assetId: source.assetId,
+          assetName: source.assetName,
+          ownerId: event.toOwnerId!,
+          ownerName: event.toOwnerName!,
+          quantity: event.quantity,
+          unit: source.unit,
+          fungible: source.fungible,
+          provenance: event.note,
+          acquiredChapter: input.chapterNumber,
+          updatedChapter: input.chapterNumber,
+        });
+      }
+    }
+    recorded.push({ ...event, chapterNumber: input.chapterNumber });
+  }
+
+  return { lots: [...lots.values()], recentEvents: recorded.slice(-120) };
 }
 
 export function rebuildBibleFromDigests(input: {
@@ -100,6 +215,12 @@ export function applyDigest(input: {
     `${state.subjectId}:${state.systemId}:${state.trackId ?? ''}`,
     { ...state },
   ]));
+  const assetState = applyAssetEvents({
+    chapterNumber: digest.chapterNumber,
+    lots: core.activeAssetLots,
+    priorEvents: core.recentAssetEvents,
+    events: digest.coreChanges.assetEvents,
+  });
 
   // 2. New cast arrives with a sheet, and cannot collide with a known id.
   for (const arrival of digest.coreChanges.newCast) {
@@ -225,6 +346,8 @@ export function applyDigest(input: {
     },
     cast: [...cast.values()],
     progressions: [...progressions.values()],
+    activeAssetLots: assetState.lots,
+    recentAssetEvents: assetState.recentEvents,
     openHooks: hooks,
   };
 
@@ -333,6 +456,8 @@ export function seedBible(input: { premise: Premise }): Bible {
         ...premise.castSeed.flatMap(member => member.startingProgressions.map(state => ({ subjectId: member.id, ...state }))),
         ...premise.worldKernel.progressionSubjects.flatMap(subject => subject.startingProgressions.map(state => ({ subjectId: subject.id, ...state }))),
       ],
+      activeAssetLots: [],
+      recentAssetEvents: [],
       openHooks: [],
     },
     castSheet: premise.castSeed.map(member => ({

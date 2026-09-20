@@ -1,0 +1,57 @@
+{
+  "serialId": "67265a0f-9270-486b-b296-9d158f0821b3",
+  "throughChapter": 10,
+  "chapters": [
+    {
+      "chapterNumber": 2,
+      "assetEvents": [
+        { "eventId": "c2_nhap_man_nguu_01", "kind": "acquire", "assetId": "man_nguu_luyen_the_quyet_nhat_giai_trung_pham", "assetName": "Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm", "quantity": 1, "unit": "bản", "fungible": false, "sourceLotId": null, "fromOwnerId": null, "fromOwnerName": "Quầy bí tịch phổ thông Thanh Lô Phường", "toOwnerId": "lam_viet", "toOwnerName": "Lâm Việt", "note": "Lâm Việt mua một bản chép được phép bán bằng một linh thạch hạ phẩm." },
+        { "eventId": "c2_giao_man_nguu_chu_da", "kind": "transfer", "assetId": "man_nguu_luyen_the_quyet_nhat_giai_trung_pham", "assetName": "Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm", "quantity": 1, "unit": "bản", "fungible": false, "sourceLotId": "c2_nhap_man_nguu_01", "fromOwnerId": "lam_viet", "fromOwnerName": "Lâm Việt", "toOwnerId": "chu_da", "toOwnerName": "Chu Dã", "note": "Chu Dã trả bốn tinh hạch Nhất giai và nhận bản bí tịch." }
+      ]
+    },
+    {
+      "chapterNumber": 3,
+      "assetEvents": [
+        { "eventId": "c3_nhap_man_nguu_tro_tan", "kind": "acquire", "assetId": "man_nguu_luyen_the_quyet_nhat_giai_trung_pham", "assetName": "Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm", "quantity": 3, "unit": "bản", "fungible": true, "sourceLotId": null, "fromOwnerId": null, "fromOwnerName": "Quầy bí tịch phổ thông Thanh Lô Phường", "toOwnerId": "lam_viet", "toOwnerName": "Lâm Việt", "note": "Lâm Việt mua ba bản để hoàn tất đơn đã thanh toán của Đội Tro Tàn." }
+      ]
+    },
+    {
+      "chapterNumber": 4,
+      "assetEvents": [
+        { "eventId": "c4_giao_man_nguu_bach_tan", "kind": "transfer", "assetId": "man_nguu_luyen_the_quyet_nhat_giai_trung_pham", "assetName": "Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm", "quantity": 1, "unit": "bản", "fungible": true, "sourceLotId": "c3_nhap_man_nguu_tro_tan", "fromOwnerId": "lam_viet", "fromOwnerName": "Lâm Việt", "toOwnerId": "bach_tan", "toOwnerName": "Bạch Tẫn", "note": "Giao bản thứ nhất trong đơn ba bản đã thanh toán của Đội Tro Tàn." },
+        { "eventId": "c4_giao_man_nguu_phan_kha", "kind": "transfer", "assetId": "man_nguu_luyen_the_quyet_nhat_giai_trung_pham", "assetName": "Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm", "quantity": 1, "unit": "bản", "fungible": true, "sourceLotId": "c3_nhap_man_nguu_tro_tan", "fromOwnerId": "lam_viet", "fromOwnerName": "Lâm Việt", "toOwnerId": "phan_kha", "toOwnerName": "Phan Kha", "note": "Giao bản thứ hai trong đơn ba bản đã thanh toán của Đội Tro Tàn." },
+        { "eventId": "c4_giao_man_nguu_moc_tu", "kind": "transfer", "assetId": "man_nguu_luyen_the_quyet_nhat_giai_trung_pham", "assetName": "Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm", "quantity": 1, "unit": "bản", "fungible": true, "sourceLotId": "c3_nhap_man_nguu_tro_tan", "fromOwnerId": "lam_viet", "fromOwnerName": "Lâm Việt", "toOwnerId": "moc_tu", "toOwnerName": "Mộc Tử", "note": "Giao bản thứ ba trong đơn ba bản đã thanh toán của Đội Tro Tàn." }
+      ]
+    },
+    {
+      "chapterNumber": 5,
+      "assetEvents": [
+        { "eventId": "c5_nhap_ho_than_01", "kind": "acquire", "assetId": "ho_than_phu_nhat_giai_ha_pham", "assetName": "Hộ Thân Phù Nhất giai hạ phẩm số 01", "quantity": 1, "unit": "lá", "fungible": false, "sourceLotId": null, "fromOwnerId": null, "fromOwnerName": "Quầy phù Thanh Lô Phường", "toOwnerId": "lam_viet", "toOwnerName": "Lâm Việt", "note": "Một trong ba lá phù Lâm Việt mua bằng sáu linh thạch." },
+        { "eventId": "c5_nhap_ho_than_02", "kind": "acquire", "assetId": "ho_than_phu_nhat_giai_ha_pham", "assetName": "Hộ Thân Phù Nhất giai hạ phẩm số 02", "quantity": 1, "unit": "lá", "fungible": false, "sourceLotId": null, "fromOwnerId": null, "fromOwnerName": "Quầy phù Thanh Lô Phường", "toOwnerId": "lam_viet", "toOwnerName": "Lâm Việt", "note": "Một trong ba lá phù Lâm Việt mua bằng sáu linh thạch." },
+        { "eventId": "c5_nhap_ho_than_03", "kind": "acquire", "assetId": "ho_than_phu_nhat_giai_ha_pham", "assetName": "Hộ Thân Phù Nhất giai hạ phẩm số 03", "quantity": 1, "unit": "lá", "fungible": false, "sourceLotId": null, "fromOwnerId": null, "fromOwnerName": "Quầy phù Thanh Lô Phường", "toOwnerId": "lam_viet", "toOwnerName": "Lâm Việt", "note": "Một trong ba lá phù Lâm Việt mua bằng sáu linh thạch." }
+      ]
+    },
+    {
+      "chapterNumber": 8,
+      "assetEvents": [
+        { "eventId": "c8_giao_ho_than_01_chu_da", "kind": "transfer", "assetId": "ho_than_phu_nhat_giai_ha_pham", "assetName": "Hộ Thân Phù Nhất giai hạ phẩm số 01", "quantity": 1, "unit": "lá", "fungible": false, "sourceLotId": "c5_nhap_ho_than_01", "fromOwnerId": "lam_viet", "fromOwnerName": "Lâm Việt", "toOwnerId": "chu_da", "toOwnerName": "Chu Dã", "note": "Chu Dã mua Hộ Thân Phù số 01 bằng tinh hạch tự kiếm." }
+      ]
+    },
+    {
+      "chapterNumber": 9,
+      "assetEvents": [
+        { "eventId": "c9_giao_ho_than_02_bach_tan", "kind": "transfer", "assetId": "ho_than_phu_nhat_giai_ha_pham", "assetName": "Hộ Thân Phù Nhất giai hạ phẩm số 02", "quantity": 1, "unit": "lá", "fungible": false, "sourceLotId": "c5_nhap_ho_than_02", "fromOwnerId": "lam_viet", "fromOwnerName": "Lâm Việt", "toOwnerId": "bach_tan", "toOwnerName": "Bạch Tẫn", "note": "Bạch Tẫn dùng điểm Đội Tro Tàn mua Hộ Thân Phù số 02 cho đội." },
+        { "eventId": "c9_giao_ho_than_03_bach_tan", "kind": "transfer", "assetId": "ho_than_phu_nhat_giai_ha_pham", "assetName": "Hộ Thân Phù Nhất giai hạ phẩm số 03", "quantity": 1, "unit": "lá", "fungible": false, "sourceLotId": "c5_nhap_ho_than_03", "fromOwnerId": "lam_viet", "fromOwnerName": "Lâm Việt", "toOwnerId": "bach_tan", "toOwnerName": "Bạch Tẫn", "note": "Bạch Tẫn dùng điểm Đội Tro Tàn mua Hộ Thân Phù số 03 cho đội." },
+        { "eventId": "c9_nhan_diem_tro_tan", "kind": "acquire", "assetId": "hach_diem_song_gioi", "assetName": "Hạch điểm Song Giới", "quantity": 32.25, "unit": "điểm", "fungible": true, "sourceLotId": null, "fromOwnerId": null, "fromOwnerName": "Song Giới Thương Điếm", "toOwnerId": "doi_tro_tan", "toOwnerName": "Đội Tro Tàn", "note": "Bốn mươi ba cân huyết nhục sạch được quyết toán thành 32,25 điểm." },
+        { "eventId": "c9_tieu_diem_tro_tan", "kind": "consume", "assetId": "hach_diem_song_gioi", "assetName": "Hạch điểm Song Giới", "quantity": 23, "unit": "điểm", "fungible": true, "sourceLotId": "c9_nhan_diem_tro_tan", "fromOwnerId": "doi_tro_tan", "fromOwnerName": "Đội Tro Tàn", "toOwnerId": null, "toOwnerName": null, "note": "Đội Tro Tàn đổi ba gói Bột Cầm Máu và Hộ Thân Phù số 02, 03; số dư còn 9,25 điểm." }
+      ]
+    },
+    {
+      "chapterNumber": 10,
+      "assetEvents": [
+        { "eventId": "c10_quyen_xac_lang_to_van", "kind": "acquire", "assetId": "xac_tram_nha_lang_vuong", "assetName": "Quyền sở hữu xác Trầm Nha Lang Vương Nhị giai", "quantity": 60, "unit": "phần trăm", "fungible": true, "sourceLotId": null, "fromOwnerId": null, "fromOwnerName": "Chuyến săn Lang Vương", "toOwnerId": "to_van", "toOwnerName": "Tô Vãn", "note": "Tô Vãn sở hữu sáu phần xác Lang Vương theo sổ ký gửi." },
+        { "eventId": "c10_quyen_xac_lang_hua_an", "kind": "acquire", "assetId": "xac_tram_nha_lang_vuong", "assetName": "Quyền sở hữu xác Trầm Nha Lang Vương Nhị giai", "quantity": 40, "unit": "phần trăm", "fungible": true, "sourceLotId": null, "fromOwnerId": null, "fromOwnerName": "Chuyến săn Lang Vương", "toOwnerId": "hua_an", "toOwnerName": "Hứa An", "note": "Hứa An sở hữu bốn phần xác Lang Vương theo sổ ký gửi." }
+      ]
+    }
+  ]
+}

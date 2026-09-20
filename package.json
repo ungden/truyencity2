@@ -23,6 +23,7 @@
     "serial:run": "node --import tsx scripts/serial-run.ts",
     "serial:trial": "node --import tsx scripts/serial-continuation-trial.ts",
     "serial:reconcile-state": "node --import tsx scripts/serial-reconcile-state.ts",
+    "serial:backfill-assets": "node --import tsx scripts/serial-backfill-asset-ledger.ts",
     "serial:operator": "node --import tsx scripts/serial-operator.ts",
     "serial:rewrite": "node --import tsx scripts/serial-editorial-rewrite.ts",
     "serial:rewrite:report": "node --import tsx scripts/serial-editorial-report.ts",

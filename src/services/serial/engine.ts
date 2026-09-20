@@ -9,7 +9,9 @@ import {
   buildCyclePlannerBrief, buildExtractorBrief, buildJudgeBrief, buildWriterBrief,
   buildOpeningAuditBrief, collectSteering, refreshStyleMemory,
 } from './context';
-import { applyDigest, assertBibleCoherence, assertPayoffRotation, overdueHooks, SerialStateError } from './state';
+import {
+  applyDigest, assertBibleCoherence, assertCycleAssetCoherence, assertPayoffRotation, overdueHooks, SerialStateError,
+} from './state';
 
 /**
  * The chapter loop and the cycle lifecycle.
@@ -94,6 +96,7 @@ export async function writeOneChapter(input: {
 }): Promise<ChapterOutcome> {
   const { provider, routes, premise, bible, cycle, chapterNumber } = input;
   assertBibleCoherence(premise, bible);
+  assertCycleAssetCoherence(bible, cycle);
   const usages: ProviderUsage[] = [];
   const writerBrief = buildWriterBrief({ premise, bible, cycle, chapterNumber, previousChapter: input.previousChapter });
 
@@ -213,8 +216,12 @@ export async function planNextCycle(input: {
   const first = await planCycle({ provider: input.provider, routes: input.routes, plannerBrief });
   usages.push(first.usage);
   const firstCycle = CyclePlanSchema.parse({ ...first.value, editorialNotes: input.editorialNotes ?? [] });
+  const assertPlan = (candidate: CyclePlan): void => {
+    assertPayoffRotation(input.previousCycle, candidate);
+    assertCycleAssetCoherence(input.bible, candidate);
+  };
   try {
-    assertPayoffRotation(input.previousCycle, firstCycle);
+    assertPlan(firstCycle);
     return { cycle: firstCycle, usages, costUsd: totalCost(usages) };
   } catch (error) {
     if (!(error instanceof SerialStateError)) throw error;
@@ -224,7 +231,7 @@ export async function planNextCycle(input: {
     });
     usages.push(retry.usage);
     const retryCycle = CyclePlanSchema.parse({ ...retry.value, editorialNotes: input.editorialNotes ?? [] });
-    assertPayoffRotation(input.previousCycle, retryCycle);
+    assertPlan(retryCycle);
     return { cycle: retryCycle, usages, costUsd: totalCost(usages) };
   }
 }
@@ -256,6 +263,10 @@ export function foldVolume(input: { bible: Bible; volumeNumber: number; summary?
   const summary = (input.summary?.trim() || generated).slice(0, 1_200);
   return BibleSchema.parse({
     ...bible,
+    symbolicCore: {
+      ...bible.symbolicCore,
+      recentAssetEvents: bible.symbolicCore.recentAssetEvents.slice(-40),
+    },
     volumeSummaries: [...bible.volumeSummaries, { volumeNumber, summary: summary || `Quyển ${volumeNumber}.` }].slice(-12),
     recentSummary: bible.recentSummary.slice(-3),
     styleMemory: [],

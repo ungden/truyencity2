@@ -269,7 +269,18 @@ async function stageWrite(
   const { data: cycleRow, error: cycleError } = await db.from('serial_cycles')
     .select('id,plan,start_chapter,end_chapter').eq('id', job.current_cycle_id).single();
   if (cycleError) throw cycleError;
-  const cycle = CyclePlanSchema.parse((cycleRow as { plan: unknown }).plan);
+  const parsedCycle = CyclePlanSchema.safeParse((cycleRow as { plan: unknown }).plan);
+  if (!parsedCycle.success) {
+    await releaseLease(db, job, {
+      stage: 'plan_cycle', status: 'ready', next_run_at: new Date().toISOString(),
+      last_error: 'Kế hoạch chu kỳ cũ chưa có hợp đồng tài sản có cấu trúc; lập lại kế hoạch trước khi viết.',
+    });
+    return {
+      status: 'completed', jobId: job.id, stage: 'write',
+      detail: 'Cycle plan predates the asset contract; returning to planning before any chapter call.',
+    };
+  }
+  const cycle = parsedCycle.data;
   const chapterNumber = job.current_chapter + 1;
 
   // Beat sheets are three chapters deep. Running past them means planning again.
