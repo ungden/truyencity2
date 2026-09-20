@@ -332,12 +332,28 @@ describe('context selection', () => {
       expect(JSON.stringify(brief)).toContain('Tịnh Mạch Đan');
     }
     expect(extractor.thucTheTheGioiHopLe.every(entity => /^[a-z0-9_]+$/.test(entity.id))).toBe(true);
+    expect(extractor.chuTheTienTrienHopLe).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        id: 'song_gioi_thuong_diem',
+        tienTrienHienTai: expect.any(Array),
+        nacKeTiepDuyNhat: expect.arrayContaining([
+          expect.objectContaining({ rank: expect.objectContaining({ id: 'kho_thu_mua' }) }),
+        ]),
+      }),
+    ]));
+    expect(writer.worldSlice.progressionSubjects).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: 'song_gioi_thuong_diem' }),
+    ]));
     expect(extractor.nacKimThuChiHienTai?.id).toBe('ke_ban_le');
     expect(extractor.nacKeTiepDuyNhat?.id).toBe('kho_thu_mua');
     expect(writer.ghiChuBienTap).toEqual(['Mọi lô hàng phải có người giao và đối giá rõ.']);
     expect(writer.soGiaoDichMoDau).toEqual(
       premise.worldKernel.openingLedger.filter(entry => entry.chapterNumber === 1),
     );
+    expect(EXTRACTOR_SYSTEM_PROMPT).toContain('learnedFinger chỉ được chứa id của người');
+    expect(EXTRACTOR_SYSTEM_PROMPT).toContain('dueByChapter phải lớn hơn chuongSo hiện tại');
+    expect(JUDGE_SYSTEM_PROMPT).toContain('trạng thái ở đầu chương, không phải trần của chương');
+    expect(EXTRACTOR_SYSTEM_PROMPT).toContain('newCast.locationId và moved.toLocationId chỉ được lấy nguyên văn từ diaDiemHopLe');
   });
 
   test('planner receives the open payoff registry as exact ids', () => {

@@ -11,7 +11,7 @@ import playbookData from './playbook.json';
  * composed in at the marked point. Changing craft is a data edit; changing the
  * contract is a code change. They rot at different speeds.
  */
-export const SERIAL_PROMPT_VERSION = `serial-prompts-16 + playbook-${playbookData.version}`;
+export const SERIAL_PROMPT_VERSION = `serial-prompts-22 + playbook-${playbookData.version}`;
 
 export const WRITER_SYSTEM_PROMPT = `Bạn là tác giả truyện mạng tiếng Việt, viết truyện dài nhiều chương ra hằng ngày.
 
@@ -33,6 +33,7 @@ Truyện này có hệ thống hiện ra cho độc giả đọc. Thông báo c�
 export const JUDGE_SYSTEM_PROMPT = `Bạn đọc và soát chương truyện mạng tiếng Việt.
 
 LỖI CHẶN: chỉ báo mâu thuẫn canon được cấp và chỉ khi bạn trích được nguyên văn làm bằng chứng. Sáu loại: người chết trở lại, tụt cấp vô cớ, vị trí bất khả, sai thời gian, biết bí mật chưa được biết, mâu thuẫn Bible. Suy đoán "có vẻ không hợp lý" không phải bằng chứng.
+Phần khongDuocTrai là trạng thái ở đầu chương, không phải trần của chương. Nhân vật, cửa hàng hoặc công ty được phép đạt cấp kế tiếp trên trang; nếu hopDongMoDau yêu cầu một cấp hay kết quả mới thì đó là tiến triển bắt buộc, tuyệt đối không báo mâu thuẫn chỉ vì Bible đầu chương vẫn ở cấp cũ. Chỉ chặn khi chương tụt cấp, nhảy trái hệ hoặc kết thúc trái cấp đích.
 
 ĐIỂM ĐỌC 0–5, không bao giờ chặn chương; dùng lái chu kỳ sau:
 - opening: vào thẳng việc độc giả quan tâm, tình huống tiến lên.
@@ -54,7 +55,7 @@ Tên riêng phải lấy đúng như trong chương. Mỗi thực thể mới c�
 summary là một câu. endedOn là thứ mà câu cuối chương để ngỏ.
 worldFactsRevealed chỉ ghi sự thật mới của một id có nguyên văn trong thucTheTheGioiHopLe. Tổ đội tạm thời, đơn hàng, hành động vừa xảy ra hoặc một cụm danh từ mới không phải world entity: để trong newNamedThings, tuyệt đối không tự tạo id cho worldFactsRevealed.
 goldenFingerRungChange chỉ khác null khi ngay trong chương có thông báo hệ thống hoặc xác nhận trực tiếp rằng kim thủ chỉ đã mở nấc mới. Bán được hàng, nhận đơn lớn, dùng một tính năng đang có hoặc doanh thu tăng không phải nâng nấc. Nếu thật sự nâng, toRungId chỉ được là id trong nacKeTiepDuyNhat; tuyệt đối không nhảy nấc.
-coreChanges chỉ chứa thay đổi dứt khoát: ai chết; subject nào tiến trong đúng system/track/rank/minorStage và vì sao; kim thủ chỉ có lên nấc riêng hay không; ai đổi chỗ; địa điểm/phe phái canon nào thực sự lộ trên trang; ai mới xuất hiện tại đâu; phục bút nào được gieo hoặc được trả; ai vừa biết bí mật; và chương này tiêu mất mấy ngày truyện. Chỉ dùng id có trong world slice, không tự ghép cảnh giới với nghề nghiệp.`;
+coreChanges chỉ chứa thay đổi dứt khoát: ai chết; subject nào tiến trong đúng system/track/rank/minorStage và vì sao; kim thủ chỉ có lên nấc riêng hay không; ai đổi chỗ; địa điểm/phe phái canon nào thực sự lộ trên trang; ai mới xuất hiện tại đâu; phục bút nào được gieo hoặc được trả; ai vừa biết bí mật; và chương này tiêu mất mấy ngày truyện. progressionChanges chỉ được dùng subjectId trong nhanVatDaBiet hoặc chuTheTienTrienHopLe; phe phái cùng tên không phải chủ thể tiến triển. Ký hợp đồng, có doanh thu, nhận đơn hàng hay dùng năng lực sẵn có không tự động là lên cấp: chỉ ghi khi chương trực tiếp xác nhận chủ thể đạt cấp mới, và cấp mới phải đúng nacKeTiepDuyNhat. learnedFinger chỉ được chứa id của người có trong nhanVatDaBiet hoặc nhân vật vừa khai báo ở newCast; năng lực, sản phẩm, công ty và phe phái không phải người nên tuyệt đối không được ghi vào learnedFinger. newCast.locationId và moved.toLocationId chỉ được lấy nguyên văn từ diaDiemHopLe; id thế giới hoặc phe phái không phải địa điểm. hooksPlanted chỉ ghi lời hứa còn để ngỏ sau câu cuối; việc đã hoàn tất trong chương không phải phục bút, và dueByChapter phải lớn hơn chuongSo hiện tại. Chỉ dùng id có trong world slice, không tự ghép cảnh giới với nghề nghiệp.`;
 
 export const OPENING_AUDITOR_SYSTEM_PROMPT = `Bạn kiểm toán bốn chương mở đầu như một chỉnh thể trước khi đưa cho biên tập viên đọc.
 

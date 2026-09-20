@@ -119,9 +119,20 @@ export function relevantWorldSlice(input: {
   const systemIds = new Set(bible.symbolicCore.progressions
     .filter(state => focusedCastIds.has(state.subjectId) || bible.symbolicCore.mc.keyAssetIds.includes(state.subjectId))
     .map(state => state.systemId));
+  const progressionSubjects = kernel.progressionSubjects.map(subject => ({
+    ...subject,
+    currentProgressions: bible.symbolicCore.progressions.filter(state => state.subjectId === subject.id),
+  }));
+  for (const subject of progressionSubjects) {
+    for (const state of subject.currentProgressions) systemIds.add(state.systemId);
+  }
   const gradeIds = new Set(products.map(product => product.gradeSystemId));
   return {
     worlds,
+    // These ids are the only legal non-character subjects for progression changes.
+    // A kernel contains very few of them, and omitting one makes an extractor bind a
+    // business milestone to a similarly named faction instead of the tracked entity.
+    progressionSubjects,
     progressionSystems: kernel.progressionSystems.filter(system => systemIds.has(system.id)),
     gradeSystems: kernel.gradeSystems.filter(system => gradeIds.has(system.id)),
     equivalences: kernel.equivalences.filter(item => systemIds.has(item.leftSystemId) || systemIds.has(item.rightSystemId)),
@@ -240,6 +251,21 @@ export function buildExtractorBrief(input: {
     chuong: input.prose,
     // Exact ids the extractor must reuse rather than invent, so the merge can bind them.
     nhanVatDaBiet: input.bible.castSheet.map(entry => ({ id: entry.id, ten: entry.name })),
+    chuTheTienTrienHopLe: slice.progressionSubjects.map(subject => ({
+      id: subject.id,
+      ten: subject.name,
+      loai: subject.kind,
+      tienTrienHienTai: subject.currentProgressions,
+      nacKeTiepDuyNhat: subject.currentProgressions.map(current => {
+        const system = input.premise.worldKernel.progressionSystems.find(item => item.id === current.systemId);
+        const rankIndex = system?.ranks.findIndex(rank => rank.id === current.rankId) ?? -1;
+        return {
+          systemId: current.systemId,
+          trackId: current.trackId,
+          rank: rankIndex >= 0 ? system?.ranks[rankIndex + 1] ?? null : null,
+        };
+      }),
+    })),
     heTienTrienLienQuan: slice.progressionSystems,
     phamCapLienQuan: slice.gradeSystems,
     nacKimThuChiHopLe: input.premise.goldenFinger.evolution,
