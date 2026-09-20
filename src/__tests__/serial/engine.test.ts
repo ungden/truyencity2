@@ -280,6 +280,42 @@ describe('cycle lifecycle', () => {
     expect(result.usages).toHaveLength(2);
   });
 
+  test('a rolling planner changes recent scene modes outside locked customer milestones', async () => {
+    const makeBeat = (chapterNumber: number, sceneMode: 'transaction' | 'hunt' | 'public_showcase' | 'investigation' | 'crafting') => ({
+      chapterNumber,
+      sceneMode,
+      openingBridge: `Trả ngay câu cuối chương ${chapterNumber - 1}.`,
+      protagonistMove: `Lâm Việt tự chọn cách xử lý chương ${chapterNumber}.`,
+      beats: ['Mở cảnh bằng hệ quả trực tiếp', 'Chốt một thành quả nhìn thấy'],
+      materialOutcome: `Một kết quả vật chất của chương ${chapterNumber} được xác lập.`,
+      emotionalTarget: 'Thỏa mãn vì tình thế đổi thật.',
+      newNamedThing: `Mốc ${chapterNumber}`,
+      endHookKind: 'opportunity' as const,
+    });
+    const active = cycle({
+      startChapter: 11,
+      plannedEndChapter: 18,
+      beatSheets: [makeBeat(11, 'transaction'), makeBeat(12, 'hunt'), makeBeat(13, 'public_showcase')],
+    });
+    const provider = stubProvider({ planner: [
+      cycle({
+        startChapter: 11, plannedEndChapter: 18,
+        beatSheets: [makeBeat(14, 'transaction'), makeBeat(15, 'hunt'), makeBeat(16, 'investigation')],
+      }),
+      cycle({
+        startChapter: 11, plannedEndChapter: 18,
+        beatSheets: [makeBeat(14, 'transaction'), makeBeat(15, 'investigation'), makeBeat(16, 'crafting')],
+      }),
+    ] });
+    const result = await planNextCycle({
+      provider, routes: DEFAULT_SERIAL_ROUTES, premise, bible: baseBible(),
+      previousCycle: null, activeCycle: active,
+      cycleNumber: 2, volumeNumber: 1, startChapter: 14, fixedEndChapter: 18, recentVerdicts: [],
+    });
+    expect(result.cycle.beatSheets.map(sheet => sheet.sceneMode)).toEqual(['transaction', 'investigation', 'crafting']);
+    expect(result.usages).toHaveLength(2);
+  });
+
   test('a cycle cannot close early or with an overdue hook', () => {
     const bible = baseBible();
     expect(cycleReadyToClose(bible, cycle({ plannedEndChapter: 16 }))).toEqual({ ready: false, reason: 'At chapter 7 of 16.' });
@@ -337,7 +373,11 @@ describe('context selection', () => {
       editorialNotes: ['Mọi lô hàng phải có người giao và đối giá rõ.'],
       beatSheets: [{
         chapterNumber: 1,
+        sceneMode: 'public_showcase',
+        openingBridge: 'Hứa An bước vào quầy ngay sau lời mời thử đan.',
+        protagonistMove: 'Lâm Việt tự niêm yết điều kiện dùng thử trước phố.',
         beats: ['Hứa An dùng Tịnh Mạch Đan trước phố', 'Khách gọi phẩm cấp rồi tranh mua'],
+        materialOutcome: 'Hứa An hoàn tất thức tỉnh và khách đầu tiên đặt hàng.',
         emotionalTarget: 'Giá trị cửa hàng được công khai.',
         newNamedThing: 'Tịnh Mạch Đan Nhất giai hạ phẩm',
         endHookKind: 'reward',

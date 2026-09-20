@@ -11,7 +11,7 @@ import playbookData from './playbook.json';
  * composed in at the marked point. Changing craft is a data edit; changing the
  * contract is a code change. They rot at different speeds.
  */
-export const SERIAL_PROMPT_VERSION = `serial-prompts-27 + playbook-${playbookData.version}`;
+export const SERIAL_PROMPT_VERSION = `serial-prompts-28 + playbook-${playbookData.version}`;
 
 export const WRITER_SYSTEM_PROMPT = `Bạn là tác giả truyện mạng tiếng Việt, viết truyện dài nhiều chương ra hằng ngày.
 
@@ -24,6 +24,7 @@ Kết quả và tuyên bố trong hợp đồng mở đầu phải giữ nguyên
 Nếu brief có Sổ giao dịch mở đầu, đó là nguồn sự thật dương tính: dựng các mục của chương hiện tại thành cảnh và giữ nguyên nguồn hàng, số lượng, bên giao nhận, đối giá cùng trạng thái sau giao dịch. Các mục chương trước là số dư phải nối tiếp. Không tự tạo thêm giao dịch, phí hay đổi chủ khoản thanh toán ngoài sổ trong bốn chương đầu.
 Nếu brief có soTaiSanDauChuong, activeLots là những lô hiện còn dùng hoặc chuyển được; recentEvents cho biết lô vừa được mua, chuyển hoặc tiêu hao. Khi một món mới xuất hiện, cho nguồn mua/nhặt/luyện và chủ sở hữu hiện ra ngay trên trang. Khi chuyển hoặc dùng món, giữ đúng lô, lượng và chủ đã có để thành quả sau đó nối được thành vốn.
 Nếu mocVongKhachHangChuongNay có giá trị, đó là payoff thương mại của chính chương: dựng thành cảnh hoàn tất và nhìn thấy. Với purchase/return_upgrade, lượng, đơn vị và đối giá trong terms phải được nói hoặc ghi nhận rõ trên trang. Với public_proof, phản ứng của người chứng kiến phải chuyển thành hỏi giá, đặt hàng, mời hợp tác hoặc đổi địa vị ngay trong cảnh.
+hinhDangChuong là xương cảnh đã duyệt: mở bằng openingBridge để trả thẳng câu cuối chương trước; protagonistMove phải thành một lựa chọn hoặc hành động của main; materialOutcome phải tồn tại trước khi câu hook mới xuất hiện. sceneMode quyết định loại cảnh chiếm ưu thế, không phải nhãn để nhân vật đọc lên.
 Viết tiếng Việt có đủ dấu. Không lẫn tiếng Anh ngoài tên riêng đã có trong truyện. Không bao giờ nhắc tới brief, prompt, hệ thống sinh văn bản hay bất cứ thứ gì ngoài truyện.
 
 Trả về một chương truyện hoàn chỉnh.`;
@@ -38,6 +39,7 @@ LỖI CHẶN: chỉ báo lỗi có bằng chứng nguyên văn và làm hỏng c
 Kim thủ chỉ là lợi thế đã duyệt, không phải cái cớ để phát sinh bất kỳ vật phẩm hay quyền lực nào có chữ “hệ thống”. Nếu prose tạo lực đẩy, cưỡng chế, liên lạc xuyên giới, sản xuất hoặc quyền quản lý chưa có trong nấc hiện tại, dùng golden_finger_scope. Nếu người viết gọi tên đúng phẩm nhưng quyền sở hữu, số lượng hay người mua tự mâu thuẫn ngay trên trang, dùng transaction_contradiction.
 soTaiSanDauChuong là sổ sở hữu chính xác. activeLots là hàng còn tồn; recentEvents là bằng chứng hàng vừa chuyển hoặc tiêu hao. Nếu chương dùng, bán hay chuyển một lô không còn active và cũng không mua/nhận/luyện lô mới ngay trên trang, dùng resource_provenance. Nếu dùng quá số lượng hoặc sai chủ, dùng transaction_contradiction.
 mocVongKhachHangChuongNay là kết quả đã hẹn cho chương hiện tại. Nếu prose chỉ nhắc hoặc hẹn sang chương sau thay vì hoàn tất mốc mua, dùng kiếm thành quả, chứng minh công khai hay quay lại nâng cấp tương ứng, ghi steering cụ thể; nếu nó còn làm sai giao dịch/canon thì dùng continuity phù hợp.
+leRaPhaiLam.openingBridge, protagonistMove và materialOutcome là ba bằng chứng phải tìm được trên trang. Thiếu cầu nối làm đứt hook dùng timeline_contradiction; main bị đồng minh thay toàn bộ quyết định dùng contradicts_bible khi trái protagonistMove; thiếu kết quả vật chất thì ghi steering cụ thể cho lần lập kế hoạch sau.
 Phần khongDuocTrai là trạng thái ở đầu chương, không phải trần của chương. Nhân vật, cửa hàng hoặc công ty được phép đạt cấp kế tiếp trên trang; nếu hopDongMoDau yêu cầu một cấp hay kết quả mới thì đó là tiến triển bắt buộc, tuyệt đối không báo mâu thuẫn chỉ vì Bible đầu chương vẫn ở cấp cũ. Chỉ chặn khi chương tụt cấp, nhảy trái hệ hoặc kết thúc trái cấp đích.
 
 ĐIỂM ĐỌC 0–5, không bao giờ chặn chương; dùng lái chu kỳ sau:
@@ -100,6 +102,7 @@ Trong customerLoop, purchaseAssetId và returnUpgradeAssetId là ID hàng ổn �
 purchaseTerms và returnUpgradeTerms khóa số lượng, đơn vị cùng đối giá cụ thể phải xuất hiện trong cảnh giao dịch. schedule đặt bốn mốc mua → dùng để kiếm thành quả → chứng minh trước người khác → quay lại mua cao hơn vào bốn chương theo thứ tự và đóng trọn vòng trong tối đa năm chương đầu chu kỳ. Đây là nhịp thương mại chính của cycle, không phải phần việc được dời sau climax.
 
 beatSheets lập cho tối đa ba chương kế tiếp, bắt đầu đúng chuongBatDau, liên tiếp và không vượt qua chuongKetThucCoDinh nếu trường này có giá trị. Mỗi chương ghi hai đến bốn nhịp bằng lời kể, một mục tiêu cảm xúc, một thứ mới sẽ được đặt tên, và kiểu hook kết chương. Chương cuối của chu kỳ phải trả climax bằng kết quả nhìn thấy trước khi mở nextHook. Tuyệt đối không ghi con số trạng thái, không ghi delta tài nguyên, không ghi lịch trình phút.
+Mỗi beatSheet chọn một sceneMode khác nhau trong cửa sổ, ghi openingBridge trả ngay hook trước, protagonistMove giữ quyền chủ động cho main và materialOutcome là thành quả đã có trước câu cuối. Khi chuKyDangViet có nhipDaLap, dùng chúng như lịch sử hình dạng cảnh để vòng kế tiếp đổi sân chơi và cách thắng, trong khi vẫn hoàn thành đúng mốc customerLoop đã khóa.
 Nếu chuKyDangViet có giá trị, đây là lời hứa đã duyệt của chu kỳ hiện tại. Lập các beat tiếp theo để thực hiện đúng pressure, escalation, climax và vongKhachHang ấy; không tự thay bằng một chu kỳ mini khác. Nếu một sự kiện được hẹn sau nhiều ngày, beat đến hạn phải đặt mốc thời gian và phần chuẩn bị nhìn thấy trên trang.
 Thứ mới của chương phải có nguồn trong canon: hàng main đang có, sản phẩm do nghề hiện tại chế được, chứng từ do phe có thẩm quyền cấp, hoặc chức năng ghi nguyên văn trong nấc kim thủ chỉ hiện tại. Một tên có vẻ hợp hệ thống không tự biến thành quyền cưỡng chế, liên lạc hay sản xuất.`;
 

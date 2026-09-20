@@ -95,7 +95,11 @@ describe('serial runtime', () => {
       editorialNotes: ['khóa sổ đúng giá'],
       beatSheets: [{
         chapterNumber: 10,
+        sceneMode: 'public_showcase',
+        openingBridge: 'Trả ngay lời hẹn mang chiến lợi phẩm về chợ.',
+        protagonistMove: 'Lâm Việt tự mở buổi đối chiếu giá trước đám đông.',
         beats: ['Khép trận bãi săn', 'Chốt hợp đồng'],
+        materialOutcome: 'Hợp đồng bãi săn được ký và đặt cọc.',
         emotionalTarget: 'Chu kỳ kết thúc bằng thành quả nhìn thấy.',
         newNamedThing: 'Hợp đồng bãi săn',
         endHookKind: 'reward',
@@ -120,9 +124,13 @@ describe('serial runtime', () => {
     });
     const rolling = cycle({
       cycleNumber: 1, volumeNumber: 1, startChapter: 9, plannedEndChapter: 13,
-      beatSheets: [9, 10, 11].map(chapterNumber => ({
+      beatSheets: [9, 10, 11].map((chapterNumber, index) => ({
         chapterNumber,
+        sceneMode: (['transaction', 'hunt', 'public_showcase'] as const)[index],
+        openingBridge: `Trả lời câu cuối chương ${chapterNumber - 1}.`,
+        protagonistMove: `Lâm Việt chọn cách giải quyết mốc ${chapterNumber}.`,
         beats: ['Đưa lời hứa lên sân khấu', 'Trả kết quả nhìn thấy'],
+        materialOutcome: `Mốc ${chapterNumber} tạo ra một kết quả có người nhận.`,
         emotionalTarget: 'Thỏa mãn vì lời hứa được thực hiện.',
         newNamedThing: `Mốc ${chapterNumber}`,
         endHookKind: 'reward' as const,

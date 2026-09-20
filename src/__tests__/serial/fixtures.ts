@@ -96,7 +96,11 @@ export const cycle = (
     },
     beatSheets: beatSheets ?? [{
       chapterNumber: startChapter,
+      sceneMode: 'transaction',
+      openingBridge: 'Tô Vãn trả lời ngay lời mời trình lô phù ở cuối chương trước.',
+      protagonistMove: 'Lâm Việt tự niêm yết điều kiện bán lô phù cho Thành Vệ.',
       beats: ['Lâm Việt trình lô phù trước Thành Vệ', 'Tô Vãn và Cao Nguyên cùng hô giá'],
+      materialOutcome: 'Một đơn Thành Vệ có số lượng và đối giá được ký tại quầy.',
       emotionalTarget: 'Hả hê vì quy mô giao dịch tăng cấp.',
       newNamedThing: 'Hợp đồng Thành Vệ Đông Hà',
       endHookKind: 'opportunity',

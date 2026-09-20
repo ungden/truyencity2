@@ -67,7 +67,10 @@ describe('serial contracts', () => {
   test('beat sheets are rolling and carry no mechanical state', () => {
     const sheet = cycle().beatSheets[0];
     expect(cycle().beatSheets.length).toBeLessThanOrEqual(3);
-    expect(Object.keys(sheet).sort()).toEqual(['beats', 'chapterNumber', 'emotionalTarget', 'endHookKind', 'newNamedThing']);
+    expect(Object.keys(sheet).sort()).toEqual([
+      'beats', 'chapterNumber', 'emotionalTarget', 'endHookKind', 'materialOutcome',
+      'newNamedThing', 'openingBridge', 'protagonistMove', 'sceneMode',
+    ]);
   });
 
   test('scorecard averages reading and craft dimensions', () => {

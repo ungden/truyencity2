@@ -410,6 +410,12 @@ export type Bible = z.infer<typeof BibleSchema>;
 
 // -------------------------------------------------------------- Cycle plan
 
+export const SceneModeSchema = z.enum([
+  'transaction', 'hunt', 'combat', 'public_showcase', 'negotiation',
+  'investigation', 'crafting', 'world_crossing', 'organization', 'progression',
+]);
+export type SceneMode = z.infer<typeof SceneModeSchema>;
+
 /** A 副本: pressure, escalation, release. 5–15 chapters. */
 export const CyclePlanSchema = z.object({
   schemaVersion: z.literal(1),
@@ -464,8 +470,15 @@ export const CyclePlanSchema = z.object({
   /** Rolling: beats for the next 3 chapters only. */
   beatSheets: z.array(z.object({
     chapterNumber: z.number().int().min(1),
+    sceneMode: SceneModeSchema,
+    /** The concrete first movement that pays the previous chapter's last line. */
+    openingBridge: line,
+    /** A choice/action only the protagonist makes; allies may execute after it. */
+    protagonistMove: line,
     /** 2–4 beats. Prose intent, never state deltas. */
     beats: z.array(line).min(2).max(4),
+    /** What materially exists, changes hands or changes status before the hook. */
+    materialOutcome: line,
     /** What the reader should feel by the last line. */
     emotionalTarget: line,
     /** At least one new named thing this chapter introduces. */
@@ -495,6 +508,14 @@ export const CyclePlanSchema = z.object({
       });
     }
   });
+  const plannedModes = cycle.beatSheets.map(sheet => sheet.sceneMode);
+  if (new Set(plannedModes).size !== plannedModes.length) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['beatSheets'],
+      message: 'A rolling beat window must use a different dominant scene mode for each chapter.',
+    });
+  }
   const schedule = cycle.customerLoop.schedule;
   if (schedule.purchaseChapter < cycle.startChapter || schedule.purchaseChapter > cycle.startChapter + 1) {
     ctx.addIssue({

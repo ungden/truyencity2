@@ -235,6 +235,20 @@ export async function planNextCycle(input: {
         `New cycle must start at chapter ${input.startChapter}, got ${candidate.startChapter}.`,
       );
     }
+    if (input.activeCycle) {
+      const recentModes = new Set(input.activeCycle.beatSheets
+        .filter(sheet => sheet.chapterNumber < input.startChapter && sheet.chapterNumber >= input.startChapter - 3)
+        .map(sheet => sheet.sceneMode));
+      const scheduledChapters = new Set(Object.values(candidate.customerLoop.schedule));
+      const repeated = candidate.beatSheets.find(sheet =>
+        recentModes.has(sheet.sceneMode) && !scheduledChapters.has(sheet.chapterNumber));
+      if (repeated) {
+        throw new SerialStateError(
+          'recent_scene_mode_repeat',
+          `Chapter ${repeated.chapterNumber} repeats recent scene mode ${repeated.sceneMode} outside a scheduled customer milestone.`,
+        );
+      }
+    }
     assertPayoffRotation(input.previousCycle, candidate);
     assertCycleAssetCoherence(input.bible, candidate, input.startChapter);
   };
