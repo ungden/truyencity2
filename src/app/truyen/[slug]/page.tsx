@@ -38,6 +38,13 @@ import type { Metadata } from 'next';
 // via the SSR client would force dynamic rendering and defeat this).
 export const revalidate = 300;
 
+// Build novel pages on first request, then keep the rendered HTML in ISR for
+// five minutes. Returning an empty list is intentional: the catalogue is
+// database-driven and should not make every build enumerate every novel.
+export function generateStaticParams() {
+  return [];
+}
+
 // Only select columns needed for the detail page — skip large internal fields
 // (master_outline, story_outline, story_bible can be 10-50KB each)
 const NOVEL_DETAIL_COLS = 'id,slug,title,author,cover_url,status,genres,total_chapters,updated_at,created_at,description';
