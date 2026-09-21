@@ -5,9 +5,10 @@ import {
   type SerialRoutes,
 } from './contracts';
 import {
-  CYCLE_PLANNER_SYSTEM_PROMPT, EXTRACTOR_SYSTEM_PROMPT, JUDGE_SYSTEM_PROMPT,
-  OPENING_AUDITOR_SYSTEM_PROMPT, PREMISE_SYSTEM_PROMPT, WRITER_SYSTEM_PANEL_RULE, WRITER_SYSTEM_PROMPT,
+  PREMISE_SYSTEM_PROMPT, WRITER_SYSTEM_PANEL_RULE,
 } from './prompts';
+import { narrativeCraft, type NarrativeCraftProfile } from '@/services/narrative/foundation';
+import { serialSystemPrompt } from './foundation';
 
 /**
  * One function per model call. Each takes a provider so the whole engine can be exercised
@@ -48,9 +49,10 @@ export async function writeChapter(input: {
   premise: Premise;
   writerBrief: unknown;
 }): Promise<AgentResult<ChapterDraft>> {
+  const base = serialSystemPrompt('writer', input.premise);
   const system = input.premise.voiceSheet.showsSystemPanel
-    ? `${WRITER_SYSTEM_PROMPT}\n\n${WRITER_SYSTEM_PANEL_RULE}`
-    : WRITER_SYSTEM_PROMPT;
+    ? `${base}\n\n${WRITER_SYSTEM_PANEL_RULE}`
+    : base;
   const result = await input.provider.json({
     model: input.routes.writer,
     system,
@@ -75,7 +77,8 @@ export async function reviseChapter(input: {
   rejected: ChapterDraft;
   findings: JudgeVerdict['continuity'];
 }): Promise<AgentResult<ChapterDraft>> {
-  const system = `${input.premise.voiceSheet.showsSystemPanel ? `${WRITER_SYSTEM_PROMPT}\n\n${WRITER_SYSTEM_PANEL_RULE}` : WRITER_SYSTEM_PROMPT}
+  const base = serialSystemPrompt('writer', input.premise);
+  const system = `${input.premise.voiceSheet.showsSystemPanel ? `${base}\n\n${WRITER_SYSTEM_PANEL_RULE}` : base}
 
 ĐANG SỬA BẢN BỊ TRẢ
 banBiTra là chương bạn vừa viết. loi là những chỗ mâu thuẫn với canon, mỗi lỗi có trích dẫn nguyên văn chỉ đúng chỗ hỏng.
@@ -95,11 +98,12 @@ Trả về toàn bộ chương sau khi sửa.`;
 export async function auditOpening(input: {
   provider: StoryModelProvider;
   routes: SerialRoutes;
+  premise: Premise;
   auditBrief: unknown;
 }): Promise<AgentResult<OpeningAudit>> {
   const result = await input.provider.json({
     model: input.routes.judge,
-    system: OPENING_AUDITOR_SYSTEM_PROMPT,
+    system: serialSystemPrompt('opening', input.premise),
     prompt: brief(input.auditBrief),
     schema: OpeningAuditSchema,
     temperature: 0,
@@ -111,11 +115,12 @@ export async function auditOpening(input: {
 export async function judgeChapter(input: {
   provider: StoryModelProvider;
   routes: SerialRoutes;
+  premise: Premise;
   judgeBrief: unknown;
 }): Promise<AgentResult<JudgeVerdict>> {
   const result = await input.provider.json({
     model: input.routes.judge,
-    system: JUDGE_SYSTEM_PROMPT,
+    system: serialSystemPrompt('judge', input.premise),
     prompt: brief(input.judgeBrief),
     schema: JudgeVerdictSchema,
     temperature: 0.2,
@@ -127,11 +132,12 @@ export async function judgeChapter(input: {
 export async function extractDigest(input: {
   provider: StoryModelProvider;
   routes: SerialRoutes;
+  premise: Premise;
   extractorBrief: unknown;
 }): Promise<AgentResult<ChapterDigest>> {
   const result = await input.provider.json({
     model: input.routes.extractor,
-    system: EXTRACTOR_SYSTEM_PROMPT,
+    system: serialSystemPrompt('extractor', input.premise),
     prompt: brief(input.extractorBrief),
     schema: ChapterDigestSchema,
     temperature: 0,
@@ -143,11 +149,12 @@ export async function extractDigest(input: {
 export async function planCycle(input: {
   provider: StoryModelProvider;
   routes: SerialRoutes;
+  premise: Premise;
   plannerBrief: unknown;
 }): Promise<AgentResult<CyclePlan>> {
   const result = await input.provider.json({
     model: input.routes.planner,
-    system: CYCLE_PLANNER_SYSTEM_PROMPT,
+    system: serialSystemPrompt('planner', input.premise),
     prompt: brief(input.plannerBrief),
     schema: CyclePlanSchema,
     temperature: 0.8,
@@ -161,11 +168,14 @@ export async function proposePremise(input: {
   routes: SerialRoutes;
   lane: string;
   avoid: string[];
+  craftProfile?: NarrativeCraftProfile;
 }): Promise<AgentResult<Premise>> {
   const result = await input.provider.json({
     model: input.routes.premise,
-    system: PREMISE_SYSTEM_PROMPT,
-    prompt: brief({ lane: input.lane, khongDuocTrungVoi: input.avoid }),
+    system: input.craftProfile
+      ? `Bạn dựng premise schemaVersion 3 với narrativeFoundation đầy đủ.\n\n${narrativeCraft(input.craftProfile)}\n\nKhông khóa số chương phải bán hàng hoặc lên cấp. World Kernel vẫn dùng stable IDs; các mảng thương mại/cấp bậc có thể rỗng nếu chưa thuộc mở đầu.`
+      : PREMISE_SYSTEM_PROMPT,
+    prompt: brief({ lane: input.lane, craftProfile: input.craftProfile ?? null, khongDuocTrungVoi: input.avoid }),
     schema: PremiseSchema,
     temperature: 1,
     timeoutMs: SUPPORT_TIMEOUT_MS,

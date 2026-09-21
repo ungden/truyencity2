@@ -14,13 +14,10 @@ CREATE TABLE IF NOT EXISTS editor_reviews (
   scanned_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
-
 CREATE INDEX IF NOT EXISTS idx_editor_reviews_project_chapter
   ON editor_reviews(project_id, chapter_number DESC);
-
 CREATE INDEX IF NOT EXISTS idx_editor_reviews_low_score
   ON editor_reviews(overall_score, scanned_at DESC);
-
 CREATE TABLE IF NOT EXISTS rewrite_chain_jobs (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   project_id UUID NOT NULL REFERENCES ai_story_projects(id) ON DELETE CASCADE,
@@ -39,13 +36,10 @@ CREATE TABLE IF NOT EXISTS rewrite_chain_jobs (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   completed_at TIMESTAMPTZ
 );
-
 CREATE INDEX IF NOT EXISTS idx_rewrite_chain_jobs_status
   ON rewrite_chain_jobs(status, updated_at DESC);
-
 CREATE INDEX IF NOT EXISTS idx_rewrite_chain_jobs_project
   ON rewrite_chain_jobs(project_id, created_at DESC);
-
 CREATE TABLE IF NOT EXISTS rewrite_chain_items (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   job_id UUID NOT NULL REFERENCES rewrite_chain_jobs(id) ON DELETE CASCADE,
@@ -61,10 +55,8 @@ CREATE TABLE IF NOT EXISTS rewrite_chain_items (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE(job_id, chapter_number)
 );
-
 CREATE INDEX IF NOT EXISTS idx_rewrite_chain_items_job_status
   ON rewrite_chain_items(job_id, status, chapter_number);
-
 CREATE TABLE IF NOT EXISTS chapter_versions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   chapter_id UUID NOT NULL REFERENCES chapters(id) ON DELETE CASCADE,
@@ -76,10 +68,8 @@ CREATE TABLE IF NOT EXISTS chapter_versions (
   metadata JSONB DEFAULT '{}'::jsonb,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
-
 CREATE INDEX IF NOT EXISTS idx_chapter_versions_chapter
   ON chapter_versions(chapter_id, created_at DESC);
-
 CREATE OR REPLACE FUNCTION update_rewrite_chain_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -87,13 +77,11 @@ BEGIN
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
-
 DROP TRIGGER IF EXISTS trg_rewrite_chain_jobs_updated_at ON rewrite_chain_jobs;
 CREATE TRIGGER trg_rewrite_chain_jobs_updated_at
   BEFORE UPDATE ON rewrite_chain_jobs
   FOR EACH ROW
   EXECUTE FUNCTION update_rewrite_chain_updated_at();
-
 DROP TRIGGER IF EXISTS trg_rewrite_chain_items_updated_at ON rewrite_chain_items;
 CREATE TRIGGER trg_rewrite_chain_items_updated_at
   BEFORE UPDATE ON rewrite_chain_items

@@ -1,9 +1,7 @@
 ALTER TABLE public.story_state_events
   ADD COLUMN IF NOT EXISTS related_entity_ids text[] NOT NULL DEFAULT '{}'::text[];
-
 CREATE INDEX IF NOT EXISTS story_state_events_related_entities_idx
   ON public.story_state_events USING gin (related_entity_ids);
-
 CREATE OR REPLACE FUNCTION public.commit_story_factory_chapter(
   p_job_id uuid,
   p_lease_token uuid,
@@ -118,7 +116,6 @@ BEGIN
 
   RETURN jsonb_build_object('chapterNumber', p_expected_chapter, 'status', 'published');
 END $$;
-
 CREATE OR REPLACE FUNCTION public.commit_story_factory_arc_transition(
   p_job_id uuid,
   p_lease_token uuid,
@@ -193,7 +190,6 @@ BEGIN
 
   RETURN jsonb_build_object('status', p_lifecycle_status, 'chapterNumber', job.current_chapter);
 END $$;
-
 REVOKE ALL ON FUNCTION public.commit_story_factory_chapter(
   uuid, uuid, uuid, integer, text, text, jsonb, jsonb, jsonb, jsonb,
   jsonb, jsonb, numeric, integer, integer, text
@@ -202,14 +198,12 @@ GRANT EXECUTE ON FUNCTION public.commit_story_factory_chapter(
   uuid, uuid, uuid, integer, text, text, jsonb, jsonb, jsonb, jsonb,
   jsonb, jsonb, numeric, integer, integer, text
 ) TO service_role;
-
 REVOKE ALL ON FUNCTION public.commit_story_factory_arc_transition(
   uuid, uuid, uuid, text, jsonb, jsonb, jsonb, jsonb, jsonb, numeric, text
 ) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.commit_story_factory_arc_transition(
   uuid, uuid, uuid, text, jsonb, jsonb, jsonb, jsonb, jsonb, numeric, text
 ) TO service_role;
-
 -- The original sea-village canary remains an immutable benchmark corpus.
 UPDATE public.story_factory_jobs
 SET status = 'cancelled',
@@ -222,13 +216,11 @@ SET status = 'cancelled',
     updated_at = now()
 WHERE id = '173c2314-c7c1-493a-8c72-bb98cec4ba03'::uuid
   AND current_chapter = 20;
-
 UPDATE public.novels
 SET hidden = true,
     status = 'Tạm dừng',
     updated_at = now()
 WHERE id = '207d7e88-1ee5-4943-9172-e64f34447bb6'::uuid;
-
 INSERT INTO public.story_state_events(
   project_id, chapter_number, delta_id, kind, entity_id, before_value,
   after_value, source, related_entity_ids

@@ -18,15 +18,12 @@ CREATE TABLE IF NOT EXISTS embedding_cache (
 
   UNIQUE(project_id, text_hash)
 );
-
 -- Index for fast lookups
 CREATE INDEX IF NOT EXISTS idx_embedding_cache_lookup
   ON embedding_cache(project_id, text_hash);
-
 -- Index for LRU eviction (by hit count)
 CREATE INDEX IF NOT EXISTS idx_embedding_cache_hits
   ON embedding_cache(project_id, hit_count DESC);
-
 -- ============================================================================
 -- COST TRACKING TABLE
 -- Tracks API costs for budget management
@@ -42,15 +39,12 @@ CREATE TABLE IF NOT EXISTS cost_tracking (
   cost DECIMAL(10, 6) NOT NULL DEFAULT 0,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
-
 -- Index for daily cost queries
 CREATE INDEX IF NOT EXISTS idx_cost_tracking_daily
   ON cost_tracking(project_id, created_at DESC);
-
 -- Index for task-based analysis
 CREATE INDEX IF NOT EXISTS idx_cost_tracking_task
   ON cost_tracking(project_id, task, created_at DESC);
-
 -- ============================================================================
 -- QC RESULTS TABLE
 -- Stores QC evaluation results for analytics
@@ -86,13 +80,10 @@ CREATE TABLE IF NOT EXISTS qc_results (
 
   UNIQUE(project_id, chapter_number)
 );
-
 CREATE INDEX IF NOT EXISTS idx_qc_results_project
   ON qc_results(project_id, chapter_number);
-
 CREATE INDEX IF NOT EXISTS idx_qc_results_failed
   ON qc_results(project_id, passed) WHERE passed = false;
-
 -- ============================================================================
 -- HELPER FUNCTIONS
 -- ============================================================================
@@ -105,7 +96,6 @@ RETURNS DECIMAL AS $$
   WHERE project_id = p_project_id
     AND created_at::DATE = p_date;
 $$ LANGUAGE SQL STABLE;
-
 -- Function to get cost by task type
 CREATE OR REPLACE FUNCTION get_cost_by_task(p_project_id UUID, p_days INTEGER DEFAULT 7)
 RETURNS TABLE(task VARCHAR, total_cost DECIMAL, call_count BIGINT) AS $$
@@ -119,7 +109,6 @@ RETURNS TABLE(task VARCHAR, total_cost DECIMAL, call_count BIGINT) AS $$
   GROUP BY task
   ORDER BY total_cost DESC;
 $$ LANGUAGE SQL STABLE;
-
 -- Function to get cache hit rate
 CREATE OR REPLACE FUNCTION get_cache_hit_rate(p_project_id UUID)
 RETURNS TABLE(total_entries BIGINT, total_hits BIGINT, estimated_savings DECIMAL) AS $$
@@ -130,7 +119,6 @@ RETURNS TABLE(total_entries BIGINT, total_hits BIGINT, estimated_savings DECIMAL
   FROM embedding_cache
   WHERE project_id = p_project_id;
 $$ LANGUAGE SQL STABLE;
-
 -- Function to get QC pass rate
 CREATE OR REPLACE FUNCTION get_qc_pass_rate(p_project_id UUID, p_last_n_chapters INTEGER DEFAULT 20)
 RETURNS TABLE(total_chapters BIGINT, passed_chapters BIGINT, pass_rate DECIMAL, avg_score DECIMAL) AS $$
@@ -147,7 +135,6 @@ RETURNS TABLE(total_chapters BIGINT, passed_chapters BIGINT, pass_rate DECIMAL, 
     LIMIT p_last_n_chapters
   ) recent;
 $$ LANGUAGE SQL STABLE;
-
 -- ============================================================================
 -- TRIGGERS
 -- ============================================================================
@@ -160,7 +147,6 @@ BEGIN
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
-
 CREATE TRIGGER trigger_embedding_cache_update
   BEFORE UPDATE ON embedding_cache
   FOR EACH ROW

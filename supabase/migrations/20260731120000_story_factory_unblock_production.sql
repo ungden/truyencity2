@@ -26,22 +26,17 @@
 -- DDL below takes ACCESS EXCLUSIVE locks while a 2-minute cron holds row locks from
 -- claim/commit. Fail fast rather than queueing every reader behind a blocked ALTER.
 SET lock_timeout = '5s';
-
 -- 1. Telemetry: record the engine revision (prompt/planner/validator/route versions)
 --    that produced each run, now that those no longer belong to the release identity.
 ALTER TABLE public.story_factory_runs
   ADD COLUMN IF NOT EXISTS engine_revision text;
-
 COMMENT ON COLUMN public.story_factory_runs.engine_revision IS
   'Hash of prompt/planner/validator/context/memory/window-review/route versions. Telemetry for quality attribution; never gates job claiming.';
-
 -- 2. Bounded self-healing for transient infrastructure failures.
 ALTER TABLE public.story_factory_jobs
   ADD COLUMN IF NOT EXISTS retry_count integer NOT NULL DEFAULT 0 CHECK (retry_count >= 0);
-
 COMMENT ON COLUMN public.story_factory_jobs.retry_count IS
   'Consecutive infra_blocked retries. Reset on every committed chapter. Semantic blocks (setup/plan/quality) never retry.';
-
 -- 3. The rewrite path becomes its own stage so a single tick never has to fit
 --    Writer + Editor + Rewrite + Editor inside the 300s Vercel ceiling.
 ALTER TABLE public.story_factory_jobs
@@ -49,7 +44,6 @@ ALTER TABLE public.story_factory_jobs
 ALTER TABLE public.story_factory_jobs
   ADD CONSTRAINT story_factory_jobs_stage_check
   CHECK (stage IN ('setup', 'plan', 'write', 'revise', 'window_review', 'arc', 'cover', 'done'));
-
 -- 4. Mechanical smoke gate replaces the four-run benchmark chain.
 --
 -- The gate now answers exactly one question: does the machine run end to end on this
@@ -98,10 +92,8 @@ AS $$
     LIMIT 1
   ), false);
 $$;
-
 REVOKE ALL ON FUNCTION public.story_factory_release_is_approved(uuid, text, jsonb) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.story_factory_release_is_approved(uuid, text, jsonb) TO service_role;
-
 -- 5. Claim: restore the 30 minute lease.
 --
 -- 20260726091255 restored it deliberately; 20260726133707 reinstated a stale copy of
@@ -167,10 +159,8 @@ BEGIN
   WHERE job.id = claimed_id
   RETURNING job.*;
 END $$;
-
 REVOKE ALL ON FUNCTION public.claim_story_factory_job(text, text) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.claim_story_factory_job(text, text) TO service_role;
-
 -- 6. Reconcile requeues a stale lease instead of parking the job forever.
 --
 -- Previously an expired lease set status = 'infra_blocked', which is not in the
@@ -210,10 +200,8 @@ BEGIN
   GET DIAGNOSTICS affected = ROW_COUNT;
   RETURN affected;
 END $$;
-
 REVOKE ALL ON FUNCTION public.reconcile_story_factory_jobs(integer) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.reconcile_story_factory_jobs(integer) TO service_role;
-
 -- 7. Commit resets the retry budget: a chapter that lands proves the job is healthy.
 CREATE OR REPLACE FUNCTION public.commit_story_factory_chapter(
   p_job_id uuid,
@@ -335,7 +323,6 @@ BEGIN
 
   RETURN jsonb_build_object('chapterNumber', p_expected_chapter, 'status', 'published');
 END $$;
-
 REVOKE ALL ON FUNCTION public.commit_story_factory_chapter(
   uuid, uuid, uuid, integer, text, text, jsonb, jsonb, jsonb, jsonb,
   jsonb, jsonb, numeric, integer, integer, jsonb, text
@@ -344,7 +331,6 @@ GRANT EXECUTE ON FUNCTION public.commit_story_factory_chapter(
   uuid, uuid, uuid, integer, text, text, jsonb, jsonb, jsonb, jsonb,
   jsonb, jsonb, numeric, integer, integer, jsonb, text
 ) TO service_role;
-
 -- 8. Promotion keeps the two cheap, real signals and drops the benchmark cross-checks
 --    that the smoke gate no longer produces.
 CREATE OR REPLACE FUNCTION public.promote_story_factory_canary(p_job_id uuid, p_engine_release text)
@@ -414,10 +400,8 @@ BEGIN
     'reviewRelease', latest_review_release
   );
 END $$;
-
 REVOKE ALL ON FUNCTION public.promote_story_factory_canary(uuid, text) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.promote_story_factory_canary(uuid, text) TO service_role;
-
 -- 9. Arc transitions also prove the job healthy: reset the retry budget on commit.
 --    Body identical to 20260724074948 except the retry_count reset — the budget is
 --    for CONSECUTIVE failures, and without resets on non-chapter successes a new
@@ -497,14 +481,12 @@ BEGIN
 
   RETURN jsonb_build_object('status', p_lifecycle_status, 'chapterNumber', job.current_chapter);
 END $$;
-
 REVOKE ALL ON FUNCTION public.commit_story_factory_arc_transition(
   uuid, uuid, uuid, text, jsonb, jsonb, jsonb, jsonb, jsonb, numeric, text
 ) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.commit_story_factory_arc_transition(
   uuid, uuid, uuid, text, jsonb, jsonb, jsonb, jsonb, jsonb, numeric, text
 ) TO service_role;
-
 -- 10. Return the parked fleet to the queue.
 --
 -- Every currently blocked job is a casualty of the old self-invalidating gate, not a

@@ -1,5 +1,4 @@
 -- Typed causal mechanics change the artifact contracts and benchmark protocol.
--- The migration is deliberately fail-closed: no historical benchmark can promote this release.
 -- Older evidence remains available, but cannot authorize this release.
 UPDATE public.story_factory_runs
 SET benchmark_protocol_version = 'legacy_incomparable',
@@ -206,3 +205,4 @@ END $$;
 
 REVOKE ALL ON FUNCTION public.promote_story_factory_canary(uuid, text) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.promote_story_factory_canary(uuid, text) TO service_role;
+;

@@ -15,9 +15,7 @@ CREATE TABLE IF NOT EXISTS project_daily_quotas (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   PRIMARY KEY (project_id, vn_date)
 );
-
 CREATE INDEX IF NOT EXISTS idx_project_daily_quotas_vn_date
   ON project_daily_quotas(vn_date);
-
 CREATE INDEX IF NOT EXISTS idx_project_daily_quotas_due
   ON project_daily_quotas(vn_date, status, written_chapters, next_due_at);

@@ -69,10 +69,8 @@ BEGIN
     'reviewRelease', latest_review_release
   );
 END $$;
-
 REVOKE ALL ON FUNCTION public.promote_story_factory_canary(uuid, text) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.promote_story_factory_canary(uuid, text) TO service_role;
-
 DO $$
 DECLARE
   target_project_id constant uuid := '07e86a9d-7aab-41d2-8eea-5c20294997b7';

@@ -1,5 +1,10 @@
 import { z } from 'zod';
 import { payoffKindIds } from './playbook';
+import {
+  NarrativeEvidenceSchema,
+  NarrativeFoundationSchema,
+  assertFoundationReferences,
+} from '@/services/narrative/foundation';
 
 /**
  * Artifacts for the serial engine.
@@ -15,7 +20,7 @@ import { payoffKindIds } from './playbook';
  * See docs/FALOO_CRAFT.md for the measurements these contracts encode.
  */
 
-const id = z.string().trim().regex(/^[a-z0-9_]{2,48}$/, 'stable id: lowercase, digits, underscore');
+const id = z.string().trim().regex(/^[a-z0-9_]{2,64}$/, 'stable id: lowercase, digits, underscore');
 const line = z.string().trim().min(1).max(400);
 const para = z.string().trim().min(1).max(1_200);
 
@@ -126,7 +131,8 @@ const MilestoneSchema = z.object({
 }).strict();
 
 export const PremiseSchema = z.object({
-  schemaVersion: z.literal(2),
+  schemaVersion: z.union([z.literal(2), z.literal(3)]),
+  narrativeFoundation: NarrativeFoundationSchema.optional(),
   lane: z.enum(LANES),
   /** `ĐẤU TRƯỜNG: nhân vật + lợi thế + payoff`, the measured Faloo formula. */
   title: z.string().trim().min(12).max(120),
@@ -152,8 +158,8 @@ export const PremiseSchema = z.object({
     rule: para,
     /** Optional functional scope of the established advantage. */
     scope: para.nullable().default(null),
-    /** 6–8 rungs, each changing HOW it is used, never only the number. */
-    evolution: z.array(z.object({ id, name: line, changesUse: line })).min(6).max(8),
+    /** Each rung changes HOW the advantage is used, never only the number. */
+    evolution: z.array(z.object({ id, name: line, changesUse: line })).min(1).max(12),
   }).strict(),
 
   /** Four directions for expansion, selected by the story rather than a fixed sequence. */
@@ -180,7 +186,7 @@ export const PremiseSchema = z.object({
    */
   oppositionEngine: para,
 
-  /** ≥6 named people at launch, ≥2 antagonists in two different classes. */
+  /** Named launch cast. Lived-causality stories may introduce a smaller cast naturally. */
   castSeed: z.array(z.object({
     id,
     name: z.string().trim().min(1).max(60),
@@ -190,8 +196,8 @@ export const PremiseSchema = z.object({
     antagonistClass: z.string().trim().max(60).nullable().default(null),
     startLocationId: id,
     startingProgressions: z.array(ProgressionRefSchema).max(8).default([]),
-    milestones: z.array(MilestoneSchema).min(3).max(5),
-  }).strict()).min(6).max(12),
+    milestones: z.array(MilestoneSchema).min(1).max(8),
+  }).strict()).min(3).max(16),
 
   /** Complete approved canon. The living Bible only stores facts already shown in prose. */
   worldKernel: z.object({
@@ -210,7 +216,7 @@ export const PremiseSchema = z.object({
       tracks: z.array(RankSchema).max(12).default([]),
       ranks: z.array(RankSchema).min(2).max(24),
       minorStages: z.array(RankSchema).max(12).default([]),
-    }).strict()).min(3).max(16),
+    }).strict()).min(1).max(16),
     progressionSubjects: z.array(z.object({
       id,
       name: line,
@@ -229,27 +235,27 @@ export const PremiseSchema = z.object({
       if (system.tiers.length === 0 && system.qualities.length === 0) {
         ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'A grade system needs tiers or qualities.' });
       }
-    })).min(2).max(16),
+    })).max(16),
     equivalences: z.array(z.object({
       leftSystemId: id, leftRankId: id, rightSystemId: id, rightRankId: id, note: para,
     }).strict()).max(24).default([]),
     economyLoops: z.array(z.object({
       id, name: line, fromWorldId: id, toWorldId: id,
       goods: z.array(line).min(1).max(12), buyer: line, settlement: line, reinvestment: para,
-    }).strict()).min(2).max(12),
+    }).strict()).max(12),
     launchProducts: z.array(z.object({
-      id, name: line, category: line, gradeSystemId: id,
+      id, name: line, category: line, gradeSystemId: id.nullable().default(null),
       tierId: id.nullable().default(null), qualityId: id.nullable().default(null),
-      effect: para, targetBuyer: line, introducedChapter: z.number().int().min(1).max(4),
-    }).strict()).min(4).max(16),
+      effect: para, targetBuyer: line, introducedChapter: z.number().int().min(1).nullable().default(null),
+    }).strict()).max(16),
     openingContract: z.array(z.object({
       chapterNumber: z.number().int().min(1).max(4),
       proves: para,
-      namedLevelOrGrade: line,
+      namedLevelOrGrade: line.nullable().default(null),
       visibleResult: line,
-      witnessReaction: line,
-      commercialAction: line,
-    }).strict()).length(4),
+      witnessReaction: line.nullable().default(null),
+      commercialAction: line.nullable().default(null),
+    }).strict()).max(12),
     /**
      * Positive source of truth for the opening's commerce. The Writer turns these
      * entries into scenes; it does not have to reconstruct an accounting chain from
@@ -265,7 +271,7 @@ export const PremiseSchema = z.object({
       to: line,
       consideration: para,
       resultingStatus: para,
-    }).strict()).min(4).max(24),
+    }).strict()).max(24),
   }).strict(),
 
   /** Legible category the Vietnamese convert reader already knows. Never a borrowed IP. */
@@ -299,13 +305,29 @@ export const PremiseSchema = z.object({
   unique([...grades.keys()], ['worldKernel', 'gradeSystems']);
   unique(premise.castSeed.map(member => member.id), ['castSeed']);
   unique(premise.worldKernel.progressionSubjects.map(subject => subject.id), ['worldKernel', 'progressionSubjects']);
+  if (premise.schemaVersion === 2 && premise.narrativeFoundation) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['narrativeFoundation'], message: 'Legacy premise v2 cannot carry the lived-causality foundation.' });
+  }
+  if (premise.schemaVersion === 3 && !premise.narrativeFoundation) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['narrativeFoundation'], message: 'Premise v3 requires a narrative foundation.' });
+  }
   if (premise.castSeed.filter(member => member.role === 'protagonist').length !== 1) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['castSeed'], message: 'Premise needs exactly one protagonist.' });
   }
   const antagonistClasses = new Set(premise.castSeed
     .filter(member => member.role === 'antagonist' && member.antagonistClass)
     .map(member => member.antagonistClass));
-  if (antagonistClasses.size < 2) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['castSeed'], message: 'Premise needs antagonists from at least two classes.' });
+  if (premise.schemaVersion === 2 && antagonistClasses.size < 2) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['castSeed'], message: 'Legacy premise needs antagonists from at least two classes.' });
+  if (premise.schemaVersion === 2 && (premise.castSeed.length < 6
+    || premise.goldenFinger.evolution.length < 6
+    || premise.goldenFinger.evolution.length > 8
+    || premise.worldKernel.progressionSystems.length < 3
+    || premise.worldKernel.gradeSystems.length < 2
+    || premise.worldKernel.economyLoops.length < 2
+    || premise.worldKernel.launchProducts.length < 4
+    || premise.worldKernel.openingLedger.length < 4)) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Legacy premise v2 must retain its original launch minimums.' });
+  }
   const validateProgression = (state: z.infer<typeof ProgressionRefSchema>, path: (string | number)[]) => {
     const system = systems.get(state.systemId);
     if (!system) return ctx.addIssue({ code: z.ZodIssueCode.custom, path: [...path, 'systemId'], message: `Unknown progression system ${state.systemId}.` });
@@ -335,13 +357,31 @@ export const PremiseSchema = z.object({
     if (!worldIds.has(loop.fromWorldId) || !worldIds.has(loop.toWorldId)) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['worldKernel', 'economyLoops', index], message: 'Economy loop references an unknown world.' });
   });
   premise.worldKernel.launchProducts.forEach((product, index) => {
-    const grade = grades.get(product.gradeSystemId);
+    const grade = product.gradeSystemId ? grades.get(product.gradeSystemId) : null;
+    if (premise.schemaVersion === 2 && !product.gradeSystemId) return ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['worldKernel', 'launchProducts', index, 'gradeSystemId'], message: 'Legacy launch products require a grade system.' });
+    if (!product.gradeSystemId) return;
     if (!grade) return ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['worldKernel', 'launchProducts', index, 'gradeSystemId'], message: 'Unknown grade system.' });
     if (product.tierId && !grade.tiers.some(tier => tier.id === product.tierId)) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['worldKernel', 'launchProducts', index, 'tierId'], message: 'Unknown product tier.' });
     if (product.qualityId && !grade.qualities.some(quality => quality.id === product.qualityId)) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['worldKernel', 'launchProducts', index, 'qualityId'], message: 'Unknown product quality.' });
   });
   const chapters = premise.worldKernel.openingContract.map(item => item.chapterNumber).sort();
-  if (chapters.join(',') !== '1,2,3,4') ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['worldKernel', 'openingContract'], message: 'Opening contract must cover chapters 1, 2, 3 and 4 exactly once.' });
+  if (premise.schemaVersion === 2 && chapters.join(',') !== '1,2,3,4') ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['worldKernel', 'openingContract'], message: 'Legacy opening contract must cover chapters 1, 2, 3 and 4 exactly once.' });
+  if (premise.schemaVersion === 2 && premise.worldKernel.openingContract.some(item =>
+    !item.namedLevelOrGrade || !item.witnessReaction || !item.commercialAction)) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['worldKernel', 'openingContract'], message: 'Legacy opening rows require grade, witness, and commercial action.' });
+  }
+  if (premise.schemaVersion === 3 && premise.narrativeFoundation) {
+    try {
+      assertFoundationReferences({
+        foundation: premise.narrativeFoundation,
+        characterIds: premise.castSeed.map(member => member.id),
+        worldIds: premise.worldKernel.worlds.map(world => world.id),
+        protagonistId: premise.castSeed.find(member => member.role === 'protagonist')?.id ?? '',
+      });
+    } catch (error) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['narrativeFoundation'], message: error instanceof Error ? error.message : String(error) });
+    }
+  }
 });
 export type Premise = z.infer<typeof PremiseSchema>;
 
@@ -369,6 +409,15 @@ export const SymbolicCoreSchema = z.object({
   /** Current spendable/usable lots plus a bounded cross-chapter audit trail. */
   activeAssetLots: z.array(AssetLotSchema).max(240).default([]),
   recentAssetEvents: z.array(RecordedAssetEventSchema).max(120).default([]),
+  /** Reader-grounded revelations. A plan or kernel fact does not count as revealed. */
+  narrativeEvidence: z.array(NarrativeEvidenceSchema).max(240).default([]),
+  /** Durable indexes. Unlike narrativeEvidence, these are never truncated. */
+  revealedNarrativeIds: z.array(id).max(2_000).default([]),
+  achievedNarrativeMilestoneIds: z.array(id).max(1_000).default([]),
+  characterKnowledge: z.array(z.object({
+    characterId: id,
+    factIds: z.array(id).max(2_000),
+  }).strict()).max(120).default([]),
   openHooks: z.array(z.object({
     id,
     what: line,
@@ -413,12 +462,13 @@ export type Bible = z.infer<typeof BibleSchema>;
 export const SceneModeSchema = z.enum([
   'transaction', 'hunt', 'combat', 'public_showcase', 'negotiation',
   'investigation', 'crafting', 'world_crossing', 'organization', 'progression',
+  'daily_life', 'relationship', 'reflection', 'discovery',
 ]);
 export type SceneMode = z.infer<typeof SceneModeSchema>;
 
 /** A 副本: pressure, escalation, release. 5–15 chapters. */
 export const CyclePlanSchema = z.object({
-  schemaVersion: z.literal(1),
+  schemaVersion: z.union([z.literal(1), z.literal(2)]),
   cycleNumber: z.number().int().min(1),
   volumeNumber: z.number().int().min(1),
   startChapter: z.number().int().min(1),
@@ -433,7 +483,7 @@ export const CyclePlanSchema = z.object({
     /** The visible, material result. "He wins" is not a result. */
     result: para,
     /** Who sees it happen. A payoff nobody witnesses does not land. */
-    witnesses: z.array(line).min(1).max(6),
+    witnesses: z.array(line).max(6),
   }).strict(),
   aftermath: para,
   /** The expectation this cycle leaves burning for the next one. */
@@ -466,7 +516,7 @@ export const CyclePlanSchema = z.object({
       publicProofChapter: z.number().int().min(1),
       returnUpgradeChapter: z.number().int().min(1),
     }).strict(),
-  }).strict(),
+  }).strict().nullable(),
   /** Rolling: beats for the next 3 chapters only. */
   beatSheets: z.array(z.object({
     chapterNumber: z.number().int().min(1),
@@ -482,7 +532,10 @@ export const CyclePlanSchema = z.object({
     /** What the reader should feel by the last line. */
     emotionalTarget: line,
     /** At least one new named thing this chapter introduces. */
-    newNamedThing: line,
+    newNamedThing: line.nullable(),
+    prerequisiteIds: z.array(id).max(24).default([]),
+    revealsFactIds: z.array(id).max(24).default([]),
+    advancesMilestoneIds: z.array(id).max(12).default([]),
     endHookKind: z.enum(['threat', 'question', 'declaration', 'opportunity', 'reward', 'reveal']),
   }).strict()).min(1).max(3),
   /** Human/auditor findings carried unchanged into every Writer brief for this replan. */
@@ -509,15 +562,21 @@ export const CyclePlanSchema = z.object({
     }
   });
   const plannedModes = cycle.beatSheets.map(sheet => sheet.sceneMode);
-  if (new Set(plannedModes).size !== plannedModes.length) {
+  if (cycle.schemaVersion === 1 && new Set(plannedModes).size !== plannedModes.length) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: ['beatSheets'],
       message: 'A rolling beat window must use a different dominant scene mode for each chapter.',
     });
   }
-  const schedule = cycle.customerLoop.schedule;
-  if (schedule.purchaseChapter < cycle.startChapter || schedule.purchaseChapter > cycle.startChapter + 1) {
+  if (cycle.schemaVersion === 1 && (!cycle.customerLoop
+    || cycle.climax.witnesses.length === 0
+    || cycle.beatSheets.some(sheet => !sheet.newNamedThing))) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Legacy cycle v1 requires a customer loop, witnesses, and one new named thing per beat.' });
+  }
+  const schedule = cycle.customerLoop?.schedule;
+  if (!schedule) return;
+  if (cycle.schemaVersion === 1 && (schedule.purchaseChapter < cycle.startChapter || schedule.purchaseChapter > cycle.startChapter + 1)) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: ['customerLoop', 'schedule', 'purchaseChapter'],
@@ -537,7 +596,7 @@ export const CyclePlanSchema = z.object({
       message: 'Purchase, use-to-earn, public proof and return upgrade must land in four consecutive-order chapter slots.',
     });
   }
-  if (schedule.returnUpgradeChapter > Math.min(cycle.plannedEndChapter, cycle.startChapter + 4)) {
+  if (cycle.schemaVersion === 1 && schedule.returnUpgradeChapter > Math.min(cycle.plannedEndChapter, cycle.startChapter + 4)) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: ['customerLoop', 'schedule', 'returnUpgradeChapter'],
@@ -557,6 +616,7 @@ export const ChapterDigestSchema = z.object({
   payoffKind: PayoffKindSchema.nullable(),
   endedOn: line,
   newNamedThings: z.array(line).max(8),
+  narrativeEvidence: z.array(NarrativeEvidenceSchema).max(24).default([]),
   coreChanges: z.object({
     storyDayDelta: z.number().int().min(0).max(3_650),
     died: z.array(id).max(8),

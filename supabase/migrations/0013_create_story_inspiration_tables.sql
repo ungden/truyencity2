@@ -23,7 +23,6 @@ CREATE TABLE IF NOT EXISTS source_stories (
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
-
 -- Table: Story structure analysis (extracted from source)
 CREATE TABLE IF NOT EXISTS story_analysis (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -61,7 +60,6 @@ CREATE TABLE IF NOT EXISTS story_analysis (
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
-
 -- Table: Inspired story outlines (rewritten based on source)
 CREATE TABLE IF NOT EXISTS story_outlines (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -105,7 +103,6 @@ CREATE TABLE IF NOT EXISTS story_outlines (
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
-
 -- Table: Track inspiration writing jobs
 CREATE TABLE IF NOT EXISTS inspiration_jobs (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -130,7 +127,6 @@ CREATE TABLE IF NOT EXISTS inspiration_jobs (
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
-
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_source_stories_user_id ON source_stories(user_id);
 CREATE INDEX IF NOT EXISTS idx_source_stories_status ON source_stories(analysis_status);
@@ -139,13 +135,11 @@ CREATE INDEX IF NOT EXISTS idx_story_outlines_user_id ON story_outlines(user_id)
 CREATE INDEX IF NOT EXISTS idx_story_outlines_status ON story_outlines(status);
 CREATE INDEX IF NOT EXISTS idx_inspiration_jobs_user_id ON inspiration_jobs(user_id);
 CREATE INDEX IF NOT EXISTS idx_inspiration_jobs_status ON inspiration_jobs(status);
-
 -- Enable RLS
 ALTER TABLE source_stories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE story_analysis ENABLE ROW LEVEL SECURITY;
 ALTER TABLE story_outlines ENABLE ROW LEVEL SECURITY;
 ALTER TABLE inspiration_jobs ENABLE ROW LEVEL SECURITY;
-
 -- RLS Policies: Users can only see their own data
 DO $$
 BEGIN
@@ -210,7 +204,6 @@ BEGIN
   END IF;
 END
 $$;
-
 -- Service role bypass policies
 DO $$
 BEGIN

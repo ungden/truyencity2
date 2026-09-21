@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { NarrativeFoundationSchema, assertFoundationReferences } from '@/services/narrative/foundation';
 
 const stableId = z.string().regex(/^[a-z][a-z0-9_-]{1,63}$/);
 const shortText = z.string().trim().min(2).max(160);
@@ -142,6 +143,7 @@ export const WorldMechanicSchema = z.discriminatedUnion('kind', [
 
 export const StoryKernelSchema = z.object({
   schemaVersion: z.literal(2),
+  narrativeFoundation: NarrativeFoundationSchema.optional(),
   title: z.string().trim().min(4).max(180),
   description: z.string().trim().min(40).max(2_000),
   genreLane: z.string().trim().min(2).max(80),
@@ -207,6 +209,18 @@ export const StoryKernelSchema = z.object({
   const characters = new Set(kernel.characters.map(item => item.id));
   if (!characters.has(kernel.protagonistId)) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['protagonistId'], message: 'Unknown protagonist id.' });
+  }
+  if (kernel.narrativeFoundation) {
+    try {
+      assertFoundationReferences({
+        foundation: kernel.narrativeFoundation,
+        characterIds: kernel.characters.map(item => item.id),
+        worldIds: kernel.worldModel.geography.map(item => item.id),
+        protagonistId: kernel.protagonistId,
+      });
+    } catch (error) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['narrativeFoundation'], message: error instanceof Error ? error.message : String(error) });
+    }
   }
   const locations = new Set(kernel.locations.map(item => item.id));
   const resources = new Set(kernel.resources.map(item => item.id));

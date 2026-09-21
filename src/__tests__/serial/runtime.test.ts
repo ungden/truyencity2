@@ -2,8 +2,11 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import type { StoryModelProvider } from '@/services/story-factory/provider';
 import { editorialNotesFromError, mergeEditorialNotes, mergeRollingCyclePlan, runSerialTick, runSerialTicks, CYCLES_PER_VOLUME, serialFailureDisposition } from '@/services/serial/runtime';
 import { StoryFactoryError } from '@/services/story-factory/contracts';
-import { premise, baseBible, cycle } from './fixtures';
+import { premise, baseBible, cycle, digest as chapterDigest } from './fixtures';
 import { DEFAULT_SERIAL_ROUTES } from '@/services/serial/routes';
+import { CyclePlanSchema, PremiseSchema } from '@/services/serial/contracts';
+import { NARRATIVE_FOUNDATION_VERSION } from '@/services/narrative/foundation';
+import { seedBible } from '@/services/serial/state';
 
 /**
  * A thenable stand-in for the Supabase query builder. Supabase's builder resolves when
@@ -31,6 +34,8 @@ function fakeDb(script: Script) {
       eq: () => self,
       in: () => self,
       not: () => self,
+      gte: () => self,
+      lte: () => self,
       order: () => self,
       limit: () => self,
       insert: (value: Row) => { pending = value; writes.push({ op: 'insert', table, value }); return self; },
@@ -64,6 +69,63 @@ const job = (over: Row = {}): Row => ({
 const novelRow = (): Row => ({
   id: 'sn1', premise, bible: baseBible(), routes: DEFAULT_SERIAL_ROUTES,
 });
+
+const livedPremise = () => {
+  const protagonistId = premise.castSeed.find(member => member.role === 'protagonist')!.id;
+  return PremiseSchema.parse({
+    ...premise,
+    schemaVersion: 3,
+    narrativeFoundation: {
+      craftProfile: { version: NARRATIVE_FOUNDATION_VERSION, genre: 'two_world_commerce' },
+      characters: [{
+        characterId: protagonistId,
+        background: 'Lâm Việt lớn lên trong một cửa hàng nhỏ và quen tự kiểm hàng.',
+        presentLife: 'Anh đang giữ cửa hàng, kiểm tồn kho và xoay dòng tiền từng ngày.',
+        existingCompetence: 'Anh biết so giá, ghi sổ và kiểm chất lượng hàng phổ thông.',
+        limitsOfKnowledge: 'Anh không biết công nghệ cao và chưa hiểu quy tắc của thế giới bên kia.',
+        relationships: 'Anh còn giữ liên hệ với người giao hàng và vài khách quen trong phố.',
+        habits: 'Anh ghi mã lô, chụp tem và luôn thử món mới ở quy mô nhỏ.',
+        desireBeforeAdvantage: 'Anh muốn cửa hàng sống được mà không phải bán tài sản gia đình.',
+      }],
+      livedWorlds: premise.worldKernel.worlds.map(world => ({
+        worldId: world.id,
+        everydayLife: 'Người dân ăn ở, mua bán và đi lại theo nhịp riêng trước khi main xuất hiện.',
+        livelihoods: 'Cửa hàng, đội săn và thợ thủ công tạo ra sinh kế của địa phương.',
+        infrastructure: 'Kho, đường vận chuyển và cơ chế kiểm định giới hạn hàng có thể lưu thông.',
+        inequality: 'Quyền tiếp cận vốn và vật tư khác nhau giữa người lao động và tổ chức lớn.',
+        institutionsWithoutProtagonist: 'Thành Vệ và thương hội vẫn tranh nguồn hàng theo lợi ích riêng.',
+      })),
+      advantageDiscovery: {
+        acquisitionEvent: 'Lâm Việt phát hiện cánh cửa lạ khi kiểm kho sau giờ đóng cửa.',
+        initialReaction: 'Anh khóa cửa, đánh dấu đồ vật và kiểm tra một hiện tượng nhỏ trước.',
+        firstExperiments: ['Đưa một vật đánh dấu qua ngưỡng rồi kiểm đường quay về.'],
+        initiallyKnownFactIds: [],
+        unresolvedOrigin: 'Anh chưa biết ai tạo ra cánh cửa và vì sao nó nối hai nơi.',
+      },
+      facts: [{
+        id: 'cua_hai_gioi', truth: 'Cánh cửa nối hai kho và cho phép quay về.',
+        initiallyKnownByCharacterIds: [], revealThrough: 'Hai phép thử có đánh dấu được diễn trên trang.',
+      }],
+      milestones: [{
+        id: 'kiem_chung_cua', intention: 'Lâm Việt tin cánh cửa tồn tại sau phép thử.',
+        prerequisiteIds: ['cua_hai_gioi'], evidenceNeeded: 'Hai lần thử và đường quay về đều xuất hiện.',
+      }],
+    },
+  });
+};
+
+const livedCycle = () => {
+  const base = cycle({ cycleNumber: 1, startChapter: 1, plannedEndChapter: 5 });
+  return CyclePlanSchema.parse({
+    ...base,
+    schemaVersion: 2,
+    customerLoop: null,
+    beatSheets: [1, 2, 3].map(chapterNumber => ({
+      ...base.beatSheets[0], chapterNumber,
+      sceneMode: 'discovery', prerequisiteIds: [], revealsFactIds: [], advancesMilestoneIds: [],
+    })),
+  });
+};
 
 const unusedProvider = {
   async text() { throw new Error('unused'); },
@@ -103,6 +165,9 @@ describe('serial runtime', () => {
         emotionalTarget: 'Chu kỳ kết thúc bằng thành quả nhìn thấy.',
         newNamedThing: 'Hợp đồng bãi săn',
         endHookKind: 'reward',
+        prerequisiteIds: [],
+        revealsFactIds: [],
+        advancesMilestoneIds: [],
       }],
     });
 
@@ -134,6 +199,9 @@ describe('serial runtime', () => {
         emotionalTarget: 'Thỏa mãn vì lời hứa được thực hiện.',
         newNamedThing: `Mốc ${chapterNumber}`,
         endHookKind: 'reward' as const,
+        prerequisiteIds: [],
+        revealsFactIds: [],
+        advancesMilestoneIds: [],
       })),
     });
 
@@ -186,6 +254,103 @@ describe('serial runtime', () => {
     expect(result.detail).toMatch(/No open cycle/);
   });
 
+  test('extractor failure preserves the private prose and never replans or deletes the cycle', async () => {
+    const badDigest = {
+      chapterNumber: 8,
+      title: 'Ca kiểm hàng',
+      summary: 'Lâm Việt kiểm hàng rồi ghi sổ.',
+      payoffKind: null,
+      endedOn: 'Anh khép sổ.',
+      newNamedThings: [],
+      narrativeEvidence: [],
+      coreChanges: {
+        storyDayDelta: 0, died: [], progressionChanges: [], assetEvents: [],
+        goldenFingerRungChange: null, moved: [], worldFactsRevealed: [], newCast: [],
+        hooksPlanted: [], hooksPaid: ['hook_khong_ton_tai'], learnedFinger: [],
+      },
+    };
+    const prose = 'Lâm Việt kiểm từng kiện hàng, ghi lại dấu niêm phong rồi khép sổ. '.repeat(20);
+    const provider = {
+      async text() { throw new Error('unused'); },
+      async json<T>(input: { system: string; model: string }) {
+        const value = input.system.startsWith('Bạn là tác giả')
+          ? { title: 'Ca kiểm hàng', content: prose }
+          : input.system.startsWith('Bạn đọc và soát')
+            ? {
+                continuity: [],
+                scorecard: { opening: 4, anticipation: 4, payoff: 3, newness: 3, endHook: 3 },
+                craft: { protagonistAgency: 4, sceneLife: 4, worldLogic: 4, dialogueNaturalness: 4, structuralFreshness: 3 },
+                repetition: [], aiFlavor: [], steering: [],
+              }
+            : badDigest;
+        return {
+          value: value as T,
+          usage: { model: input.model, inputTokens: 1, outputTokens: 1, costUsd: 0.01, finishReason: 'STOP' },
+        };
+      },
+    } as StoryModelProvider;
+    const { db, writes, rpcCalls } = fakeDb({
+      rows: {
+        serial_novels: novelRow(),
+        serial_cycles: { id: 'cy1', plan: cycle(), start_chapter: 8, end_chapter: 16 },
+        serial_runs: { id: 'run1' },
+        chapters: null,
+      },
+      rpc: { claim_serial_job: job() },
+    });
+    const result = await runSerialTick({ db, provider });
+    expect(result.detail).toMatch(/Paused with private extractor artifact/);
+    expect(rpcCalls.map(call => call.fn)).not.toContain('replan_serial_cycle');
+    const saved = writes.find(write => write.table === 'serial_runs' && write.op === 'update');
+    expect(saved?.value).toMatchObject({
+      status: 'failed',
+      draft_artifact: { reviewKind: 'extractor', chapter: { content: prose.trim() } },
+    });
+    const parked = writes.filter(write => write.table === 'serial_jobs').at(-1);
+    expect(parked?.value).toMatchObject({ status: 'paused' });
+  });
+
+  test('the next tick consumes an extractor checkpoint instead of calling Writer and Judge again', async () => {
+    const verdict = {
+      continuity: [],
+      scorecard: { opening: 4, anticipation: 4, payoff: 3, newness: 3, endHook: 3 },
+      craft: { protagonistAgency: 4, sceneLife: 4, worldLogic: 4, dialogueNaturalness: 4, structuralFreshness: 3 },
+      repetition: [], aiFlavor: [], steering: [],
+    };
+    const systems: string[] = [];
+    const provider = {
+      async text() { throw new Error('unused'); },
+      async json<T>(input: { system: string; model: string }) {
+        systems.push(input.system);
+        if (!input.system.startsWith('Bạn đọc một chương vừa viết xong')) throw new Error('Writer or Judge was called after checkpoint resume.');
+        return {
+          value: chapterDigest() as T,
+          usage: { model: input.model, inputTokens: 1, outputTokens: 1, costUsd: 0.01, finishReason: 'STOP' },
+        };
+      },
+    } as StoryModelProvider;
+    const { db, rpcCalls } = fakeDb({
+      rows: {
+        serial_novels: novelRow(),
+        serial_cycles: { id: 'cy1', plan: cycle(), start_chapter: 8, end_chapter: 16, checkpoint_bible: baseBible() },
+        serial_runs: {
+          id: 'run2',
+          draft_artifact: {
+            schemaVersion: 1, resumeFrom: 'extractor', attempts: 1,
+            chapter: { chapterNumber: 8, title: 'Ca kiểm hàng', content: 'x'.repeat(900) },
+            verdict,
+          },
+        },
+        chapters: null,
+      },
+      rpc: { claim_serial_job: job(), commit_serial_chapter: { chapterNumber: 8 } },
+    });
+    const result = await runSerialTick({ db, provider });
+    expect(result.detail).toContain('Ca kiểm hàng');
+    expect(systems).toHaveLength(1);
+    expect(rpcCalls.map(call => call.fn)).toContain('commit_serial_chapter');
+  });
+
   test('publishing hands the job to volume folding on a volume boundary', async () => {
     const { db, rpcCalls } = fakeDb({
       rows: { serial_cycles: { cycle_number: CYCLES_PER_VOLUME } },
@@ -209,6 +374,64 @@ describe('serial runtime', () => {
     });
     await runSerialTick({ db, provider: unusedProvider });
     expect(rpcCalls.find(call => call.fn === 'publish_serial_cycle')?.args.p_next_stage).toBe('plan_cycle');
+  });
+
+  test('a lived-causality cycle is reviewed with its plan before publish and blocking prose keeps every draft private', async () => {
+    const v3 = livedPremise();
+    const plan = livedCycle();
+    const bible = seedBible({ premise: v3 });
+    bible.symbolicCore.chapterNumber = 5;
+    const chapters = Array.from({ length: 5 }, (_, index) => ({
+      chapter_number: index + 1,
+      title: `Phép thử ${index + 1}`,
+      content: `Lâm Việt đánh dấu chai nước trong phép thử ${index + 1} rồi ghi kết quả vào sổ.`,
+    }));
+    const prompts: Array<Record<string, unknown>> = [];
+    const provider = {
+      async text() { throw new Error('unused'); },
+      async json<T>(input: { prompt: string; model: string }) {
+        prompts.push(JSON.parse(input.prompt) as Record<string, unknown>);
+        return {
+          value: {
+            findings: [{
+              target: 'prose', kind: 'unlived_scene', severity: 'blocking', chapterNumber: 5,
+              quote: 'Lâm Việt đánh dấu chai nước trong phép thử 5 rồi ghi kết quả vào sổ.',
+              explanation: 'Lựa chọn quan trọng bị nén thành một câu.',
+              direction: 'Giữ draft riêng tư và diễn phép thử trước khi xuất bản.',
+            }],
+            readerAssessment: {
+              protagonist: 'Lâm Việt có mục tiêu rõ.', world: 'Hai thế giới có đời sống riêng.',
+              causality: 'Phép thử cuối bị bỏ bước.', sceneLife: 'Cảnh cuối bị kể tắt quá nhanh.',
+              desireToContinue: 'Cần thấy phép thử được thực hiện.',
+            },
+          } as T,
+          usage: { model: input.model, inputTokens: 10, outputTokens: 5, costUsd: 0.01, finishReason: 'STOP' },
+        };
+      },
+    } as StoryModelProvider;
+    const { db, writes, rpcCalls } = fakeDb({
+      rows: {
+        serial_novels: { id: 'sn1', premise: v3, bible, routes: DEFAULT_SERIAL_ROUTES },
+        serial_cycles: {
+          id: 'cy1', cycle_number: 1, start_chapter: 1, end_chapter: 5,
+          plan, plan_history: [plan], checkpoint_bible: seedBible({ premise: v3 }),
+          narrative_review: null, narrative_review_fingerprint: null,
+        },
+        chapters,
+      },
+      rpc: { claim_serial_job: job({ stage: 'publish_cycle', current_chapter: 5 }) },
+    });
+    const result = await runSerialTick({ db, provider });
+    expect(result.detail).toMatch(/paused publication/);
+    expect(rpcCalls.map(call => call.fn)).not.toContain('publish_serial_cycle');
+    expect(writes.find(write => write.table === 'serial_cycles' && write.op === 'update')?.value)
+      .toMatchObject({ narrative_review: { findings: [expect.objectContaining({ target: 'prose' })] } });
+    expect(writes.filter(write => write.table === 'serial_jobs').at(-1)?.value).toMatchObject({ status: 'paused' });
+    expect(prompts[0]).toMatchObject({
+      approvedPlan: [expect.objectContaining({ schemaVersion: 2 })],
+      stateAtSequenceStart: { chapterNumber: 0 },
+      durableNarrativeState: { revealedNarrativeIds: [] },
+    });
   });
 
   test('folding a volume bounds the stored Bible and resumes planning', async () => {

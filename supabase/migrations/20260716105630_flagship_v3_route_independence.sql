@@ -37,12 +37,10 @@ BEGIN
   RETURN NEW;
 END;
 $$;
-
 DROP TRIGGER IF EXISTS trg_validate_flagship_v3_route_contract ON public.ai_story_projects;
 CREATE TRIGGER trg_validate_flagship_v3_route_contract
 BEFORE INSERT OR UPDATE OF style_directives, flagship_v3_status
 ON public.ai_story_projects
 FOR EACH ROW EXECUTE FUNCTION public.validate_flagship_v3_route_contract();
-
 REVOKE ALL ON FUNCTION public.validate_flagship_v3_route_contract() FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.validate_flagship_v3_route_contract() TO service_role;

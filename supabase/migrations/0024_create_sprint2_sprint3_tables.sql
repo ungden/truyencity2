@@ -51,12 +51,10 @@ CREATE TABLE IF NOT EXISTS character_depth_profiles (
   
   UNIQUE(project_id, name)
 );
-
 -- Indexes for character depth
 CREATE INDEX IF NOT EXISTS idx_character_depth_project ON character_depth_profiles(project_id);
 CREATE INDEX IF NOT EXISTS idx_character_depth_role ON character_depth_profiles(project_id, role);
 CREATE INDEX IF NOT EXISTS idx_character_depth_growth ON character_depth_profiles(project_id, ((character_arc->>'growthScore')::integer));
-
 -- =============================================
 -- 2. ROMANCE PROGRESSIONS
 -- Tracks romantic relationship development
@@ -96,12 +94,10 @@ CREATE TABLE IF NOT EXISTS romance_progressions (
   
   UNIQUE(project_id, character1, character2)
 );
-
 -- Indexes for romance
 CREATE INDEX IF NOT EXISTS idx_romance_project ON romance_progressions(project_id);
 CREATE INDEX IF NOT EXISTS idx_romance_status ON romance_progressions(project_id, status);
 CREATE INDEX IF NOT EXISTS idx_romance_characters ON romance_progressions(project_id, character1, character2);
-
 -- =============================================
 -- 3. BATTLE RECORDS
 -- Tracks battle variety and tactical patterns
@@ -134,12 +130,10 @@ CREATE TABLE IF NOT EXISTS battle_records (
   
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
-
 -- Indexes for battles
 CREATE INDEX IF NOT EXISTS idx_battle_project_chapter ON battle_records(project_id, chapter_number);
 CREATE INDEX IF NOT EXISTS idx_battle_type ON battle_records(project_id, battle_type);
 CREATE INDEX IF NOT EXISTS idx_battle_variety_score ON battle_records(project_id, variety_score);
-
 -- =============================================
 -- 4. ENEMY SCALING
 -- Tracks power gap consistency
@@ -157,9 +151,7 @@ CREATE TABLE IF NOT EXISTS enemy_scaling (
   
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
-
 CREATE INDEX IF NOT EXISTS idx_enemy_scaling_project ON enemy_scaling(project_id, chapter_number);
-
 -- =============================================
 -- 5. CHARACTER VOICES
 -- Stores voice profiles for dialogue consistency
@@ -184,9 +176,7 @@ CREATE TABLE IF NOT EXISTS character_voices (
   
   UNIQUE(project_id, character_name)
 );
-
 CREATE INDEX IF NOT EXISTS idx_character_voices_project ON character_voices(project_id);
-
 -- =============================================
 -- 6. WRITING STYLE ANALYTICS
 -- Stores style analysis history for improvement tracking
@@ -219,10 +209,8 @@ CREATE TABLE IF NOT EXISTS writing_style_analytics (
   
   UNIQUE(project_id, chapter_number)
 );
-
 CREATE INDEX IF NOT EXISTS idx_style_analytics_project ON writing_style_analytics(project_id, chapter_number);
 CREATE INDEX IF NOT EXISTS idx_style_analytics_score ON writing_style_analytics(project_id, overall_score);
-
 -- =============================================
 -- HELPER FUNCTIONS
 -- =============================================
@@ -262,7 +250,6 @@ BEGIN
     p_current_chapter - COALESCE(cdp.last_appearance, cdp.first_appearance) DESC;
 END;
 $$ LANGUAGE plpgsql STABLE;
-
 -- Function to get battle variety report
 CREATE OR REPLACE FUNCTION get_battle_variety_report(p_project_id UUID)
 RETURNS JSONB AS $$
@@ -301,7 +288,6 @@ BEGIN
   RETURN COALESCE(v_result, '{}'::jsonb);
 END;
 $$ LANGUAGE plpgsql STABLE;
-
 -- Function to check romance stall
 CREATE OR REPLACE FUNCTION check_romance_stalls(p_project_id UUID, p_current_chapter INTEGER)
 RETURNS TABLE(
@@ -330,7 +316,6 @@ BEGIN
         END;
 END;
 $$ LANGUAGE plpgsql STABLE;
-
 -- Function to get writing style trends
 CREATE OR REPLACE FUNCTION get_writing_style_trends(p_project_id UUID, p_last_n_chapters INTEGER DEFAULT 20)
 RETURNS JSONB AS $$
@@ -371,7 +356,6 @@ BEGIN
   RETURN COALESCE(v_result, '{}'::jsonb);
 END;
 $$ LANGUAGE plpgsql STABLE;
-
 -- =============================================
 -- ROW LEVEL SECURITY
 -- =============================================
@@ -382,51 +366,38 @@ ALTER TABLE battle_records ENABLE ROW LEVEL SECURITY;
 ALTER TABLE enemy_scaling ENABLE ROW LEVEL SECURITY;
 ALTER TABLE character_voices ENABLE ROW LEVEL SECURITY;
 ALTER TABLE writing_style_analytics ENABLE ROW LEVEL SECURITY;
-
 -- Service role bypass
 CREATE POLICY "Service role bypass for character_depth_profiles" ON character_depth_profiles
   FOR ALL TO service_role USING (true);
-  
 CREATE POLICY "Service role bypass for romance_progressions" ON romance_progressions
   FOR ALL TO service_role USING (true);
-  
 CREATE POLICY "Service role bypass for battle_records" ON battle_records
   FOR ALL TO service_role USING (true);
-  
 CREATE POLICY "Service role bypass for enemy_scaling" ON enemy_scaling
   FOR ALL TO service_role USING (true);
-  
 CREATE POLICY "Service role bypass for character_voices" ON character_voices
   FOR ALL TO service_role USING (true);
-  
 CREATE POLICY "Service role bypass for writing_style_analytics" ON writing_style_analytics
   FOR ALL TO service_role USING (true);
-
 -- Admin access
 CREATE POLICY "Admins have full access to character_depth_profiles" ON character_depth_profiles
   FOR ALL TO authenticated
   USING ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
-
 CREATE POLICY "Admins have full access to romance_progressions" ON romance_progressions
   FOR ALL TO authenticated
   USING ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
-
 CREATE POLICY "Admins have full access to battle_records" ON battle_records
   FOR ALL TO authenticated
   USING ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
-
 CREATE POLICY "Admins have full access to enemy_scaling" ON enemy_scaling
   FOR ALL TO authenticated
   USING ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
-
 CREATE POLICY "Admins have full access to character_voices" ON character_voices
   FOR ALL TO authenticated
   USING ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
-
 CREATE POLICY "Admins have full access to writing_style_analytics" ON writing_style_analytics
   FOR ALL TO authenticated
   USING ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
-
 -- =============================================
 -- TRIGGERS
 -- =============================================
@@ -439,16 +410,13 @@ BEGIN
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
-
 -- Update timestamps
 CREATE TRIGGER update_character_depth_updated_at
   BEFORE UPDATE ON character_depth_profiles
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
 CREATE TRIGGER update_romance_progressions_updated_at
   BEFORE UPDATE ON romance_progressions
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
 CREATE TRIGGER update_character_voices_updated_at
   BEFORE UPDATE ON character_voices
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();

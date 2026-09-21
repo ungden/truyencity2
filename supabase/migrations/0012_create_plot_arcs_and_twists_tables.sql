@@ -36,12 +36,10 @@ CREATE TABLE IF NOT EXISTS plot_arcs (
   CHECK (climax_chapter IS NULL OR (climax_chapter >= start_chapter AND climax_chapter <= end_chapter)),
   CHECK (tension_curve IS NULL OR array_length(tension_curve, 1) = (end_chapter - start_chapter + 1))
 );
-
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_plot_arcs_project_id ON plot_arcs(project_id);
 CREATE INDEX IF NOT EXISTS idx_plot_arcs_status ON plot_arcs(project_id, status);
 CREATE INDEX IF NOT EXISTS idx_plot_arcs_chapters ON plot_arcs(project_id, start_chapter, end_chapter);
-
 -- ============================================================================
 -- PLANNED TWISTS TABLE - Lập kế hoạch twist trước để foreshadow
 -- ============================================================================
@@ -74,13 +72,11 @@ CREATE TABLE IF NOT EXISTS planned_twists (
   CHECK (impact_level >= 0 AND impact_level <= 100),
   CHECK (twist_type IN ('betrayal', 'revelation', 'power_up', 'death', 'reunion', 'hidden_identity', 'plot_reversal', 'alliance', 'inheritance', 'prophecy'))
 );
-
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_planned_twists_project_id ON planned_twists(project_id);
 CREATE INDEX IF NOT EXISTS idx_planned_twists_arc_id ON planned_twists(arc_id);
 CREATE INDEX IF NOT EXISTS idx_planned_twists_target_chapter ON planned_twists(project_id, target_chapter);
 CREATE INDEX IF NOT EXISTS idx_planned_twists_status ON planned_twists(project_id, status);
-
 -- ============================================================================
 -- CHARACTER ARCS TABLE - Theo dõi sự phát triển nhân vật
 -- ============================================================================
@@ -111,11 +107,9 @@ CREATE TABLE IF NOT EXISTS character_arcs (
   UNIQUE(project_id, character_name),
   CHECK (arc_type IN ('growth', 'fall', 'redemption', 'corruption', 'static', 'transformation'))
 );
-
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_character_arcs_project_id ON character_arcs(project_id);
 CREATE INDEX IF NOT EXISTS idx_character_arcs_character_name ON character_arcs(project_id, character_name);
-
 -- ============================================================================
 -- HIERARCHICAL SUMMARIES TABLE - Tóm tắt theo cấp để tiết kiệm token
 -- ============================================================================
@@ -150,12 +144,10 @@ CREATE TABLE IF NOT EXISTS hierarchical_summaries (
   CHECK (level IN ('arc', 'volume')),
   CHECK (start_chapter <= end_chapter)
 );
-
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_hierarchical_summaries_project_id ON hierarchical_summaries(project_id);
 CREATE INDEX IF NOT EXISTS idx_hierarchical_summaries_level ON hierarchical_summaries(project_id, level, level_number);
 CREATE INDEX IF NOT EXISTS idx_hierarchical_summaries_chapters ON hierarchical_summaries(project_id, start_chapter, end_chapter);
-
 -- ============================================================================
 -- RLS POLICIES
 -- ============================================================================
@@ -165,40 +157,31 @@ ALTER TABLE plot_arcs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE planned_twists ENABLE ROW LEVEL SECURITY;
 ALTER TABLE character_arcs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE hierarchical_summaries ENABLE ROW LEVEL SECURITY;
-
 -- Policies: Everyone can read, authenticated can write
 DROP POLICY IF EXISTS "Allow public read access to plot_arcs" ON plot_arcs;
 CREATE POLICY "Allow public read access to plot_arcs"
   ON plot_arcs FOR SELECT USING (true);
-
 DROP POLICY IF EXISTS "Allow authenticated users to manage plot_arcs" ON plot_arcs;
 CREATE POLICY "Allow authenticated users to manage plot_arcs"
   ON plot_arcs FOR ALL USING (auth.role() = 'authenticated');
-
 DROP POLICY IF EXISTS "Allow public read access to planned_twists" ON planned_twists;
 CREATE POLICY "Allow public read access to planned_twists"
   ON planned_twists FOR SELECT USING (true);
-
 DROP POLICY IF EXISTS "Allow authenticated users to manage planned_twists" ON planned_twists;
 CREATE POLICY "Allow authenticated users to manage planned_twists"
   ON planned_twists FOR ALL USING (auth.role() = 'authenticated');
-
 DROP POLICY IF EXISTS "Allow public read access to character_arcs" ON character_arcs;
 CREATE POLICY "Allow public read access to character_arcs"
   ON character_arcs FOR SELECT USING (true);
-
 DROP POLICY IF EXISTS "Allow authenticated users to manage character_arcs" ON character_arcs;
 CREATE POLICY "Allow authenticated users to manage character_arcs"
   ON character_arcs FOR ALL USING (auth.role() = 'authenticated');
-
 DROP POLICY IF EXISTS "Allow public read access to hierarchical_summaries" ON hierarchical_summaries;
 CREATE POLICY "Allow public read access to hierarchical_summaries"
   ON hierarchical_summaries FOR SELECT USING (true);
-
 DROP POLICY IF EXISTS "Allow authenticated users to manage hierarchical_summaries" ON hierarchical_summaries;
 CREATE POLICY "Allow authenticated users to manage hierarchical_summaries"
   ON hierarchical_summaries FOR ALL USING (auth.role() = 'authenticated');
-
 -- ============================================================================
 -- HELPER FUNCTIONS
 -- ============================================================================
@@ -231,14 +214,12 @@ BEGIN
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
-
 -- Trigger to auto-create arcs
 DROP TRIGGER IF EXISTS trigger_auto_create_plot_arc ON ai_story_projects;
 CREATE TRIGGER trigger_auto_create_plot_arc
   AFTER UPDATE OF current_chapter ON ai_story_projects
   FOR EACH ROW
   EXECUTE FUNCTION auto_create_plot_arc();
-
 -- Function to generate arc summary when arc completes
 CREATE OR REPLACE FUNCTION generate_arc_summary()
 RETURNS TRIGGER AS $$
@@ -285,12 +266,10 @@ BEGIN
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
-
 -- Trigger to auto-generate arc summaries
 DROP TRIGGER IF EXISTS trigger_generate_arc_summary ON plot_arcs;
 CREATE TRIGGER trigger_generate_arc_summary
   AFTER UPDATE OF status ON plot_arcs
   FOR EACH ROW
   EXECUTE FUNCTION generate_arc_summary();
-
--- Done!
+-- Done!;

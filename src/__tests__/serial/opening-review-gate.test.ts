@@ -8,6 +8,10 @@ const auditMigration = readFileSync(
   'supabase/migrations/20260919205759_serial_opening_audit.sql',
   'utf8',
 );
+const cycleReviewMigration = readFileSync(
+  'supabase/migrations/20260921152309_serial_cycle_narrative_review_gate.sql',
+  'utf8',
+);
 const runtime = readFileSync('src/services/serial/runtime.ts', 'utf8');
 const adminRoute = readFileSync('src/app/api/admin/serial/route.ts', 'utf8');
 const operator = readFileSync('scripts/serial-operator.ts', 'utf8');
@@ -52,5 +56,14 @@ describe('chapter-four human review gate', () => {
     expect(adminRoute).toMatch(/A review gate cannot be replaced by pause/);
     expect(operator).toMatch(/resume requires a paused job; it cannot bypass a review gate/);
     expect(operator).toMatch(/opening_reviewed_at/);
+  });
+
+  test('every lived-causality cycle is fail-closed on a current, passing literary review', () => {
+    expect(runtime).toMatch(/reviewNarrativeSequence/);
+    expect(runtime).toMatch(/Cycle literary review paused publication/);
+    expect(cycleReviewMigration).toMatch(/SERIAL_NARRATIVE_REVIEW_REQUIRED_OR_STALE/);
+    expect(cycleReviewMigration).toMatch(/narrative_review_snapshot IS DISTINCT FROM v_draft_snapshot/);
+    expect(cycleReviewMigration).toMatch(/SERIAL_NARRATIVE_REVIEW_BLOCKED/);
+    expect(cycleReviewMigration).toMatch(/finding->>'target' IN \('foundation', 'plan'\)/);
   });
 });

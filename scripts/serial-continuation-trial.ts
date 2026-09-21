@@ -210,7 +210,7 @@ async function main(): Promise<void> {
       });
       usages.push(...outcome.usages);
     }
-    if (outcome.status === 'needs_replan') {
+    if (outcome.status !== 'committed') {
       writeFileSync(join(outDir, `chapter-${chapterNumber}-stopped.json`), `${JSON.stringify(outcome, null, 2)}\n`);
       throw new Error(`Trial stopped at chapter ${chapterNumber}: ${outcome.reason}`);
     }

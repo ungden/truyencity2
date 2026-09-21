@@ -11,7 +11,7 @@ async function probeCanonicalSchema() {
     { table: 'ai_story_projects', columns: 'id,engine_release,story_kernel,arc_plan,story_state' },
     { table: 'story_factory_jobs', columns: 'id,status,stage,rolling_plan,lease_until' },
     { table: 'story_factory_runs', columns: 'id,kind,status,engine_release' },
-    { table: 'story_state_events', columns: 'id,event_type,payload' },
+    { table: 'story_state_events', columns: 'id,kind,entity_id,before_value,after_value' },
   ];
   const results: Array<{ table: string; ready: boolean; error?: string }> = [];
   for (const p of probes) {

@@ -5,7 +5,6 @@ select cron.unschedule('daily-spawn-cron')
 where exists (
   select 1 from cron.job where jobname = 'daily-spawn-cron'
 );
-
 select cron.schedule(
   'daily-spawn-cron',
   '55 23 * * *',

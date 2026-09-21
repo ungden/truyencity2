@@ -2,9 +2,7 @@
 -- one database transaction so a paused job cannot be made ready while its open
 -- cycle still carries the exhausted automatic-replan counter.
 BEGIN;
-
 SET lock_timeout = '5s';
-
 CREATE OR REPLACE FUNCTION public.resume_serial_job(p_job_id uuid)
 RETURNS jsonb
 LANGUAGE plpgsql SECURITY INVOKER SET search_path = public AS $$
@@ -43,8 +41,6 @@ BEGIN
     'nextStage', v_job.stage
   );
 END $$;
-
 REVOKE ALL ON FUNCTION public.resume_serial_job(uuid) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.resume_serial_job(uuid) TO service_role;
-
 COMMIT;

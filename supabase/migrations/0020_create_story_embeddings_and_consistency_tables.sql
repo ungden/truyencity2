@@ -5,7 +5,6 @@
 
 -- Enable pgvector extension
 CREATE EXTENSION IF NOT EXISTS vector;
-
 -- ============================================================================
 -- STORY EMBEDDINGS TABLE - For semantic search/RAG
 -- ============================================================================
@@ -29,15 +28,12 @@ CREATE TABLE IF NOT EXISTS story_embeddings (
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
-
 -- Index for vector similarity search
 CREATE INDEX IF NOT EXISTS idx_story_embeddings_vector ON story_embeddings
   USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100);
-
 CREATE INDEX IF NOT EXISTS idx_story_embeddings_project ON story_embeddings(project_id);
 CREATE INDEX IF NOT EXISTS idx_story_embeddings_chapter ON story_embeddings(project_id, chapter_number);
 CREATE INDEX IF NOT EXISTS idx_story_embeddings_type ON story_embeddings(project_id, content_type);
-
 -- ============================================================================
 -- CHARACTER TRACKER TABLE - For consistency checking
 -- ============================================================================
@@ -72,10 +68,8 @@ CREATE TABLE IF NOT EXISTS character_tracker (
 
   UNIQUE(project_id, character_name)
 );
-
 CREATE INDEX IF NOT EXISTS idx_character_tracker_project ON character_tracker(project_id);
 CREATE INDEX IF NOT EXISTS idx_character_tracker_name ON character_tracker(project_id, character_name);
-
 -- ============================================================================
 -- POWER PROGRESSION TABLE - Track cultivation/power levels
 -- ============================================================================
@@ -105,11 +99,9 @@ CREATE TABLE IF NOT EXISTS power_progression (
 
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
-
 CREATE INDEX IF NOT EXISTS idx_power_progression_project ON power_progression(project_id);
 CREATE INDEX IF NOT EXISTS idx_power_progression_character ON power_progression(project_id, character_name);
 CREATE INDEX IF NOT EXISTS idx_power_progression_chapter ON power_progression(project_id, chapter_number);
-
 -- ============================================================================
 -- WORLD STATE TABLE - Track world/setting changes
 -- ============================================================================
@@ -137,10 +129,8 @@ CREATE TABLE IF NOT EXISTS world_state (
 
   UNIQUE(project_id, category, name)
 );
-
 CREATE INDEX IF NOT EXISTS idx_world_state_project ON world_state(project_id);
 CREATE INDEX IF NOT EXISTS idx_world_state_category ON world_state(project_id, category);
-
 -- ============================================================================
 -- CONSISTENCY ISSUES TABLE - Log detected inconsistencies
 -- ============================================================================
@@ -169,11 +159,9 @@ CREATE TABLE IF NOT EXISTS consistency_issues (
 
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
-
 CREATE INDEX IF NOT EXISTS idx_consistency_issues_project ON consistency_issues(project_id);
 CREATE INDEX IF NOT EXISTS idx_consistency_issues_status ON consistency_issues(project_id, status);
 CREATE INDEX IF NOT EXISTS idx_consistency_issues_chapter ON consistency_issues(project_id, chapter_number);
-
 -- ============================================================================
 -- BEAT USAGE TABLE - Track dopamine/plot beats to avoid repetition
 -- ============================================================================
@@ -197,11 +185,9 @@ CREATE TABLE IF NOT EXISTS beat_usage (
 
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
-
 CREATE INDEX IF NOT EXISTS idx_beat_usage_project ON beat_usage(project_id);
 CREATE INDEX IF NOT EXISTS idx_beat_usage_type ON beat_usage(project_id, beat_type);
 CREATE INDEX IF NOT EXISTS idx_beat_usage_chapter ON beat_usage(project_id, chapter_number);
-
 -- ============================================================================
 -- RLS POLICIES
 -- ============================================================================
@@ -211,7 +197,6 @@ ALTER TABLE power_progression ENABLE ROW LEVEL SECURITY;
 ALTER TABLE world_state ENABLE ROW LEVEL SECURITY;
 ALTER TABLE consistency_issues ENABLE ROW LEVEL SECURITY;
 ALTER TABLE beat_usage ENABLE ROW LEVEL SECURITY;
-
 -- Allow authenticated users to manage their data (via project ownership)
 CREATE POLICY "story_embeddings_all" ON story_embeddings FOR ALL USING (auth.role() = 'authenticated');
 CREATE POLICY "character_tracker_all" ON character_tracker FOR ALL USING (auth.role() = 'authenticated');
@@ -219,7 +204,6 @@ CREATE POLICY "power_progression_all" ON power_progression FOR ALL USING (auth.r
 CREATE POLICY "world_state_all" ON world_state FOR ALL USING (auth.role() = 'authenticated');
 CREATE POLICY "consistency_issues_all" ON consistency_issues FOR ALL USING (auth.role() = 'authenticated');
 CREATE POLICY "beat_usage_all" ON beat_usage FOR ALL USING (auth.role() = 'authenticated');
-
 -- ============================================================================
 -- HELPER FUNCTIONS
 -- ============================================================================
@@ -264,7 +248,6 @@ BEGIN
   LIMIT p_limit;
 END;
 $$;
-
 -- Function to check if a beat can be used
 CREATE OR REPLACE FUNCTION can_use_beat(
   p_project_id UUID,
@@ -293,7 +276,6 @@ BEGIN
   RETURN p_current_chapter >= (v_last_usage + v_cooldown);
 END;
 $$;
-
 -- Function to get character's current state
 CREATE OR REPLACE FUNCTION get_character_state(
   p_project_id UUID,
@@ -323,5 +305,4 @@ BEGIN
   RETURN COALESCE(v_result, '{}'::jsonb);
 END;
 $$;
-
--- Done!
+-- Done!;

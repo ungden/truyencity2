@@ -1,7 +1,3 @@
--- Concept Lab and full-draft repair can legitimately exceed the old five
--- minute lease. A short lease let another cron claim the same immutable stage
--- while the first worker was still waiting on the provider. Keep one generous
--- lease per tick; the reconciler still closes genuinely abandoned work.
 CREATE OR REPLACE FUNCTION public.claim_story_factory_job(
   p_worker_id text,
   p_engine_release text
@@ -55,4 +51,4 @@ END $$;
 REVOKE ALL ON FUNCTION public.claim_story_factory_job(text, text)
   FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.claim_story_factory_job(text, text)
-  TO service_role;
+  TO service_role;;

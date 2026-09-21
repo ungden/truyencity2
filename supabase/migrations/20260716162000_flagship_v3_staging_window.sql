@@ -3,7 +3,6 @@
 
 ALTER TABLE public.ai_story_projects
   ADD COLUMN IF NOT EXISTS initial_window_v3 jsonb;
-
 CREATE TABLE IF NOT EXISTS public.story_benchmark_plans (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   source_blueprint_id uuid NOT NULL,
@@ -19,17 +18,14 @@ CREATE TABLE IF NOT EXISTS public.story_benchmark_plans (
   archived_at timestamptz NOT NULL DEFAULT now(),
   UNIQUE(project_id, chapter_number, source_version, archive_reason)
 );
-
 CREATE INDEX IF NOT EXISTS idx_story_benchmark_plans_project
   ON public.story_benchmark_plans(project_id, chapter_number);
-
 ALTER TABLE public.story_benchmark_plans ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON public.story_benchmark_plans FROM anon, authenticated;
 GRANT ALL ON public.story_benchmark_plans TO service_role;
 DROP POLICY IF EXISTS story_benchmark_plans_service_all ON public.story_benchmark_plans;
 CREATE POLICY story_benchmark_plans_service_all ON public.story_benchmark_plans
   FOR ALL TO service_role USING (true) WITH CHECK (true);
-
 CREATE OR REPLACE FUNCTION public.stage_flagship_launch_pack_v3(
   p_project_id uuid,
   p_launch_pack jsonb,
@@ -89,7 +85,6 @@ BEGIN
   RETURN jsonb_build_object('staged', true, 'project_id', p_project_id, 'plan_count', v_index);
 END;
 $$;
-
 CREATE OR REPLACE FUNCTION public.archive_reset_flagship_canary_v3(
   p_project_id uuid,
   p_confirmation text
@@ -211,7 +206,6 @@ BEGIN
   );
 END;
 $$;
-
 REVOKE ALL ON FUNCTION public.stage_flagship_launch_pack_v3(uuid,jsonb,jsonb) FROM PUBLIC, anon, authenticated;
 REVOKE ALL ON FUNCTION public.archive_reset_flagship_canary_v3(uuid,text) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.stage_flagship_launch_pack_v3(uuid,jsonb,jsonb) TO service_role;

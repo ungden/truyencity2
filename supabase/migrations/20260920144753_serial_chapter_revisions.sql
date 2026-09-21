@@ -1,9 +1,7 @@
 -- Keep every public editorial replacement recoverable and apply a reviewed batch
 -- only while its serial job is explicitly paused.
 BEGIN;
-
 SET lock_timeout = '5s';
-
 CREATE TABLE public.serial_chapter_revisions (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   serial_novel_id uuid NOT NULL REFERENCES public.serial_novels(id) ON DELETE CASCADE,
@@ -25,17 +23,14 @@ CREATE TABLE public.serial_chapter_revisions (
   created_at timestamptz NOT NULL DEFAULT now(),
   UNIQUE (chapter_id, revision_number)
 );
-
 CREATE INDEX idx_serial_chapter_revisions_story
   ON public.serial_chapter_revisions(serial_novel_id, chapter_number, revision_number DESC);
-
 ALTER TABLE public.serial_chapter_revisions ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON public.serial_chapter_revisions FROM PUBLIC, anon, authenticated;
 GRANT ALL ON public.serial_chapter_revisions TO service_role;
 CREATE POLICY serial_chapter_revisions_service_only
   ON public.serial_chapter_revisions FOR ALL TO service_role
   USING (true) WITH CHECK (true);
-
 CREATE OR REPLACE FUNCTION public.apply_serial_editorial_revisions(
   p_serial_novel_id uuid,
   p_revisions jsonb,
@@ -112,10 +107,8 @@ BEGIN
 
   RETURN jsonb_build_object('applied', v_applied, 'serialNovelId', p_serial_novel_id);
 END $$;
-
 REVOKE ALL ON FUNCTION public.apply_serial_editorial_revisions(uuid,jsonb,text,text,text)
   FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.apply_serial_editorial_revisions(uuid,jsonb,text,text,text)
   TO service_role;
-
 COMMIT;

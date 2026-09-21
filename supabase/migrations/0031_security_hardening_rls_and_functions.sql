@@ -12,19 +12,16 @@
 
 -- health_checks: system health monitoring (admin read-only, service_role writes)
 ALTER TABLE health_checks ENABLE ROW LEVEL SECURITY;
-
 CREATE POLICY "health_checks_admin_select"
   ON health_checks FOR SELECT
   USING (
     EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
   );
-
 -- No INSERT/UPDATE/DELETE policy for authenticated users.
 -- Only service_role (which bypasses RLS) can write.
 
 -- embedding_cache: AI embedding cache (admin-only access via client)
 ALTER TABLE embedding_cache ENABLE ROW LEVEL SECURITY;
-
 CREATE POLICY "embedding_cache_admin_all"
   ON embedding_cache FOR ALL
   USING (
@@ -33,10 +30,8 @@ CREATE POLICY "embedding_cache_admin_all"
   WITH CHECK (
     EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
   );
-
 -- cost_tracking: AI cost tracking (admin-only access via client)
 ALTER TABLE cost_tracking ENABLE ROW LEVEL SECURITY;
-
 CREATE POLICY "cost_tracking_admin_all"
   ON cost_tracking FOR ALL
   USING (
@@ -45,10 +40,8 @@ CREATE POLICY "cost_tracking_admin_all"
   WITH CHECK (
     EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
   );
-
 -- qc_results: AI quality check results (admin-only access via client)
 ALTER TABLE qc_results ENABLE ROW LEVEL SECURITY;
-
 CREATE POLICY "qc_results_admin_all"
   ON qc_results FOR ALL
   USING (
@@ -57,7 +50,6 @@ CREATE POLICY "qc_results_admin_all"
   WITH CHECK (
     EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
   );
-
 -- ─────────────────────────────────────────────────────────────────────────────
 -- PART 2: Restrict 10 tables from "any authenticated" to "admin only" for writes
 -- Keep public SELECT where it existed, but restrict INSERT/UPDATE/DELETE to admins.
@@ -72,7 +64,6 @@ DROP POLICY IF EXISTS "Allow authenticated users to manage plot_arcs" ON plot_ar
 DROP POLICY IF EXISTS "Allow authenticated users to manage planned_twists" ON planned_twists;
 DROP POLICY IF EXISTS "Allow authenticated users to manage character_arcs" ON character_arcs;
 DROP POLICY IF EXISTS "Allow authenticated users to manage hierarchical_summaries" ON hierarchical_summaries;
-
 -- Create admin-only write policies (public SELECT policies remain unchanged)
 CREATE POLICY "plot_arcs_admin_write"
   ON plot_arcs FOR ALL
@@ -82,7 +73,6 @@ CREATE POLICY "plot_arcs_admin_write"
   WITH CHECK (
     EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
   );
-
 CREATE POLICY "planned_twists_admin_write"
   ON planned_twists FOR ALL
   USING (
@@ -91,7 +81,6 @@ CREATE POLICY "planned_twists_admin_write"
   WITH CHECK (
     EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
   );
-
 CREATE POLICY "character_arcs_admin_write"
   ON character_arcs FOR ALL
   USING (
@@ -100,7 +89,6 @@ CREATE POLICY "character_arcs_admin_write"
   WITH CHECK (
     EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
   );
-
 CREATE POLICY "hierarchical_summaries_admin_write"
   ON hierarchical_summaries FOR ALL
   USING (
@@ -109,7 +97,6 @@ CREATE POLICY "hierarchical_summaries_admin_write"
   WITH CHECK (
     EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
   );
-
 -- Group B: story_embeddings, character_tracker, power_progression,
 --          world_state, consistency_issues, beat_usage
 -- Currently have: authenticated ALL
@@ -121,7 +108,6 @@ DROP POLICY IF EXISTS "power_progression_all" ON power_progression;
 DROP POLICY IF EXISTS "world_state_all" ON world_state;
 DROP POLICY IF EXISTS "consistency_issues_all" ON consistency_issues;
 DROP POLICY IF EXISTS "beat_usage_all" ON beat_usage;
-
 CREATE POLICY "story_embeddings_admin_all"
   ON story_embeddings FOR ALL
   USING (
@@ -130,7 +116,6 @@ CREATE POLICY "story_embeddings_admin_all"
   WITH CHECK (
     EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
   );
-
 CREATE POLICY "character_tracker_admin_all"
   ON character_tracker FOR ALL
   USING (
@@ -139,7 +124,6 @@ CREATE POLICY "character_tracker_admin_all"
   WITH CHECK (
     EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
   );
-
 CREATE POLICY "power_progression_admin_all"
   ON power_progression FOR ALL
   USING (
@@ -148,7 +132,6 @@ CREATE POLICY "power_progression_admin_all"
   WITH CHECK (
     EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
   );
-
 CREATE POLICY "world_state_admin_all"
   ON world_state FOR ALL
   USING (
@@ -157,7 +140,6 @@ CREATE POLICY "world_state_admin_all"
   WITH CHECK (
     EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
   );
-
 CREATE POLICY "consistency_issues_admin_all"
   ON consistency_issues FOR ALL
   USING (
@@ -166,7 +148,6 @@ CREATE POLICY "consistency_issues_admin_all"
   WITH CHECK (
     EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
   );
-
 CREATE POLICY "beat_usage_admin_all"
   ON beat_usage FOR ALL
   USING (
@@ -175,7 +156,6 @@ CREATE POLICY "beat_usage_admin_all"
   WITH CHECK (
     EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
   );
-
 -- ─────────────────────────────────────────────────────────────────────────────
 -- PART 3: Fix consume_chapter_credit to use auth.uid() instead of p_user_id
 -- This prevents any user from draining another user's credits via RPC.

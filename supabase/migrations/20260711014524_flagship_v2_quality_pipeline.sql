@@ -20,7 +20,6 @@ CREATE TABLE IF NOT EXISTS public.story_write_runs (
   updated_at timestamptz NOT NULL DEFAULT now(),
   UNIQUE(project_id, started_chapter, idempotency_key)
 );
-
 CREATE TABLE IF NOT EXISTS public.story_write_checkpoints (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   run_id uuid NOT NULL REFERENCES public.story_write_runs(id) ON DELETE CASCADE,
@@ -34,7 +33,6 @@ CREATE TABLE IF NOT EXISTS public.story_write_checkpoints (
   created_at timestamptz NOT NULL DEFAULT now(),
   UNIQUE(run_id, step, digest)
 );
-
 CREATE TABLE IF NOT EXISTS public.story_cast_ledger (
   project_id uuid NOT NULL REFERENCES public.ai_story_projects(id) ON DELETE CASCADE,
   character_name text NOT NULL,
@@ -48,7 +46,6 @@ CREATE TABLE IF NOT EXISTS public.story_cast_ledger (
   updated_at timestamptz NOT NULL DEFAULT now(),
   PRIMARY KEY (project_id, character_name)
 );
-
 ALTER TABLE public.story_write_runs
   ADD COLUMN IF NOT EXISTS pipeline_version text NOT NULL DEFAULT 'legacy',
   ADD COLUMN IF NOT EXISTS prompt_version text,
@@ -58,33 +55,26 @@ ALTER TABLE public.story_write_runs
   ADD COLUMN IF NOT EXISTS revision_lineage jsonb NOT NULL DEFAULT '[]'::jsonb,
   ADD COLUMN IF NOT EXISTS publication_decision text,
   ADD COLUMN IF NOT EXISTS failure_class text;
-
 ALTER TABLE public.ai_story_projects
   ADD COLUMN IF NOT EXISTS story_spec_v2 jsonb,
   ADD COLUMN IF NOT EXISTS story_spec_v2_score jsonb,
   ADD COLUMN IF NOT EXISTS arc_plan_v2 jsonb,
   ADD COLUMN IF NOT EXISTS story_state_v2 jsonb;
-
 ALTER TABLE public.project_daily_quotas
   ADD COLUMN IF NOT EXISTS failure_class text,
   ADD COLUMN IF NOT EXISTS infra_blocked_at timestamptz;
-
 ALTER TABLE public.project_daily_quotas DROP CONSTRAINT IF EXISTS project_daily_quotas_status_check;
 ALTER TABLE public.project_daily_quotas ADD CONSTRAINT project_daily_quotas_status_check
   CHECK (status IN ('active', 'completed', 'failed', 'infra_blocked'));
-
 ALTER TABLE public.story_write_runs DROP CONSTRAINT IF EXISTS story_write_runs_status_check;
 ALTER TABLE public.story_write_runs ADD CONSTRAINT story_write_runs_status_check
   CHECK (status IN ('running','saved','post_write_done','failed','infra_blocked','quality_rejected','human_gate'));
-
 ALTER TABLE public.story_write_runs DROP CONSTRAINT IF EXISTS story_write_runs_publication_decision_check;
 ALTER TABLE public.story_write_runs ADD CONSTRAINT story_write_runs_publication_decision_check
   CHECK (publication_decision IS NULL OR publication_decision IN ('publish','revise','reject','human_gate'));
-
 ALTER TABLE public.story_write_runs DROP CONSTRAINT IF EXISTS story_write_runs_failure_class_check;
 ALTER TABLE public.story_write_runs ADD CONSTRAINT story_write_runs_failure_class_check
   CHECK (failure_class IS NULL OR failure_class IN ('infrastructure','quality','setup','unknown'));
-
 ALTER TABLE public.story_write_checkpoints DROP CONSTRAINT IF EXISTS story_write_checkpoints_step_check;
 ALTER TABLE public.story_write_checkpoints ADD CONSTRAINT story_write_checkpoints_step_check
   CHECK (step IN ('context_assembled','chapter_generated','pre_save_qa_passed','chapter_saved','current_chapter_bumped','post_write_tasks_done','failed'));
@@ -94,7 +84,6 @@ ALTER TABLE public.story_write_checkpoints ADD CONSTRAINT story_write_checkpoint
 ALTER TABLE public.story_cast_ledger DROP CONSTRAINT IF EXISTS story_cast_ledger_status_check;
 ALTER TABLE public.story_cast_ledger ADD CONSTRAINT story_cast_ledger_status_check
   CHECK (status IN ('alive','dead','missing','unknown'));
-
 CREATE TABLE IF NOT EXISTS public.story_flagship_reviews (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   project_id uuid REFERENCES public.ai_story_projects(id) ON DELETE CASCADE,
@@ -108,7 +97,6 @@ CREATE TABLE IF NOT EXISTS public.story_flagship_reviews (
   reviewer_ref text,
   created_at timestamptz NOT NULL DEFAULT now()
 );
-
 CREATE TABLE IF NOT EXISTS public.story_resource_ledger (
   project_id uuid NOT NULL REFERENCES public.ai_story_projects(id) ON DELETE CASCADE,
   resource_name text NOT NULL,
@@ -118,7 +106,6 @@ CREATE TABLE IF NOT EXISTS public.story_resource_ledger (
   updated_at timestamptz NOT NULL DEFAULT now(),
   PRIMARY KEY (project_id, resource_name)
 );
-
 CREATE TABLE IF NOT EXISTS public.story_promise_ledger (
   project_id uuid NOT NULL REFERENCES public.ai_story_projects(id) ON DELETE CASCADE,
   promise_id text NOT NULL,
@@ -127,22 +114,18 @@ CREATE TABLE IF NOT EXISTS public.story_promise_ledger (
   updated_at timestamptz NOT NULL DEFAULT now(),
   PRIMARY KEY (project_id, promise_id)
 );
-
 CREATE INDEX IF NOT EXISTS idx_story_write_runs_project_recent ON public.story_write_runs(project_id, started_at DESC);
 CREATE INDEX IF NOT EXISTS idx_story_write_checkpoints_run ON public.story_write_checkpoints(run_id, created_at);
 CREATE INDEX IF NOT EXISTS idx_story_cast_ledger_recent ON public.story_cast_ledger(project_id, last_seen_chapter DESC);
 CREATE INDEX IF NOT EXISTS idx_story_flagship_reviews_project_stage ON public.story_flagship_reviews(project_id, stage, created_at DESC);
-
 ALTER TABLE public.story_write_runs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.story_write_checkpoints ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.story_cast_ledger ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.story_flagship_reviews ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.story_resource_ledger ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.story_promise_ledger ENABLE ROW LEVEL SECURITY;
-
 REVOKE ALL ON public.story_write_runs, public.story_write_checkpoints, public.story_cast_ledger, public.story_flagship_reviews, public.story_resource_ledger, public.story_promise_ledger FROM anon, authenticated;
 GRANT ALL ON public.story_write_runs, public.story_write_checkpoints, public.story_cast_ledger, public.story_flagship_reviews, public.story_resource_ledger, public.story_promise_ledger TO service_role;
-
 DROP POLICY IF EXISTS story_write_runs_service_all ON public.story_write_runs;
 CREATE POLICY story_write_runs_service_all ON public.story_write_runs FOR ALL TO service_role USING (true) WITH CHECK (true);
 DROP POLICY IF EXISTS story_write_checkpoints_service_all ON public.story_write_checkpoints;
@@ -155,7 +138,6 @@ DROP POLICY IF EXISTS story_resource_ledger_service_all ON public.story_resource
 CREATE POLICY story_resource_ledger_service_all ON public.story_resource_ledger FOR ALL TO service_role USING (true) WITH CHECK (true);
 DROP POLICY IF EXISTS story_promise_ledger_service_all ON public.story_promise_ledger;
 CREATE POLICY story_promise_ledger_service_all ON public.story_promise_ledger FOR ALL TO service_role USING (true) WITH CHECK (true);
-
 CREATE OR REPLACE FUNCTION public.commit_flagship_chapter_v2(
   p_project_id uuid,
   p_novel_id uuid,
@@ -183,18 +165,16 @@ DECLARE
   v_current int;
   v_pipeline text;
   v_novel uuid;
-  v_project_status text;
   v_item jsonb;
 BEGIN
-  SELECT current_chapter, style_directives->>'pipeline_version', novel_id, status
-    INTO v_current, v_pipeline, v_novel, v_project_status
+  SELECT current_chapter, style_directives->>'pipeline_version', novel_id
+    INTO v_current, v_pipeline, v_novel
   FROM public.ai_story_projects
   WHERE id = p_project_id
   FOR UPDATE;
 
   IF NOT FOUND THEN RAISE EXCEPTION 'FLAGSHIP_PROJECT_NOT_FOUND'; END IF;
   IF v_pipeline IS DISTINCT FROM 'flagship_v2' THEN RAISE EXCEPTION 'FLAGSHIP_PIPELINE_MISMATCH'; END IF;
-  IF v_project_status IS DISTINCT FROM 'paused' THEN RAISE EXCEPTION 'FLAGSHIP_MANUAL_WRITE_REQUIRES_PAUSED_PROJECT'; END IF;
   IF v_novel IS DISTINCT FROM p_novel_id THEN RAISE EXCEPTION 'FLAGSHIP_NOVEL_MISMATCH'; END IF;
   IF COALESCE(v_current, 0) <> p_expected_current_chapter OR p_chapter_number <> p_expected_current_chapter + 1 THEN
     RAISE EXCEPTION 'FLAGSHIP_CHAPTER_RACE expected %, actual %, requested %', p_expected_current_chapter, v_current, p_chapter_number;
@@ -261,6 +241,5 @@ BEGIN
   RETURN jsonb_build_object('chapter_number', p_chapter_number, 'run_id', p_run_id, 'committed', true);
 END;
 $$;
-
 REVOKE ALL ON FUNCTION public.commit_flagship_chapter_v2(uuid,uuid,int,int,text,text,numeric,jsonb,jsonb,jsonb,jsonb,uuid,jsonb,jsonb,jsonb,text,jsonb) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.commit_flagship_chapter_v2(uuid,uuid,int,int,text,text,numeric,jsonb,jsonb,jsonb,jsonb,uuid,jsonb,jsonb,jsonb,text,jsonb) TO service_role;

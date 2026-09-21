@@ -15,16 +15,12 @@ CREATE TABLE IF NOT EXISTS world_constraints (
   immutable BOOLEAN DEFAULT true,
   created_at TIMESTAMPTZ DEFAULT now()
 );
-
 CREATE INDEX IF NOT EXISTS idx_world_constraints_project ON world_constraints(project_id);
 CREATE INDEX IF NOT EXISTS idx_world_constraints_subject ON world_constraints(project_id, subject);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_world_constraints_unique
   ON world_constraints(project_id, subject, predicate);
-
 COMMENT ON TABLE world_constraints IS 'Hard immutable facts from World Bible for consistency enforcement across all genres.';
-
 -- RLS
 ALTER TABLE world_constraints ENABLE ROW LEVEL SECURITY;
-
 CREATE POLICY "service_role_full_access" ON world_constraints
   FOR ALL USING (true) WITH CHECK (true);

@@ -149,6 +149,7 @@ export function validateKernelState(kernel: StoryKernel, state: StoryState): voi
   const resourceIds = new Set(kernel.resources.map(item => item.id));
   const promiseIds = new Set(kernel.promises.map(item => item.id));
   const locationIds = new Set(kernel.locations.map(item => item.id));
+  validateFoundationKnowledge(kernel, state);
   for (const mechanic of kernel.worldMechanics) {
     if (mechanic.kind === 'conversion') {
       for (const resource of [...mechanic.inputsPerBatch, ...mechanic.outputsPerBatch]) {
@@ -245,6 +246,29 @@ export function validateKernelState(kernel: StoryKernel, state: StoryState): voi
       `Kernel travel graph must let the protagonist reach every declared location and return (từ ${protagonistLocation} — ${parts.join('; ')}).`,
       { protagonistLocation, unreachable, noReturn },
     );
+  }
+}
+
+export function validateFoundationKnowledge(
+  kernel: Pick<StoryKernel, 'narrativeFoundation'>,
+  state: Pick<StoryState, 'chapterNumber' | 'facts' | 'characters'>,
+): void {
+  if (!kernel.narrativeFoundation) return;
+  const stateFactIds = new Set(state.facts.map(item => item.id));
+  for (const fact of kernel.narrativeFoundation.facts) {
+    if (!stateFactIds.has(fact.id)) {
+      fail(`Narrative foundation fact ${fact.id} is missing from StoryState facts.`);
+    }
+  }
+  if (state.chapterNumber !== 0) return;
+  for (const fact of kernel.narrativeFoundation.facts) {
+    const expected = new Set(fact.initiallyKnownByCharacterIds);
+    for (const character of state.characters) {
+      const actuallyKnows = character.knownFactIds.includes(fact.id);
+      if (actuallyKnows !== expected.has(character.characterId)) {
+        fail(`Initial knowledge for ${character.characterId}:${fact.id} contradicts narrativeFoundation.`);
+      }
+    }
   }
 }
 

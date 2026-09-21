@@ -28,16 +28,12 @@ CREATE TABLE IF NOT EXISTS foreshadowing_plans (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE(project_id, hint_id)
 );
-
 CREATE INDEX IF NOT EXISTS idx_foreshadowing_project_status
   ON foreshadowing_plans(project_id, status);
-
 CREATE INDEX IF NOT EXISTS idx_foreshadowing_plant_chapter
   ON foreshadowing_plans(project_id, plant_chapter);
-
 CREATE INDEX IF NOT EXISTS idx_foreshadowing_payoff_chapter
   ON foreshadowing_plans(project_id, payoff_chapter);
-
 -- ============================================================================
 -- 2. CHARACTER ARCS — character development tracking with signature traits
 -- ============================================================================
@@ -58,10 +54,8 @@ CREATE TABLE IF NOT EXISTS character_arcs (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE(project_id, character_name)
 );
-
 CREATE INDEX IF NOT EXISTS idx_character_arcs_project
   ON character_arcs(project_id, character_name);
-
 -- ============================================================================
 -- 3. ARC PACING BLUEPRINTS — per-arc pacing mood blueprints
 -- ============================================================================
@@ -74,10 +68,8 @@ CREATE TABLE IF NOT EXISTS arc_pacing_blueprints (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE(project_id, arc_number)
 );
-
 CREATE INDEX IF NOT EXISTS idx_pacing_blueprints_project
   ON arc_pacing_blueprints(project_id, arc_number);
-
 -- ============================================================================
 -- 4. VOICE FINGERPRINTS — narrative style fingerprint & drift detection
 -- ============================================================================
@@ -91,7 +83,6 @@ CREATE TABLE IF NOT EXISTS voice_fingerprints (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
-
 -- ============================================================================
 -- 5. MC POWER STATES — MC power state tracking with anti-plot-armor
 -- ============================================================================
@@ -103,7 +94,6 @@ CREATE TABLE IF NOT EXISTS mc_power_states (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
-
 -- ============================================================================
 -- 6. LOCATION BIBLES — world map & location bible generation
 -- ============================================================================
@@ -120,13 +110,10 @@ CREATE TABLE IF NOT EXISTS location_bibles (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE(project_id, location_name)
 );
-
 CREATE INDEX IF NOT EXISTS idx_location_bibles_project
   ON location_bibles(project_id, explored);
-
 CREATE INDEX IF NOT EXISTS idx_location_bibles_arc_range
   ON location_bibles(project_id, arc_range);
-
 -- ============================================================================
 -- RLS: Enable Row Level Security (service_role bypasses, anon blocked)
 -- ============================================================================
@@ -137,33 +124,27 @@ ALTER TABLE arc_pacing_blueprints ENABLE ROW LEVEL SECURITY;
 ALTER TABLE voice_fingerprints ENABLE ROW LEVEL SECURITY;
 ALTER TABLE mc_power_states ENABLE ROW LEVEL SECURITY;
 ALTER TABLE location_bibles ENABLE ROW LEVEL SECURITY;
-
 -- Service role full access (used by server-side API routes)
 DO $$ BEGIN
   CREATE POLICY "service_role_full_foreshadowing" ON foreshadowing_plans FOR ALL TO service_role USING (true) WITH CHECK (true);
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
-
 DO $$ BEGIN
   CREATE POLICY "service_role_full_character_arcs" ON character_arcs FOR ALL TO service_role USING (true) WITH CHECK (true);
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
-
 DO $$ BEGIN
   CREATE POLICY "service_role_full_pacing_blueprints" ON arc_pacing_blueprints FOR ALL TO service_role USING (true) WITH CHECK (true);
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
-
 DO $$ BEGIN
   CREATE POLICY "service_role_full_voice_fingerprints" ON voice_fingerprints FOR ALL TO service_role USING (true) WITH CHECK (true);
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
-
 DO $$ BEGIN
   CREATE POLICY "service_role_full_mc_power_states" ON mc_power_states FOR ALL TO service_role USING (true) WITH CHECK (true);
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
-
 DO $$ BEGIN
   CREATE POLICY "service_role_full_location_bibles" ON location_bibles FOR ALL TO service_role USING (true) WITH CHECK (true);
 EXCEPTION WHEN duplicate_object THEN NULL;

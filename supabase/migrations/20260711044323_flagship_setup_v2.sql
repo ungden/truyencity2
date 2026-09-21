@@ -1,58 +1,111 @@
 -- Isolated flagship setup artifacts. Legacy setup_stage remains untouched and cannot
 -- act as a fallback for flagship projects.
 
+-- The blueprint tables originally lived in an unrecorded short-version
+-- migration. Define them before the setup functions below reference them so a
+-- fresh replay does not depend on the historical deployment environment.
+CREATE TABLE IF NOT EXISTS public.chapter_blueprints (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  project_id uuid NOT NULL REFERENCES public.ai_story_projects(id) ON DELETE CASCADE,
+  chapter_number integer NOT NULL CHECK (chapter_number > 0),
+  volume_number integer,
+  arc_number integer,
+  sub_arc_number integer,
+  title_hint text,
+  goal text NOT NULL,
+  conflict text,
+  payoff text NOT NULL,
+  ending_hook text,
+  "cast" text[] NOT NULL DEFAULT '{}',
+  location text,
+  resource_ledger_delta text,
+  world_state_delta text,
+  species_delta text,
+  template_inspiration text,
+  authority_constraints text,
+  forbidden_terms text[] NOT NULL DEFAULT '{}',
+  status text NOT NULL DEFAULT 'planned'
+    CHECK (status IN ('planned', 'used', 'repaired', 'invalid')),
+  version integer NOT NULL DEFAULT 1,
+  actual_summary_delta text,
+  meta jsonb NOT NULL DEFAULT '{}'::jsonb,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  UNIQUE(project_id, chapter_number)
+);
+
+CREATE TABLE IF NOT EXISTS public.story_blueprint_runs (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  project_id uuid NOT NULL REFERENCES public.ai_story_projects(id) ON DELETE CASCADE,
+  target_chapters integer NOT NULL CHECK (target_chapters > 0),
+  generated_chapters integer NOT NULL DEFAULT 0,
+  version integer NOT NULL DEFAULT 1,
+  status text NOT NULL DEFAULT 'generating'
+    CHECK (status IN ('generating', 'valid', 'invalid', 'failed')),
+  last_error text,
+  coverage_ok boolean NOT NULL DEFAULT false,
+  meta jsonb NOT NULL DEFAULT '{}'::jsonb,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  UNIQUE(project_id, version)
+);
+
+CREATE INDEX IF NOT EXISTS idx_chapter_blueprints_project_chapter
+  ON public.chapter_blueprints(project_id, chapter_number);
+CREATE INDEX IF NOT EXISTS idx_chapter_blueprints_project_status
+  ON public.chapter_blueprints(project_id, status);
+CREATE INDEX IF NOT EXISTS idx_story_blueprint_runs_project_version
+  ON public.story_blueprint_runs(project_id, version DESC);
+
+ALTER TABLE public.chapter_blueprints ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.story_blueprint_runs ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS chapter_blueprints_service_all ON public.chapter_blueprints;
+CREATE POLICY chapter_blueprints_service_all ON public.chapter_blueprints
+  FOR ALL TO service_role USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS story_blueprint_runs_service_all ON public.story_blueprint_runs;
+CREATE POLICY story_blueprint_runs_service_all ON public.story_blueprint_runs
+  FOR ALL TO service_role USING (true) WITH CHECK (true);
+REVOKE ALL ON public.chapter_blueprints, public.story_blueprint_runs FROM PUBLIC, anon, authenticated;
+GRANT ALL ON public.chapter_blueprints, public.story_blueprint_runs TO service_role;
+
 ALTER TABLE public.ai_story_projects
   ADD COLUMN IF NOT EXISTS flagship_setup_brief_v2 jsonb,
   ADD COLUMN IF NOT EXISTS flagship_concept_tournament_v2 jsonb,
   ADD COLUMN IF NOT EXISTS flagship_setup_selection_v2 jsonb,
   ADD COLUMN IF NOT EXISTS flagship_setup_artifacts_v2 jsonb,
   ADD COLUMN IF NOT EXISTS flagship_setup_status text;
-
 ALTER TABLE public.ai_story_projects DROP CONSTRAINT IF EXISTS ai_story_projects_flagship_setup_status_check;
 ALTER TABLE public.ai_story_projects ADD CONSTRAINT ai_story_projects_flagship_setup_status_check
   CHECK (flagship_setup_status IS NULL OR flagship_setup_status IN (
     'brief_ready', 'tournament_generating', 'concept_review', 'kernel_generating',
     'story_spec_review', 'ready_to_write', 'setup_blocked', 'infra_blocked'
   ));
-
 CREATE INDEX IF NOT EXISTS idx_ai_story_projects_flagship_setup_status
   ON public.ai_story_projects(flagship_setup_status, updated_at)
   WHERE style_directives->>'pipeline_version' = 'flagship_v2';
-
 CREATE TABLE IF NOT EXISTS public.story_flagship_setup_runs (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   project_id uuid NOT NULL REFERENCES public.ai_story_projects(id) ON DELETE CASCADE,
   phase text NOT NULL CHECK (phase IN ('concept_tournament','launch_pack','rolling_plan')),
   status text NOT NULL DEFAULT 'running' CHECK (status IN ('running','saved','setup_blocked','infra_blocked','human_gate')),
   model text NOT NULL,
-  model_routes jsonb NOT NULL DEFAULT '{}'::jsonb,
   prompt_version text NOT NULL,
   call_roles jsonb NOT NULL DEFAULT '[]'::jsonb,
-  artifact_snapshot jsonb,
   error_message text,
   started_at timestamptz NOT NULL DEFAULT now(),
   finished_at timestamptz
 );
-
-ALTER TABLE public.story_flagship_setup_runs
-  ADD COLUMN IF NOT EXISTS model_routes jsonb NOT NULL DEFAULT '{}'::jsonb,
-  ADD COLUMN IF NOT EXISTS artifact_snapshot jsonb;
-
 CREATE INDEX IF NOT EXISTS idx_story_flagship_setup_runs_project_recent
   ON public.story_flagship_setup_runs(project_id, started_at DESC);
-
 ALTER TABLE public.story_flagship_setup_runs ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON public.story_flagship_setup_runs FROM anon, authenticated;
 GRANT ALL ON public.story_flagship_setup_runs TO service_role;
 DROP POLICY IF EXISTS story_flagship_setup_runs_service_all ON public.story_flagship_setup_runs;
 CREATE POLICY story_flagship_setup_runs_service_all ON public.story_flagship_setup_runs
   FOR ALL TO service_role USING (true) WITH CHECK (true);
-
-DROP FUNCTION IF EXISTS public.install_flagship_setup_brief_v2(uuid,jsonb);
 CREATE OR REPLACE FUNCTION public.install_flagship_setup_brief_v2(
   p_project_id uuid,
-  p_brief jsonb,
-  p_model_routes jsonb
+  p_brief jsonb
 ) RETURNS jsonb
 LANGUAGE plpgsql
 SECURITY INVOKER
@@ -72,14 +125,6 @@ BEGIN
   IF COALESCE((p_brief->>'schemaVersion')::int, -1) <> 2 OR p_brief->>'language' IS DISTINCT FROM 'vi' THEN
     RAISE EXCEPTION 'FLAGSHIP_SETUP_BRIEF_INVALID';
   END IF;
-  IF p_model_routes IS NULL
-     OR p_model_routes->>'writer' IS NULL OR p_model_routes->>'editor' IS NULL
-     OR p_model_routes->>'setupCreative' IS NULL OR p_model_routes->>'setupJudge' IS NULL
-     OR p_model_routes->>'director' IS NULL OR p_model_routes->>'planner' IS NULL
-     OR p_model_routes->>'writer' = p_model_routes->>'editor'
-     OR p_model_routes->>'setupCreative' = p_model_routes->>'setupJudge' THEN
-    RAISE EXCEPTION 'FLAGSHIP_MODEL_ROUTES_INVALID';
-  END IF;
 
   DELETE FROM public.chapter_blueprints WHERE project_id = p_project_id;
   UPDATE public.ai_story_projects
@@ -98,15 +143,13 @@ BEGIN
       style_directives = COALESCE(style_directives, '{}'::jsonb) || jsonb_build_object(
         'pipeline_version', 'flagship_v2',
         'publication_mode', 'human_gate',
-        'flagship_setup_mode', 'manual_only',
-        'flagship_model_routes', p_model_routes
+        'flagship_setup_mode', 'manual_only'
       ),
       updated_at = now()
   WHERE id = p_project_id;
   RETURN jsonb_build_object('installed', true, 'status', 'brief_ready');
 END;
 $$;
-
 CREATE OR REPLACE FUNCTION public.save_flagship_concept_tournament_v2(
   p_project_id uuid,
   p_tournament jsonb
@@ -152,7 +195,6 @@ BEGIN
   RETURN jsonb_build_object('saved', true, 'status', 'concept_review');
 END;
 $$;
-
 CREATE OR REPLACE FUNCTION public.commit_flagship_launch_pack_v2(
   p_project_id uuid,
   p_selection jsonb,
@@ -232,16 +274,9 @@ BEGIN
       updated_at = now()
   WHERE id = p_project_id;
 
-  UPDATE public.novels
-  SET title = p_launch_pack->'storySpec'->>'title',
-      description = p_launch_pack->'storySpec'->>'premise',
-      updated_at = now()
-  WHERE id = (SELECT novel_id FROM public.ai_story_projects WHERE id = p_project_id);
-
   RETURN jsonb_build_object('saved', true, 'status', 'story_spec_review', 'candidate_id', v_candidate_id);
 END;
 $$;
-
 CREATE OR REPLACE FUNCTION public.approve_flagship_story_spec_v2(
   p_project_id uuid,
   p_reviewer_ref text,
@@ -285,7 +320,6 @@ BEGIN
   RETURN jsonb_build_object('approved', true, 'status', 'ready_to_write');
 END;
 $$;
-
 CREATE OR REPLACE FUNCTION public.commit_flagship_rolling_window_v2(
   p_project_id uuid,
   p_expected_current_chapter int,
@@ -341,7 +375,6 @@ BEGIN
   RETURN jsonb_build_object('saved', true, 'start_chapter', p_expected_current_chapter + 1, 'end_chapter', p_expected_current_chapter + 5);
 END;
 $$;
-
 CREATE OR REPLACE FUNCTION public.approve_flagship_checkpoint_v2(
   p_project_id uuid,
   p_stage text,
@@ -380,14 +413,13 @@ BEGIN
   RETURN jsonb_build_object('approved', true, 'stage', p_stage, 'chapter', v_required_chapter);
 END;
 $$;
-
-REVOKE ALL ON FUNCTION public.install_flagship_setup_brief_v2(uuid,jsonb,jsonb) FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.install_flagship_setup_brief_v2(uuid,jsonb) FROM PUBLIC, anon, authenticated;
 REVOKE ALL ON FUNCTION public.save_flagship_concept_tournament_v2(uuid,jsonb) FROM PUBLIC, anon, authenticated;
 REVOKE ALL ON FUNCTION public.commit_flagship_launch_pack_v2(uuid,jsonb,jsonb,jsonb) FROM PUBLIC, anon, authenticated;
 REVOKE ALL ON FUNCTION public.approve_flagship_story_spec_v2(uuid,text,jsonb) FROM PUBLIC, anon, authenticated;
 REVOKE ALL ON FUNCTION public.commit_flagship_rolling_window_v2(uuid,int,jsonb) FROM PUBLIC, anon, authenticated;
 REVOKE ALL ON FUNCTION public.approve_flagship_checkpoint_v2(uuid,text,text,jsonb,jsonb) FROM PUBLIC, anon, authenticated;
-GRANT EXECUTE ON FUNCTION public.install_flagship_setup_brief_v2(uuid,jsonb,jsonb) TO service_role;
+GRANT EXECUTE ON FUNCTION public.install_flagship_setup_brief_v2(uuid,jsonb) TO service_role;
 GRANT EXECUTE ON FUNCTION public.save_flagship_concept_tournament_v2(uuid,jsonb) TO service_role;
 GRANT EXECUTE ON FUNCTION public.commit_flagship_launch_pack_v2(uuid,jsonb,jsonb,jsonb) TO service_role;
 GRANT EXECUTE ON FUNCTION public.approve_flagship_story_spec_v2(uuid,text,jsonb) TO service_role;

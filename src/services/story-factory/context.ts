@@ -13,6 +13,7 @@ import {
   type RelevantStoryTransition,
 } from './memory';
 import type { CraftGuidance } from './craft';
+import { foundationContext } from './foundation';
 
 export interface ContextManifestEntry {
   role: 'writer' | 'editor' | 'revision' | 'planner';
@@ -32,6 +33,7 @@ export interface WriterBrief {
   recentTitles: string[];
   recentTitleStems: string[];
   craftGuidance: CraftGuidance[];
+  narrativeFoundation: ReturnType<typeof foundationContext>;
   cast: unknown[];
   canonicalUnits: string[];
   physicalLaws: string[];
@@ -358,6 +360,7 @@ export function buildWriterBrief(input: {
     recentTitles,
     recentTitleStems,
     craftGuidance: (input.craftGuidance ?? []).slice(0, 4),
+    narrativeFoundation: foundationContext(input.kernel),
     canonicalUnits: [...new Set(input.kernel.resources.flatMap(resource =>
       resource.kind === 'numeric' ? [resource.unit] : []))],
     // Canon laws governing this chapter, verbatim. The Writer used to be denied all
@@ -465,6 +468,7 @@ export function buildChapterContexts(input: {
   ]));
   const editorKernel = {
     title: input.kernel.title,
+    narrativeFoundation: input.kernel.narrativeFoundation,
     protagonistId: input.kernel.protagonistId,
     characters: input.kernel.characters.filter(character => ids.characters.has(character.id) || character.id === input.kernel.protagonistId),
     worldMechanics: input.kernel.worldMechanics.filter(mechanic =>

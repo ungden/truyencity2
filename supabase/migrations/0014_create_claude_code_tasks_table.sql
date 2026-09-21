@@ -15,16 +15,13 @@ CREATE TABLE IF NOT EXISTS claude_code_tasks (
   completed_at TIMESTAMP WITH TIME ZONE,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
-
 -- Create indexes for better query performance
 CREATE INDEX IF NOT EXISTS idx_claude_code_tasks_user_id ON claude_code_tasks(user_id);
 CREATE INDEX IF NOT EXISTS idx_claude_code_tasks_project_id ON claude_code_tasks(project_id);
 CREATE INDEX IF NOT EXISTS idx_claude_code_tasks_status ON claude_code_tasks(status);
 CREATE INDEX IF NOT EXISTS idx_claude_code_tasks_created_at ON claude_code_tasks(created_at DESC);
-
 -- Enable RLS
 ALTER TABLE claude_code_tasks ENABLE ROW LEVEL SECURITY;
-
 -- RLS Policies
 -- Users can only see their own tasks
 DO $$
@@ -38,7 +35,6 @@ BEGIN
   END IF;
 END
 $$;
-
 -- Users can create their own tasks
 DO $$
 BEGIN
@@ -51,7 +47,6 @@ BEGIN
   END IF;
 END
 $$;
-
 -- Users can update their own tasks
 DO $$
 BEGIN
@@ -64,7 +59,6 @@ BEGIN
   END IF;
 END
 $$;
-
 -- Users can delete their own tasks
 DO $$
 BEGIN
@@ -77,7 +71,6 @@ BEGIN
   END IF;
 END
 $$;
-
 -- Create trigger to update updated_at
 CREATE OR REPLACE FUNCTION update_claude_code_tasks_updated_at()
 RETURNS TRIGGER AS $$
@@ -86,7 +79,6 @@ BEGIN
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
-
 DROP TRIGGER IF EXISTS trigger_claude_code_tasks_updated_at ON claude_code_tasks;
 CREATE TRIGGER trigger_claude_code_tasks_updated_at
   BEFORE UPDATE ON claude_code_tasks

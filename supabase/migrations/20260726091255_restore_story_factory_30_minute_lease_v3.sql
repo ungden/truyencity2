@@ -92,4 +92,4 @@ BEGIN
 END $$;
 
 REVOKE ALL ON FUNCTION public.claim_story_factory_job(text, text) FROM PUBLIC, anon, authenticated;
-GRANT EXECUTE ON FUNCTION public.claim_story_factory_job(text, text) TO service_role;
+GRANT EXECUTE ON FUNCTION public.claim_story_factory_job(text, text) TO service_role;;

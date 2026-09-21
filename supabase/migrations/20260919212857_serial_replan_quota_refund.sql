@@ -2,9 +2,7 @@
 -- must not exhaust the daily chapter quota. Refund only drafts created on today's
 -- Ho Chi Minh quota date; older work remains counted in its original day.
 BEGIN;
-
 SET lock_timeout = '5s';
-
 CREATE OR REPLACE FUNCTION public.replan_serial_cycle(
   p_job_id uuid, p_lease_token uuid, p_cycle_id uuid, p_reason text
 ) RETURNS jsonb
@@ -71,8 +69,6 @@ BEGIN
     'quotaRefunded', v_refund
   );
 END $$;
-
 REVOKE ALL ON FUNCTION public.replan_serial_cycle(uuid,uuid,uuid,text) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.replan_serial_cycle(uuid,uuid,uuid,text) TO service_role;
-
 COMMIT;

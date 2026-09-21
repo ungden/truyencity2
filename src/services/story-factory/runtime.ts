@@ -44,6 +44,7 @@ import { requireMarketBlueprint, runConceptLab, StoryCommissionSchema } from './
 import { assertFirst30PortfolioCommission } from './portfolio';
 import type { SetupCheckpoint } from './setup';
 import { enqueueStoryFactoryOperatorAlert } from './alerts';
+import { narrativeReviewGate } from '@/services/narrative/foundation';
 
 interface FactoryJobRow {
   id: string;
@@ -1055,6 +1056,24 @@ async function runWindowReview(db: SupabaseClient, job: FactoryJobRow, project: 
       .lte('chapter_number', job.current_chapter)
       .order('chapter_number').order('id');
     if (events.error) throw events.error;
+    const windowRow = await db.from('story_factory_windows')
+      .select('checkpoint_state,rolling_plan,review_history')
+      .eq('job_id', job.id)
+      .in('status', ['generating', 'reviewing'])
+      .order('start_chapter', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (windowRow.error) throw windowRow.error;
+    const planRuns = await db.from('story_factory_runs')
+      .select('chapter_number,output_artifact')
+      .eq('job_id', job.id)
+      .eq('kind', 'plan')
+      .eq('status', 'passed')
+      .gte('chapter_number', job.current_chapter - 4)
+      .lte('chapter_number', job.current_chapter)
+      .order('chapter_number', { ascending: true })
+      .order('finished_at', { ascending: true });
+    if (planRuns.error) throw planRuns.error;
     const windowChapters = (chapters ?? []).map(chapter => ({
       chapterNumber: chapter.chapter_number,
       title: chapter.title,
@@ -1074,14 +1093,47 @@ async function runWindowReview(db: SupabaseClient, job: FactoryJobRow, project: 
         source: event.source,
       })),
       styleTelemetry,
+      windowContext: {
+        stateAtWindowStart: windowRow.data?.checkpoint_state ?? null,
+        approvedPlan: {
+          openingPlan: windowRow.data?.rolling_plan ?? null,
+          planRuns: planRuns.data ?? [],
+          finalRemainingPlan: job.rolling_plan,
+        },
+        priorEvidence: windowRow.data?.review_history ?? [],
+      },
       routes, marketBlueprint, provider,
       }),
     );
+    const { upstreamFindings, mayPublish } = narrativeReviewGate(reviewed.narrativeReview);
+    if (upstreamFindings.length > 0) {
+      const target = upstreamFindings.some(finding => finding.target === 'foundation')
+        ? 'foundation'
+        : 'plan';
+      throw new StoryFactoryError(
+        target === 'foundation' ? 'setup_blocked' : 'plan_blocked',
+        `Narrative review returned ${upstreamFindings.length} ${target} finding(s); prose repair was intentionally skipped.`,
+        { narrativeReview: reviewed.narrativeReview, usages: [reviewed.usage] },
+      );
+    }
+    if (!mayPublish) {
+      throw new StoryFactoryError('quality_blocked', 'Literary review blocked private prose; drafts were preserved for targeted review.', {
+        review: reviewed.review,
+        narrativeReview: reviewed.narrativeReview,
+        styleTelemetry,
+        usages: [reviewed.usage],
+      });
+    }
     if (reviewed.review.status === 'block') {
       // First failure returns to the saved private checkpoint and replans from
       // the first bad chapter. A second failure is deliberately frozen; neither
       // path exposes prose that did not pass the full-window review.
-      const review = { ...reviewed.review, styleTelemetry };
+      const review = {
+        ...reviewed.review,
+        status: 'block' as const,
+        styleTelemetry,
+        narrativeReview: reviewed.narrativeReview,
+      };
       const { data: repaired, error: repairError } = await db.rpc('repair_story_factory_draft_window', {
         p_job_id: job.id,
         p_lease_token: job.lease_token,
@@ -1102,7 +1154,7 @@ async function runWindowReview(db: SupabaseClient, job: FactoryJobRow, project: 
     }
     const nextStage = state.chapterNumber >= arc.plannedEndChapter ? 'arc' : 'write';
     const runTelemetry = await db.from('story_factory_runs').update({
-      output_artifact: { ...reviewed.review, styleTelemetry }, usage: [reviewed.usage],
+      output_artifact: { ...reviewed.review, styleTelemetry, narrativeReview: reviewed.narrativeReview }, usage: [reviewed.usage],
       estimated_cost_usd: reviewed.usage.costUsd,
     }).eq('id', runId).eq('status', 'running');
     if (runTelemetry.error) throw runTelemetry.error;
@@ -1110,8 +1162,8 @@ async function runWindowReview(db: SupabaseClient, job: FactoryJobRow, project: 
       p_job_id: job.id,
       p_lease_token: job.lease_token,
       p_review_run_id: runId,
-      p_review: { ...reviewed.review, styleTelemetry },
-      p_review_digest: digestArtifact({ review: reviewed.review, chapters: windowChapters }),
+      p_review: { ...reviewed.review, styleTelemetry, narrativeReview: reviewed.narrativeReview },
+      p_review_digest: digestArtifact({ review: reviewed.review, narrativeReview: reviewed.narrativeReview, chapters: windowChapters }),
       p_next_stage: nextStage,
     });
     if (publishError) throw publishError;

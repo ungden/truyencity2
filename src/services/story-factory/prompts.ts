@@ -1,4 +1,4 @@
-export const FACTORY_PROMPT_VERSION = 'story-factory-2026-09-02.62-causal-spine-revision';
+export const FACTORY_PROMPT_VERSION = 'story-factory-2026-09-21.63-narrative-foundation';
 
 /**
  * Invariants that protect canon, ledger, scene completion and the reader-facing

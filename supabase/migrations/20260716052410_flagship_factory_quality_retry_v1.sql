@@ -4,7 +4,6 @@
 
 ALTER TABLE public.story_write_runs
   ADD COLUMN IF NOT EXISTS quality_verdict jsonb NOT NULL DEFAULT '{}'::jsonb;
-
 CREATE OR REPLACE FUNCTION public.record_flagship_factory_quality_failure_v1(
   p_project_id uuid,
   p_error_message text,
@@ -64,7 +63,6 @@ BEGIN
   );
 END;
 $$;
-
 REVOKE ALL ON FUNCTION public.record_flagship_factory_quality_failure_v1(uuid,text,jsonb)
   FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.record_flagship_factory_quality_failure_v1(uuid,text,jsonb)

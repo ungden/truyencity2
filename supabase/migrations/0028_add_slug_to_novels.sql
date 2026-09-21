@@ -2,10 +2,8 @@
 -- Example: /truyen/ta-co-the-nhin-thay-gia-tri instead of /novel/6d798afb-...
 
 ALTER TABLE novels ADD COLUMN IF NOT EXISTS slug TEXT UNIQUE;
-
 -- Create index for fast slug lookups
 CREATE INDEX IF NOT EXISTS idx_novels_slug ON novels(slug);
-
 -- Function to generate slug from Vietnamese title
 CREATE OR REPLACE FUNCTION generate_novel_slug(title TEXT) RETURNS TEXT AS $$
 DECLARE
@@ -29,7 +27,6 @@ BEGIN
   RETURN result;
 END;
 $$ LANGUAGE plpgsql IMMUTABLE;
-
 -- Backfill slugs for all existing novels
 -- Append a short suffix from id if there's a collision
 DO $$
@@ -55,10 +52,8 @@ BEGIN
   END LOOP;
 END;
 $$;
-
 -- Make slug NOT NULL after backfill
 ALTER TABLE novels ALTER COLUMN slug SET NOT NULL;
-
 -- Trigger to auto-generate slug on INSERT if not provided
 CREATE OR REPLACE FUNCTION auto_generate_novel_slug() RETURNS TRIGGER AS $$
 DECLARE
@@ -80,7 +75,6 @@ BEGIN
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
-
 CREATE OR REPLACE TRIGGER trg_novels_auto_slug
   BEFORE INSERT ON novels
   FOR EACH ROW

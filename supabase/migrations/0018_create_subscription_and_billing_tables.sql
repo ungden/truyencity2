@@ -8,25 +8,21 @@ DO $$ BEGIN
   CREATE TYPE subscription_tier AS ENUM ('free', 'creator', 'pro', 'enterprise');
 EXCEPTION WHEN duplicate_object THEN null;
 END $$;
-
 -- Subscription status enum
 DO $$ BEGIN
   CREATE TYPE subscription_status AS ENUM ('active', 'canceled', 'past_due', 'trialing', 'expired');
 EXCEPTION WHEN duplicate_object THEN null;
 END $$;
-
 -- Payment method enum
 DO $$ BEGIN
   CREATE TYPE payment_method AS ENUM ('stripe', 'vnpay', 'momo', 'bank_transfer', 'credits');
 EXCEPTION WHEN duplicate_object THEN null;
 END $$;
-
 -- Transaction type enum
 DO $$ BEGIN
   CREATE TYPE transaction_type AS ENUM ('subscription', 'credit_purchase', 'credit_usage', 'refund', 'bonus');
 EXCEPTION WHEN duplicate_object THEN null;
 END $$;
-
 -- ============================================================================
 -- USER SUBSCRIPTIONS
 -- ============================================================================
@@ -67,7 +63,6 @@ CREATE TABLE IF NOT EXISTS user_subscriptions (
   -- One active subscription per user
   UNIQUE(user_id)
 );
-
 -- ============================================================================
 -- USER CREDITS
 -- ============================================================================
@@ -98,7 +93,6 @@ CREATE TABLE IF NOT EXISTS user_credits (
   CONSTRAINT positive_balance CHECK (balance >= 0),
   CONSTRAINT positive_daily_used CHECK (daily_used >= 0)
 );
-
 -- ============================================================================
 -- CREDIT TRANSACTIONS (Audit log for all credit movements)
 -- ============================================================================
@@ -128,7 +122,6 @@ CREATE TABLE IF NOT EXISTS credit_transactions (
 
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
-
 -- ============================================================================
 -- USAGE TRACKING
 -- ============================================================================
@@ -159,7 +152,6 @@ CREATE TABLE IF NOT EXISTS usage_tracking (
 
   UNIQUE(user_id, period_start)
 );
-
 -- ============================================================================
 -- SUBSCRIPTION TIER LIMITS (Configuration table)
 -- ============================================================================
@@ -196,7 +188,6 @@ CREATE TABLE IF NOT EXISTS subscription_tier_limits (
   description TEXT,
   features JSONB DEFAULT '[]'
 );
-
 -- Insert default tier limits
 INSERT INTO subscription_tier_limits (
   tier, daily_chapter_limit, monthly_chapter_limit, max_projects, max_chapters_per_project,
@@ -219,7 +210,6 @@ ON CONFLICT (tier) DO UPDATE SET
   price_vnd_monthly = EXCLUDED.price_vnd_monthly,
   price_usd_monthly = EXCLUDED.price_usd_monthly,
   features = EXCLUDED.features;
-
 -- ============================================================================
 -- INDEXES
 -- ============================================================================
@@ -228,18 +218,14 @@ CREATE INDEX IF NOT EXISTS idx_user_subscriptions_user_id ON user_subscriptions(
 CREATE INDEX IF NOT EXISTS idx_user_subscriptions_status ON user_subscriptions(status);
 CREATE INDEX IF NOT EXISTS idx_user_subscriptions_tier ON user_subscriptions(tier);
 CREATE INDEX IF NOT EXISTS idx_user_subscriptions_period_end ON user_subscriptions(current_period_end);
-
 CREATE INDEX IF NOT EXISTS idx_user_credits_user_id ON user_credits(user_id);
 CREATE INDEX IF NOT EXISTS idx_user_credits_daily_reset ON user_credits(daily_reset_at);
-
 CREATE INDEX IF NOT EXISTS idx_credit_transactions_user_id ON credit_transactions(user_id);
 CREATE INDEX IF NOT EXISTS idx_credit_transactions_type ON credit_transactions(type);
 CREATE INDEX IF NOT EXISTS idx_credit_transactions_created_at ON credit_transactions(created_at);
 CREATE INDEX IF NOT EXISTS idx_credit_transactions_reference ON credit_transactions(reference_type, reference_id);
-
 CREATE INDEX IF NOT EXISTS idx_usage_tracking_user_id ON usage_tracking(user_id);
 CREATE INDEX IF NOT EXISTS idx_usage_tracking_period ON usage_tracking(period_start, period_end);
-
 -- ============================================================================
 -- ROW LEVEL SECURITY
 -- ============================================================================
@@ -248,7 +234,6 @@ ALTER TABLE user_subscriptions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_credits ENABLE ROW LEVEL SECURITY;
 ALTER TABLE credit_transactions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE usage_tracking ENABLE ROW LEVEL SECURITY;
-
 -- Users can only see their own data
 DO $$ BEGIN
 CREATE POLICY "Users can view own subscription"
@@ -256,31 +241,26 @@ CREATE POLICY "Users can view own subscription"
   USING (auth.uid() = user_id);
 EXCEPTION WHEN duplicate_object THEN null;
 END $$;
-
 DO $$ BEGIN
 CREATE POLICY "Users can view own credits"
   ON user_credits FOR SELECT
   USING (auth.uid() = user_id);
 EXCEPTION WHEN duplicate_object THEN null;
 END $$;
-
 DO $$ BEGIN
 CREATE POLICY "Users can view own transactions"
   ON credit_transactions FOR SELECT
   USING (auth.uid() = user_id);
 EXCEPTION WHEN duplicate_object THEN null;
 END $$;
-
 DO $$ BEGIN
 CREATE POLICY "Users can view own usage"
   ON usage_tracking FOR SELECT
   USING (auth.uid() = user_id);
 EXCEPTION WHEN duplicate_object THEN null;
 END $$;
-
 -- Tier limits are public
 ALTER TABLE subscription_tier_limits ENABLE ROW LEVEL SECURITY;
-
 DO $$ BEGIN
 CREATE POLICY "Tier limits are public"
   ON subscription_tier_limits FOR SELECT
@@ -288,7 +268,6 @@ CREATE POLICY "Tier limits are public"
   USING (TRUE);
 EXCEPTION WHEN duplicate_object THEN null;
 END $$;
-
 -- ============================================================================
 -- FUNCTIONS
 -- ============================================================================
@@ -310,13 +289,11 @@ BEGIN
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
-
 -- Trigger for new users
 DROP TRIGGER IF EXISTS on_auth_user_created_billing ON auth.users;
 CREATE TRIGGER on_auth_user_created_billing
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION initialize_user_billing();
-
 -- Function to reset daily credits
 CREATE OR REPLACE FUNCTION reset_daily_credits()
 RETURNS void AS $$
@@ -328,7 +305,6 @@ BEGIN
   WHERE daily_reset_at < NOW() - INTERVAL '24 hours';
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
-
 -- Function to check if user can write a chapter
 CREATE OR REPLACE FUNCTION can_user_write_chapter(p_user_id UUID)
 RETURNS JSONB AS $$
@@ -388,7 +364,6 @@ BEGIN
   );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
-
 -- Function to consume a credit when writing a chapter
 CREATE OR REPLACE FUNCTION consume_chapter_credit(
   p_user_id UUID,

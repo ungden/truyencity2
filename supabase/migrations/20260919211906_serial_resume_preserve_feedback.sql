@@ -1,9 +1,7 @@
 -- A paused replan carries the exact audit findings the next planner must repair.
 -- Resuming resets retry counters but intentionally preserves serial_jobs.last_error.
 BEGIN;
-
 SET lock_timeout = '5s';
-
 CREATE OR REPLACE FUNCTION public.resume_serial_job(p_job_id uuid)
 RETURNS jsonb
 LANGUAGE plpgsql SECURITY INVOKER SET search_path = public AS $$
@@ -42,8 +40,6 @@ BEGIN
     'feedbackPreserved', v_job.last_error IS NOT NULL
   );
 END $$;
-
 REVOKE ALL ON FUNCTION public.resume_serial_job(uuid) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.resume_serial_job(uuid) TO service_role;
-
 COMMIT;

@@ -41,6 +41,5 @@ LEFT JOIN LATERAL (
 ) r ON true
 WHERE p.flagship_v3_status IS NOT NULL
    OR p.style_directives->>'pipeline_version' = 'flagship_v3';
-
 REVOKE ALL ON public.factory_story_status_v3 FROM PUBLIC, anon, authenticated;
 GRANT SELECT ON public.factory_story_status_v3 TO service_role;

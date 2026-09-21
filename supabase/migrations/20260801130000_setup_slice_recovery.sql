@@ -11,7 +11,6 @@
 --     setup progresses; checkpoints make the work monotonic. The higher cap still
 --     bounds a genuinely crash-looping setup instead of letting it burn forever.
 SET lock_timeout = '5s';
-
 CREATE OR REPLACE FUNCTION public.claim_story_factory_job(p_worker_id text, p_engine_release text)
 RETURNS SETOF public.story_factory_jobs
 LANGUAGE plpgsql
@@ -69,10 +68,8 @@ BEGIN
   WHERE job.id = claimed_id
   RETURNING job.*;
 END $$;
-
 REVOKE ALL ON FUNCTION public.claim_story_factory_job(text, text) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.claim_story_factory_job(text, text) TO service_role;
-
 CREATE OR REPLACE FUNCTION public.reconcile_story_factory_jobs(p_stale_minutes integer DEFAULT 10)
 RETURNS integer
 LANGUAGE plpgsql
@@ -112,6 +109,5 @@ BEGIN
   GET DIAGNOSTICS affected = ROW_COUNT;
   RETURN affected;
 END $$;
-
 REVOKE ALL ON FUNCTION public.reconcile_story_factory_jobs(integer) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.reconcile_story_factory_jobs(integer) TO service_role;

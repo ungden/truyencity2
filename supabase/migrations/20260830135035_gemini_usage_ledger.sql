@@ -30,24 +30,18 @@ CREATE TABLE IF NOT EXISTS public.gemini_usage_events (
   observed_at timestamptz NOT NULL DEFAULT now(),
   created_at timestamptz NOT NULL DEFAULT now()
 );
-
 CREATE INDEX IF NOT EXISTS gemini_usage_events_observed_at_idx
   ON public.gemini_usage_events (observed_at DESC);
-
 CREATE INDEX IF NOT EXISTS gemini_usage_events_project_observed_at_idx
   ON public.gemini_usage_events (project_id, observed_at DESC)
   WHERE project_id IS NOT NULL;
-
 CREATE INDEX IF NOT EXISTS gemini_usage_events_source_idx
   ON public.gemini_usage_events (source_type, source_id)
   WHERE source_id IS NOT NULL;
-
 ALTER TABLE public.gemini_usage_events ENABLE ROW LEVEL SECURITY;
-
 -- Event rows are accounting records, never a public API surface. Server-side
 -- admin routes use the service role; no user-level policy is intentionally added.
 REVOKE ALL ON TABLE public.gemini_usage_events FROM anon, authenticated;
-
 CREATE OR REPLACE VIEW public.gemini_usage_daily
 WITH (security_invoker = true) AS
 SELECT
@@ -69,12 +63,9 @@ SELECT
   sum(grounding_cost_upper_usd)::numeric(14, 8) AS grounding_cost_upper_usd
 FROM public.gemini_usage_events
 GROUP BY 1, 2, 3, 4;
-
 REVOKE ALL ON TABLE public.gemini_usage_daily FROM anon, authenticated;
 GRANT SELECT ON TABLE public.gemini_usage_events, public.gemini_usage_daily TO service_role;
-
 COMMENT ON TABLE public.gemini_usage_events IS
   'One immutable, deduplicated Gemini API response per row. Usage counters come from Gemini usageMetadata; price is a versioned list-price estimate, not a provider invoice.';
-
 COMMENT ON VIEW public.gemini_usage_daily IS
   'Vietnam-day Gemini token/accounting aggregate. token_cost_usd excludes cache storage and the shared monthly free allowance for Search grounding; grounding_cost_upper_usd is the worst-case incremental Search amount.';

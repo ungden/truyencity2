@@ -244,3 +244,4 @@ END $$;
 
 REVOKE ALL ON FUNCTION public.promote_story_factory_canary(uuid, text) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.promote_story_factory_canary(uuid, text) TO service_role;
+;

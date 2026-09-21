@@ -9,26 +9,21 @@ CREATE TABLE IF NOT EXISTS public.ai_provider_settings (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     UNIQUE(user_id)
 );
-
 -- Enable RLS
 ALTER TABLE public.ai_provider_settings ENABLE ROW LEVEL SECURITY;
-
 -- Policies
 CREATE POLICY "Users can view their own settings" 
     ON public.ai_provider_settings FOR SELECT 
     TO authenticated 
     USING (auth.uid() = user_id);
-
 CREATE POLICY "Users can update their own settings" 
     ON public.ai_provider_settings FOR UPDATE 
     TO authenticated 
     USING (auth.uid() = user_id);
-
 CREATE POLICY "Users can insert their own settings" 
     ON public.ai_provider_settings FOR INSERT 
     TO authenticated 
     WITH CHECK (auth.uid() = user_id);
-
 -- Add trigger for updated_at
 CREATE TRIGGER handle_updated_at 
     BEFORE UPDATE ON public.ai_provider_settings 

@@ -1,0 +1,113 @@
+{
+  "reviewState": "private_foundation_only",
+  "replacesPublicContent": false,
+  "craftProfile": {
+    "version": "lived-causality-2026-09-21.1",
+    "genre": "two_world_commerce"
+  },
+  "story": {
+    "workingTitle": "Song Xuyên Tương Lai: Từ Một Lưỡi Dao Đến Công Ty Công Nghệ",
+    "protagonist": "Trần Khải, 27 tuổi, đang tự giữ tiệm tạp hóa Khải Minh sau khi cha nhập viện",
+    "initialGoal": "Cứu dòng tiền của tiệm, quan sát công nghệ tương lai và âm thầm tìm thứ có thể làm lại hợp pháp ở hiện tại",
+    "longDirection": "Bắt đầu từ đồ dùng nhỏ có thể kiểm tra và sản xuất, sau đó mới tiến tới phần mềm, thiết bị và công ty công nghệ ở hiện tại; quan hệ kinh tế ở tương lai phát triển theo nhu cầu riêng của cư dân bên đó"
+  },
+  "foundation": {
+    "craftProfile": {
+      "version": "lived-causality-2026-09-21.1",
+      "genre": "two_world_commerce"
+    },
+    "characters": [
+      {
+        "characterId": "tran_khai",
+        "background": "Khải lớn lên trong tiệm tạp hóa gia đình, học cao đẳng quản trị chuỗi cung ứng rồi về phụ cha vì tiệm liên tục thiếu người.",
+        "presentLife": "Anh đang tự mở cửa từ sáu giờ sáng, nhận hàng, bán lẻ, kiểm hạn dùng và trả khoản nợ viện phí của cha từ một dòng tiền rất mỏng.",
+        "existingCompetence": "Anh biết đọc nhãn lô, so giá, thương lượng với nhà cung cấp nhỏ, dùng bảng tính và nhận ra khác biệt giữa mẫu thử với hàng có thể nhập đều.",
+        "limitsOfKnowledge": "Anh không phải kỹ sư vật liệu, không biết chế tạo chip hay AI, không hiểu pháp luật và tiêu chuẩn của tương lai, cũng chưa từng vận hành công ty công nghệ.",
+        "relationships": "Anh tin chị gái Trần Mai nhưng giấu khó khăn tài chính; chú Tư giao rau cho tiệm nhiều năm; bạn học cũ Phạm Khoa đang làm kiểm thử phần mềm và không dễ tin lời quảng cáo.",
+        "habits": "Khải chụp tem lô hàng, ghi số tiền cuối ca, giữ một hộp đồ lỗi để đối chiếu và luôn thử món mới trên quy mô nhỏ trước khi nhập.",
+        "desireBeforeAdvantage": "Trước khi thấy cánh cửa, anh chỉ muốn tiệm sống được sáu tháng nữa và không phải bán căn nhà của cha mẹ."
+      },
+      {
+        "characterId": "diep_ninh",
+        "background": "Diệp Ninh sinh ra ở khu dân cư hạ tầng Tân Hải, học sửa đồ gia dụng từ các mô-đun bị tầng trên thải xuống.",
+        "presentLife": "Cô nhận sửa dao cạo, khóa cửa và bộ lọc khí theo ca, đổi công lấy vật tư và chăm mẹ đang lệ thuộc dịch dinh dưỡng rẻ tiền.",
+        "existingCompetence": "Cô biết phân loại linh kiện phổ thông, kiểm tra độ bền và tìm chợ sửa chữa không chính thức.",
+        "limitsOfKnowledge": "Cô không biết xã hội hiện đại của Khải, không có quyền truy cập thiết kế lõi và chỉ hiểu công nghệ đúng phạm vi nghề sửa chữa.",
+        "relationships": "Cô nợ chủ xưởng một kỳ tiền thuê, có khách quen trong phố hạ tầng và dè chừng người lạ hỏi nguồn linh kiện.",
+        "habits": "Cô tháo thiết bị trước mặt khách, đánh dấu linh kiện thay và không nhận món không thể kiếm phụ tùng.",
+        "desireBeforeAdvantage": "Cô muốn giữ quầy sửa chữa và tìm thức ăn thật cho mẹ mà không phải ký hợp đồng lệ thuộc tập đoàn."
+      }
+    ],
+    "livedWorlds": [
+      {
+        "worldId": "van_cang_hien_dai",
+        "everydayLife": "Vân Cảng là đô thị cảng có siêu thị, chợ dân sinh, giao hàng ứng dụng và những tiệm nhỏ sống bằng khách quanh khu phố.",
+        "livelihoods": "Người bán lẻ chịu tiền thuê, hàng tồn và phí nền tảng; kỹ sư trẻ làm thuê cho công ty phần mềm; xưởng nhỏ chỉ nhận sản phẩm khi có bản vẽ và đơn tối thiểu.",
+        "infrastructure": "Điện, mạng, logistics, ngân hàng, kiểm định sản phẩm và sở hữu trí tuệ đều hoạt động; một món lạ không thể tự nhiên lên kệ số lượng lớn.",
+        "inequality": "Tiệm gia đình khó tiếp cận vốn và phòng thử nghiệm, trong khi tập đoàn có tiền mua bằng sáng chế, quảng cáo và kênh phân phối.",
+        "institutionsWithoutProtagonist": "Nhà cung cấp, xưởng gia công, sàn bán hàng, cơ quan tiêu chuẩn và các công ty công nghệ vẫn cạnh tranh lợi nhuận dù Khải không xuất hiện."
+      },
+      {
+        "worldId": "tan_hai_tuong_lai",
+        "everydayLife": "Tân Hải ba trăm năm sau có cư dân đi làm theo quyền truy cập, ăn dịch dinh dưỡng và sửa đồ nhiều lần vì hàng mới bị phân tầng giá.",
+        "livelihoods": "Thợ sửa, người thu hồi linh kiện, đội vận chuyển và quầy dịch dinh dưỡng trao đổi tín dụng địa phương; thực phẩm tươi hiếm nhưng không phải ai cũng có tiền mua.",
+        "infrastructure": "Lưới điện vi mô, khóa nhận dạng, kho vật liệu và hệ thống cấp phép chia thành tầng; thiết bị dân dụng có thể rất tiên tiến nhưng vẫn cần pin, phụ tùng và quyền kích hoạt.",
+        "inequality": "Khu hạ tầng dùng hàng sửa và tài khoản giới hạn, còn khu lõi thành phố nắm bản thiết kế, vật liệu chuẩn và quyền cập nhật.",
+        "institutionsWithoutProtagonist": "Chủ xưởng muốn giữ thợ, tập đoàn dinh dưỡng giữ giấy chứng nhận, người thu hồi linh kiện giữ nguồn hàng; mỗi bên có mục tiêu riêng với hoặc không có Khải."
+      }
+    ],
+    "advantageDiscovery": {
+      "acquisitionEvent": "Sau một lần mất điện, Khải kéo kệ hàng bị ẩm khỏi tường kho và thấy cánh cửa sắt vốn bị xây bít mở vào một căn phòng sáng bằng dải đèn xa lạ.",
+      "initialReaction": "Anh đóng cửa tiệm, gọi nhưng không ai đáp, kiểm camera và dấu cạy rồi mới dùng phấn đánh dấu ngưỡng cửa.",
+      "firstExperiments": [
+        "Khải đẩy qua một chai nước có ký hiệu, đóng cửa mười phút rồi mở lại để kiểm vị trí, nhiệt độ và tem chai.",
+        "Anh buộc dây vào xe đẩy, đặt hai đồng hồ ở hai phía và chỉ bước nửa người qua trước khi xác nhận vẫn có đường lui.",
+        "Anh mang theo khẩu trang, đèn pin và điện thoại không mạng để quan sát căn phòng, chưa lấy hay bán bất cứ thứ gì."
+      ],
+      "initiallyKnownFactIds": [],
+      "unresolvedOrigin": "Nguồn gốc cánh cửa chưa được giải thích; trên khung có một dãy ký hiệu bị mòn sẽ trở thành manh mối về sau."
+    },
+    "facts": [
+      {
+        "id": "cua_noi_hai_kho",
+        "truth": "Cánh cửa nối cố định kho tiệm Khải Minh với một cửa hàng bỏ trống ở khu hạ tầng Tân Hải.",
+        "initiallyKnownByCharacterIds": [],
+        "revealThrough": "Hai phép thử vật đánh dấu và chuyến đi ngắn có đường quay về cho Khải bằng chứng trong phạm vi đã thử."
+      },
+      {
+        "id": "thoi_gian_dong_bo",
+        "truth": "Trong phạm vi những lần đầu, thời gian hai phía trôi gần như đồng bộ nhưng Khải chưa biết điều này luôn đúng hay không.",
+        "initiallyKnownByCharacterIds": [],
+        "revealThrough": "Khải so hai đồng hồ qua nhiều lần mở cửa và chỉ ghi kết luận tạm thời cùng sai số."
+      },
+      {
+        "id": "dao_cao_rau_dan_dung",
+        "truth": "Dao cạo dân dụng đã lỗi mốt ở Tân Hải dùng lớp phủ bền và cơ cấu tự làm sạch tốt hơn hàng phổ thông hiện đại, nhưng pin và lưỡi thay thế là hai nút thắt.",
+        "initiallyKnownByCharacterIds": ["diep_ninh"],
+        "revealThrough": "Diệp Ninh tháo một máy hỏng, chỉ cho Khải từng bộ phận và nói rõ thứ cô biết với thứ thuộc thiết kế lõi."
+      }
+    ],
+    "milestones": [
+      {
+        "id": "kiem_chung_cua",
+        "intention": "Khải xác nhận cánh cửa có thật, có thể quay về và chưa có dấu hiệu tức thời làm hỏng vật thường.",
+        "prerequisiteIds": ["cua_noi_hai_kho", "thoi_gian_dong_bo"],
+        "evidenceNeeded": "Ít nhất hai lượt thử có vật đánh dấu, đồng hồ, quan sát sai số và một chuyến đi có chuẩn bị được viết trên trang."
+      },
+      {
+        "id": "hieu_mau_dau_tien",
+        "intention": "Khải hiểu công dụng, giới hạn, phụ tùng và rủi ro của một đồ dùng nhỏ trước khi nghĩ đến sản phẩm hiện đại.",
+        "prerequisiteIds": ["kiem_chung_cua", "dao_cao_rau_dan_dung"],
+        "evidenceNeeded": "Thiết bị được tháo kiểm, dùng thử có tiêu chí, ghi lại lỗi pin và lưỡi; chưa được gọi là sản phẩm thương mại."
+      }
+    ]
+  },
+  "openingProgression": [
+    { "phase": "đời sống", "content": "Một ca bán ế, áp lực viện phí, thói quen kiểm kho và quan hệ nguồn rau cho thấy Khải là ai trước lợi thế." },
+    { "phase": "phát hiện", "content": "Cánh cửa xuất hiện từ sự cố vật lý; Khải phản ứng như chủ tiệm thận trọng, không nhận ngay đây là bàn tay vàng." },
+    { "phase": "thử nghiệm", "content": "Anh kiểm ngưỡng cửa, vật đánh dấu, thời gian và đường về; kết luận luôn giữ đúng phạm vi quan sát." },
+    { "phase": "khám phá", "content": "Anh chỉ quan sát khu hạ tầng Tân Hải, học giá trị của đồ ăn và đồ dân dụng từ đời sống người ở đó." },
+    { "phase": "lựa chọn mẫu", "content": "Một dao cạo hỏng trở thành mẫu nghiên cứu vì nhỏ, dễ giấu và có công dụng kiểm được; chưa bán, chưa ký công ty, chưa có AI tự xuất hiện." },
+    { "phase": "chuẩn bị hiện đại", "content": "Khải nhờ Phạm Khoa kiểm phần điện tử, tìm xưởng cho phần cơ khí và tra quyền sở hữu; chỉ sau prototype, độ bền và chi phí mới cân nhắc thị trường." }
+  ]
+}

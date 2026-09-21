@@ -1,9 +1,4 @@
--- SECURITY NOTICE: This migration contained a hardcoded CRON_SECRET in plaintext.
--- It has been superseded by migration 0121 which reads from Supabase Vault.
--- The secret in this file should be considered COMPROMISED and has been rotated.
--- See 0121_vault_cron_secrets.sql for the current approach.
---
--- Original purpose: Fix all pg_cron jobs: replace placeholder secrets with real CRON_SECRET.
+-- Fix all pg_cron jobs: replace placeholder secrets with real CRON_SECRET.
 -- All 4 jobs were sending "Bearer YOUR_CRON_SECRET" or "Bearer __CRON_SECRET__"
 -- causing 401 Unauthorized on every call since migration 0102-0106.
 
@@ -13,16 +8,12 @@
 
 SELECT cron.unschedule('daily-spawn-cron')
 WHERE EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'daily-spawn-cron');
-
 SELECT cron.unschedule('health-check-cron')
 WHERE EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'health-check-cron');
-
 SELECT cron.unschedule('ai-editor-scan-cron')
 WHERE EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'ai-editor-scan-cron');
-
 SELECT cron.unschedule('ai-editor-rewrite-cron')
 WHERE EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'ai-editor-rewrite-cron');
-
 -- ═══════════════════════════════════════════════════════════════════
 -- 2. Reschedule with real secret
 -- ═══════════════════════════════════════════════════════════════════
@@ -39,7 +30,6 @@ SELECT cron.schedule(
   ) AS request_id;
   $$
 );
-
 -- health-check: minute 2 every hour
 SELECT cron.schedule(
   'health-check-cron',
@@ -52,7 +42,6 @@ SELECT cron.schedule(
   ) AS request_id;
   $$
 );
-
 -- ai-editor-scan: 00:05 UTC daily
 SELECT cron.schedule(
   'ai-editor-scan-cron',
@@ -65,7 +54,6 @@ SELECT cron.schedule(
   ) AS request_id;
   $$
 );
-
 -- ai-editor-rewrite: every 10 minutes
 SELECT cron.schedule(
   'ai-editor-rewrite-cron',

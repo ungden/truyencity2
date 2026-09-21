@@ -7,7 +7,6 @@
 -- ============================================================================
 
 DROP TABLE IF EXISTS character_arcs CASCADE;
-
 CREATE TABLE character_arcs (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   project_id UUID NOT NULL REFERENCES ai_story_projects(id) ON DELETE CASCADE,
@@ -24,12 +23,9 @@ CREATE TABLE character_arcs (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE(project_id, character_name)
 );
-
 CREATE INDEX IF NOT EXISTS idx_character_arcs_project
   ON character_arcs(project_id, character_name);
-
 ALTER TABLE character_arcs ENABLE ROW LEVEL SECURITY;
-
 DO $$ BEGIN
   CREATE POLICY "service_role_full_character_arcs" ON character_arcs FOR ALL TO service_role USING (true) WITH CHECK (true);
 EXCEPTION WHEN duplicate_object THEN NULL;

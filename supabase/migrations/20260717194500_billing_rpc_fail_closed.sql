@@ -1,5 +1,4 @@
 BEGIN;
-
 CREATE OR REPLACE FUNCTION public.can_user_write_chapter(p_user_id uuid)
 RETURNS jsonb
 LANGUAGE plpgsql
@@ -37,7 +36,6 @@ BEGIN
     'daily_limit',v_daily_limit,'balance',v_balance);
 END;
 $$;
-
 CREATE OR REPLACE FUNCTION public.consume_chapter_credit(
   p_chapter_id uuid DEFAULT NULL,
   p_words_count integer DEFAULT 0
@@ -72,5 +70,4 @@ BEGIN
   RETURN jsonb_build_object('success',true,'daily_used',v_new_daily_used,'balance',v_new_balance);
 END;
 $$;
-
 COMMIT;

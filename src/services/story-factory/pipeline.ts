@@ -17,6 +17,7 @@ import type { CraftGuidance } from './craft';
 import type { ContinuityPacket } from './memory';
 import type { ProviderUsage, StoryModelProvider } from './provider';
 import { CHAPTER_CALL_TIMEOUT_MS, geminiProvider } from './provider';
+import { foundationSystemPrompt } from './foundation';
 import {
   EDITOR_SYSTEM_PROMPT,
   REVISION_SYSTEM_PROMPT,
@@ -544,7 +545,7 @@ function preflight(
 }
 
 function editorPrompt(input: {
-  kernel: Pick<StoryKernel, 'protagonistId' | 'resources'>;
+  kernel: Pick<StoryKernel, 'protagonistId' | 'resources' | 'narrativeFoundation'>;
   state: unknown;
   plan: ChapterPlan;
   draft: ChapterDraft;
@@ -783,7 +784,7 @@ function groundIssueEvidence(input: {
 export async function assessStoryDraft(input: {
   provider: StoryModelProvider;
   model: string;
-  kernel: Pick<StoryKernel, 'protagonistId' | 'resources'>;
+  kernel: Pick<StoryKernel, 'protagonistId' | 'resources' | 'narrativeFoundation'>;
   state: unknown;
   plan: ChapterPlan;
   draft: ChapterDraft;
@@ -844,7 +845,7 @@ export async function assessStoryDraft(input: {
   const response = await input.provider.json({
     model: input.model,
     timeoutMs: CHAPTER_CALL_TIMEOUT_MS,
-    system: EDITOR_SYSTEM_PROMPT,
+    system: foundationSystemPrompt(EDITOR_SYSTEM_PROMPT, input.kernel, 'editor'),
     prompt: editorPrompt({ ...input, deterministicIssues }),
     schema: responseSchema,
     temperature: 0.4,
@@ -862,7 +863,7 @@ export async function assessStoryDraft(input: {
     const corrective = await input.provider.json({
       model: input.model,
       timeoutMs: CHAPTER_CALL_TIMEOUT_MS,
-      system: `${EDITOR_SYSTEM_PROMPT}
+      system: `${foundationSystemPrompt(EDITOR_SYSTEM_PROMPT, input.kernel, 'editor')}
 Bản assessment trước bị từ chối vì evidence không đạt hợp đồng grounding. Chấm lại toàn bộ: mỗi anchor evidence phải là 4-12 từ liên tiếp copy đúng từng ký tự từ draft, referenceId phải là stable ID có thật, và mọi issue phải sửa đúng lỗi grounding được nêu.`,
       prompt: `${editorPrompt({ ...input, deterministicIssues })}
 
@@ -1099,7 +1100,11 @@ export async function draftStoryChapter(input: ChapterStageInput): Promise<Chapt
       // Transition-only recovery briefs get one short generation instead of a
       // normal high-verbosity chapter that must later be rewritten or padded.
       verbosity: compressedBridge ? 'low' : 'high',
-      system: buildWriterSystemPrompt({ voicePolicy: input.writerVoicePolicy }),
+      system: foundationSystemPrompt(
+        buildWriterSystemPrompt({ voicePolicy: input.writerVoicePolicy }),
+        input.kernel,
+        'writer',
+      ),
       prompt: JSON.stringify({
         task: compressedBridge
           ? 'Viết nhịp cầu chuyển tiếp ngắn dưới 600 từ; không độn thành chương thường.'
@@ -1159,7 +1164,7 @@ export async function reviseStoryChapter(
       model: input.routes.writer,
       timeoutMs: CHAPTER_CALL_TIMEOUT_MS,
       verbosity: compressedBridge ? 'low' : 'high',
-      system: REVISION_SYSTEM_PROMPT,
+      system: foundationSystemPrompt(REVISION_SYSTEM_PROMPT, input.kernel, 'revision'),
       prompt: JSON.stringify(buildRevisionContext({
         brief: contexts.brief,
         previousTail: contexts.previousTail,

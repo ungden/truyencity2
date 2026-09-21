@@ -1,15 +1,21 @@
+import { createHash } from 'node:crypto';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { ZodError } from 'zod';
 import type { ProviderUsage, StoryModelProvider } from '@/services/story-factory/provider';
 import { geminiProvider } from '@/services/story-factory/provider';
 import { StoryFactoryError } from '@/services/story-factory/contracts';
 import {
-  BibleSchema, CyclePlanSchema, JudgeVerdictSchema, PremiseSchema, SerialRoutesSchema, scorecardAverage,
+  BibleSchema, ChapterDigestSchema, ChapterDraftSchema, CyclePlanSchema, JudgeVerdictSchema, PremiseSchema, SerialRoutesSchema, scorecardAverage,
   type Bible, type CyclePlan, type Premise, type SerialRoutes,
 } from './contracts';
 import { SERIAL_PROMPT_VERSION } from './prompts';
-import { auditFourChapterOpening, foldVolume, planNextCycle, writeOneChapter } from './engine';
+import {
+  auditFourChapterOpening, foldVolume, planNextCycle, SerialCheckpointError, writeOneChapter,
+  type ChapterOutcome, type SerialDraftCheckpoint,
+} from './engine';
 import { SerialStateError } from './state';
+import { NarrativeReviewSchema, narrativeReviewGate } from '@/services/narrative/foundation';
+import { reviewNarrativeSequence } from './foundation';
 
 /**
  * The state machine. One stage per claim, lease-guarded, every mutation through an RPC.
@@ -42,6 +48,34 @@ export const editorialNotesFromError = (value: string | null): string[] => value
 
 export const mergeEditorialNotes = (fresh: string[], inherited: string[]): string[] =>
   [...new Set([...fresh, ...inherited])].slice(0, 8);
+
+function parseDraftCheckpoint(value: unknown): SerialDraftCheckpoint | null {
+  if (!value || typeof value !== 'object') return null;
+  const candidate = value as Record<string, unknown>;
+  if (candidate.schemaVersion !== 1 || !['judge', 'revision', 'extractor', 'verifier', 'literary_review'].includes(String(candidate.resumeFrom))) {
+    return null;
+  }
+  const chapterRaw = candidate.chapter as Record<string, unknown> | undefined;
+  const chapterNumber = chapterRaw?.chapterNumber;
+  const chapter = ChapterDraftSchema.safeParse(chapterRaw && { title: chapterRaw.title, content: chapterRaw.content });
+  const verdict = candidate.verdict === undefined ? null : JudgeVerdictSchema.safeParse(candidate.verdict);
+  const digest = candidate.digest === undefined ? null : ChapterDigestSchema.safeParse(candidate.digest);
+  if (!Number.isInteger(chapterNumber) || !chapter.success || (verdict && !verdict.success) || (digest && !digest.success)) return null;
+  return {
+    schemaVersion: 1,
+    resumeFrom: candidate.resumeFrom as SerialDraftCheckpoint['resumeFrom'],
+    chapter: { chapterNumber: chapterNumber as number, ...chapter.data },
+    verdict: verdict?.data,
+    digest: digest?.data,
+    attempts: Number.isInteger(candidate.attempts) && Number(candidate.attempts) > 0 ? Number(candidate.attempts) : 1,
+  };
+}
+
+function usagesFromError(error: unknown): ProviderUsage[] {
+  if (!(error instanceof StoryFactoryError) || !error.evidence || typeof error.evidence !== 'object') return [];
+  const evidence = error.evidence as { usage?: ProviderUsage; usages?: ProviderUsage[] };
+  return Array.isArray(evidence.usages) ? evidence.usages : evidence.usage ? [evidence.usage] : [];
+}
 
 /**
  * A rolling plan supplies only the next beat-sheet window. The cycle promise and
@@ -141,6 +175,7 @@ async function openCycle(db: SupabaseClient, input: {
     start_chapter: input.cycle.startChapter,
     end_chapter: input.cycle.plannedEndChapter,
     plan: input.cycle,
+    plan_history: [input.cycle],
     checkpoint_bible: input.bible,
     status: 'writing',
   }).select('id').single();
@@ -154,7 +189,7 @@ async function stagePlanCycle(
   const { premise, bible, routes } = await loadNovel(db, job.serial_novel_id);
 
   const { data: lastCycle, error: lastError } = await db.from('serial_cycles')
-    .select('id,cycle_number,volume_number,start_chapter,end_chapter,plan,status')
+    .select('id,cycle_number,volume_number,start_chapter,end_chapter,plan,plan_history,status')
     .eq('serial_novel_id', job.serial_novel_id)
     .order('cycle_number', { ascending: false }).limit(1).maybeSingle();
   if (lastError) throw lastError;
@@ -232,9 +267,17 @@ async function stagePlanCycle(
     : await openCycle(db, { job, novelId: job.serial_novel_id, cycle: planned.cycle, bible });
 
   if (extending) {
+    if (!lastCycle) throw new SerialStateError('serial_open_cycle_missing', 'Open cycle row disappeared before its rolling plan could be saved.');
     // Rolling beats only: the cycle keeps its number, span and checkpoint.
     const { error } = await db.from('serial_cycles')
-      .update({ plan: planned.cycle, status: 'writing', updated_at: new Date().toISOString() })
+      .update({
+        plan: planned.cycle,
+        plan_history: [
+          ...(Array.isArray(lastCycle.plan_history) ? lastCycle.plan_history : [lastCycle.plan]),
+          planned.cycle,
+        ],
+        status: 'writing', updated_at: new Date().toISOString(),
+      })
       .eq('id', cycleId);
     if (error) throw error;
   }
@@ -267,7 +310,7 @@ async function stageWrite(
 
   const { premise, bible, routes } = await loadNovel(db, job.serial_novel_id);
   const { data: cycleRow, error: cycleError } = await db.from('serial_cycles')
-    .select('id,plan,start_chapter,end_chapter').eq('id', job.current_cycle_id).single();
+    .select('id,plan,start_chapter,end_chapter,checkpoint_bible').eq('id', job.current_cycle_id).single();
   if (cycleError) throw cycleError;
   const parsedCycle = CyclePlanSchema.safeParse((cycleRow as { plan: unknown }).plan);
   if (!parsedCycle.success) {
@@ -281,6 +324,7 @@ async function stageWrite(
     };
   }
   const cycle = parsedCycle.data;
+  const startBible = BibleSchema.safeParse((cycleRow as { checkpoint_bible?: unknown }).checkpoint_bible);
   const chapterNumber = job.current_chapter + 1;
 
   // Beat sheets are three chapters deep. Running past them means planning again.
@@ -292,6 +336,18 @@ async function stageWrite(
   const { data: previous } = await db.from('chapters')
     .select('content').eq('novel_id', job.novel_id).eq('chapter_number', job.current_chapter).maybeSingle();
 
+  const { data: checkpointRow, error: checkpointError } = await db.from('serial_runs')
+    .select('draft_artifact')
+    .eq('serial_novel_id', job.serial_novel_id)
+    .eq('cycle_id', job.current_cycle_id)
+    .eq('chapter_number', chapterNumber)
+    .not('draft_artifact', 'is', null)
+    .order('started_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (checkpointError) throw checkpointError;
+  const resumeArtifact = parseDraftCheckpoint((checkpointRow as { draft_artifact?: unknown } | null)?.draft_artifact);
+
   const { data: runRow, error: runError } = await db.from('serial_runs').insert({
     serial_novel_id: job.serial_novel_id, cycle_id: cycle.cycleNumber ? job.current_cycle_id : null,
     kind: 'chapter', chapter_number: chapterNumber, status: 'running',
@@ -300,10 +356,49 @@ async function stageWrite(
   if (runError) throw runError;
   const runId = (runRow as { id: string }).id;
 
-  const outcome = await writeOneChapter({
-    provider, routes, premise, bible, cycle, chapterNumber,
-    previousChapter: (previous as { content?: string } | null)?.content ?? null,
-  });
+  let outcome: ChapterOutcome;
+  try {
+    outcome = await writeOneChapter({
+      provider, routes, premise, bible, cycle, chapterNumber,
+      previousChapter: (previous as { content?: string } | null)?.content ?? null,
+      resumeArtifact,
+    });
+  } catch (error) {
+    if (!(error instanceof SerialCheckpointError)) {
+      const failedUsages = usagesFromError(error);
+      const costUsd = Number(failedUsages.reduce((sum, usage) => sum + usage.costUsd, 0).toFixed(6));
+      const saved = await db.from('serial_runs').update({
+        status: 'failed', usage: failedUsages, cost_usd: costUsd,
+        error: (error instanceof Error ? error.message : String(error)).slice(0, 4_000),
+        finished_at: new Date().toISOString(),
+      }).eq('id', runId);
+      if (saved.error) throw saved.error;
+      throw error;
+    }
+    const failedUsages = [...error.usages, ...usagesFromError(error.underlying)];
+    const costUsd = Number(failedUsages.reduce((sum, usage) => sum + usage.costUsd, 0).toFixed(6));
+    const saved = await db.from('serial_runs').update({
+      status: 'failed', usage: failedUsages, cost_usd: costUsd,
+      attempts: error.checkpoint.attempts,
+      verdict: error.checkpoint.verdict ?? null,
+      digest: error.checkpoint.digest ?? null,
+      draft_artifact: error.checkpoint,
+      error: error.message.slice(0, 4_000), finished_at: new Date().toISOString(),
+    }).eq('id', runId);
+    if (saved.error) throw saved.error;
+    const retryCount = (job.retry_count ?? 0) + 1;
+    await releaseLease(db, job, {
+      status: serialFailureDisposition(error.underlying, retryCount),
+      retry_count: retryCount,
+      next_run_at: new Date(Date.now() + 5 * 60_000).toISOString(),
+      last_error: error.message.slice(0, 500),
+    });
+    return {
+      status: 'failed', jobId: job.id, stage: 'write', chapterNumber,
+      detail: `Saved ${error.checkpoint.resumeFrom} checkpoint: ${error.message}`,
+      costUsd,
+    };
+  }
 
   if (outcome.status === 'needs_replan') {
     const savedFailure = await db.from('serial_runs').update({
@@ -324,6 +419,30 @@ async function stageWrite(
     };
   }
 
+  if (outcome.status === 'needs_review') {
+    const savedReview = await db.from('serial_runs').update({
+      status: 'failed', usage: outcome.usages, cost_usd: outcome.costUsd,
+      verdict: outcome.verdict, attempts: outcome.attempts,
+      digest: outcome.rejectedDigest,
+      draft_artifact: {
+        schemaVersion: 1,
+        resumeFrom: 'extractor',
+        reviewKind: outcome.reviewKind,
+        chapter: outcome.chapter,
+        verdict: outcome.verdict,
+        attempts: outcome.attempts,
+      },
+      error: outcome.reason, finished_at: new Date().toISOString(),
+    }).eq('id', runId);
+    if (savedReview.error) throw savedReview.error;
+    await releaseLease(db, job, { status: 'paused', last_error: outcome.reason });
+    return {
+      status: 'completed', jobId: job.id, stage: 'write', chapterNumber,
+      detail: `Paused with private ${outcome.reviewKind} artifact: ${outcome.reason}`,
+      costUsd: outcome.costUsd,
+    };
+  }
+
   let commitUsages = outcome.usages;
   let commitCostUsd = outcome.costUsd;
   if (chapterNumber === 4) {
@@ -340,16 +459,109 @@ async function stageWrite(
       })),
       { chapterNumber: 4, title: outcome.chapter.title, content: outcome.chapter.content },
     ];
-    const audited = await auditFourChapterOpening({ provider, routes, premise, chapters });
+    let audited: Awaited<ReturnType<typeof auditFourChapterOpening>>;
+    try {
+      audited = await auditFourChapterOpening({
+        provider, routes, premise, chapters, bible,
+        startBible: startBible.success ? startBible.data : undefined,
+        approvedPlan: cycle,
+      });
+    } catch (error) {
+      const reviewUsages = usagesFromError(error);
+      const failedUsages = [...outcome.usages, ...reviewUsages];
+      const failedCost = Number(failedUsages.reduce((sum, usage) => sum + usage.costUsd, 0).toFixed(6));
+      const artifact: SerialDraftCheckpoint = {
+        schemaVersion: 1, resumeFrom: 'literary_review',
+        chapter: outcome.chapter, verdict: outcome.verdict, digest: outcome.digest,
+        attempts: outcome.attempts,
+      };
+      const saved = await db.from('serial_runs').update({
+        status: 'failed', usage: failedUsages, cost_usd: failedCost,
+        verdict: outcome.verdict, digest: outcome.digest, attempts: outcome.attempts,
+        draft_artifact: artifact,
+        error: (error instanceof Error ? error.message : String(error)).slice(0, 4_000),
+        finished_at: new Date().toISOString(),
+      }).eq('id', runId);
+      if (saved.error) throw saved.error;
+      const retryCount = (job.retry_count ?? 0) + 1;
+      await releaseLease(db, job, {
+        status: serialFailureDisposition(error, retryCount), retry_count: retryCount,
+        next_run_at: new Date(Date.now() + 5 * 60_000).toISOString(),
+        last_error: error instanceof Error ? error.message.slice(0, 500) : String(error).slice(0, 500),
+      });
+      return {
+        status: 'failed', jobId: job.id, stage: 'write', chapterNumber,
+        detail: `Saved literary-review checkpoint: ${error instanceof Error ? error.message : String(error)}`,
+        costUsd: failedCost,
+      };
+    }
     commitUsages = [...outcome.usages, ...audited.usages];
     commitCostUsd = Number((outcome.costUsd + audited.costUsd).toFixed(6));
-    const savedAudit = await db.from('serial_runs').update({ opening_audit: audited.audit }).eq('id', runId);
+    const savedAudit = await db.from('serial_runs').update({
+      opening_audit: { ...audited.audit, narrativeReview: audited.narrativeReview },
+    }).eq('id', runId);
     if (savedAudit.error) throw savedAudit.error;
 
-    if (!audited.audit.passed) {
-      const reason = `Opening audit failed: ${audited.audit.findings.map(finding =>
-        `Ch.${finding.chapterNumber} ${finding.kind}: ${finding.explain} Repair: ${finding.repair}`
+    const { upstreamFindings, blockingProseFindings, mayPublish } = narrativeReviewGate(audited.narrativeReview);
+    if (upstreamFindings.length > 0) {
+      const reason = `Narrative foundation review requires upstream repair: ${upstreamFindings.map(finding =>
+        `${finding.target}/${finding.kind}: ${finding.explanation} Direction: ${finding.direction}`
       ).join(' | ')}`.slice(0, 4_000);
+      const savedUpstream = await db.from('serial_runs').update({
+        status: 'failed', usage: commitUsages, cost_usd: commitCostUsd,
+        verdict: outcome.verdict, digest: outcome.digest, attempts: outcome.attempts,
+        draft_artifact: {
+          schemaVersion: 1, resumeFrom: 'literary_review', chapter: outcome.chapter,
+          verdict: outcome.verdict, digest: outcome.digest, attempts: outcome.attempts,
+        },
+        error: reason, finished_at: new Date().toISOString(),
+      }).eq('id', runId);
+      if (savedUpstream.error) throw savedUpstream.error;
+      await releaseLease(db, job, { status: 'paused', last_error: reason });
+      return {
+        status: 'completed', jobId: job.id, stage: 'write', chapterNumber,
+        detail: `Paused for foundation/plan review: ${reason}`,
+        costUsd: commitCostUsd,
+      };
+    }
+
+    if (!mayPublish) {
+      const reason = `Opening literary review blocked prose: ${blockingProseFindings.map(finding =>
+        `Ch.${finding.chapterNumber ?? '?'} ${finding.kind}: ${finding.explanation} Repair: ${finding.direction}`
+      ).join(' | ')}`.slice(0, 4_000);
+      const savedProse = await db.from('serial_runs').update({
+        status: 'failed', usage: commitUsages, cost_usd: commitCostUsd,
+        verdict: outcome.verdict,
+        draft_artifact: {
+          schemaVersion: 1,
+          resumeFrom: 'literary_review',
+          reviewKind: 'prose',
+          chapter: outcome.chapter,
+          verdict: outcome.verdict,
+          digest: outcome.digest,
+          attempts: outcome.attempts,
+          openingAudit: audited.audit,
+          narrativeReview: audited.narrativeReview,
+        },
+        error: reason, finished_at: new Date().toISOString(),
+      }).eq('id', runId);
+      if (savedProse.error) throw savedProse.error;
+      await releaseLease(db, job, { status: 'paused', last_error: reason });
+      return {
+        status: 'completed', jobId: job.id, stage: 'write', chapterNumber,
+        detail: `Paused with private prose artifact: ${reason}`,
+        costUsd: commitCostUsd,
+      };
+    }
+
+    if (!audited.audit.passed) {
+      const literary = blockingProseFindings.map(finding =>
+        `Ch.${finding.chapterNumber ?? '?'} ${finding.kind}: ${finding.explanation} Repair: ${finding.direction}`
+      );
+      const mechanical = audited.audit.findings.map(finding =>
+        `Ch.${finding.chapterNumber} ${finding.kind}: ${finding.explain} Repair: ${finding.repair}`
+      );
+      const reason = `Opening audit failed: ${[...mechanical, ...literary].join(' | ')}`.slice(0, 4_000);
       await db.from('serial_runs').update({
         status: 'failed', usage: commitUsages, cost_usd: commitCostUsd,
         error: reason, finished_at: new Date().toISOString(),
@@ -387,16 +599,130 @@ async function stageWrite(
   };
 }
 
-async function stagePublishCycle(db: SupabaseClient, job: SerialJobRow): Promise<SerialTickResult> {
+const cycleDraftFingerprint = (chapters: Array<{ chapterNumber: number; title: string; content: string }>): string =>
+  createHash('sha256').update(JSON.stringify(chapters.map(chapter => [
+    chapter.chapterNumber, chapter.title, chapter.content,
+  ]))).digest('hex');
+
+async function stagePublishCycle(
+  db: SupabaseClient, provider: StoryModelProvider, job: SerialJobRow,
+): Promise<SerialTickResult> {
   if (!job.current_cycle_id) {
     await releaseLease(db, job, { stage: 'plan_cycle', status: 'ready', next_run_at: new Date().toISOString() });
     return { status: 'completed', jobId: job.id, stage: 'publish_cycle', detail: 'Nothing open to publish.' };
   }
   const { data: cycleRow, error: cycleError } = await db.from('serial_cycles')
-    .select('cycle_number').eq('id', job.current_cycle_id).single();
+    .select('cycle_number,start_chapter,end_chapter,plan,plan_history,checkpoint_bible,narrative_review,narrative_review_fingerprint,narrative_review_snapshot')
+    .eq('id', job.current_cycle_id).single();
   if (cycleError) throw cycleError;
-  const cycleNumber = (cycleRow as { cycle_number: number }).cycle_number;
+  const persistedCycle = cycleRow as {
+    cycle_number: number;
+    start_chapter?: number;
+    end_chapter?: number;
+    plan?: unknown;
+    plan_history?: unknown;
+    checkpoint_bible?: unknown;
+    narrative_review?: unknown;
+    narrative_review_fingerprint?: string | null;
+    narrative_review_snapshot?: unknown;
+  };
+  const cycleNumber = persistedCycle.cycle_number;
   const nextStage: SerialStage = cycleNumber % CYCLES_PER_VOLUME === 0 ? 'fold_volume' : 'plan_cycle';
+
+  const parsedPlan = CyclePlanSchema.safeParse(persistedCycle.plan);
+  if (parsedPlan.success && parsedPlan.data.schemaVersion === 2) {
+    const { premise, bible, routes } = await loadNovel(db, job.serial_novel_id);
+    const startChapter = persistedCycle.start_chapter ?? parsedPlan.data.startChapter;
+    const endChapter = persistedCycle.end_chapter ?? parsedPlan.data.plannedEndChapter;
+    const { data: chapterRows, error: chaptersError } = await db.from('chapters')
+      .select('chapter_number,title,content')
+      .eq('novel_id', job.novel_id)
+      .gte('chapter_number', startChapter).lte('chapter_number', endChapter)
+      .eq('publication_state', 'draft')
+      .order('chapter_number', { ascending: true });
+    if (chaptersError) throw chaptersError;
+    const chapters = ((chapterRows ?? []) as Array<{ chapter_number: number; title: string; content: string }>).map(chapter => ({
+      chapterNumber: chapter.chapter_number, title: chapter.title, content: chapter.content,
+    }));
+    if (chapters.length !== endChapter - startChapter + 1) {
+      throw new SerialStateError('cycle_review_incomplete', `Narrative review requires chapters ${startChapter}-${endChapter}.`);
+    }
+    const fingerprint = cycleDraftFingerprint(chapters);
+    const cached = persistedCycle.narrative_review_fingerprint === fingerprint
+      ? NarrativeReviewSchema.safeParse(persistedCycle.narrative_review)
+      : null;
+    let review = cached?.success ? cached.data : null;
+    let reviewUsages: ProviderUsage[] = [];
+    if (!review) {
+      const startBible = BibleSchema.safeParse(persistedCycle.checkpoint_bible);
+      try {
+        const reviewed = await reviewNarrativeSequence({
+          provider, routes, premise, chapters, bible,
+          startBible: startBible.success ? startBible.data : undefined,
+          approvedPlan: Array.isArray(persistedCycle.plan_history)
+            ? persistedCycle.plan_history.flatMap(value => {
+              const parsed = CyclePlanSchema.safeParse(value);
+              return parsed.success ? [parsed.data] : [];
+            })
+            : [parsedPlan.data],
+        });
+        if (!reviewed) throw new SerialStateError('cycle_review_missing', 'Lived-causality cycle produced no narrative review.');
+        review = reviewed.review;
+        reviewUsages = [reviewed.usage];
+      } catch (error) {
+        reviewUsages = usagesFromError(error);
+        const reviewCost = Number(reviewUsages.reduce((sum, usage) => sum + usage.costUsd, 0).toFixed(6));
+        const savedFailedReview = await db.from('serial_runs').insert({
+          serial_novel_id: job.serial_novel_id, cycle_id: job.current_cycle_id,
+          kind: 'publish_cycle', status: 'failed', usage: reviewUsages, cost_usd: reviewCost,
+          route_version: routes.routeVersion, prompt_version: SERIAL_PROMPT_VERSION,
+          error: (error instanceof Error ? error.message : String(error)).slice(0, 4_000),
+          finished_at: new Date().toISOString(),
+        });
+        if (savedFailedReview.error) throw savedFailedReview.error;
+        const retryCount = (job.retry_count ?? 0) + 1;
+        await releaseLease(db, job, {
+          status: serialFailureDisposition(error, retryCount), retry_count: retryCount,
+          next_run_at: new Date(Date.now() + 5 * 60_000).toISOString(),
+          last_error: (error instanceof Error ? error.message : String(error)).slice(0, 500),
+        });
+        return {
+          status: 'failed', jobId: job.id, stage: 'publish_cycle',
+          detail: `Cycle narrative review failed: ${error instanceof Error ? error.message : String(error)}`,
+          costUsd: reviewCost,
+        };
+      }
+      const savedReview = await db.from('serial_cycles').update({
+        narrative_review: review,
+        narrative_review_fingerprint: fingerprint,
+        narrative_review_snapshot: chapters,
+        narrative_reviewed_at: new Date().toISOString(),
+      }).eq('id', job.current_cycle_id);
+      if (savedReview.error) throw savedReview.error;
+      const reviewCost = Number(reviewUsages.reduce((sum, usage) => sum + usage.costUsd, 0).toFixed(6));
+      const savedRun = await db.from('serial_runs').insert({
+        serial_novel_id: job.serial_novel_id, cycle_id: job.current_cycle_id,
+        kind: 'publish_cycle', status: 'committed', usage: reviewUsages, cost_usd: reviewCost,
+        route_version: routes.routeVersion, prompt_version: SERIAL_PROMPT_VERSION,
+        finished_at: new Date().toISOString(),
+      });
+      if (savedRun.error) throw savedRun.error;
+    }
+
+    const { upstreamFindings, blockingProseFindings, mayPublish } = narrativeReviewGate(review);
+    if (upstreamFindings.length > 0 || !mayPublish) {
+      const findings = upstreamFindings.length > 0 ? upstreamFindings : blockingProseFindings;
+      const reason = `Cycle literary review paused publication: ${findings.map(finding =>
+        `${finding.target}/${finding.kind}: ${finding.explanation} Direction: ${finding.direction}`
+      ).join(' | ')}`.slice(0, 4_000);
+      await releaseLease(db, job, { status: 'paused', last_error: reason });
+      return {
+        status: 'completed', jobId: job.id, stage: 'publish_cycle',
+        detail: reason,
+        costUsd: Number(reviewUsages.reduce((sum, usage) => sum + usage.costUsd, 0).toFixed(6)),
+      };
+    }
+  }
 
   const { data, error } = await db.rpc('publish_serial_cycle', {
     p_job_id: job.id, p_lease_token: job.lease_token,
@@ -455,7 +781,7 @@ export async function runSerialTick(input: {
     switch (job.stage) {
       case 'plan_cycle': return await stagePlanCycle(db, provider, job);
       case 'write': return await stageWrite(db, provider, job);
-      case 'publish_cycle': return await stagePublishCycle(db, job);
+      case 'publish_cycle': return await stagePublishCycle(db, provider, job);
       case 'fold_volume': return await stageFoldVolume(db, job);
       default: throw new Error(`Unknown serial stage ${String(job.stage)}`);
     }

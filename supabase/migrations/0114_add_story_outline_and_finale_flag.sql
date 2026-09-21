@@ -4,6 +4,5 @@
 
 ALTER TABLE ai_story_projects
   ADD COLUMN IF NOT EXISTS story_outline jsonb;
-
 ALTER TABLE arc_plans
   ADD COLUMN IF NOT EXISTS is_finale_arc boolean DEFAULT false;

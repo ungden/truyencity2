@@ -20,10 +20,11 @@ import type { CraftGuidance, VietnameseStyleTelemetry } from './craft';
 import { mergeProviderUsage, type ProviderUsage, type StoryModelProvider } from './provider';
 import { geminiProvider } from './provider';
 import type { MarketBlueprint } from './setup';
+import { foundationSystemPrompt, reviewNarrativeWindow } from './foundation';
 
 // Defined here, not in release.ts: release → benchmark → planner already exists, so a
 // planner → release import closes a cycle and breaks the production bundle (TDZ at init).
-export const FACTORY_PLANNER_VERSION = 'story-factory-planner-94-causal-core';
+export const FACTORY_PLANNER_VERSION = 'story-factory-planner-95-narrative-foundation';
 import { EDITOR_SYSTEM_PROMPT, PLANNER_SYSTEM_PROMPT, PLAN_JUDGE_SYSTEM_PROMPT } from './prompts';
 import {
   ARC_ACTIVE_MECHANIC_BUDGET,
@@ -72,6 +73,7 @@ export function projectKernelForRollingPlanner(kernel: StoryKernel, arc: ArcPlan
 
   return {
     schemaVersion: kernel.schemaVersion,
+    narrativeFoundation: kernel.narrativeFoundation ?? null,
     title: kernel.title,
     description: kernel.description,
     genreLane: kernel.genreLane,
@@ -132,7 +134,7 @@ export function earlyPayoffsForChapterRange(
   startChapter: number,
   endChapter: number,
 ): MarketBlueprint['earlyPayoffs'] {
-  if (!blueprint || endChapter < startChapter) return [];
+  if (!blueprint || blueprint.craftProfile || endChapter < startChapter) return [];
   return blueprint.earlyPayoffs.filter(payoff => (
     payoff.byChapter >= startChapter && payoff.byChapter <= endChapter
   ));
@@ -2010,7 +2012,7 @@ export async function assessRollingPlan(input: {
   }));
   const result = await input.provider.json({
     model: input.model,
-    system: PLAN_JUDGE_SYSTEM_PROMPT,
+    system: foundationSystemPrompt(PLAN_JUDGE_SYSTEM_PROMPT, input.kernel, 'plan_judge'),
     prompt: JSON.stringify({
       task: 'Đánh giá rolling plan theo agency, đối lực, tích lũy, biến hóa cảnh, stage và hợp đồng sản phẩm; không chấm prose, không kiểm số học.',
       authorDirective: input.authorDirective?.trim()
@@ -2547,7 +2549,7 @@ export async function planRollingWindow(input: {
       // schemas, a compiled dependency guide and deterministic validators, so low
       // thinking removes latency/cost without removing any correctness gate.
       thinkingLevel: 'low',
-      system: PLANNER_SYSTEM_PROMPT,
+      system: foundationSystemPrompt(PLANNER_SYSTEM_PROMPT, input.kernel, 'planner'),
       prompt: JSON.stringify({
         task: [inputForAttempt.task, hardMechanicDirective].filter(Boolean).join('\n\n'),
         kernel: plannerKernel,
@@ -2994,7 +2996,12 @@ export async function reviewFiveChapterWindow(input: {
   routes: ModelRoutes;
   marketBlueprint?: MarketBlueprint | null;
   provider?: StoryModelProvider;
-}): Promise<{ review: WindowReview; usage: ProviderUsage }> {
+  windowContext?: {
+    stateAtWindowStart?: unknown;
+    approvedPlan?: unknown;
+    priorEvidence?: unknown;
+  };
+}): Promise<{ review: WindowReview; narrativeReview: import('@/services/narrative/foundation').NarrativeReview | null; usage: ProviderUsage }> {
   if (input.chapters.length !== 5) throw new Error('Window review requires exactly five committed chapters.');
   const firstChapter = input.chapters[0]?.chapterNumber ?? 0;
   const lastChapter = input.chapters.at(-1)?.chapterNumber ?? firstChapter;
@@ -3006,7 +3013,7 @@ export async function reviewFiveChapterWindow(input: {
   const provider = input.provider ?? geminiProvider;
   const result = await provider.json({
     model: input.routes.editor,
-    system: `${EDITOR_SYSTEM_PROMPT}
+    system: `${foundationSystemPrompt(EDITOR_SYSTEM_PROMPT, input.kernel, 'editor')}
 Ở chế độ window review, đọc liền mạch năm chương và so với recentOutcomes/state đã commit.
 Block nếu nhân vật phản ứng như quên sự kiện vừa trải qua, cơ chế vật phẩm/công nghệ đổi cách hoạt động, số tiền/khối lượng/giá trong prose lệch với ledger, hoặc năm chương lặp cùng cấu trúc mà không tạo tiến triển.
 Kiểm số dư theo LỊCH SỬ: resourceTransitions là chuỗi giao dịch đã commit theo thứ tự (before → after tại từng chương). Một câu tổng kết số dư trong chương N phải khớp với after của transition cuối cùng tính đến thời điểm đó trong chương N — KHÔNG so với currentState, vì currentState chỉ là số dư sau chương cuối cửa sổ. Chỉ báo lỗi tiền khi con số lệch với transition lịch sử tương ứng.
@@ -3103,8 +3110,10 @@ Trạng thái pass cũng phải có bằng chứng cụ thể. Chỉ báo tối 
     validateWindowEvidence(materialized, input.chapters);
     return applyDeterministicWindowPolicy(materialized, input.kernel.realityMode);
   };
+  let review: WindowReview;
+  let mechanicalUsage = result.usage;
   try {
-    return { review: materializeAndGround(result.value), usage: result.usage };
+    review = materializeAndGround(result.value);
   } catch (error) {
     // Reviewing five long chapters at once, the model measurably tends to compress or
     // paraphrase its quotes: one production window failed grounding four rolls in a
@@ -3114,7 +3123,7 @@ Trạng thái pass cũng phải có bằng chứng cụ thể. Chỉ báo tối 
     if (!(error instanceof StoryFactoryError)) throw error;
     const corrective = await provider.json({
       model: input.routes.editor,
-      system: `${EDITOR_SYSTEM_PROMPT}
+      system: `${foundationSystemPrompt(EDITOR_SYSTEM_PROMPT, input.kernel, 'editor')}
 Bản review trước bị từ chối vì evidence không sao chép NGUYÊN VĂN từ prose. Lập lại toàn bộ review; mỗi quote trong evidence, patterns và issues phải là 4-12 từ liên tiếp copy đúng từng ký tự từ content của đúng chapterNumber, và mỗi check phải có bằng chứng từ ít nhất hai chương khác nhau.`,
       prompt: JSON.stringify({
         task: 'Chấm lại window sau khi bị từ chối vì evidence không nguyên văn.',
@@ -3136,20 +3145,35 @@ Bản review trước bị từ chối vì evidence không sao chép NGUYÊN VĂ
       deferApplicationSchemaValidation: true,
       temperature: 0.2,
     });
-    const usageTotal = mergeProviderUsage(result.usage, corrective.usage);
+    mechanicalUsage = mergeProviderUsage(result.usage, corrective.usage);
     try {
-      return { review: materializeAndGround(corrective.value), usage: usageTotal };
+      review = materializeAndGround(corrective.value);
     } catch (secondError) {
       if (secondError instanceof StoryFactoryError) {
         throw new StoryFactoryError(secondError.code, secondError.message, {
           validation: secondError.evidence,
           firstAttempt: { message: error.message },
-          usages: [usageTotal],
+          usages: [mechanicalUsage],
         });
       }
       throw secondError;
     }
   }
+  const reviewed = await reviewNarrativeWindow({
+    provider,
+    model: input.routes.editor,
+    kernel: input.kernel,
+    chapters: input.chapters,
+    baseUsage: mechanicalUsage,
+    diagnosticContext: {
+      arc: input.arc,
+      stateAtWindowStart: input.windowContext?.stateAtWindowStart,
+      stateAtWindowEnd: input.state,
+      approvedPlan: input.windowContext?.approvedPlan,
+      priorEvidence: input.windowContext?.priorEvidence,
+    },
+  });
+  return { review, ...reviewed };
 }
 
 export async function planArcLifecycle(input: {
@@ -3184,12 +3208,16 @@ export async function planArcLifecycle(input: {
   }).strict();
   const wireResult = await provider.json({
     model: input.routes.planner,
-    system: `${PLANNER_SYSTEM_PROMPT}\nỞ ranh giới arc, quyết định tiếp tục, vào finale hoặc kết thúc tự nhiên. Không kéo dài chỉ để đủ quota.\nNếu có marketBlueprint, arc tiếp theo phải tiến sang nấc scaleLadder phù hợp hoặc làm thay đổi thực chất coreAdvantage/comparisonEngine/worldConflictEngine; cấm chỉ đổi tên địa điểm hay thay một phản diện cùng cấp.\nNếu status là continue hoặc finale thì nextArc và canonExtension là bắt buộc; nếu status là complete thì cả hai để null. Trong canonExtension, khai báo mechanic mới theo đúng ba mảng mechanicConversions/mechanicCapabilities/mechanicConstraints (mảng rỗng nếu không thêm loại đó); tổng cả ba tối đa tám.\nVới capability mới: effectResources của resource numeric chỉ được direction=increase hoặc decrease; state_change chỉ dùng resource kind=state. Nếu năng lực chỉ tạo/chuyển fact như “hầm đá hai lớp đã hoàn thành”, khai báo fact đó trong effectFactIds và để effectResources rỗng — không dùng state_change lên hàng hóa hay tiền.\nMọi phần tử mới trong canonExtension đều tiêu một expansion seed: seedId phải lấy NGUYÊN VĂN từ permittedExpansionSeeds của đúng stage đích, kind của seed phải khớp loại phần tử (character/location/promise/world_rule/world_mechanic), và seedId chưa nằm trong usedExpansionSeedIds. Tuyệt đối không tự bịa seedId; nếu stage đích không còn seed của một loại thì không thêm phần tử loại đó.
+    system: `${foundationSystemPrompt(PLANNER_SYSTEM_PROMPT, input.kernel, 'arc')}\nỞ ranh giới arc, quyết định tiếp tục, vào finale hoặc kết thúc tự nhiên. Không kéo dài chỉ để đủ quota.\nNếu có marketBlueprint, arc tiếp theo phải tiến sang nấc scaleLadder phù hợp hoặc làm thay đổi thực chất coreAdvantage/comparisonEngine/worldConflictEngine; cấm chỉ đổi tên địa điểm hay thay một phản diện cùng cấp.\nNếu status là continue hoặc finale thì nextArc và canonExtension là bắt buộc; nếu status là complete thì cả hai để null. Trong canonExtension, khai báo mechanic mới theo đúng ba mảng mechanicConversions/mechanicCapabilities/mechanicConstraints (mảng rỗng nếu không thêm loại đó); tổng cả ba tối đa tám.\nVới capability mới: effectResources của resource numeric chỉ được direction=increase hoặc decrease; state_change chỉ dùng resource kind=state. Nếu năng lực chỉ tạo/chuyển fact như “hầm đá hai lớp đã hoàn thành”, khai báo fact đó trong effectFactIds và để effectResources rỗng — không dùng state_change lên hàng hóa hay tiền.\nMọi phần tử mới trong canonExtension đều tiêu một expansion seed: seedId phải lấy NGUYÊN VĂN từ permittedExpansionSeeds của đúng stage đích, kind của seed phải khớp loại phần tử (character/location/promise/world_rule/world_mechanic), và seedId chưa nằm trong usedExpansionSeedIds. Tuyệt đối không tự bịa seedId; nếu stage đích không còn seed của một loại thì không thêm phần tử loại đó.
 activeMechanicIds của nextArc là working set của Planner trong arc đó: chỉ chọn những mechanic mà các beat của arc thật sự dùng (tối đa ${ARC_ACTIVE_MECHANIC_BUDGET}). Mechanic không chọn vẫn nằm nguyên trong kernel — arc sau kích hoạt lại được — nên bỏ bớt không mất gì, còn working set càng gọn thì kế hoạch từng chương càng sắc.
 travelRules là đồ thị CÓ HƯỚNG và mỗi chiều là một phần tử riêng. Với mỗi địa điểm mới, phải khai đủ cả chiều đi lẫn chiều về: main phải tới được nó từ protagonistLocationId và từ nó quay về được. Một cạnh một chiều sẽ bị từ chối và làm hỏng cả arc.
 fromLocationId/toLocationId chỉ được là ID có thật trong existingLocations hoặc ID của địa điểm vừa khai trong chính canonExtension này. Không khai lại cạnh đã có trong existingTravelRules — trùng cạnh cũng bị từ chối.`,
     prompt: JSON.stringify({
       task: 'Đánh giá ending direction và lập arc tiếp theo nếu truyện chưa hoàn tất.',
+      narrativeFoundation: input.kernel.narrativeFoundation ?? null,
+      narrativeFoundationRule: input.kernel.narrativeFoundation
+        ? 'Chỉ mở rộng arc khi điều kiện, tri thức, nguồn lực, thời gian và quan hệ đã được tích lũy; không bắt arc đổi thành giao dịch hoặc lên cấp nếu tiến trình đang ở khám phá, đời sống hay quan hệ.'
+        : null,
       marketBlueprint: input.marketBlueprint ?? null,
       endingDirection: input.kernel.endingDirection,
       seriesSpine: input.kernel.seriesSpine,

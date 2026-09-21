@@ -72,6 +72,5 @@ BEGIN
   );
 END;
 $$;
-
 REVOKE ALL ON FUNCTION public.create_flagship_pilot_v2(text,text,jsonb,jsonb,int) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.create_flagship_pilot_v2(text,text,jsonb,jsonb,int) TO service_role;

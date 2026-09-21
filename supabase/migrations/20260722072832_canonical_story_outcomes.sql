@@ -3,13 +3,11 @@
 ALTER TABLE public.story_factory_jobs
   ADD COLUMN IF NOT EXISTS plan_feedback jsonb,
   ADD COLUMN IF NOT EXISTS replan_attempts integer NOT NULL DEFAULT 0;
-
 ALTER TABLE public.story_factory_jobs
   DROP CONSTRAINT IF EXISTS story_factory_jobs_replan_attempts_check;
 ALTER TABLE public.story_factory_jobs
   ADD CONSTRAINT story_factory_jobs_replan_attempts_check
   CHECK (replan_attempts BETWEEN 0 AND 1);
-
 CREATE OR REPLACE FUNCTION public.commit_story_factory_chapter(
   p_job_id uuid,
   p_lease_token uuid,
@@ -114,7 +112,6 @@ BEGIN
 
   RETURN jsonb_build_object('chapterNumber', p_expected_chapter, 'status', 'published');
 END $$;
-
 REVOKE ALL ON FUNCTION public.commit_story_factory_chapter(
   uuid, uuid, uuid, integer, text, text, jsonb, jsonb, jsonb, jsonb,
   jsonb, jsonb, numeric, integer, integer, text

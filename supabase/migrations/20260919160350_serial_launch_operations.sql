@@ -4,9 +4,7 @@
 --   * an automatic replan reuses its cycle number instead of accidentally opening
 --     the next numbered cycle at the same chapter.
 BEGIN;
-
 SET lock_timeout = '5s';
-
 CREATE OR REPLACE FUNCTION public.replan_serial_cycle(
   p_job_id uuid, p_lease_token uuid, p_cycle_id uuid, p_reason text
 ) RETURNS jsonb
@@ -59,7 +57,6 @@ BEGIN
     'paused', v_cycle.replan_count + 1 >= 2
   );
 END $$;
-
 CREATE OR REPLACE FUNCTION public.restart_serial_opening(
   p_job_id uuid, p_reason text DEFAULT 'Opening rejected by human review.'
 ) RETURNS jsonb
@@ -122,7 +119,6 @@ BEGIN
     'nextChapter', 1
   );
 END $$;
-
 CREATE OR REPLACE FUNCTION public.release_serial_novel(p_job_id uuid)
 RETURNS jsonb
 LANGUAGE plpgsql SECURITY INVOKER SET search_path = public AS $$
@@ -159,12 +155,10 @@ BEGIN
     'publishedThrough', v_first_cycle.end_chapter
   );
 END $$;
-
 REVOKE ALL ON FUNCTION public.replan_serial_cycle(uuid,uuid,uuid,text) FROM PUBLIC, anon, authenticated;
 REVOKE ALL ON FUNCTION public.restart_serial_opening(uuid,text) FROM PUBLIC, anon, authenticated;
 REVOKE ALL ON FUNCTION public.release_serial_novel(uuid) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.replan_serial_cycle(uuid,uuid,uuid,text) TO service_role;
 GRANT EXECUTE ON FUNCTION public.restart_serial_opening(uuid,text) TO service_role;
 GRANT EXECUTE ON FUNCTION public.release_serial_novel(uuid) TO service_role;
-
 COMMIT;

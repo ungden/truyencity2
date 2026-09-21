@@ -105,7 +105,6 @@ BEGIN
 
   RETURN jsonb_build_object('chapterNumber', p_expected_chapter, 'status', 'published');
 END $$;
-
 REVOKE ALL ON FUNCTION public.commit_story_factory_chapter(
   uuid, uuid, uuid, integer, text, text, jsonb, jsonb, jsonb, jsonb,
   jsonb, jsonb, numeric, integer, integer, text

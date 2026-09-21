@@ -45,10 +45,13 @@ describe('Song Xuyên production packages', () => {
   test('opening contract always names rank, visible result, expert reaction and next trade', () => {
     for (const { premise } of SERIAL_PREMISE_CATALOG) {
       for (const chapter of premise.worldKernel.openingContract) {
-        expect(chapter.namedLevelOrGrade.length).toBeGreaterThan(10);
+        expect(chapter.namedLevelOrGrade).not.toBeNull();
+        expect(chapter.witnessReaction).not.toBeNull();
+        expect(chapter.commercialAction).not.toBeNull();
+        expect(chapter.namedLevelOrGrade!.length).toBeGreaterThan(10);
         expect(chapter.visibleResult.length).toBeGreaterThan(20);
-        expect(chapter.witnessReaction.length).toBeGreaterThan(20);
-        expect(chapter.commercialAction.length).toBeGreaterThan(20);
+        expect(chapter.witnessReaction!.length).toBeGreaterThan(20);
+        expect(chapter.commercialAction!.length).toBeGreaterThan(20);
       }
       expect(premise.blurb).not.toMatch(/thi triều|biến người[^.]{0,30}zombie/i);
       expect(premise.blurb).toMatch(/bán|đổi|giao dịch/i);

@@ -53,6 +53,39 @@ function sliceBetween(source: string, startMarker: string, endMarker: string): s
 const read = (target: string) => readFileSync(target, 'utf8');
 
 describe('Story Factory architecture boundary', () => {
+  test('canonical migrations create legacy dependencies before first use', () => {
+    const migrationSql = readdirSync('supabase/migrations')
+      .filter(entry => entry.endsWith('.sql'))
+      .sort()
+      .map(entry => read(path.join('supabase/migrations', entry)))
+      .join('\n');
+    for (const [definition, firstUse] of [
+      [
+        'CREATE TABLE IF NOT EXISTS public.character_knowledge',
+        'ALTER TABLE character_knowledge',
+      ],
+      [
+        'CREATE TABLE IF NOT EXISTS public.chapter_blueprints',
+        'DELETE FROM public.chapter_blueprints',
+      ],
+      [
+        'CREATE TABLE IF NOT EXISTS public.story_factory_jobs',
+        'v_job public.story_factory_jobs',
+      ],
+    ]) {
+      const definitionIndex = migrationSql.indexOf(definition);
+      const firstUseIndex = migrationSql.indexOf(firstUse);
+      expect(definitionIndex).toBeGreaterThanOrEqual(0);
+      expect(firstUseIndex).toBeGreaterThan(definitionIndex);
+    }
+  });
+
+  test('canonical schema probe uses the actual event ledger columns', () => {
+    const route = read('src/app/api/admin/migrations/route.ts');
+    expect(route).toContain("'id,kind,entity_id,before_value,after_value'");
+    expect(route).not.toContain("'id,event_type,payload'");
+  });
+
   test('legacy engines, endpoints and docs no longer exist', () => {
     // Gone, not merely empty. Empty shells kept reading as a live five-layer engine in the
     // docs and in every fresh session's mental model of the repo.
@@ -293,6 +326,12 @@ describe('Story Factory architecture boundary', () => {
     expect(read('src/app/api/cron/story-factory/route.ts')).toContain('runStoryFactoryTicks()');
   });
 
+  test('profiled arc planning uses the foundation prompt adapter', () => {
+    const planner = read('src/services/story-factory/planner.ts');
+    const arc = planner.slice(planner.indexOf('export async function planArcLifecycle'));
+    expect(arc).toContain("foundationSystemPrompt(PLANNER_SYSTEM_PROMPT, input.kernel, 'arc')");
+  });
+
   test('health check uses the full database claim predicate', () => {
     const route = read('src/app/api/cron/health-check/route.ts');
     const heartbeat = read('src/app/api/cron/story-factory/route.ts');
@@ -406,6 +445,13 @@ describe('Story Factory architecture boundary', () => {
     expect(repair).toContain("chapter_number BETWEEN v_window.start_chapter AND v_window.end_chapter");
     expect(repair).toContain("status='ready',stage='plan'");
     expect(runtime).toContain("db.rpc('repair_story_factory_draft_window'");
+    const reviewStage = sliceBetween(runtime, 'async function runWindowReview', 'async function runArc');
+    expect(reviewStage.indexOf('if (!mayPublish)')).toBeGreaterThan(-1);
+    expect(reviewStage.indexOf('if (!mayPublish)')).toBeLessThan(reviewStage.indexOf("db.rpc('repair_story_factory_draft_window'"));
+    expect(reviewStage).toContain('drafts were preserved for targeted review');
+    expect(reviewStage).toContain(".select('checkpoint_state,rolling_plan,review_history')");
+    expect(reviewStage).toContain(".select('chapter_number,output_artifact')");
+    expect(reviewStage).toContain('planRuns: planRuns.data ?? []');
     const memory = read(latestMigrationContaining('USING gin (related_entity_ids)'));
     expect(memory).toContain('related_entity_ids text[]');
     expect(memory).not.toContain('DROP INDEX');

@@ -5,7 +5,6 @@ select cron.unschedule('health-check-cron')
 where exists (
   select 1 from cron.job where jobname = 'health-check-cron'
 );
-
 select cron.schedule(
   'health-check-cron',
   '2 * * * *',

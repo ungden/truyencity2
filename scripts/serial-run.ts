@@ -92,8 +92,8 @@ async function main(): Promise<void> {
     });
     usages.push(...outcome.usages);
 
-    if (outcome.status === 'needs_replan') {
-      console.error(`Chapter ${chapterNumber} needs a replan: ${outcome.reason}`);
+    if (outcome.status !== 'committed') {
+      console.error(`Chapter ${chapterNumber} cannot commit (${outcome.status}): ${outcome.reason}`);
       writeFileSync(join(outDir, `chapter-${chapterNumber}-failed.json`), JSON.stringify(outcome, null, 2));
       break;
     }

@@ -1,5 +1,9 @@
 # Serial engine
 
+## Narrative Foundation v3 (opt-in)
+
+Premise schema v3 uses `lived-causality-2026-09-21.1` and requires a `narrativeFoundation`. Its cycle schema v2 plans from explicit prerequisites and committed narrative evidence; a cycle may have no customer loop while the story is still living, discovering, or preparing. Premise v2 and cycle v1 retain the legacy contract. Stories are upgraded one at a time after review; the runtime does not auto-convert stored premises.
+
 The replacement for the story factory. It writes web serials in the Faloo mould: short
 cycles of desire and payoff, a golden finger that evolves, named multi-axis progression, and a
 hook at the end of every chapter.
@@ -28,7 +32,18 @@ cron */5  →  /api/cron/serial  →  reconcile_serial_jobs  →  runSerialTicks
 |---|---|---|
 | `plan_cycle` | Plan a 5–15 chapter cycle, or refresh the rolling three beat sheets inside the open one | `write` |
 | `write` | Writer → Judge → [repair] → [rewrite] → Extractor → merge → commit as a **draft** | `write`, or `publish_cycle` at the cycle's last chapter |
-| `publish_cycle` | Flip the whole cycle from draft to published in one transaction | `plan_cycle`, or `fold_volume` every 10 cycles |
+| `publish_cycle` | For v3, review the exact private cycle against its foundation, checkpoint Bible and complete rolling-plan history; then publish atomically only if the review passes | `plan_cycle`, or `fold_volume` every 10 cycles |
+
+Paid chapter work is checkpointed by completed layer. If Judge, revision, Extractor,
+semantic evidence verification or literary review fails after prose exists, the run stores
+the draft and the last completed artifacts in `draft_artifact`. The next tick resumes at
+that layer instead of buying Writer and earlier reviewers again. Each run records only the
+usage spent in that attempt, so resumed work is not double-booked.
+
+For v3 cycles, `publish_serial_cycle` is fail-closed in SQL as well as runtime. The cycle
+stores the ordered plan history, the literary review and the exact reviewed chapter
+snapshot. Missing, stale or blocking review data prevents publication even if an old
+client calls the RPC directly.
 | `fold_volume` | Compress the Bible: recent chapters become one volume paragraph | `plan_cycle` |
 
 Readers never see a partial cycle. Chapters land in `chapters` with

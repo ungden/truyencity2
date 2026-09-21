@@ -9,7 +9,6 @@ BEGIN
     WITH CHECK (get_user_role() = 'admin');
   END IF;
 END $$;
-
 -- Add policy for project owners to insert chapters (skip if exists)
 DO $$ 
 BEGIN
@@ -25,7 +24,6 @@ BEGIN
     );
   END IF;
 END $$;
-
 -- Add policy for admin to update chapters (skip if exists)
 DO $$ 
 BEGIN
@@ -37,7 +35,6 @@ BEGIN
     USING (get_user_role() = 'admin');
   END IF;
 END $$;
-
 -- Add policy for project owners to update chapters (skip if exists)
 DO $$ 
 BEGIN
@@ -53,7 +50,6 @@ BEGIN
     );
   END IF;
 END $$;
-
 -- Add policy for admin to delete chapters (skip if exists)
 DO $$ 
 BEGIN
@@ -65,7 +61,6 @@ BEGIN
     USING (get_user_role() = 'admin');
   END IF;
 END $$;
-
 -- Add policy for project owners to delete chapters (skip if exists)
 DO $$ 
 BEGIN

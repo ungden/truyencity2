@@ -14,31 +14,28 @@ DO $$ BEGIN
   CREATE TYPE reader_tier AS ENUM ('free', 'vip');
 EXCEPTION WHEN duplicate_object THEN null;
 END $$;
-
 -- ═══════════════════════════════════════════════════════════════════════════
 -- Add reader_tier to user_subscriptions
 -- ═══════════════════════════════════════════════════════════════════════════
 ALTER TABLE user_subscriptions
   ADD COLUMN IF NOT EXISTS reader_tier reader_tier NOT NULL DEFAULT 'free';
-
 ALTER TABLE user_subscriptions
   ADD COLUMN IF NOT EXISTS reader_tier_expires_at TIMESTAMPTZ;
-
 ALTER TABLE user_subscriptions
   ADD COLUMN IF NOT EXISTS reader_tier_auto_renew BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE user_subscriptions
+  ADD COLUMN IF NOT EXISTS reader_tier_payment_method TEXT;
+-- 'apple_iap', 'google_play', 'vnpay', 'momo'
 
 ALTER TABLE user_subscriptions
-  ADD COLUMN IF NOT EXISTS reader_tier_payment_method TEXT; -- 'apple_iap', 'google_play', 'vnpay', 'momo'
-
-ALTER TABLE user_subscriptions
-  ADD COLUMN IF NOT EXISTS reader_tier_store_tx_id TEXT; -- Apple/Google transaction ID
+  ADD COLUMN IF NOT EXISTS reader_tier_store_tx_id TEXT;
+-- Apple/Google transaction ID
 
 -- Index for expiration checks
 CREATE INDEX IF NOT EXISTS idx_user_subscriptions_reader_tier
   ON user_subscriptions(reader_tier) WHERE reader_tier = 'vip';
 CREATE INDEX IF NOT EXISTS idx_user_subscriptions_reader_expires
   ON user_subscriptions(reader_tier_expires_at) WHERE reader_tier = 'vip';
-
 -- ═══════════════════════════════════════════════════════════════════════════
 -- Reader VIP tier configuration
 -- ═══════════════════════════════════════════════════════════════════════════
@@ -66,7 +63,6 @@ CREATE TABLE IF NOT EXISTS reader_tier_limits (
   description TEXT,
   features JSONB DEFAULT '[]'
 );
-
 INSERT INTO reader_tier_limits (
   tier, show_ads, daily_download_limit, daily_tts_limit_seconds,
   has_exclusive_themes, has_early_access, has_badge,
@@ -89,10 +85,8 @@ ON CONFLICT (tier) DO UPDATE SET
   price_usd_monthly = EXCLUDED.price_usd_monthly,
   description = EXCLUDED.description,
   features = EXCLUDED.features;
-
 -- RLS
 ALTER TABLE reader_tier_limits ENABLE ROW LEVEL SECURITY;
-
 DO $$ BEGIN
 CREATE POLICY "Reader tier limits are public"
   ON reader_tier_limits FOR SELECT
@@ -100,7 +94,6 @@ CREATE POLICY "Reader tier limits are public"
   USING (TRUE);
 EXCEPTION WHEN duplicate_object THEN null;
 END $$;
-
 -- ═══════════════════════════════════════════════════════════════════════════
 -- TTS Usage Tracking
 -- ═══════════════════════════════════════════════════════════════════════════
@@ -113,32 +106,26 @@ CREATE TABLE IF NOT EXISTS tts_usage (
 
   UNIQUE(user_id, usage_date)
 );
-
 CREATE INDEX IF NOT EXISTS idx_tts_usage_user_date ON tts_usage(user_id, usage_date);
-
 ALTER TABLE tts_usage ENABLE ROW LEVEL SECURITY;
-
 DO $$ BEGIN
 CREATE POLICY "Users can view own TTS usage"
   ON tts_usage FOR SELECT
   USING (auth.uid() = user_id);
 EXCEPTION WHEN duplicate_object THEN null;
 END $$;
-
 DO $$ BEGIN
 CREATE POLICY "Users can insert own TTS usage"
   ON tts_usage FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 EXCEPTION WHEN duplicate_object THEN null;
 END $$;
-
 DO $$ BEGIN
 CREATE POLICY "Users can update own TTS usage"
   ON tts_usage FOR UPDATE
   USING (auth.uid() = user_id);
 EXCEPTION WHEN duplicate_object THEN null;
 END $$;
-
 -- ═══════════════════════════════════════════════════════════════════════════
 -- Download Usage Tracking
 -- ═══════════════════════════════════════════════════════════════════════════
@@ -151,32 +138,26 @@ CREATE TABLE IF NOT EXISTS download_usage (
 
   UNIQUE(user_id, usage_date)
 );
-
 CREATE INDEX IF NOT EXISTS idx_download_usage_user_date ON download_usage(user_id, usage_date);
-
 ALTER TABLE download_usage ENABLE ROW LEVEL SECURITY;
-
 DO $$ BEGIN
 CREATE POLICY "Users can view own download usage"
   ON download_usage FOR SELECT
   USING (auth.uid() = user_id);
 EXCEPTION WHEN duplicate_object THEN null;
 END $$;
-
 DO $$ BEGIN
 CREATE POLICY "Users can insert own download usage"
   ON download_usage FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 EXCEPTION WHEN duplicate_object THEN null;
 END $$;
-
 DO $$ BEGIN
 CREATE POLICY "Users can update own download usage"
   ON download_usage FOR UPDATE
   USING (auth.uid() = user_id);
 EXCEPTION WHEN duplicate_object THEN null;
 END $$;
-
 -- ═══════════════════════════════════════════════════════════════════════════
 -- Helper Functions
 -- ═══════════════════════════════════════════════════════════════════════════
@@ -253,7 +234,6 @@ BEGIN
   );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
-
 -- Record TTS usage (upsert)
 CREATE OR REPLACE FUNCTION record_tts_usage(p_user_id UUID, p_seconds INTEGER)
 RETURNS JSONB AS $$
@@ -286,7 +266,6 @@ BEGIN
   );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
-
 -- Record download usage (upsert)
 CREATE OR REPLACE FUNCTION record_download_usage(p_user_id UUID, p_chapters INTEGER)
 RETURNS JSONB AS $$

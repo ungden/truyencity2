@@ -1,10 +1,8 @@
 BEGIN;
-
 ALTER TABLE public.story_calibration_campaigns_v3
   ADD COLUMN IF NOT EXISTS launch_pack_digests jsonb NOT NULL DEFAULT '[]'::jsonb;
 ALTER TABLE public.story_factory_calibrations
   ADD COLUMN IF NOT EXISTS launch_pack_digests jsonb NOT NULL DEFAULT '[]'::jsonb;
-
 CREATE OR REPLACE FUNCTION public.promote_flagship_v3_factory_release(
   p_project_id uuid, p_engine_release_id text, p_daily_quota integer, p_confirmation text
 ) RETURNS jsonb
@@ -41,8 +39,6 @@ BEGIN
   SELECT public.enroll_flagship_factory_job_v3(p_project_id,1200,'narrative_ending') INTO v_job;
   RETURN jsonb_build_object('promoted',true,'project_id',p_project_id,'engine_release_id',p_engine_release_id,'job',v_job);
 END; $$;
-
 REVOKE ALL ON FUNCTION public.promote_flagship_v3_factory_release(uuid,text,integer,text) FROM PUBLIC,anon,authenticated;
 GRANT EXECUTE ON FUNCTION public.promote_flagship_v3_factory_release(uuid,text,integer,text) TO service_role;
-
 COMMIT;

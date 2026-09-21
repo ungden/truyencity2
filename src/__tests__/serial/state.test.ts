@@ -52,14 +52,14 @@ describe('serial contracts', () => {
 
   test('a cycle closes its purchase-to-upgrade loop inside five chapters', () => {
     const valid = cycle();
-    expect(valid.customerLoop.schedule).toEqual({
+    expect(valid.customerLoop!.schedule).toEqual({
       purchaseChapter: 8, useToEarnChapter: 9, publicProofChapter: 10, returnUpgradeChapter: 11,
     });
     expect(() => CyclePlanSchema.parse({
       ...valid,
       customerLoop: {
-        ...valid.customerLoop,
-        schedule: { ...valid.customerLoop.schedule, returnUpgradeChapter: 13 },
+        ...valid.customerLoop!,
+        schedule: { ...valid.customerLoop!.schedule, returnUpgradeChapter: 13 },
       },
     })).toThrow(/full customer loop/i);
   });
@@ -68,8 +68,9 @@ describe('serial contracts', () => {
     const sheet = cycle().beatSheets[0];
     expect(cycle().beatSheets.length).toBeLessThanOrEqual(3);
     expect(Object.keys(sheet).sort()).toEqual([
-      'beats', 'chapterNumber', 'emotionalTarget', 'endHookKind', 'materialOutcome',
-      'newNamedThing', 'openingBridge', 'protagonistMove', 'sceneMode',
+      'advancesMilestoneIds', 'beats', 'chapterNumber', 'emotionalTarget', 'endHookKind',
+      'materialOutcome', 'newNamedThing', 'openingBridge', 'prerequisiteIds',
+      'protagonistMove', 'revealsFactIds', 'sceneMode',
     ]);
   });
 
@@ -258,7 +259,7 @@ describe('serial state merge', () => {
       ownerId: 'bay_thach', ownerName: 'Bảy Thạch', quantity: 1, unit: 'bản', fungible: false,
       provenance: 'Đã mua và nhận ở chương 4.', acquiredChapter: 4, updatedChapter: 4,
     }];
-    const baseline = cycle().customerLoop;
+    const baseline = cycle().customerLoop!;
 
     expect(() => assertCycleAssetCoherence(bible, cycle({ customerLoop: {
       ...baseline,

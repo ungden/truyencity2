@@ -2,7 +2,6 @@
 -- Concept Lab has produced a title. Promotion is the moment a novel becomes
 -- reader-facing — the URL should carry the title, not the seed artifact.
 SET lock_timeout = '5s';
-
 -- Deterministic Vietnamese slugifier: strips diacritics (including đ/Đ), lowercases,
 -- collapses everything else to single hyphens.
 CREATE OR REPLACE FUNCTION public.vn_slugify(input text)
@@ -19,10 +18,8 @@ AS $$
     '[^a-z0-9]+', '-', 'g'
   ));
 $$;
-
 REVOKE ALL ON FUNCTION public.vn_slugify(text) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.vn_slugify(text) TO service_role;
-
 -- Promotion now regenerates the slug from the final title, keeping uniqueness with a
 -- numeric suffix. Everything else is identical to 20260731120000's definition.
 CREATE OR REPLACE FUNCTION public.promote_story_factory_canary(p_job_id uuid, p_engine_release text)
@@ -109,10 +106,8 @@ BEGIN
     'reviewRelease', latest_review_release
   );
 END $$;
-
 REVOKE ALL ON FUNCTION public.promote_story_factory_canary(uuid, text) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.promote_story_factory_canary(uuid, text) TO service_role;
-
 -- The one novel promoted before this migration keeps living at a seed slug; move it
 -- onto its title slug the same way future promotions will.
 UPDATE public.novels

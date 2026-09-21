@@ -1,7 +1,13 @@
 const { execFileSync } = require('child_process');
 const { existsSync, readFileSync } = require('fs');
 
-const files = execFileSync('git', ['ls-files'], { encoding: 'utf8' })
+// Scan both committed paths and new, non-ignored workspace files. Migration
+// fetches create untracked SQL first, and those files must not bypass this gate.
+const files = execFileSync(
+  'git',
+  ['ls-files', '--cached', '--others', '--exclude-standard'],
+  { encoding: 'utf8' },
+)
   .split('\n')
   .filter(Boolean)
   .filter((file) => !file.startsWith('node_modules/') && !file.startsWith('.next/'));
@@ -37,7 +43,6 @@ for (const file of files) {
   // index still lists them. They cannot contain a newly committed secret.
   if (!existsSync(file)) continue;
   const text = readFileSync(file, 'utf8');
-  const lines = text.split('\n');
   for (const { name, re } of patterns) {
     re.lastIndex = 0;
     let match;
@@ -56,4 +61,4 @@ if (findings.length > 0) {
   process.exit(1);
 }
 
-console.log(`Secret scan passed (${files.length} tracked files).`);
+console.log(`Secret scan passed (${files.length} tracked and untracked workspace files).`);

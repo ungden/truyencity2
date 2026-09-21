@@ -11,35 +11,29 @@ CREATE TABLE IF NOT EXISTS ai_prompt_templates (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
-
 -- Create indexes for fast lookup
 CREATE INDEX IF NOT EXISTS idx_ai_prompt_templates_category
   ON ai_prompt_templates(category);
 CREATE INDEX IF NOT EXISTS idx_ai_prompt_templates_is_default
   ON ai_prompt_templates(category, is_default) WHERE is_default = true;
-
 -- Enable RLS
 ALTER TABLE ai_prompt_templates ENABLE ROW LEVEL SECURITY;
-
 -- Policy: Everyone can read templates
 DROP POLICY IF EXISTS "Allow public read access to ai_prompt_templates" ON ai_prompt_templates;
 CREATE POLICY "Allow public read access to ai_prompt_templates"
   ON ai_prompt_templates FOR SELECT
   USING (true);
-
 -- Policy: Only authenticated users can insert/update/delete
 DROP POLICY IF EXISTS "Allow authenticated users to manage ai_prompt_templates" ON ai_prompt_templates;
 CREATE POLICY "Allow authenticated users to manage ai_prompt_templates"
   ON ai_prompt_templates FOR ALL
   USING (auth.role() = 'authenticated');
-
 -- ============================================================================
 -- SEED DATA: HIGH-QUALITY PROMPT TEMPLATES
 -- ============================================================================
 
 -- Delete existing default templates to avoid conflicts
 DELETE FROM ai_prompt_templates WHERE is_default = true;
-
 -- 1. TIÊN HIỆP (Cultivation) Template
 INSERT INTO ai_prompt_templates (category, template, is_default, description, variables) VALUES (
   'cultivation',
@@ -117,7 +111,6 @@ BẮT ĐẦU VIẾT (VĂN BẢN THUẦN, KHÔNG MARKDOWN):',
   'Template cho thể loại Tiên Hiệp - Cultivation novels với hệ tu luyện',
   '["CHAPTER_NUMBER", "NOVEL_TITLE", "MAIN_CHARACTER", "WORLD_DESCRIPTION", "CULTIVATION_SYSTEM", "TARGET_LENGTH", "PLOT_OBJECTIVES"]'::jsonb
 );
-
 -- 2. ĐÔ THỊ (Urban) Template
 INSERT INTO ai_prompt_templates (category, template, is_default, description, variables) VALUES (
   'urban',
@@ -194,7 +187,6 @@ BẮT ĐẦU VIẾT (VĂN BẢN THUẦN, KHÔNG MARKDOWN):',
   'Template cho thể loại Đô Thị - Modern urban stories',
   '["CHAPTER_NUMBER", "NOVEL_TITLE", "MAIN_CHARACTER", "WORLD_DESCRIPTION", "TARGET_LENGTH", "PLOT_OBJECTIVES"]'::jsonb
 );
-
 -- 3. HUYỀN HUYỄN (Fantasy) Template
 INSERT INTO ai_prompt_templates (category, template, is_default, description, variables) VALUES (
   'fantasy',
@@ -268,7 +260,6 @@ BẮT ĐẦU VIẾT (VĂN BẢN THUẦN, KHÔNG MARKDOWN):',
   'Template cho thể loại Huyền Huyễn - Fantasy novels với phép thuật',
   '["CHAPTER_NUMBER", "NOVEL_TITLE", "MAIN_CHARACTER", "WORLD_DESCRIPTION", "MAGIC_SYSTEM", "TARGET_LENGTH", "PLOT_OBJECTIVES"]'::jsonb
 );
-
 -- 4. KHOA HUYỄN (Sci-Fi) Template
 INSERT INTO ai_prompt_templates (category, template, is_default, description, variables) VALUES (
   'sci-fi',
@@ -557,4 +548,4 @@ BẮT ĐẦU VIẾT (VĂN BẢN THUẦN, KHÔNG MARKDOWN):',
   '["CHAPTER_NUMBER", "NOVEL_TITLE", "MAIN_CHARACTER", "WORLD_DESCRIPTION", "GAME_SYSTEM", "TARGET_LENGTH", "PLOT_OBJECTIVES"]'::jsonb
 );
 
--- Done!
+-- Done!;

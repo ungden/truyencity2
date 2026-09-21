@@ -138,4 +138,4 @@ LIMIT 50;
 -- Example curl command to trigger manually:
 -- curl -X POST 'https://YOUR_PROJECT_REF.supabase.co/functions/v1/factory-main-loop' \
 --   -H 'Authorization: Bearer YOUR_SERVICE_ROLE_KEY' \
---   -H 'Content-Type: application/json'
+--   -H 'Content-Type: application/json';

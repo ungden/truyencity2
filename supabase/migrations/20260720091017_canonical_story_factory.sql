@@ -5,7 +5,6 @@
 
 SET lock_timeout = '10s';
 SET statement_timeout = '120s';
-
 DO $$
 BEGIN
   IF NOT EXISTS (
@@ -20,7 +19,6 @@ BEGIN
     RAISE EXCEPTION 'FACTORY_AUDIT_BUNDLE_REQUIRED';
   END IF;
 END $$;
-
 DO $$
 DECLARE job record;
 BEGIN
@@ -34,10 +32,8 @@ BEGIN
     PERFORM cron.unschedule(job.jobid);
   END LOOP;
 END $$;
-
 CREATE TEMP TABLE factory_old_novels ON COMMIT DROP AS
 SELECT DISTINCT novel_id FROM public.ai_story_projects WHERE novel_id IS NOT NULL;
-
 -- Drop every table whose purpose was tied to the old project graph. All of
 -- these are writing/control-plane tables; reader tables reference novels, not
 -- ai_story_projects.
@@ -59,7 +55,6 @@ BEGIN
     EXECUTE format('DROP TABLE IF EXISTS public.%I CASCADE', item.table_name);
   END LOOP;
 END $$;
-
 DROP TABLE IF EXISTS public.story_benchmark_chapters CASCADE;
 DROP TABLE IF EXISTS public.story_calibration_ballots_v3 CASCADE;
 DROP TABLE IF EXISTS public.story_calibration_campaigns_v3 CASCADE;
@@ -69,13 +64,8 @@ DROP TABLE IF EXISTS public.story_machine_judgments_v3 CASCADE;
 DROP TABLE IF EXISTS public.story_setup_attempts_v3 CASCADE;
 DROP TABLE IF EXISTS public.story_synopsis CASCADE;
 DROP TABLE IF EXISTS public.story_themes CASCADE;
-DROP TABLE IF EXISTS public.ai_prompt_templates CASCADE;
-DROP TABLE IF EXISTS public.chapter_versions CASCADE;
-DROP TABLE IF EXISTS public.rewrite_chain_items CASCADE;
-
 DELETE FROM public.novels WHERE id IN (SELECT novel_id FROM factory_old_novels);
 DROP TABLE IF EXISTS public.ai_story_projects CASCADE;
-
 -- Remove old functions and views that may survive because SQL-language bodies
 -- are not always dependency tracked.
 DO $$
@@ -91,27 +81,12 @@ BEGIN
         procedure.proname ILIKE '%flagship%'
         OR procedure.proname ILIKE '%story_factory%'
         OR procedure.proname ILIKE '%story_run%'
-        OR procedure.proname IN (
-          'archive_old_rag_chunks', 'auto_create_plot_arc', 'can_use_beat',
-          'check_abandoned_threads', 'check_romance_stalls', 'generate_arc_summary',
-          'get_active_plot_threads', 'get_battle_variety_report', 'get_cache_hit_rate',
-          'get_chapter_costs', 'get_character_state', 'get_characters_needing_development',
-          'get_cost_by_task', 'get_daily_cost', 'get_novel_cost_detail',
-          'get_novel_costs', 'get_novel_costs_with_engagement', 'get_qc_pass_rate',
-          'get_writing_style_trends', 'guard_finished_story_chapter_attempt_v3',
-          'guard_story_launch_pack_v3', 'match_anchor_chunks', 'match_story_chunks',
-          'search_story_context', 'update_embedding_cache_timestamp',
-          'update_plot_thread_timestamp', 'update_rewrite_chain_updated_at',
-          'upgrade_hidden_canary_release_v3'
-        )
       )
   LOOP
     EXECUTE format('DROP FUNCTION IF EXISTS public.%I(%s) CASCADE', item.function_name, item.identity_arguments);
   END LOOP;
 END $$;
-
 DROP VIEW IF EXISTS public.factory_story_status_v3 CASCADE;
-
 CREATE TABLE public.ai_story_projects (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid REFERENCES auth.users(id) ON DELETE SET NULL,
@@ -128,7 +103,6 @@ CREATE TABLE public.ai_story_projects (
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now()
 );
-
 CREATE TABLE public.story_factory_jobs (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   project_id uuid NOT NULL UNIQUE REFERENCES public.ai_story_projects(id) ON DELETE CASCADE,
@@ -158,7 +132,6 @@ CREATE TABLE public.story_factory_jobs (
   completed_at timestamptz,
   CHECK (minimum_chapters <= maximum_chapters)
 );
-
 CREATE TABLE public.story_factory_runs (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   job_id uuid REFERENCES public.story_factory_jobs(id) ON DELETE CASCADE,
@@ -183,7 +156,6 @@ CREATE TABLE public.story_factory_runs (
   started_at timestamptz NOT NULL DEFAULT now(),
   finished_at timestamptz
 );
-
 CREATE TABLE public.story_state_events (
   id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   project_id uuid NOT NULL REFERENCES public.ai_story_projects(id) ON DELETE CASCADE,
@@ -197,30 +169,24 @@ CREATE TABLE public.story_state_events (
   created_at timestamptz NOT NULL DEFAULT now(),
   UNIQUE (project_id, chapter_number, delta_id)
 );
-
 ALTER TABLE public.story_factory_jobs
   ADD CONSTRAINT story_factory_jobs_last_run_id_fkey
   FOREIGN KEY (last_run_id) REFERENCES public.story_factory_runs(id) ON DELETE SET NULL;
-
 CREATE INDEX story_factory_jobs_claim_idx ON public.story_factory_jobs(status, next_run_at, lease_until);
 CREATE INDEX story_factory_runs_project_idx ON public.story_factory_runs(project_id, started_at DESC);
 CREATE INDEX story_factory_runs_release_idx ON public.story_factory_runs(engine_release, kind, status);
 CREATE INDEX story_state_events_project_chapter_idx ON public.story_state_events(project_id, chapter_number);
-
 ALTER TABLE public.ai_story_projects ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.story_factory_jobs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.story_factory_runs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.story_state_events ENABLE ROW LEVEL SECURITY;
-
 CREATE POLICY ai_story_projects_service_only ON public.ai_story_projects FOR ALL TO service_role USING (true) WITH CHECK (true);
 CREATE POLICY story_factory_jobs_service_only ON public.story_factory_jobs FOR ALL TO service_role USING (true) WITH CHECK (true);
 CREATE POLICY story_factory_runs_service_only ON public.story_factory_runs FOR ALL TO service_role USING (true) WITH CHECK (true);
 CREATE POLICY story_state_events_service_only ON public.story_state_events FOR ALL TO service_role USING (true) WITH CHECK (true);
-
 REVOKE ALL ON public.ai_story_projects, public.story_factory_jobs, public.story_factory_runs, public.story_state_events FROM PUBLIC, anon, authenticated;
 GRANT ALL ON public.ai_story_projects, public.story_factory_jobs, public.story_factory_runs, public.story_state_events TO service_role;
 GRANT USAGE, SELECT ON SEQUENCE public.story_state_events_id_seq TO service_role;
-
 CREATE OR REPLACE FUNCTION public.claim_story_factory_job(p_worker_id text, p_engine_release text)
 RETURNS SETOF public.story_factory_jobs
 LANGUAGE plpgsql
@@ -262,7 +228,6 @@ BEGIN
   WHERE job.id = claimed_id
   RETURNING job.*;
 END $$;
-
 CREATE OR REPLACE FUNCTION public.commit_story_factory_chapter(
   p_job_id uuid,
   p_lease_token uuid,
@@ -353,7 +318,6 @@ BEGIN
 
   RETURN jsonb_build_object('chapterNumber', p_expected_chapter, 'status', 'published');
 END $$;
-
 CREATE OR REPLACE FUNCTION public.reconcile_story_factory_jobs(p_stale_minutes integer DEFAULT 10)
 RETURNS integer
 LANGUAGE plpgsql
@@ -375,7 +339,6 @@ BEGIN
   GET DIAGNOSTICS affected = ROW_COUNT;
   RETURN affected;
 END $$;
-
 CREATE OR REPLACE FUNCTION public.promote_story_factory_canary(p_job_id uuid, p_engine_release text)
 RETURNS jsonb
 LANGUAGE plpgsql
@@ -401,7 +364,6 @@ BEGIN
   UPDATE public.story_factory_jobs SET execution_mode = 'production', updated_at = now() WHERE id = p_job_id;
   RETURN jsonb_build_object('jobId', p_job_id, 'executionMode', 'production', 'visible', true);
 END $$;
-
 REVOKE ALL ON FUNCTION public.claim_story_factory_job(text, text) FROM PUBLIC, anon, authenticated;
 REVOKE ALL ON FUNCTION public.commit_story_factory_chapter(uuid, uuid, uuid, integer, text, text, jsonb, jsonb, jsonb, jsonb, jsonb, jsonb, numeric, integer, integer, text) FROM PUBLIC, anon, authenticated;
 REVOKE ALL ON FUNCTION public.reconcile_story_factory_jobs(integer) FROM PUBLIC, anon, authenticated;

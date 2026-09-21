@@ -1,5 +1,9 @@
 # Story Factory
 
+## Versioned narrative foundation
+
+A commission can opt into `lived-causality-2026-09-21.1` through `craftProfile`. Setup then generates a matching kernel `narrativeFoundation`, removes fixed opening payoff deadlines, and sends the same character, world, knowledge, and causal rules to planner, writer, and editor. The five-chapter review classifies defects by `foundation`, `plan`, or `prose`; upstream defects stop at their source instead of buying a prose rewrite. Projects without a profile keep the legacy setup and review policy.
+
 The one system that writes novels. 17 files, one cron, one queue.
 
 `src/services/story-factory/` — flat, no subdirectories. If you are looking for

@@ -56,7 +56,6 @@ CREATE TABLE IF NOT EXISTS factory_config (
   
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
-
 -- =============================================
 -- 2. AI AUTHOR PROFILES
 -- =============================================
@@ -92,7 +91,6 @@ CREATE TABLE IF NOT EXISTS ai_author_profiles (
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
-
 -- =============================================
 -- 3. STORY IDEAS
 -- =============================================
@@ -133,7 +131,6 @@ CREATE TABLE IF NOT EXISTS story_ideas (
   approved_at TIMESTAMPTZ,
   production_started_at TIMESTAMPTZ
 );
-
 -- =============================================
 -- 4. STORY BLUEPRINTS
 -- =============================================
@@ -185,7 +182,6 @@ CREATE TABLE IF NOT EXISTS story_blueprints (
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
-
 -- =============================================
 -- 5. PRODUCTION QUEUE
 -- =============================================
@@ -235,7 +231,6 @@ CREATE TABLE IF NOT EXISTS production_queue (
   
   CONSTRAINT unique_novel_production UNIQUE (novel_id)
 );
-
 -- =============================================
 -- 6. CHAPTER WRITE QUEUE
 -- =============================================
@@ -274,7 +269,6 @@ CREATE TABLE IF NOT EXISTS chapter_write_queue (
   
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
-
 -- =============================================
 -- 7. CHAPTER PUBLISH QUEUE
 -- =============================================
@@ -295,7 +289,6 @@ CREATE TABLE IF NOT EXISTS chapter_publish_queue (
   
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
-
 -- =============================================
 -- 8. FACTORY STATS (Daily snapshots)
 -- =============================================
@@ -341,7 +334,6 @@ CREATE TABLE IF NOT EXISTS factory_stats (
   
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
-
 -- =============================================
 -- 9. FACTORY ERRORS (For admin alerts)
 -- =============================================
@@ -374,7 +366,6 @@ CREATE TABLE IF NOT EXISTS factory_errors (
   
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
-
 -- =============================================
 -- 10. FACTORY RUN LOG
 -- =============================================
@@ -395,7 +386,6 @@ CREATE TABLE IF NOT EXISTS factory_run_log (
   duration_seconds INTEGER,
   items_processed INTEGER DEFAULT 0
 );
-
 -- =============================================
 -- INDEXES
 -- =============================================
@@ -404,32 +394,25 @@ CREATE TABLE IF NOT EXISTS factory_run_log (
 CREATE INDEX IF NOT EXISTS idx_story_ideas_status ON story_ideas(status);
 CREATE INDEX IF NOT EXISTS idx_story_ideas_genre ON story_ideas(genre);
 CREATE INDEX IF NOT EXISTS idx_story_ideas_created ON story_ideas(created_at DESC);
-
 -- Blueprints
 CREATE INDEX IF NOT EXISTS idx_blueprints_status ON story_blueprints(status);
 CREATE INDEX IF NOT EXISTS idx_blueprints_author ON story_blueprints(author_id);
-
 -- Production Queue
 CREATE INDEX IF NOT EXISTS idx_production_status ON production_queue(status);
 CREATE INDEX IF NOT EXISTS idx_production_active ON production_queue(status, priority DESC) WHERE status = 'active';
 CREATE INDEX IF NOT EXISTS idx_production_novel ON production_queue(novel_id);
-
 -- Chapter Write Queue
 CREATE INDEX IF NOT EXISTS idx_write_queue_status ON chapter_write_queue(status);
 CREATE INDEX IF NOT EXISTS idx_write_queue_production ON chapter_write_queue(production_id, chapter_number);
 CREATE INDEX IF NOT EXISTS idx_write_queue_scheduled ON chapter_write_queue(scheduled_time) WHERE status = 'pending';
-
 -- Chapter Publish Queue
 CREATE INDEX IF NOT EXISTS idx_publish_queue_scheduled ON chapter_publish_queue(scheduled_time) WHERE status = 'scheduled';
 CREATE INDEX IF NOT EXISTS idx_publish_queue_production ON chapter_publish_queue(production_id);
-
 -- Factory Errors
 CREATE INDEX IF NOT EXISTS idx_factory_errors_new ON factory_errors(created_at DESC) WHERE status = 'new';
 CREATE INDEX IF NOT EXISTS idx_factory_errors_severity ON factory_errors(severity, created_at DESC) WHERE requires_attention = true;
-
 -- Factory Run Log
 CREATE INDEX IF NOT EXISTS idx_run_log_type ON factory_run_log(run_type, started_at DESC);
-
 -- =============================================
 -- ROW LEVEL SECURITY
 -- =============================================
@@ -444,79 +427,58 @@ ALTER TABLE chapter_publish_queue ENABLE ROW LEVEL SECURITY;
 ALTER TABLE factory_stats ENABLE ROW LEVEL SECURITY;
 ALTER TABLE factory_errors ENABLE ROW LEVEL SECURITY;
 ALTER TABLE factory_run_log ENABLE ROW LEVEL SECURITY;
-
 -- Admin can do everything
 CREATE POLICY "Admins have full access to factory_config" ON factory_config
   FOR ALL TO authenticated
   USING ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
-
 CREATE POLICY "Admins have full access to ai_author_profiles" ON ai_author_profiles
   FOR ALL TO authenticated
   USING ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
-
 CREATE POLICY "Admins have full access to story_ideas" ON story_ideas
   FOR ALL TO authenticated
   USING ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
-
 CREATE POLICY "Admins have full access to story_blueprints" ON story_blueprints
   FOR ALL TO authenticated
   USING ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
-
 CREATE POLICY "Admins have full access to production_queue" ON production_queue
   FOR ALL TO authenticated
   USING ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
-
 CREATE POLICY "Admins have full access to chapter_write_queue" ON chapter_write_queue
   FOR ALL TO authenticated
   USING ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
-
 CREATE POLICY "Admins have full access to chapter_publish_queue" ON chapter_publish_queue
   FOR ALL TO authenticated
   USING ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
-
 CREATE POLICY "Admins have full access to factory_stats" ON factory_stats
   FOR ALL TO authenticated
   USING ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
-
 CREATE POLICY "Admins have full access to factory_errors" ON factory_errors
   FOR ALL TO authenticated
   USING ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
-
 CREATE POLICY "Admins have full access to factory_run_log" ON factory_run_log
   FOR ALL TO authenticated
   USING ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
-
 -- Service role bypass (for edge functions)
 CREATE POLICY "Service role bypass for factory_config" ON factory_config
   FOR ALL TO service_role USING (true);
-
 CREATE POLICY "Service role bypass for ai_author_profiles" ON ai_author_profiles
   FOR ALL TO service_role USING (true);
-
 CREATE POLICY "Service role bypass for story_ideas" ON story_ideas
   FOR ALL TO service_role USING (true);
-
 CREATE POLICY "Service role bypass for story_blueprints" ON story_blueprints
   FOR ALL TO service_role USING (true);
-
 CREATE POLICY "Service role bypass for production_queue" ON production_queue
   FOR ALL TO service_role USING (true);
-
 CREATE POLICY "Service role bypass for chapter_write_queue" ON chapter_write_queue
   FOR ALL TO service_role USING (true);
-
 CREATE POLICY "Service role bypass for chapter_publish_queue" ON chapter_publish_queue
   FOR ALL TO service_role USING (true);
-
 CREATE POLICY "Service role bypass for factory_stats" ON factory_stats
   FOR ALL TO service_role USING (true);
-
 CREATE POLICY "Service role bypass for factory_errors" ON factory_errors
   FOR ALL TO service_role USING (true);
-
 CREATE POLICY "Service role bypass for factory_run_log" ON factory_run_log
   FOR ALL TO service_role USING (true);
-
 -- =============================================
 -- INITIAL DATA
 -- =============================================
@@ -525,7 +487,6 @@ CREATE POLICY "Service role bypass for factory_run_log" ON factory_run_log
 INSERT INTO factory_config (id)
 SELECT gen_random_uuid()
 WHERE NOT EXISTS (SELECT 1 FROM factory_config LIMIT 1);
-
 -- Insert sample AI Authors
 INSERT INTO ai_author_profiles (pen_name, writing_style, tone, primary_genres, secondary_genres, persona_prompt, bio) VALUES
 (
@@ -619,7 +580,6 @@ INSERT INTO ai_author_profiles (pen_name, writing_style, tone, primary_genres, s
   'Nguồn năng lượng tích cực của văn đàn ngôn tình.'
 )
 ON CONFLICT (pen_name) DO NOTHING;
-
 -- =============================================
 -- FUNCTIONS
 -- =============================================
@@ -650,7 +610,6 @@ BEGIN
   RETURN v_author_id;
 END;
 $$ LANGUAGE plpgsql;
-
 -- Function to update author stats after chapter is written
 CREATE OR REPLACE FUNCTION update_author_stats(p_author_id UUID, p_quality_score DECIMAL)
 RETURNS void AS $$
@@ -666,7 +625,6 @@ BEGIN
   WHERE id = p_author_id;
 END;
 $$ LANGUAGE plpgsql;
-
 -- Function to log factory error
 CREATE OR REPLACE FUNCTION log_factory_error(
   p_error_type TEXT,
@@ -704,7 +662,6 @@ BEGIN
   RETURN v_error_id;
 END;
 $$ LANGUAGE plpgsql;
-
 -- Function to get factory dashboard stats
 CREATE OR REPLACE FUNCTION get_factory_dashboard_stats()
 RETURNS JSONB AS $$
@@ -726,7 +683,6 @@ BEGIN
   RETURN v_result;
 END;
 $$ LANGUAGE plpgsql;
-
 -- =============================================
 -- TRIGGERS
 -- =============================================
@@ -739,19 +695,15 @@ BEGIN
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
-
 CREATE TRIGGER update_ai_author_profiles_updated_at
   BEFORE UPDATE ON ai_author_profiles
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
 CREATE TRIGGER update_story_blueprints_updated_at
   BEFORE UPDATE ON story_blueprints
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
 CREATE TRIGGER update_production_queue_updated_at
   BEFORE UPDATE ON production_queue
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
 CREATE TRIGGER update_factory_config_updated_at
   BEFORE UPDATE ON factory_config
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();

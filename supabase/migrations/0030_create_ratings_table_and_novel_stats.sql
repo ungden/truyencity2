@@ -13,32 +13,25 @@ CREATE TABLE IF NOT EXISTS ratings (
   updated_at TIMESTAMPTZ DEFAULT now(),
   UNIQUE(user_id, novel_id)
 );
-
 -- Indexes for fast lookups
 CREATE INDEX IF NOT EXISTS idx_ratings_novel_id ON ratings(novel_id);
 CREATE INDEX IF NOT EXISTS idx_ratings_user_id ON ratings(user_id);
 CREATE INDEX IF NOT EXISTS idx_ratings_novel_score ON ratings(novel_id, score);
-
 -- RLS
 ALTER TABLE ratings ENABLE ROW LEVEL SECURITY;
-
 -- Anyone can read ratings
 CREATE POLICY "ratings_select_all" ON ratings
   FOR SELECT USING (true);
-
 -- Authenticated users can insert their own ratings
 CREATE POLICY "ratings_insert_own" ON ratings
   FOR INSERT WITH CHECK (auth.uid() = user_id);
-
 -- Users can update their own ratings
 CREATE POLICY "ratings_update_own" ON ratings
   FOR UPDATE USING (auth.uid() = user_id)
   WITH CHECK (auth.uid() = user_id);
-
 -- Users can delete their own ratings
 CREATE POLICY "ratings_delete_own" ON ratings
   FOR DELETE USING (auth.uid() = user_id);
-
 -- Auto-update updated_at
 CREATE OR REPLACE FUNCTION update_ratings_updated_at()
 RETURNS TRIGGER AS $$
@@ -47,12 +40,9 @@ BEGIN
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
-
 CREATE TRIGGER ratings_updated_at
   BEFORE UPDATE ON ratings
   FOR EACH ROW EXECUTE FUNCTION update_ratings_updated_at();
-
-
 -- 2. NOVEL STATS FUNCTION
 -- Returns aggregated stats for a single novel
 -- ============================================================
@@ -89,8 +79,6 @@ BEGIN
   RETURN result;
 END;
 $$ LANGUAGE plpgsql STABLE;
-
-
 -- 3. BATCH NOVEL STATS for listing pages
 -- Returns stats for multiple novels at once (avoids N+1)
 -- ============================================================
@@ -132,8 +120,6 @@ BEGIN
   ) ch ON true;
 END;
 $$ LANGUAGE plpgsql STABLE;
-
-
 -- 4. TOP NOVELS BY VIEWS (for ranking page - hot tab)
 -- ============================================================
 CREATE OR REPLACE FUNCTION get_top_novels_by_views(p_days INT DEFAULT 7, p_limit INT DEFAULT 50)
@@ -151,8 +137,6 @@ BEGIN
   LIMIT p_limit;
 END;
 $$ LANGUAGE plpgsql STABLE;
-
-
 -- 5. TOP NOVELS BY RATING
 -- ============================================================
 CREATE OR REPLACE FUNCTION get_top_novels_by_rating(p_min_ratings INT DEFAULT 3, p_limit INT DEFAULT 50)
@@ -171,8 +155,6 @@ BEGIN
   LIMIT p_limit;
 END;
 $$ LANGUAGE plpgsql STABLE;
-
-
 -- 6. TOP NOVELS BY BOOKMARKS
 -- ============================================================
 CREATE OR REPLACE FUNCTION get_top_novels_by_bookmarks(p_limit INT DEFAULT 50)

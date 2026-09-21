@@ -29,6 +29,7 @@ function nameOf(bible: Bible, id: string): string {
 
 function customerLoopMilestone(cycle: CyclePlan, chapterNumber: number) {
   const loop = cycle.customerLoop;
+  if (!loop) return null;
   if (loop.schedule.purchaseChapter === chapterNumber) {
     return { step: 'purchase', action: loop.purchase, assetId: loop.purchaseAssetId, terms: loop.purchaseTerms };
   }
@@ -169,7 +170,7 @@ export function relevantWorldSlice(input: {
   for (const subject of progressionSubjects) {
     for (const state of subject.currentProgressions) systemIds.add(state.systemId);
   }
-  const gradeIds = new Set(products.map(product => product.gradeSystemId));
+  const gradeIds = new Set(products.flatMap(product => product.gradeSystemId ? [product.gradeSystemId] : []));
   return {
     worlds,
     // These ids are the only legal non-character subjects for progression changes.
@@ -195,7 +196,7 @@ export function buildWriterBrief(input: {
   const sheet = cycle.beatSheets.find(item => item.chapterNumber === chapterNumber);
   if (!sheet) throw new Error(`Cycle ${cycle.cycleNumber} has no beat sheet for chapter ${chapterNumber}.`);
 
-  const beatText = [sheet.newNamedThing, sheet.emotionalTarget, ...sheet.beats, cycle.pressure].join(' ');
+  const beatText = [sheet.newNamedThing ?? '', sheet.emotionalTarget, ...sheet.beats, cycle.pressure].join(' ');
   const castIds = relevantCast(bible, premise, beatText);
   const rung = premise.goldenFinger.evolution.find(item => item.id === bible.symbolicCore.mc.goldenFingerRungId);
   const worldSlice = relevantWorldSlice({ premise, bible, castIds, chapterNumber, beatText });
@@ -234,6 +235,18 @@ export function buildWriterBrief(input: {
     thuMoiPhaiDatTen: sheet.newNamedThing,
     kieuHookKetChuong: sheet.endHookKind,
     ghiChuBienTap: cycle.editorialNotes,
+    narrativeFoundation: premise.narrativeFoundation ?? null,
+    narrativeEvidence: bible.symbolicCore.narrativeEvidence,
+    durableNarrativeState: {
+      revealedNarrativeIds: bible.symbolicCore.revealedNarrativeIds,
+      achievedNarrativeMilestoneIds: bible.symbolicCore.achievedNarrativeMilestoneIds,
+      characterKnowledge: bible.symbolicCore.characterKnowledge,
+    },
+    dieuKienNhip: {
+      prerequisiteIds: sheet.prerequisiteIds,
+      revealsFactIds: sheet.revealsFactIds,
+      advancesMilestoneIds: sheet.advancesMilestoneIds,
+    },
     soGiaoDichMoDau: chapterNumber <= 4
       ? premise.worldKernel.openingLedger.filter(entry => entry.chapterNumber <= chapterNumber)
       : [],
@@ -265,7 +278,7 @@ export function buildJudgeBrief(input: {
 }) {
   const { premise, bible, cycle, chapterNumber } = input;
   const sheet = cycle.beatSheets.find(item => item.chapterNumber === chapterNumber);
-  const beatText = sheet ? [sheet.newNamedThing, sheet.emotionalTarget, ...sheet.beats].join(' ') : '';
+  const beatText = sheet ? [sheet.newNamedThing ?? '', sheet.emotionalTarget, ...sheet.beats].join(' ') : '';
   const castIds = relevantCast(bible, premise, `${beatText} ${input.prose}`);
   const assetLedger = assetLedgerSlice(bible, castIds, `${beatText} ${input.prose}`);
   return {
@@ -286,6 +299,13 @@ export function buildJudgeBrief(input: {
     } : null,
     vongKhachHangChuKy: cycle.customerLoop,
     mocVongKhachHangChuongNay: customerLoopMilestone(cycle, chapterNumber),
+    narrativeFoundation: premise.narrativeFoundation ?? null,
+    narrativeEvidence: bible.symbolicCore.narrativeEvidence,
+    durableNarrativeState: {
+      revealedNarrativeIds: bible.symbolicCore.revealedNarrativeIds,
+      achievedNarrativeMilestoneIds: bible.symbolicCore.achievedNarrativeMilestoneIds,
+      characterKnowledge: bible.symbolicCore.characterKnowledge,
+    },
     luatPhanUng: premise.voiceSheet.reactionRule,
     worldSlice: relevantWorldSlice({ premise, bible, castIds, chapterNumber, beatText }),
     soTaiSanDauChuong: assetLedger,
@@ -352,6 +372,13 @@ export function buildExtractorBrief(input: {
       ...input.bible.castSheet.map(entry => ({ id: entry.id, ten: entry.name })),
       ...input.premise.worldKernel.worlds.flatMap(world => world.factions.map(faction => ({ id: faction.id, ten: faction.name }))),
     ],
+    narrativeFoundation: input.premise.narrativeFoundation ?? null,
+    narrativeEvidenceDaCo: input.bible.symbolicCore.narrativeEvidence,
+    narrativeStateBenVung: {
+      revealedNarrativeIds: input.bible.symbolicCore.revealedNarrativeIds,
+      achievedNarrativeMilestoneIds: input.bible.symbolicCore.achievedNarrativeMilestoneIds,
+      characterKnowledge: input.bible.symbolicCore.characterKnowledge,
+    },
   };
 }
 
@@ -370,6 +397,7 @@ export function buildOpeningAuditBrief(input: {
     hangMoMan: input.premise.worldKernel.launchProducts,
     hopDongBonChuong: input.premise.worldKernel.openingContract,
     soGiaoDichChuan: input.premise.worldKernel.openingLedger,
+    narrativeFoundation: input.premise.narrativeFoundation ?? null,
     chuong: input.chapters,
   };
 }
@@ -404,9 +432,9 @@ export function buildCyclePlannerBrief(input: {
     chuongKetThucCoDinh: input.fixedEndChapter ?? null,
     trangThaiHienTai: mustNotContradict(bible, premise, bible.symbolicCore.cast.map(member => member.id)),
     soTaiSanHienTai: assetLedgerSlice(bible, bible.symbolicCore.cast.map(member => member.id), [
-      input.activeCycle?.customerLoop.purchase,
-      input.activeCycle?.customerLoop.useToEarn,
-      input.activeCycle?.customerLoop.returnUpgrade,
+      input.activeCycle?.customerLoop?.purchase,
+      input.activeCycle?.customerLoop?.useToEarn,
+      input.activeCycle?.customerLoop?.returnUpgrade,
     ].filter(Boolean).join(' '), true),
     nhanVat: bible.castSheet,
     boiCanh: bible.world,
@@ -439,6 +467,13 @@ export function buildCyclePlannerBrief(input: {
     loaiSuongDaDungGanDay: used,
     phucButQuaHan: overdueHooks(bible, input.startChapter),
     chiDaoTuBienTap: input.steering,
+    narrativeFoundation: premise.narrativeFoundation ?? null,
+    narrativeEvidence: bible.symbolicCore.narrativeEvidence,
+    durableNarrativeState: {
+      revealedNarrativeIds: bible.symbolicCore.revealedNarrativeIds,
+      achievedNarrativeMilestoneIds: bible.symbolicCore.achievedNarrativeMilestoneIds,
+      characterKnowledge: bible.symbolicCore.characterKnowledge,
+    },
   };
 }
 
@@ -475,9 +510,9 @@ export function refreshStyleMemory(bible: Bible, verdicts: JudgeVerdict[], limit
 /** Digest fields the planner needs to know a beat sheet was actually delivered. */
 export function beatDelivery(digest: ChapterDigest, cycle: CyclePlan): { named: boolean; payoff: PayoffKind | null } {
   const sheet = cycle.beatSheets.find(item => item.chapterNumber === digest.chapterNumber);
-  const expected = sheet?.newNamedThing.toLowerCase() ?? '';
+  const expected = sheet?.newNamedThing?.toLowerCase() ?? '';
   return {
-    named: digest.newNamedThings.some(thing => expected.includes(thing.toLowerCase()) || thing.toLowerCase().includes(expected)),
+    named: expected === '' || digest.newNamedThings.some(thing => expected.includes(thing.toLowerCase()) || thing.toLowerCase().includes(expected)),
     payoff: digest.payoffKind,
   };
 }

@@ -10,27 +10,22 @@ DO $$ BEGIN
   CREATE TYPE subscription_tier AS ENUM ('free', 'creator', 'pro', 'enterprise');
 EXCEPTION WHEN duplicate_object THEN null;
 END $$;
-
 DO $$ BEGIN
   CREATE TYPE subscription_status AS ENUM ('active', 'canceled', 'past_due', 'trialing', 'expired');
 EXCEPTION WHEN duplicate_object THEN null;
 END $$;
-
 DO $$ BEGIN
   CREATE TYPE payment_method AS ENUM ('stripe', 'vnpay', 'momo', 'bank_transfer', 'credits');
 EXCEPTION WHEN duplicate_object THEN null;
 END $$;
-
 DO $$ BEGIN
   CREATE TYPE transaction_type AS ENUM ('subscription', 'credit_purchase', 'credit_usage', 'refund', 'bonus');
 EXCEPTION WHEN duplicate_object THEN null;
 END $$;
-
 DO $$ BEGIN
   CREATE TYPE reader_tier AS ENUM ('free', 'vip');
 EXCEPTION WHEN duplicate_object THEN null;
 END $$;
-
 -- ── Core billing tables ──────────────────────────────────────────────────────
 
 CREATE TABLE IF NOT EXISTS user_subscriptions (
@@ -54,14 +49,12 @@ CREATE TABLE IF NOT EXISTS user_subscriptions (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE(user_id)
 );
-
 ALTER TABLE user_subscriptions
   ADD COLUMN IF NOT EXISTS reader_tier reader_tier NOT NULL DEFAULT 'free',
   ADD COLUMN IF NOT EXISTS reader_tier_expires_at TIMESTAMPTZ,
   ADD COLUMN IF NOT EXISTS reader_tier_auto_renew BOOLEAN NOT NULL DEFAULT FALSE,
   ADD COLUMN IF NOT EXISTS reader_tier_payment_method TEXT,
   ADD COLUMN IF NOT EXISTS reader_tier_store_tx_id TEXT;
-
 CREATE TABLE IF NOT EXISTS credit_transactions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -78,7 +71,6 @@ CREATE TABLE IF NOT EXISTS credit_transactions (
   metadata JSONB DEFAULT '{}',
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
-
 -- ── Reader VIP configuration ─────────────────────────────────────────────────
 
 CREATE TABLE IF NOT EXISTS reader_tier_limits (
@@ -95,7 +87,6 @@ CREATE TABLE IF NOT EXISTS reader_tier_limits (
   description TEXT,
   features JSONB DEFAULT '[]'
 );
-
 INSERT INTO reader_tier_limits (
   tier,
   show_ads,
@@ -126,7 +117,6 @@ ON CONFLICT (tier) DO UPDATE SET
   price_usd_monthly = EXCLUDED.price_usd_monthly,
   description = EXCLUDED.description,
   features = EXCLUDED.features;
-
 CREATE TABLE IF NOT EXISTS tts_usage (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -135,7 +125,6 @@ CREATE TABLE IF NOT EXISTS tts_usage (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE(user_id, usage_date)
 );
-
 CREATE TABLE IF NOT EXISTS download_usage (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -144,7 +133,6 @@ CREATE TABLE IF NOT EXISTS download_usage (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE(user_id, usage_date)
 );
-
 -- ── Indexes ──────────────────────────────────────────────────────────────────
 
 CREATE INDEX IF NOT EXISTS idx_user_subscriptions_user_id ON user_subscriptions(user_id);
@@ -153,7 +141,6 @@ CREATE INDEX IF NOT EXISTS idx_user_subscriptions_reader_expires ON user_subscri
 CREATE INDEX IF NOT EXISTS idx_credit_transactions_user_id ON credit_transactions(user_id);
 CREATE INDEX IF NOT EXISTS idx_tts_usage_user_date ON tts_usage(user_id, usage_date);
 CREATE INDEX IF NOT EXISTS idx_download_usage_user_date ON download_usage(user_id, usage_date);
-
 -- ── RLS ──────────────────────────────────────────────────────────────────────
 
 ALTER TABLE user_subscriptions ENABLE ROW LEVEL SECURITY;
@@ -161,21 +148,18 @@ ALTER TABLE credit_transactions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE reader_tier_limits ENABLE ROW LEVEL SECURITY;
 ALTER TABLE tts_usage ENABLE ROW LEVEL SECURITY;
 ALTER TABLE download_usage ENABLE ROW LEVEL SECURITY;
-
 DO $$ BEGIN
   CREATE POLICY "Users can view own subscription"
   ON user_subscriptions FOR SELECT
   USING (auth.uid() = user_id);
 EXCEPTION WHEN duplicate_object THEN null;
 END $$;
-
 DO $$ BEGIN
   CREATE POLICY "Users can view own transactions"
   ON credit_transactions FOR SELECT
   USING (auth.uid() = user_id);
 EXCEPTION WHEN duplicate_object THEN null;
 END $$;
-
 DO $$ BEGIN
   CREATE POLICY "Reader tier limits are public"
   ON reader_tier_limits FOR SELECT
@@ -183,55 +167,47 @@ DO $$ BEGIN
   USING (TRUE);
 EXCEPTION WHEN duplicate_object THEN null;
 END $$;
-
 DO $$ BEGIN
   CREATE POLICY "Users can view own TTS usage"
   ON tts_usage FOR SELECT
   USING (auth.uid() = user_id);
 EXCEPTION WHEN duplicate_object THEN null;
 END $$;
-
 DO $$ BEGIN
   CREATE POLICY "Users can insert own TTS usage"
   ON tts_usage FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 EXCEPTION WHEN duplicate_object THEN null;
 END $$;
-
 DO $$ BEGIN
   CREATE POLICY "Users can update own TTS usage"
   ON tts_usage FOR UPDATE
   USING (auth.uid() = user_id);
 EXCEPTION WHEN duplicate_object THEN null;
 END $$;
-
 DO $$ BEGIN
   CREATE POLICY "Users can view own download usage"
   ON download_usage FOR SELECT
   USING (auth.uid() = user_id);
 EXCEPTION WHEN duplicate_object THEN null;
 END $$;
-
 DO $$ BEGIN
   CREATE POLICY "Users can insert own download usage"
   ON download_usage FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 EXCEPTION WHEN duplicate_object THEN null;
 END $$;
-
 DO $$ BEGIN
   CREATE POLICY "Users can update own download usage"
   ON download_usage FOR UPDATE
   USING (auth.uid() = user_id);
 EXCEPTION WHEN duplicate_object THEN null;
 END $$;
-
 -- ── Backfill/trigger ─────────────────────────────────────────────────────────
 
 INSERT INTO user_subscriptions (user_id)
 SELECT id FROM auth.users
 ON CONFLICT (user_id) DO NOTHING;
-
 CREATE OR REPLACE FUNCTION initialize_user_billing()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -241,12 +217,10 @@ BEGIN
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
-
 DROP TRIGGER IF EXISTS on_auth_user_created_billing ON auth.users;
 CREATE TRIGGER on_auth_user_created_billing
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION initialize_user_billing();
-
 -- ── Reader status helpers (idempotent) ───────────────────────────────────────
 
 CREATE OR REPLACE FUNCTION get_reader_status(p_user_id UUID)

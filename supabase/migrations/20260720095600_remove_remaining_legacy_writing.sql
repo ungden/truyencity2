@@ -5,7 +5,6 @@
 DROP TABLE IF EXISTS public.ai_prompt_templates CASCADE;
 DROP TABLE IF EXISTS public.chapter_versions CASCADE;
 DROP TABLE IF EXISTS public.rewrite_chain_items CASCADE;
-
 DO $$
 DECLARE item record;
 BEGIN

@@ -3,12 +3,10 @@
 
 -- Step 1: Add column with default 0
 ALTER TABLE novels ADD COLUMN IF NOT EXISTS chapter_count integer NOT NULL DEFAULT 0;
-
 -- Step 2: Populate from actual data
 UPDATE novels SET chapter_count = (
   SELECT count(*)::integer FROM chapters WHERE chapters.novel_id = novels.id
 );
-
 -- Step 3: Create trigger function to keep it in sync
 CREATE OR REPLACE FUNCTION update_novel_chapter_count()
 RETURNS TRIGGER AS $$
@@ -23,13 +21,11 @@ BEGIN
   RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
-
 -- Step 4: Create trigger on chapters table
 DROP TRIGGER IF EXISTS trg_update_novel_chapter_count ON chapters;
 CREATE TRIGGER trg_update_novel_chapter_count
   AFTER INSERT OR DELETE ON chapters
   FOR EACH ROW
   EXECUTE FUNCTION update_novel_chapter_count();
-
 -- Step 5: Index for sorting by chapter_count
 CREATE INDEX IF NOT EXISTS idx_novels_chapter_count ON novels(chapter_count DESC);

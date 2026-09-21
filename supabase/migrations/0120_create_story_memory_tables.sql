@@ -24,21 +24,17 @@ CREATE TABLE IF NOT EXISTS character_states (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE(project_id, chapter_number, character_name)
 );
-
 -- Indexes for fast lookups
 CREATE INDEX IF NOT EXISTS idx_character_states_project 
   ON character_states(project_id, character_name, chapter_number DESC);
-
 CREATE INDEX IF NOT EXISTS idx_character_states_latest 
   ON character_states(project_id, chapter_number DESC);
-
 -- ============================================================================
 -- 2. STORY MEMORY CHUNKS — RAG vector search for semantic context retrieval
 -- ============================================================================
 
 -- Enable pgvector extension (idempotent)
 CREATE EXTENSION IF NOT EXISTS vector;
-
 CREATE TABLE IF NOT EXISTS story_memory_chunks (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   project_id UUID NOT NULL REFERENCES ai_story_projects(id) ON DELETE CASCADE,
@@ -49,18 +45,14 @@ CREATE TABLE IF NOT EXISTS story_memory_chunks (
   metadata JSONB DEFAULT '{}'::jsonb,  -- {characters: [], location: string, event_type: string, ...}
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
-
 -- IVFFlat index for fast approximate nearest neighbor search
 -- Lists = sqrt(expected_rows). Start with 100 for up to ~10K chunks.
 CREATE INDEX IF NOT EXISTS idx_memory_chunks_embedding 
   ON story_memory_chunks USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100);
-
 CREATE INDEX IF NOT EXISTS idx_memory_chunks_project 
   ON story_memory_chunks(project_id, chapter_number);
-
 CREATE INDEX IF NOT EXISTS idx_memory_chunks_type 
   ON story_memory_chunks(project_id, chunk_type);
-
 -- ============================================================================
 -- 3. RPC function for vector similarity search
 -- ============================================================================

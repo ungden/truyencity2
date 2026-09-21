@@ -259,3 +259,4 @@ GRANT EXECUTE ON FUNCTION public.commit_flagship_machine_calibration_v3(jsonb,js
 GRANT EXECUTE ON FUNCTION public.promote_flagship_v3_factory_release(uuid,text,integer,text) TO service_role;
 
 COMMIT;
+;

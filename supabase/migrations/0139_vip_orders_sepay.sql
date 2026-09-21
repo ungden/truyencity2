@@ -25,20 +25,16 @@ CREATE TABLE IF NOT EXISTS vip_orders (
   -- Indexes
   CONSTRAINT unique_sepay_tx UNIQUE (sepay_transaction_id)
 );
-
 -- Indexes for common queries
 CREATE INDEX idx_vip_orders_user_id ON vip_orders(user_id);
 CREATE INDEX idx_vip_orders_payment_code ON vip_orders(payment_code);
 CREATE INDEX idx_vip_orders_status ON vip_orders(status) WHERE status = 'pending';
-
 -- RLS
 ALTER TABLE vip_orders ENABLE ROW LEVEL SECURITY;
-
 -- Users can read their own orders
 CREATE POLICY "Users can view own vip_orders"
   ON vip_orders FOR SELECT
   USING (auth.uid() = user_id);
-
 -- Only service role can insert/update (via API routes)
 -- No INSERT/UPDATE policies for anon/authenticated — handled by service role in API
 

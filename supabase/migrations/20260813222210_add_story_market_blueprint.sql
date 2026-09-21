@@ -7,4 +7,4 @@ ALTER TABLE public.ai_story_projects
     CHECK (market_blueprint IS NULL OR jsonb_typeof(market_blueprint) = 'object');
 
 COMMENT ON COLUMN public.ai_story_projects.market_blueprint IS
-  'Faloo-oriented market, worldview, comparison, conflict, payoff, and scale contract selected by Concept Lab.';
+  'Faloo-oriented market, worldview, comparison, conflict, payoff, and scale contract selected by Concept Lab.';;

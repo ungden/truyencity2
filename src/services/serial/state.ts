@@ -71,6 +71,7 @@ export function assertCycleAssetCoherence(
   atChapter = cycle.startChapter,
 ): void {
   const loop = cycle.customerLoop;
+  if (!loop) return;
   const ownedAssetIds = new Set(bible.symbolicCore.activeAssetLots
     .filter(lot => lot.ownerId === loop.customerId)
     .map(lot => lot.assetId));
@@ -339,6 +340,38 @@ export function applyDigest(input: {
   }
 
   const mc = cast.get(premise.castSeed.find(member => member.role === 'protagonist')!.id);
+  const foundation = premise.schemaVersion === 3 ? premise.narrativeFoundation : null;
+  const factIds = new Set(foundation?.facts.map(fact => fact.id) ?? []);
+  const milestoneIds = new Set(foundation?.milestones.map(milestone => milestone.id) ?? []);
+  const revealedNarrativeIds = new Set([
+    ...core.revealedNarrativeIds,
+    ...core.narrativeEvidence.filter(item => factIds.has(item.id)).map(item => item.id),
+  ]);
+  const achievedNarrativeMilestoneIds = new Set([
+    ...core.achievedNarrativeMilestoneIds,
+    ...core.narrativeEvidence.filter(item => milestoneIds.has(item.id)).map(item => item.id),
+  ]);
+  const characterKnowledge = new Map(core.characterKnowledge.map(entry => [entry.characterId, new Set(entry.factIds)]));
+  // Bible JSON written before durable knowledge snapshots defaults this array to
+  // empty. Recover every learner still present in the legacy evidence window before
+  // that window is truncated, otherwise an established information boundary is lost.
+  for (const evidence of core.narrativeEvidence) {
+    if (!factIds.has(evidence.id)) continue;
+    for (const characterId of evidence.learnedByCharacterIds) {
+      const known = characterKnowledge.get(characterId) ?? new Set<string>();
+      known.add(evidence.id);
+      characterKnowledge.set(characterId, known);
+    }
+  }
+  for (const evidence of digest.narrativeEvidence) {
+    if (factIds.has(evidence.id)) revealedNarrativeIds.add(evidence.id);
+    if (milestoneIds.has(evidence.id)) achievedNarrativeMilestoneIds.add(evidence.id);
+    for (const characterId of evidence.learnedByCharacterIds) {
+      const known = characterKnowledge.get(characterId) ?? new Set<string>();
+      if (factIds.has(evidence.id)) known.add(evidence.id);
+      characterKnowledge.set(characterId, known);
+    }
+  }
 
   const symbolicCore: SymbolicCore = {
     // 8. Story time only ever moves forward.
@@ -354,6 +387,24 @@ export function applyDigest(input: {
     progressions: [...progressions.values()],
     activeAssetLots: assetState.lots,
     recentAssetEvents: assetState.recentEvents,
+    // The same fact can be revealed to the reader in one chapter and learned by
+    // another character later. Preserve those events; only remove an exact
+    // duplicate extractor record from the same chapter.
+    narrativeEvidence: [...core.narrativeEvidence, ...digest.narrativeEvidence]
+      .filter((item, index, all) => {
+        const learners = [...item.learnedByCharacterIds].sort().join(',');
+        return all.findIndex(candidate => candidate.id === item.id
+          && candidate.chapterNumber === item.chapterNumber
+          && candidate.quote === item.quote
+          && [...candidate.learnedByCharacterIds].sort().join(',') === learners) === index;
+      })
+      .slice(-240),
+    revealedNarrativeIds: [...revealedNarrativeIds],
+    achievedNarrativeMilestoneIds: [...achievedNarrativeMilestoneIds],
+    characterKnowledge: [...characterKnowledge].map(([characterId, known]) => ({
+      characterId,
+      factIds: [...known],
+    })),
     openHooks: hooks,
   };
 
@@ -381,7 +432,7 @@ export function applyDigest(input: {
  * five chapters in a row of the same contract signing, the same engine repair.
  */
 export function assertPayoffRotation(previous: CyclePlan | null, next: CyclePlan): void {
-  if (!previous) return;
+  if (!previous || next.schemaVersion === 2) return;
   if (previous.climax.payoffKind === next.climax.payoffKind) {
     throw new SerialStateError(
       'payoff_rotation',
@@ -456,7 +507,10 @@ export function seedBible(input: { premise: Premise }): Bible {
         alive: true,
         locationId: member.startLocationId,
         lastSeenChapter: 0,
-        knowsFinger: member.id === protagonist.id,
+        knowsFinger: premise.schemaVersion === 2
+          ? member.id === protagonist.id
+          : Boolean(premise.narrativeFoundation?.advantageDiscovery.initiallyKnownFactIds.length
+            && member.id === protagonist.id),
       })),
       progressions: [
         ...premise.castSeed.flatMap(member => member.startingProgressions.map(state => ({ subjectId: member.id, ...state }))),
@@ -464,12 +518,35 @@ export function seedBible(input: { premise: Premise }): Bible {
       ],
       activeAssetLots: [],
       recentAssetEvents: [],
+      narrativeEvidence: [],
+      revealedNarrativeIds: premise.schemaVersion === 3
+        ? premise.narrativeFoundation?.advantageDiscovery.initiallyKnownFactIds ?? []
+        : [],
+      achievedNarrativeMilestoneIds: [],
+      characterKnowledge: premise.schemaVersion === 3
+        ? premise.castSeed.map(member => ({
+            characterId: member.id,
+            factIds: [
+              ...(member.id === protagonist.id
+                ? premise.narrativeFoundation?.advantageDiscovery.initiallyKnownFactIds ?? []
+                : []),
+              ...(premise.narrativeFoundation?.facts
+                .filter(fact => fact.initiallyKnownByCharacterIds.includes(member.id))
+                .map(fact => fact.id) ?? []),
+            ].filter((factId, index, all) => all.indexOf(factId) === index),
+          })).filter(entry => entry.factIds.length > 0)
+        : [],
       openHooks: [],
     },
     castSheet: premise.castSeed.map(member => ({
       id: member.id,
       name: member.name,
-      sheet: `${member.role} — ${member.agenda}${member.antagonistClass ? ` (${member.antagonistClass})` : ''}`,
+      sheet: (() => {
+        const foundation = premise.narrativeFoundation?.characters.find(item => item.characterId === member.id);
+        return foundation
+          ? `${member.role} — hiện tại: ${foundation.presentLife}; năng lực: ${foundation.existingCompetence}; giới hạn: ${foundation.limitsOfKnowledge}; quan hệ: ${foundation.relationships}; thói quen: ${foundation.habits}; mong muốn: ${foundation.desireBeforeAdvantage}`
+          : `${member.role} — ${member.agenda}${member.antagonistClass ? ` (${member.antagonistClass})` : ''}`;
+      })(),
     })),
     // Complete canon stays in worldKernel; the living list starts empty and grows only
     // when an Extractor records an entity actually shown on the page.

@@ -6,7 +6,6 @@ SET benchmark_protocol_version = 'legacy_incomparable',
     )
 WHERE kind = 'benchmark'
   AND benchmark_protocol_version = 'story-factory-writer-bakeoff-v4-causal-discovery';
-
 CREATE OR REPLACE FUNCTION public.story_factory_release_is_approved(
   p_benchmark_id uuid,
   p_engine_release text,
@@ -88,6 +87,5 @@ AS $$
         = writer_validation.input_artifact->>'sourceDiscoveryDigest'
   );
 $$;
-
 REVOKE ALL ON FUNCTION public.story_factory_release_is_approved(uuid, text, jsonb) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.story_factory_release_is_approved(uuid, text, jsonb) TO service_role;

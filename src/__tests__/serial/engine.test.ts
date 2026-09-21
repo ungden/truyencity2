@@ -2,7 +2,8 @@ import type { ProviderUsage, StoryModelProvider } from '@/services/story-factory
 import type { ChapterDigest, ChapterDraft, CyclePlan, JudgeVerdict, OpeningAudit } from '@/services/serial/contracts';
 import { DEFAULT_SERIAL_ROUTES } from '@/services/serial/routes';
 import {
-  auditFourChapterOpening, cycleReadyToClose, foldVolume, planNextCycle, readingHealth, writeOneChapter,
+  auditFourChapterOpening, cycleReadyToClose, foldVolume, planNextCycle, readingHealth,
+  SerialCheckpointError, writeOneChapter,
 } from '@/services/serial/engine';
 import { normalizeChapterDraft } from '@/services/serial/agents';
 import { assetLedgerSlice, buildCyclePlannerBrief, buildExtractorBrief, buildJudgeBrief, buildWriterBrief, collectSteering, refreshStyleMemory, relevantCast } from '@/services/serial/context';
@@ -39,6 +40,7 @@ const finding: JudgeVerdict['continuity'] = [{
 
 const goodDigest: ChapterDigest = {
   chapterNumber: 8,
+  narrativeEvidence: [],
   title: 'Anh vừa nói ba trăm triệu à?',
   summary: 'Khang định giá công khai món đồ Bảy Thạch vừa bán hớ.',
   payoffKind: 'va_mat',
@@ -119,6 +121,46 @@ describe('chapter loop', () => {
     expect(provider.calls).toEqual(['writer', 'judge', 'extractor']);
   });
 
+  test('an extractor transport failure resumes from the saved draft without buying Writer or Judge again', async () => {
+    const calls: string[] = [];
+    const failingProvider = {
+      async text() { throw new Error('unused'); },
+      async json<T>(input: { system: string; model: string }) {
+        if (input.system.startsWith(WRITER_SYSTEM_PROMPT)) {
+          calls.push('writer');
+          return { value: draft() as T, usage: usage(input.model) };
+        }
+        if (input.system === JUDGE_SYSTEM_PROMPT) {
+          calls.push('judge');
+          return { value: cleanVerdict() as T, usage: usage(input.model) };
+        }
+        calls.push('extractor');
+        throw new Error('extractor timeout');
+      },
+    } as StoryModelProvider;
+    let checkpoint: SerialCheckpointError | null = null;
+    try {
+      await writeOneChapter(chapterInput(failingProvider));
+    } catch (error) {
+      if (error instanceof SerialCheckpointError) checkpoint = error;
+      else throw error;
+    }
+    expect(checkpoint?.checkpoint).toMatchObject({
+      resumeFrom: 'extractor', chapter: { title: draft().title }, verdict: cleanVerdict(),
+    });
+    expect(checkpoint?.usages).toHaveLength(2);
+    expect(calls).toEqual(['writer', 'judge', 'extractor']);
+
+    const resumedProvider = stubProvider({ extractor: [goodDigest] });
+    const resumed = await writeOneChapter({
+      ...chapterInput(resumedProvider),
+      resumeArtifact: checkpoint!.checkpoint,
+    });
+    expect(resumed.status).toBe('committed');
+    expect(resumedProvider.calls).toEqual(['extractor']);
+    if (resumed.status === 'committed') expect(resumed.costUsd).toBeCloseTo(0.02, 5);
+  });
+
   test('a cited contradiction buys one targeted repair, not a fresh chapter', async () => {
     const provider = stubProvider({
       writer: [draft(), draft({ title: 'Bản sửa' })],
@@ -157,7 +199,7 @@ describe('chapter loop', () => {
     expect(provider.calls).not.toContain('extractor');
   });
 
-  test('prose the reader accepts but state cannot absorb replans rather than committing a wrong Bible', async () => {
+  test('prose the reader accepts but state cannot absorb pauses with its private draft', async () => {
     const invalid = { ...goodDigest, coreChanges: { ...goodDigest.coreChanges, hooksPaid: ['hook_khong_ton_tai'] } };
     const provider = stubProvider({
       writer: [draft()], judge: [cleanVerdict()],
@@ -165,8 +207,11 @@ describe('chapter loop', () => {
     });
     const result = await writeOneChapter(chapterInput(provider));
 
-    expect(result.status).toBe('needs_replan');
-    if (result.status !== 'needs_replan') return;
+    expect(result.status).toBe('needs_review');
+    if (result.status !== 'needs_review') return;
+    expect(result.reviewKind).toBe('extractor');
+    expect(result.chapter.content).toBe(draft().content);
+    expect(result.rejectedDigest).toMatchObject({ chapterNumber: 8 });
     expect(result.reason).toMatch(/unknown_hook/);
     expect(provider.calls.filter(call => call === 'extractor')).toHaveLength(2);
   });
@@ -291,6 +336,9 @@ describe('cycle lifecycle', () => {
       emotionalTarget: 'Thỏa mãn vì tình thế đổi thật.',
       newNamedThing: `Mốc ${chapterNumber}`,
       endHookKind: 'opportunity' as const,
+      prerequisiteIds: [],
+      revealsFactIds: [],
+      advancesMilestoneIds: [],
     });
     const active = cycle({
       startChapter: 11,
@@ -381,6 +429,9 @@ describe('context selection', () => {
         emotionalTarget: 'Giá trị cửa hàng được công khai.',
         newNamedThing: 'Tịnh Mạch Đan Nhất giai hạ phẩm',
         endHookKind: 'reward',
+        prerequisiteIds: [],
+        revealsFactIds: [],
+        advancesMilestoneIds: [],
       }],
     });
     const writer = buildWriterBrief({ premise, bible, cycle: opening, chapterNumber: 1, previousChapter: null });

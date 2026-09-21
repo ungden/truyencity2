@@ -6,12 +6,10 @@ select cron.unschedule('ai-editor-scan-cron')
 where exists (
   select 1 from cron.job where jobname = 'ai-editor-scan-cron'
 );
-
 select cron.unschedule('ai-editor-rewrite-cron')
 where exists (
   select 1 from cron.job where jobname = 'ai-editor-rewrite-cron'
 );
-
 select cron.schedule(
   'ai-editor-scan-cron',
   '5 0 * * *',
@@ -23,7 +21,6 @@ select cron.schedule(
   ) as request_id;
   $$
 );
-
 select cron.schedule(
   'ai-editor-rewrite-cron',
   '*/10 * * * *',

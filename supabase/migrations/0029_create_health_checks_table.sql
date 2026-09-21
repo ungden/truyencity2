@@ -19,10 +19,8 @@ CREATE TABLE IF NOT EXISTS health_checks (
   -- Duration of the health check itself
   duration_ms INTEGER
 );
-
 -- Index for quick lookups
 CREATE INDEX IF NOT EXISTS idx_health_checks_created_at ON health_checks(created_at DESC);
-
 -- Keep only last 90 days of health checks (cleanup policy)
 -- Can be run manually or via pg_cron
 CREATE OR REPLACE FUNCTION cleanup_old_health_checks() RETURNS void AS $$

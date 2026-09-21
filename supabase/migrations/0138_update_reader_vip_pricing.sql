@@ -9,7 +9,6 @@
 ALTER TABLE reader_tier_limits
   ADD COLUMN IF NOT EXISTS price_vnd_yearly BIGINT NOT NULL DEFAULT 0,
   ADD COLUMN IF NOT EXISTS price_usd_yearly DECIMAL(10, 2) NOT NULL DEFAULT 0;
-
 -- Update free tier: no downloads (VIP feature), 1h TTS
 UPDATE reader_tier_limits SET
   daily_download_limit = 0,
@@ -24,7 +23,6 @@ UPDATE reader_tier_limits SET
   description = 'Doc truyen mien phi voi quang cao',
   features = '["Doc tat ca truyen", "Nghe audio 1 tieng/ngay", "Quang cao"]'::jsonb
 WHERE tier = 'free';
-
 -- Update VIP tier: 99k/month, 999k/year
 UPDATE reader_tier_limits SET
   show_ads = FALSE,

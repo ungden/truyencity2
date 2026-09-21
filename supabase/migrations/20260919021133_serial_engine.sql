@@ -1,9 +1,5 @@
--- The serial engine's own tables. Nothing here touches the story-factory schema:
--- the two run side by side until the old one is retired.
 SET lock_timeout = '5s';
 
--- One row per story. `premise` is immutable after approval; `bible` is rewritten
--- every chapter and is the only durable narrative state.
 CREATE TABLE IF NOT EXISTS public.serial_novels (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   novel_id uuid NOT NULL UNIQUE REFERENCES public.novels(id) ON DELETE CASCADE,
@@ -12,8 +8,6 @@ CREATE TABLE IF NOT EXISTS public.serial_novels (
   routes jsonb NOT NULL,
   route_version text NOT NULL,
   prompt_version text NOT NULL,
-  -- The human gate. A job cannot be claimed until someone has read the premise
-  -- and the first four chapters and said yes.
   approved_at timestamptz,
   approved_by text,
   created_at timestamptz NOT NULL DEFAULT now(),
@@ -28,7 +22,6 @@ CREATE TABLE IF NOT EXISTS public.serial_cycles (
   start_chapter integer NOT NULL CHECK (start_chapter > 0),
   end_chapter integer NOT NULL CHECK (end_chapter >= start_chapter),
   plan jsonb NOT NULL,
-  -- The Bible as it stood before the cycle's first chapter. A replan restores it.
   checkpoint_bible jsonb NOT NULL,
   status text NOT NULL DEFAULT 'writing'
     CHECK (status IN ('writing', 'ready_to_publish', 'published', 'replanned')),
@@ -44,8 +37,6 @@ CREATE TABLE IF NOT EXISTS public.serial_jobs (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   serial_novel_id uuid NOT NULL UNIQUE REFERENCES public.serial_novels(id) ON DELETE CASCADE,
   novel_id uuid NOT NULL REFERENCES public.novels(id) ON DELETE CASCADE,
-  -- There is no *_blocked status on purpose. The old engine had four, and every
-  -- production job is parked in one of them waiting for an operator.
   status text NOT NULL DEFAULT 'awaiting_approval'
     CHECK (status IN ('awaiting_approval', 'ready', 'running', 'paused', 'completed')),
   stage text NOT NULL DEFAULT 'plan_cycle'
@@ -79,7 +70,6 @@ CREATE TABLE IF NOT EXISTS public.serial_runs (
   attempts integer NOT NULL DEFAULT 0,
   verdict jsonb,
   digest jsonb,
-  -- The number the dashboard shows instead of a block count.
   scorecard_avg numeric(3, 2),
   usage jsonb NOT NULL DEFAULT '[]'::jsonb,
   cost_usd numeric(10, 4) NOT NULL DEFAULT 0,
@@ -92,7 +82,6 @@ CREATE TABLE IF NOT EXISTS public.serial_runs (
 CREATE INDEX IF NOT EXISTS idx_serial_runs_recent
   ON public.serial_runs(serial_novel_id, started_at DESC);
 
--- Service role only. These tables never reach a reader.
 DO $$
 DECLARE v_table text;
 BEGIN
@@ -106,8 +95,6 @@ BEGIN
   END LOOP;
 END $$;
 
--- ---------------------------------------------------------------- claim
-
 CREATE OR REPLACE FUNCTION public.claim_serial_job(
   p_owner text, p_lease_minutes integer DEFAULT 15, p_route_version text DEFAULT NULL
 ) RETURNS public.serial_jobs
@@ -120,7 +107,6 @@ BEGIN
     AND j.next_run_at <= now()
     AND n.approved_at IS NOT NULL
     AND (p_route_version IS NULL OR n.route_version = p_route_version)
-    -- Daily quota throttles new chapters; it never gates a publish or a replan.
     AND (j.stage <> 'write' OR j.quota_date IS DISTINCT FROM v_local_date OR j.chapters_today < j.daily_target)
   ORDER BY j.next_run_at
   FOR UPDATE OF j SKIP LOCKED
@@ -139,13 +125,6 @@ BEGIN
   RETURN v_job;
 END $$;
 
--- ------------------------------------------------------- commit a chapter
-
-/**
- * One transaction: the draft chapter, the new Bible, the run telemetry and the job
- * cursor all move together, or none of them do. The chapter lands as a draft — a
- * reader sees nothing until its whole cycle passes review.
- */
 CREATE OR REPLACE FUNCTION public.commit_serial_chapter(
   p_job_id uuid, p_lease_token uuid, p_run_id uuid, p_expected_chapter integer,
   p_title text, p_content text, p_bible jsonb, p_verdict jsonb, p_digest jsonb,
@@ -197,9 +176,6 @@ BEGIN
   RETURN jsonb_build_object('chapterNumber', p_expected_chapter, 'publication', 'draft', 'chaptersToday', v_today);
 END $$;
 
--- -------------------------------------------------------- publish a cycle
-
-/** Every chapter of the cycle becomes visible at once, or none of them do. */
 CREATE OR REPLACE FUNCTION public.publish_serial_cycle(
   p_job_id uuid, p_lease_token uuid, p_cycle_id uuid, p_next_stage text
 ) RETURNS jsonb
@@ -245,12 +221,6 @@ BEGIN
   RETURN jsonb_build_object('published', true, 'startChapter', v_cycle.start_chapter, 'endChapter', v_cycle.end_chapter);
 END $$;
 
--- --------------------------------------------------------- replan a cycle
-
-/**
- * Roll the private window back to its checkpoint and plan again. No reader ever saw
- * these chapters, so there is nothing to apologise for and no reason to park the job.
- */
 CREATE OR REPLACE FUNCTION public.replan_serial_cycle(
   p_job_id uuid, p_lease_token uuid, p_cycle_id uuid, p_reason text
 ) RETURNS jsonb
@@ -285,8 +255,6 @@ BEGIN
   UPDATE public.serial_jobs SET
     current_chapter = v_cycle.start_chapter - 1,
     stage = 'plan_cycle',
-    -- Two replans of the same cycle pauses the story for a human read. It is the one
-    -- place a person is needed, and it is a read, not a repair.
     status = CASE WHEN v_cycle.replan_count + 1 >= 2 THEN 'paused' ELSE 'ready' END,
     current_cycle_id = NULL,
     consecutive_replans = v_job.consecutive_replans + 1,
@@ -301,8 +269,6 @@ BEGIN
     'paused', v_cycle.replan_count + 1 >= 2
   );
 END $$;
-
--- ------------------------------------------------- return expired leases
 
 CREATE OR REPLACE FUNCTION public.reconcile_serial_jobs(p_stale_minutes integer DEFAULT 0)
 RETURNS integer
@@ -337,4 +303,4 @@ BEGIN
     EXECUTE format('REVOKE ALL ON FUNCTION %s FROM PUBLIC, anon, authenticated', v_signature);
     EXECUTE format('GRANT EXECUTE ON FUNCTION %s TO service_role', v_signature);
   END LOOP;
-END $$;
+END $$;;

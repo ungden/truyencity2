@@ -20,6 +20,5 @@ AS $$
     AND (job.execution_mode = 'production' OR novel.hidden = true)
     AND public.story_factory_release_is_approved(job.benchmark_run_id, p_engine_release, project.model_routes);
 $$;
-
 REVOKE ALL ON FUNCTION public.story_factory_claimable_queue_health(text) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.story_factory_claimable_queue_health(text) TO service_role;

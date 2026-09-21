@@ -5,17 +5,13 @@
 -- premise + four golden chapters. This migration makes the second gate atomic with the
 -- chapter-four commit, so a cron cannot claim chapter five between two updates.
 BEGIN;
-
 SET lock_timeout = '5s';
-
 ALTER TABLE public.serial_novels
   ADD COLUMN IF NOT EXISTS opening_reviewed_at timestamptz,
   ADD COLUMN IF NOT EXISTS opening_reviewed_by text;
-
 ALTER TABLE public.serial_jobs DROP CONSTRAINT IF EXISTS serial_jobs_status_check;
 ALTER TABLE public.serial_jobs ADD CONSTRAINT serial_jobs_status_check
   CHECK (status IN ('awaiting_approval', 'ready', 'running', 'opening_review', 'paused', 'completed'));
-
 -- Defense in depth: even if an operator or old client accidentally puts a chapter-four
 -- job back in `ready`, the claim itself still requires the opening review timestamp.
 CREATE OR REPLACE FUNCTION public.claim_serial_job(
@@ -48,7 +44,6 @@ BEGIN
   RETURNING * INTO v_job;
   RETURN v_job;
 END $$;
-
 CREATE OR REPLACE FUNCTION public.commit_serial_chapter(
   p_job_id uuid, p_lease_token uuid, p_run_id uuid, p_expected_chapter integer,
   p_title text, p_content text, p_bible jsonb, p_verdict jsonb, p_digest jsonb,
@@ -116,15 +111,12 @@ BEGIN
     'needsOpeningReview', v_needs_opening_review
   );
 END $$;
-
 REVOKE ALL ON FUNCTION public.commit_serial_chapter(
   uuid,uuid,uuid,integer,text,text,jsonb,jsonb,jsonb,numeric,jsonb,numeric,integer,text
 ) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.commit_serial_chapter(
   uuid,uuid,uuid,integer,text,text,jsonb,jsonb,jsonb,numeric,jsonb,numeric,integer,text
 ) TO service_role;
-
 REVOKE ALL ON FUNCTION public.claim_serial_job(text,integer,text) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.claim_serial_job(text,integer,text) TO service_role;
-
 COMMIT;

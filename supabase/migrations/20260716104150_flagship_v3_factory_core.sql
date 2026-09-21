@@ -12,11 +12,9 @@ ALTER TABLE public.ai_story_projects ADD CONSTRAINT ai_story_projects_flagship_v
   CHECK (flagship_v3_status IS NULL OR flagship_v3_status IN (
     'staged','ready_to_write','setup_blocked','plan_blocked','rejected'
   ));
-
 ALTER TABLE public.story_write_runs
   ADD COLUMN IF NOT EXISTS realized_delta_evidence jsonb NOT NULL DEFAULT '[]'::jsonb,
   ADD COLUMN IF NOT EXISTS estimated_cost_usd numeric(10,6);
-
 ALTER TABLE public.story_factory_jobs DROP CONSTRAINT IF EXISTS story_factory_jobs_pipeline_version_check;
 ALTER TABLE public.story_factory_jobs ADD CONSTRAINT story_factory_jobs_pipeline_version_check
   CHECK (pipeline_version IN ('flagship_v2','flagship_v3'));
@@ -26,7 +24,6 @@ ALTER TABLE public.story_factory_jobs ADD CONSTRAINT story_factory_jobs_status_c
     'queued','setup','ready','writing','finale','blocked','quality_blocked',
     'plan_blocked','infra_blocked','completed','cancelled'
   ));
-
 CREATE TABLE IF NOT EXISTS public.story_chapter_attempts (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   run_id uuid NOT NULL UNIQUE REFERENCES public.story_write_runs(id) ON DELETE RESTRICT,
@@ -53,12 +50,10 @@ CREATE TABLE IF NOT EXISTS public.story_chapter_attempts (
   finished_at timestamptz,
   UNIQUE(project_id, chapter_number, attempt_no)
 );
-
 CREATE INDEX IF NOT EXISTS idx_story_chapter_attempts_project_chapter
   ON public.story_chapter_attempts(project_id, chapter_number, attempt_no DESC);
 CREATE INDEX IF NOT EXISTS idx_story_chapter_attempts_status
   ON public.story_chapter_attempts(status, started_at DESC);
-
 CREATE OR REPLACE FUNCTION public.guard_finished_story_chapter_attempt_v3()
 RETURNS trigger
 LANGUAGE plpgsql
@@ -84,12 +79,10 @@ BEGIN
   RETURN NEW;
 END;
 $$;
-
 DROP TRIGGER IF EXISTS trg_guard_finished_story_chapter_attempt_v3 ON public.story_chapter_attempts;
 CREATE TRIGGER trg_guard_finished_story_chapter_attempt_v3
 BEFORE UPDATE OR DELETE ON public.story_chapter_attempts
 FOR EACH ROW EXECUTE FUNCTION public.guard_finished_story_chapter_attempt_v3();
-
 CREATE TABLE IF NOT EXISTS public.story_cast_ledger_v3 (
   project_id uuid NOT NULL REFERENCES public.ai_story_projects(id) ON DELETE CASCADE,
   character_id text NOT NULL,
@@ -102,7 +95,6 @@ CREATE TABLE IF NOT EXISTS public.story_cast_ledger_v3 (
   updated_at timestamptz NOT NULL DEFAULT now(),
   PRIMARY KEY (project_id, character_id)
 );
-
 CREATE TABLE IF NOT EXISTS public.story_resource_ledger_v3 (
   project_id uuid NOT NULL REFERENCES public.ai_story_projects(id) ON DELETE CASCADE,
   resource_id text NOT NULL,
@@ -112,7 +104,6 @@ CREATE TABLE IF NOT EXISTS public.story_resource_ledger_v3 (
   updated_at timestamptz NOT NULL DEFAULT now(),
   PRIMARY KEY (project_id, resource_id)
 );
-
 CREATE TABLE IF NOT EXISTS public.story_promise_ledger_v3 (
   project_id uuid NOT NULL REFERENCES public.ai_story_projects(id) ON DELETE CASCADE,
   promise_id text NOT NULL,
@@ -121,7 +112,6 @@ CREATE TABLE IF NOT EXISTS public.story_promise_ledger_v3 (
   updated_at timestamptz NOT NULL DEFAULT now(),
   PRIMARY KEY (project_id, promise_id)
 );
-
 CREATE TABLE IF NOT EXISTS public.story_benchmark_chapters (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   source_chapter_id uuid,
@@ -137,7 +127,6 @@ CREATE TABLE IF NOT EXISTS public.story_benchmark_chapters (
   archived_at timestamptz NOT NULL DEFAULT now(),
   UNIQUE(project_id, chapter_number, source_pipeline_version, archive_reason)
 );
-
 CREATE TABLE IF NOT EXISTS public.story_factory_calibrations (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   pipeline_version text NOT NULL CHECK (pipeline_version = 'flagship_v3'),
@@ -156,21 +145,18 @@ CREATE TABLE IF NOT EXISTS public.story_factory_calibrations (
   created_at timestamptz NOT NULL DEFAULT now(),
   UNIQUE(prompt_version, route_version)
 );
-
 ALTER TABLE public.story_chapter_attempts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.story_cast_ledger_v3 ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.story_resource_ledger_v3 ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.story_promise_ledger_v3 ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.story_benchmark_chapters ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.story_factory_calibrations ENABLE ROW LEVEL SECURITY;
-
 REVOKE ALL ON public.story_chapter_attempts, public.story_cast_ledger_v3,
   public.story_resource_ledger_v3, public.story_promise_ledger_v3,
   public.story_benchmark_chapters, public.story_factory_calibrations FROM PUBLIC, anon, authenticated;
 GRANT ALL ON public.story_chapter_attempts, public.story_cast_ledger_v3,
   public.story_resource_ledger_v3, public.story_promise_ledger_v3,
   public.story_benchmark_chapters, public.story_factory_calibrations TO service_role;
-
 DROP POLICY IF EXISTS story_chapter_attempts_service_all ON public.story_chapter_attempts;
 CREATE POLICY story_chapter_attempts_service_all ON public.story_chapter_attempts
   FOR ALL TO service_role USING (true) WITH CHECK (true);
@@ -189,7 +175,6 @@ CREATE POLICY story_benchmark_chapters_service_all ON public.story_benchmark_cha
 DROP POLICY IF EXISTS story_factory_calibrations_service_all ON public.story_factory_calibrations;
 CREATE POLICY story_factory_calibrations_service_all ON public.story_factory_calibrations
   FOR ALL TO service_role USING (true) WITH CHECK (true);
-
 CREATE OR REPLACE FUNCTION public.stage_flagship_launch_pack_v3(
   p_project_id uuid,
   p_launch_pack jsonb,
@@ -217,11 +202,7 @@ BEGIN
   IF length(trim(COALESCE(p_routes->>'routeVersion',''))) < 3
      OR length(trim(COALESCE(p_routes->>'writer',''))) < 3
      OR length(trim(COALESCE(p_routes->>'editor',''))) < 3
-     OR p_routes->>'writer' = p_routes->>'editor'
-     OR jsonb_array_length(COALESCE(p_routes->'setupGenerators','[]'::jsonb)) <> 2
-     OR jsonb_array_length(COALESCE(p_routes->'setupJudges','[]'::jsonb)) <> 3
-     OR length(trim(COALESCE(p_routes->>'openingSimulator',''))) < 3
-     OR length(trim(COALESCE(p_routes->>'launchArchitect',''))) < 3 THEN
+     OR p_routes->>'writer' = p_routes->>'editor' THEN
     RAISE EXCEPTION 'FLAGSHIP_V3_ROUTES_INVALID';
   END IF;
 
@@ -261,7 +242,6 @@ BEGIN
   RETURN jsonb_build_object('staged', true, 'project_id', p_project_id, 'plan_count', v_index);
 END;
 $$;
-
 CREATE OR REPLACE FUNCTION public.archive_reset_flagship_canary_v3(
   p_project_id uuid,
   p_confirmation text
@@ -346,7 +326,6 @@ BEGIN
   RETURN jsonb_build_object('reset', true, 'archived', v_archived, 'deleted', v_deleted, 'project_id', p_project_id);
 END;
 $$;
-
 CREATE OR REPLACE FUNCTION public.promote_flagship_v3_factory(
   p_project_id uuid,
   p_daily_quota integer,
@@ -408,7 +387,6 @@ BEGIN
   RETURN jsonb_build_object('promoted', true, 'project_id', p_project_id, 'job', v_job);
 END;
 $$;
-
 CREATE OR REPLACE FUNCTION public.commit_flagship_chapter_v3(
   p_project_id uuid,
   p_novel_id uuid,
@@ -564,7 +542,6 @@ BEGIN
   RETURN jsonb_build_object('committed', true, 'chapter_number', p_chapter_number, 'attempt_id', p_attempt_id);
 END;
 $$;
-
 CREATE OR REPLACE FUNCTION public.enroll_flagship_factory_job_v3(
   p_project_id uuid,
   p_max_chapters integer DEFAULT 1200,
@@ -617,7 +594,6 @@ BEGIN
   RETURN to_jsonb(v_job);
 END;
 $$;
-
 CREATE OR REPLACE FUNCTION public.commit_flagship_rolling_window_v3(
   p_project_id uuid,
   p_expected_current_chapter integer,
@@ -690,7 +666,6 @@ BEGIN
   RETURN jsonb_build_object('committed', true, 'start_chapter', v_start, 'plan_count', v_index);
 END;
 $$;
-
 CREATE OR REPLACE FUNCTION public.claim_flagship_factory_job(
   p_worker_id text,
   p_lease_seconds integer DEFAULT 900
@@ -756,7 +731,6 @@ BEGIN
   RETURN jsonb_build_object('job', to_jsonb(v_job), 'worker_id', p_worker_id);
 END;
 $$;
-
 CREATE OR REPLACE FUNCTION public.advance_flagship_factory_job(
   p_job_id uuid,
   p_lease_token uuid,
@@ -833,7 +807,6 @@ BEGIN
   RETURN to_jsonb(v_job);
 END;
 $$;
-
 CREATE OR REPLACE FUNCTION public.record_flagship_factory_chapter_quota_v1()
 RETURNS trigger
 LANGUAGE plpgsql
@@ -877,7 +850,6 @@ BEGIN
   RETURN NEW;
 END;
 $$;
-
 CREATE OR REPLACE FUNCTION public.reconcile_stale_story_runs_v3(p_stale_minutes integer DEFAULT 20)
 RETURNS jsonb
 LANGUAGE plpgsql
@@ -923,7 +895,6 @@ BEGIN
   RETURN jsonb_build_object('runs', v_runs, 'attempts', v_attempts, 'jobs', v_jobs);
 END;
 $$;
-
 DROP VIEW IF EXISTS public.factory_story_status_v3;
 CREATE VIEW public.factory_story_status_v3
 WITH (security_invoker = true)
@@ -966,10 +937,8 @@ LEFT JOIN LATERAL (
   ORDER BY run.updated_at DESC LIMIT 1
 ) r ON true
 WHERE p.style_directives->>'pipeline_version' = 'flagship_v3';
-
 REVOKE ALL ON public.factory_story_status_v3 FROM PUBLIC, anon, authenticated;
 GRANT SELECT ON public.factory_story_status_v3 TO service_role;
-
 REVOKE ALL ON FUNCTION public.guard_finished_story_chapter_attempt_v3() FROM PUBLIC, anon, authenticated;
 REVOKE ALL ON FUNCTION public.stage_flagship_launch_pack_v3(uuid,jsonb,jsonb) FROM PUBLIC, anon, authenticated;
 REVOKE ALL ON FUNCTION public.archive_reset_flagship_canary_v3(uuid,text) FROM PUBLIC, anon, authenticated;
@@ -981,7 +950,6 @@ REVOKE ALL ON FUNCTION public.claim_flagship_factory_job(text,integer) FROM PUBL
 REVOKE ALL ON FUNCTION public.advance_flagship_factory_job(uuid,uuid,text,text,text,integer,text,text,text,jsonb,text,text) FROM PUBLIC, anon, authenticated;
 REVOKE ALL ON FUNCTION public.record_flagship_factory_chapter_quota_v1() FROM PUBLIC, anon, authenticated;
 REVOKE ALL ON FUNCTION public.reconcile_stale_story_runs_v3(integer) FROM PUBLIC, anon, authenticated;
-
 GRANT EXECUTE ON FUNCTION public.guard_finished_story_chapter_attempt_v3() TO service_role;
 GRANT EXECUTE ON FUNCTION public.stage_flagship_launch_pack_v3(uuid,jsonb,jsonb) TO service_role;
 GRANT EXECUTE ON FUNCTION public.archive_reset_flagship_canary_v3(uuid,text) TO service_role;

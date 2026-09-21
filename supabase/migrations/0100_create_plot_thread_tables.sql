@@ -25,23 +25,18 @@ CREATE TABLE IF NOT EXISTS plot_threads (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
-
 -- Indexes for fast lookups
 CREATE INDEX IF NOT EXISTS idx_plot_threads_project ON plot_threads(project_id);
 CREATE INDEX IF NOT EXISTS idx_plot_threads_status ON plot_threads(project_id, status);
 CREATE INDEX IF NOT EXISTS idx_plot_threads_priority ON plot_threads(project_id, importance DESC);
 CREATE INDEX IF NOT EXISTS idx_plot_threads_start ON plot_threads(project_id, start_chapter);
 CREATE INDEX IF NOT EXISTS idx_plot_threads_active ON plot_threads(project_id, last_active_chapter);
-
 -- RLS Policies
 ALTER TABLE plot_threads ENABLE ROW LEVEL SECURITY;
-
 CREATE POLICY "Allow public read access to plot_threads"
   ON plot_threads FOR SELECT USING (true);
-
 CREATE POLICY "Allow authenticated users to manage plot_threads"
   ON plot_threads FOR ALL USING (auth.role() = 'authenticated');
-
 -- ============================================================================
 -- UPDATE TRIGGER FOR UPDATED_AT
 -- ============================================================================
@@ -53,13 +48,11 @@ BEGIN
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
-
 DROP TRIGGER IF EXISTS trigger_update_plot_thread_timestamp ON plot_threads;
 CREATE TRIGGER trigger_update_plot_thread_timestamp
   BEFORE UPDATE ON plot_threads
   FOR EACH ROW
   EXECUTE FUNCTION update_plot_thread_timestamp();
-
 -- ============================================================================
 -- ENHANCE CHARACTER TRACKER FOR RE-INTRODUCTION
 -- ============================================================================
@@ -70,11 +63,9 @@ ALTER TABLE character_tracker
   ADD COLUMN IF NOT EXISTS key_facts TEXT[] DEFAULT '{}',
   ADD COLUMN IF NOT EXISTS pending_promises TEXT[] DEFAULT '{}',
   ADD COLUMN IF NOT EXISTS last_seen_chapter INTEGER;
-
 -- Index for character lookups
 CREATE INDEX IF NOT EXISTS idx_character_tracker_last_seen 
   ON character_tracker(project_id, last_seen_chapter);
-
 -- ============================================================================
 -- VOLUME SUMMARIES TABLE (For Phase 2)
 -- ============================================================================
@@ -96,18 +87,13 @@ CREATE TABLE IF NOT EXISTS volume_summaries (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   UNIQUE(project_id, volume_number)
 );
-
 CREATE INDEX IF NOT EXISTS idx_volume_summaries_project ON volume_summaries(project_id);
 CREATE INDEX IF NOT EXISTS idx_volume_summaries_chapters ON volume_summaries(project_id, start_chapter, end_chapter);
-
 ALTER TABLE volume_summaries ENABLE ROW LEVEL SECURITY;
-
 CREATE POLICY "Allow public read access to volume_summaries"
   ON volume_summaries FOR SELECT USING (true);
-
 CREATE POLICY "Allow authenticated users to manage volume_summaries"
   ON volume_summaries FOR ALL USING (auth.role() = 'authenticated');
-
 -- ============================================================================
 -- WORLD RULES INDEX TABLE (For Phase 3)
 -- ============================================================================
@@ -124,19 +110,14 @@ CREATE TABLE IF NOT EXISTS world_rules_index (
   last_referenced_chapter INTEGER,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
-
 CREATE INDEX IF NOT EXISTS idx_world_rules_project ON world_rules_index(project_id);
 CREATE INDEX IF NOT EXISTS idx_world_rules_category ON world_rules_index(project_id, category);
 CREATE INDEX IF NOT EXISTS idx_world_rules_tags ON world_rules_index USING GIN(tags);
-
 ALTER TABLE world_rules_index ENABLE ROW LEVEL SECURITY;
-
 CREATE POLICY "Allow public read access to world_rules_index"
   ON world_rules_index FOR SELECT USING (true);
-
 CREATE POLICY "Allow authenticated users to manage world_rules_index"
   ON world_rules_index FOR ALL USING (auth.role() = 'authenticated');
-
 -- ============================================================================
 -- MILESTONE VALIDATIONS TABLE (For Phase 4)
 -- ============================================================================
@@ -153,18 +134,13 @@ CREATE TABLE IF NOT EXISTS milestone_validations (
   validated_at TIMESTAMP WITH TIME ZONE,
   UNIQUE(project_id, milestone_chapter, validation_type)
 );
-
 CREATE INDEX IF NOT EXISTS idx_milestone_validations_project ON milestone_validations(project_id);
 CREATE INDEX IF NOT EXISTS idx_milestone_validations_chapter ON milestone_validations(project_id, milestone_chapter);
-
 ALTER TABLE milestone_validations ENABLE ROW LEVEL SECURITY;
-
 CREATE POLICY "Allow public read access to milestone_validations"
   ON milestone_validations FOR SELECT USING (true);
-
 CREATE POLICY "Allow authenticated users to manage milestone_validations"
   ON milestone_validations FOR ALL USING (auth.role() = 'authenticated');
-
 -- ============================================================================
 -- HELPER FUNCTION: Get Active Plot Threads
 -- ============================================================================
@@ -204,7 +180,6 @@ BEGIN
     pt.last_active_chapter DESC;
 END;
 $$ LANGUAGE plpgsql;
-
 -- ============================================================================
 -- HELPER FUNCTION: Check Abandoned Threads
 -- ============================================================================

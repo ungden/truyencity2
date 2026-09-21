@@ -5,7 +5,6 @@
 -- Step 1: Add total_chapters column
 ALTER TABLE novels 
 ADD COLUMN IF NOT EXISTS total_chapters INTEGER NOT NULL DEFAULT 0;
-
 -- Step 2: Populate with current counts (one-time backfill)
 UPDATE novels n
 SET total_chapters = (
@@ -13,7 +12,6 @@ SET total_chapters = (
   FROM chapters c 
   WHERE c.novel_id = n.id
 );
-
 -- Step 3: Create function to update total_chapters
 CREATE OR REPLACE FUNCTION update_novel_total_chapters()
 RETURNS TRIGGER AS $$
@@ -47,18 +45,14 @@ BEGIN
   END IF;
 END;
 $$ LANGUAGE plpgsql;
-
 -- Step 4: Create trigger
 DROP TRIGGER IF EXISTS trigger_update_novel_total_chapters ON chapters;
-
 CREATE TRIGGER trigger_update_novel_total_chapters
 AFTER INSERT OR UPDATE OR DELETE ON chapters
 FOR EACH ROW
 EXECUTE FUNCTION update_novel_total_chapters();
-
 -- Step 5: Add index on total_chapters for sorting
 CREATE INDEX IF NOT EXISTS idx_novels_total_chapters 
 ON novels(total_chapters DESC);
-
 -- Step 6: Add comment
 COMMENT ON COLUMN novels.total_chapters IS 'Denormalized chapter count - auto-updated by trigger. Avoids slow chapters(count) aggregate.';

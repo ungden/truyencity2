@@ -3,26 +3,21 @@
 -- service-role only and every public table is protected by RLS.
 
 BEGIN;
-
 ALTER TABLE public.ai_story_projects
   ADD COLUMN IF NOT EXISTS completion_report_v3 jsonb;
-
 ALTER TABLE public.story_write_runs
   ADD COLUMN IF NOT EXISTS engine_release_id text;
 ALTER TABLE public.story_chapter_attempts
   ADD COLUMN IF NOT EXISTS engine_release_id text;
-
 ALTER TABLE public.story_factory_calibrations
   ADD COLUMN IF NOT EXISTS engine_release_id text,
   ADD COLUMN IF NOT EXISTS launch_pack_digest text,
   ADD COLUMN IF NOT EXISTS distinct_reviewers integer NOT NULL DEFAULT 0;
-
 ALTER TABLE public.story_factory_calibrations
   DROP CONSTRAINT IF EXISTS story_factory_calibrations_prompt_version_route_version_key;
 DROP INDEX IF EXISTS public.story_factory_calibrations_release_route_unique;
 CREATE UNIQUE INDEX story_factory_calibrations_release_route_unique
   ON public.story_factory_calibrations(engine_release_id, route_version, launch_pack_digest);
-
 CREATE TABLE IF NOT EXISTS public.story_fact_ledger_v3 (
   project_id uuid NOT NULL REFERENCES public.ai_story_projects(id) ON DELETE CASCADE,
   fact_id text NOT NULL,
@@ -34,7 +29,6 @@ CREATE TABLE IF NOT EXISTS public.story_fact_ledger_v3 (
   updated_at timestamptz NOT NULL DEFAULT now(),
   PRIMARY KEY (project_id, fact_id)
 );
-
 CREATE TABLE IF NOT EXISTS public.story_knowledge_ledger_v3 (
   project_id uuid NOT NULL REFERENCES public.ai_story_projects(id) ON DELETE CASCADE,
   character_id text NOT NULL,
@@ -44,7 +38,6 @@ CREATE TABLE IF NOT EXISTS public.story_knowledge_ledger_v3 (
   updated_at timestamptz NOT NULL DEFAULT now(),
   PRIMARY KEY (project_id, character_id, fact_id)
 );
-
 CREATE TABLE IF NOT EXISTS public.story_arc_ledger_v3 (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   project_id uuid NOT NULL REFERENCES public.ai_story_projects(id) ON DELETE CASCADE,
@@ -64,7 +57,6 @@ CREATE TABLE IF NOT EXISTS public.story_arc_ledger_v3 (
   closed_at timestamptz NOT NULL DEFAULT now(),
   UNIQUE(project_id, arc_id)
 );
-
 CREATE TABLE IF NOT EXISTS public.story_cover_manifests_v3 (
   project_id uuid PRIMARY KEY REFERENCES public.ai_story_projects(id) ON DELETE CASCADE,
   novel_id uuid NOT NULL REFERENCES public.novels(id) ON DELETE CASCADE,
@@ -80,7 +72,6 @@ CREATE TABLE IF NOT EXISTS public.story_cover_manifests_v3 (
   verified_at timestamptz NOT NULL DEFAULT now(),
   CHECK (width * 3 = height * 2)
 );
-
 CREATE TABLE IF NOT EXISTS public.story_calibration_campaigns_v3 (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name text NOT NULL,
@@ -92,7 +83,6 @@ CREATE TABLE IF NOT EXISTS public.story_calibration_campaigns_v3 (
   created_at timestamptz NOT NULL DEFAULT now(),
   closed_at timestamptz
 );
-
 CREATE TABLE IF NOT EXISTS public.story_calibration_samples_v3 (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   campaign_id uuid NOT NULL REFERENCES public.story_calibration_campaigns_v3(id) ON DELETE CASCADE,
@@ -105,7 +95,6 @@ CREATE TABLE IF NOT EXISTS public.story_calibration_samples_v3 (
   created_at timestamptz NOT NULL DEFAULT now(),
   UNIQUE(campaign_id, sample_key)
 );
-
 CREATE TABLE IF NOT EXISTS public.story_calibration_ballots_v3 (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   campaign_id uuid NOT NULL REFERENCES public.story_calibration_campaigns_v3(id) ON DELETE CASCADE,
@@ -118,7 +107,6 @@ CREATE TABLE IF NOT EXISTS public.story_calibration_ballots_v3 (
   created_at timestamptz NOT NULL DEFAULT now(),
   UNIQUE(sample_id, reviewer_id)
 );
-
 CREATE INDEX IF NOT EXISTS story_fact_ledger_v3_retrieval_idx
   ON public.story_fact_ledger_v3(project_id, status, scope, last_seen_chapter DESC);
 CREATE INDEX IF NOT EXISTS story_knowledge_ledger_v3_retrieval_idx
@@ -127,7 +115,6 @@ CREATE INDEX IF NOT EXISTS story_arc_ledger_v3_project_idx
   ON public.story_arc_ledger_v3(project_id, end_chapter DESC);
 CREATE INDEX IF NOT EXISTS story_calibration_samples_campaign_idx
   ON public.story_calibration_samples_v3(campaign_id, created_at);
-
 ALTER TABLE public.story_fact_ledger_v3 ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.story_knowledge_ledger_v3 ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.story_arc_ledger_v3 ENABLE ROW LEVEL SECURITY;
@@ -135,7 +122,6 @@ ALTER TABLE public.story_cover_manifests_v3 ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.story_calibration_campaigns_v3 ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.story_calibration_samples_v3 ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.story_calibration_ballots_v3 ENABLE ROW LEVEL SECURITY;
-
 REVOKE ALL ON public.story_fact_ledger_v3, public.story_knowledge_ledger_v3,
   public.story_arc_ledger_v3, public.story_cover_manifests_v3,
   public.story_calibration_campaigns_v3, public.story_calibration_samples_v3,
@@ -144,7 +130,6 @@ GRANT ALL ON public.story_fact_ledger_v3, public.story_knowledge_ledger_v3,
   public.story_arc_ledger_v3, public.story_cover_manifests_v3,
   public.story_calibration_campaigns_v3, public.story_calibration_samples_v3,
   public.story_calibration_ballots_v3 TO service_role;
-
 DO $$
 DECLARE t text;
 BEGIN
@@ -157,7 +142,6 @@ BEGIN
     EXECUTE format('CREATE POLICY %I ON public.%I FOR ALL TO service_role USING (true) WITH CHECK (true)', t || '_service_all', t);
   END LOOP;
 END $$;
-
 CREATE OR REPLACE FUNCTION public.stage_flagship_launch_pack_release_v3(
   p_project_id uuid, p_launch_pack jsonb, p_routes jsonb,
   p_release_manifest jsonb, p_launch_pack_digest text
@@ -181,7 +165,6 @@ BEGIN
   WHERE id = p_project_id;
   RETURN v_result || jsonb_build_object('engine_release_id', p_release_manifest->>'releaseId', 'launch_pack_digest', p_launch_pack_digest);
 END; $$;
-
 CREATE OR REPLACE FUNCTION public.archive_reset_flagship_canary_release_v3(
   p_project_id uuid, p_engine_release_id text, p_confirmation text
 ) RETURNS jsonb
@@ -204,7 +187,6 @@ BEGIN
   ), completion_report_v3=NULL WHERE id = p_project_id;
   RETURN v_result || jsonb_build_object('engine_release_id', p_engine_release_id);
 END; $$;
-
 CREATE OR REPLACE FUNCTION public.commit_flagship_chapter_release_v3(
   p_project_id uuid, p_novel_id uuid, p_expected_current_chapter integer,
   p_chapter_number integer, p_title text, p_content text, p_quality_score numeric,
@@ -244,7 +226,6 @@ BEGIN
   END LOOP;
   RETURN v_result || jsonb_build_object('engine_release_id', p_engine_release_id);
 END; $$;
-
 CREATE OR REPLACE VIEW public.factory_story_cost_v3
 WITH (security_invoker=true) AS
 SELECT a.project_id,a.chapter_number,
@@ -258,10 +239,8 @@ FROM public.story_chapter_attempts a
 LEFT JOIN public.chapter_blueprints b ON b.project_id=a.project_id AND b.chapter_number=a.chapter_number AND b.version=3
 LEFT JOIN public.story_arc_ledger_v3 ar ON ar.project_id=a.project_id AND a.chapter_number BETWEEN ar.start_chapter AND ar.end_chapter
 WHERE a.status='published';
-
 REVOKE ALL ON public.factory_story_cost_v3 FROM PUBLIC,anon,authenticated;
 GRANT SELECT ON public.factory_story_cost_v3 TO service_role;
-
 CREATE OR REPLACE FUNCTION public.commit_flagship_arc_transition_v3(
   p_project_id uuid, p_expected_current_chapter integer, p_closed_arc jsonb,
   p_closure jsonb, p_ending_readiness jsonb, p_next_arc jsonb,
@@ -299,7 +278,6 @@ BEGIN
     completion_report_v3=p_completion_report,updated_at=now() WHERE id=p_project_id;
   RETURN jsonb_build_object('committed',true,'completed',v_is_completion,'next_arc_id',p_next_arc->>'arcId');
 END; $$;
-
 CREATE OR REPLACE FUNCTION public.commit_flagship_rolling_window_release_v3(
   p_project_id uuid, p_expected_current_chapter integer, p_window jsonb,
   p_prompt_version text, p_model_route jsonb, p_context_manifest jsonb,
@@ -317,7 +295,6 @@ BEGIN
   WHERE project_id=p_project_id AND chapter_number BETWEEN (p_window->>'startChapter')::integer AND (p_window->>'startChapter')::integer+4 AND version=3;
   RETURN v_result||jsonb_build_object('engine_release_id',p_engine_release_id,'estimated_cost_usd',COALESCE(p_estimated_cost_usd,0));
 END; $$;
-
 CREATE OR REPLACE FUNCTION public.promote_flagship_v3_factory_release(
   p_project_id uuid, p_engine_release_id text, p_daily_quota integer, p_confirmation text
 ) RETURNS jsonb
@@ -353,7 +330,6 @@ BEGIN
   SELECT public.enroll_flagship_factory_job_v3(p_project_id,1200,'narrative_ending') INTO v_job;
   RETURN jsonb_build_object('promoted',true,'project_id',p_project_id,'engine_release_id',p_engine_release_id,'job',v_job);
 END; $$;
-
 -- Repair two legacy functions currently reported by linked database lint.
 CREATE OR REPLACE FUNCTION public.can_user_write_chapter(p_user_id uuid)
 RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path=public AS $$
@@ -368,7 +344,6 @@ BEGIN
   IF v_daily_limit<>-1 AND v_daily_used>=v_daily_limit THEN RETURN jsonb_build_object('allowed',false,'reason','daily_limit_reached','tier',v_subscription,'daily_used',v_daily_used,'daily_limit',v_daily_limit,'reset_at',v_reset+interval '24 hours'); END IF;
   RETURN jsonb_build_object('allowed',true,'tier',v_subscription,'daily_used',v_daily_used,'daily_limit',v_daily_limit,'balance',v_balance);
 END; $$;
-
 CREATE OR REPLACE FUNCTION public.archive_old_rag_chunks(p_chapter_buffer integer DEFAULT 800,p_dry_run boolean DEFAULT false)
 RETURNS TABLE(project_id uuid,archived_count bigint) LANGUAGE plpgsql SECURITY INVOKER SET search_path=public AS $$
 DECLARE rec record; v_archived bigint;
@@ -379,7 +354,6 @@ BEGIN
     IF v_archived>0 THEN project_id:=rec.id; archived_count:=v_archived; RETURN NEXT; END IF;
   END LOOP;
 END; $$;
-
 REVOKE ALL ON FUNCTION public.stage_flagship_launch_pack_release_v3(uuid,jsonb,jsonb,jsonb,text) FROM PUBLIC,anon,authenticated;
 REVOKE ALL ON FUNCTION public.archive_reset_flagship_canary_release_v3(uuid,text,text) FROM PUBLIC,anon,authenticated;
 REVOKE ALL ON FUNCTION public.commit_flagship_chapter_release_v3(uuid,uuid,integer,integer,text,text,numeric,jsonb,uuid,uuid,jsonb,jsonb,jsonb,jsonb,jsonb,text,jsonb,numeric,text) FROM PUBLIC,anon,authenticated;
@@ -392,5 +366,4 @@ GRANT EXECUTE ON FUNCTION public.commit_flagship_chapter_release_v3(uuid,uuid,in
 GRANT EXECUTE ON FUNCTION public.commit_flagship_arc_transition_v3(uuid,integer,jsonb,jsonb,jsonb,jsonb,jsonb,text,text,jsonb,jsonb,numeric) TO service_role;
 GRANT EXECUTE ON FUNCTION public.commit_flagship_rolling_window_release_v3(uuid,integer,jsonb,text,jsonb,jsonb,text,numeric) TO service_role;
 GRANT EXECUTE ON FUNCTION public.promote_flagship_v3_factory_release(uuid,text,integer,text) TO service_role;
-
 COMMIT;
