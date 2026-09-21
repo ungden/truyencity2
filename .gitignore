@@ -68,6 +68,8 @@ scripts/_*.ts
 public/covers/*
 !public/covers/flagship-first-30/
 !public/covers/flagship-first-30/**
+!public/covers/serial-pilots/
+!public/covers/serial-pilots/**
 
 # typescript
 *.tsbuildinfo

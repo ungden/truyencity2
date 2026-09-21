@@ -9,7 +9,8 @@ import {
   Flame
 } from 'lucide-react';
 import Link from 'next/link';
-import { createServerClient } from '@/integrations/supabase/server';
+import { unstable_cache } from 'next/cache';
+import { hasSupabaseClientConfig, supabase } from '@/integrations/supabase/client';
 import { Novel } from '@/lib/types';
 import { ContinueReading } from '@/components/continue-reading';
 import { LatestUpdatesCarousel } from '@/components/latest-updates-carousel';
@@ -17,6 +18,61 @@ import { AdPlacement } from '@/components/ads/AdPlacement';
 import { AppDownloadBanner } from '@/components/AppDownloadBanner';
 
 export const revalidate = 300;
+
+const NOVEL_LIST_COLS = 'id,slug,title,author,cover_url,status,genres,total_chapters,updated_at,created_at';
+const FEATURED_COLS = `${NOVEL_LIST_COLS},description`;
+
+const fetchHomepageCatalog = unstable_cache(
+  async () => {
+    const [latestResult, newestResult, featuredResult, tienHiepResult, doThiResult] = await Promise.all([
+      supabase
+        .from('novels')
+        .select(NOVEL_LIST_COLS)
+        .eq('hidden', false)
+        .order('updated_at', { ascending: false })
+        .limit(20),
+      supabase
+        .from('novels')
+        .select(NOVEL_LIST_COLS)
+        .eq('hidden', false)
+        .order('created_at', { ascending: false })
+        .limit(12),
+      supabase
+        .from('novels')
+        .select(FEATURED_COLS)
+        .eq('hidden', false)
+        .not('cover_url', 'is', null)
+        .order('updated_at', { ascending: false })
+        .limit(10),
+      supabase
+        .from('novels')
+        .select(NOVEL_LIST_COLS)
+        .eq('hidden', false)
+        .overlaps('genres', ['tien-hiep'])
+        .not('cover_url', 'is', null)
+        .order('updated_at', { ascending: false })
+        .limit(8),
+      supabase
+        .from('novels')
+        .select(NOVEL_LIST_COLS)
+        .eq('hidden', false)
+        .overlaps('genres', ['do-thi'])
+        .not('cover_url', 'is', null)
+        .order('updated_at', { ascending: false })
+        .limit(8),
+    ]);
+
+    return {
+      latest: (latestResult.data || []) as Novel[],
+      newest: (newestResult.data || []) as Novel[],
+      featured: (featuredResult.data || []) as Novel[],
+      tienHiep: (tienHiepResult.data || []) as Novel[],
+      doThi: (doThiResult.data || []) as Novel[],
+    };
+  },
+  ['homepage-public-catalog-v1'],
+  { revalidate: 300 },
+);
 
 // Helper to extract chapter count from total_chapters column
 function getChapterCount(novel: Novel): number {
@@ -26,7 +82,7 @@ function getChapterCount(novel: Novel): number {
 export default async function HomePage() {
   // Allow builds/tests to succeed without Supabase env configured.
   // In production, these env vars must be set.
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+  if (!hasSupabaseClientConfig()) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
@@ -41,65 +97,15 @@ export default async function HomePage() {
     );
   }
 
-  const supabase = await createServerClient();
-
-  // Only select columns needed for display — avoids fetching large text fields
-  // (description, master_outline, story_outline, story_bible) that can be 10-50KB each.
-  // `description` is dropped from list cols (cards/carousels never read it) and kept
-  // ONLY on the featured query, since the hero is the sole consumer (line ~136).
-  const NOVEL_LIST_COLS = 'id,slug,title,author,cover_url,status,genres,total_chapters,updated_at,created_at';
-  const FEATURED_COLS = `${NOVEL_LIST_COLS},description`;
-
-  // Parallel fetch all data
-  const [latestResult, newestResult, featuredResult, tienHiepResult, doThiResult] = await Promise.all([
-    // Recently updated novels
-    supabase
-      .from('novels')
-      .select(NOVEL_LIST_COLS)
-      .eq('hidden', false)
-      .order('updated_at', { ascending: false })
-      .limit(20),
-    // Newly launched novels
-    supabase
-      .from('novels')
-      .select(NOVEL_LIST_COLS)
-      .eq('hidden', false)
-      .order('created_at', { ascending: false })
-      .limit(12),
-    // Featured: novels with covers, most chapters (carries `description` for the hero)
-    supabase
-      .from('novels')
-      .select(FEATURED_COLS)
-      .eq('hidden', false)
-      .not('cover_url', 'is', null)
-      .order('updated_at', { ascending: false })
-      .limit(10),
-    // Tiên Hiệp genre
-    supabase
-      .from('novels')
-      .select(NOVEL_LIST_COLS)
-      .eq('hidden', false)
-      .overlaps('genres', ['tien-hiep'])
-      .not('cover_url', 'is', null)
-      .order('updated_at', { ascending: false })
-      .limit(8),
-    // Đô Thị genre
-    supabase
-      .from('novels')
-      .select(NOVEL_LIST_COLS)
-      .eq('hidden', false)
-      .overlaps('genres', ['do-thi'])
-      .not('cover_url', 'is', null)
-      .order('updated_at', { ascending: false })
-      .limit(8),
-  ]);
-
-  const novels: Novel[] = latestResult.data || [];
-  const newestNovelsRaw: Novel[] = newestResult.data || [];
-  const featuredNovels: Novel[] = (featuredResult.data || [])
+  // Public catalogue data is shared across users. Keeping it outside the
+  // cookie-aware SSR client lets Next/Vercel reuse the same five-minute entry.
+  const catalog = await fetchHomepageCatalog();
+  const novels = catalog.latest;
+  const newestNovelsRaw = catalog.newest;
+  const featuredNovels = [...catalog.featured]
     .sort((a: Novel, b: Novel) => getChapterCount(b) - getChapterCount(a));
-  const tienHiepNovels: Novel[] = tienHiepResult.data || [];
-  const doThiNovels: Novel[] = doThiResult.data || [];
+  const tienHiepNovels = catalog.tienHiep;
+  const doThiNovels = catalog.doThi;
 
   // Featured = novel with most chapters and a cover
   const featuredNovel = featuredNovels[0] || novels[0];

@@ -1,41 +1,84 @@
 import { useCssElement } from "react-native-css";
 import React from "react";
-import { StyleSheet } from "react-native";
+import { PixelRatio, StyleSheet } from "react-native";
 import Animated from "react-native-reanimated";
-import { Image as RNImage } from "expo-image";
+import { Image as RNImage, type ImageProps as ExpoImageProps, type ImageSource } from "expo-image";
+import { getOptimizedImageUri, PUBLIC_WEB_ORIGIN } from "@/lib/image-url";
 
 const AnimatedExpoImage = Animated.createAnimatedComponent(RNImage);
-const PUBLIC_WEB_ORIGIN = "https://www.truyencity.com";
+const FALLBACK_IMAGE_URI = `${PUBLIC_WEB_ORIGIN}/placeholder.svg`;
 
-function resolveImageSource(
-  source: React.ComponentProps<typeof AnimatedExpoImage>["source"]
-) {
-  if (typeof source !== "string") return source;
-  const uri = source.startsWith("/") ? `${PUBLIC_WEB_ORIGIN}${source}` : source;
-  return { uri };
+type ExpoImageSource = ExpoImageProps["source"];
+
+function getSourceUri(source: ExpoImageSource): string | null {
+  if (typeof source === "string") return source;
+  if (source && !Array.isArray(source) && typeof source === "object" && "uri" in source) {
+    return typeof source.uri === "string" ? source.uri : null;
+  }
+  return null;
 }
 
-export type ImageProps = React.ComponentProps<typeof Image>;
+function resolveImageSource(
+  source: ExpoImageSource,
+  renderedWidth?: number,
+) {
+  const uri = getSourceUri(source);
+  if (!uri) return source;
 
-function CSSImage(props: React.ComponentProps<typeof AnimatedExpoImage>) {
+  const optimizedUri = getOptimizedImageUri(uri, renderedWidth, PixelRatio.get());
+  if (typeof source === "string") return { uri: optimizedUri };
+  if (source && !Array.isArray(source) && typeof source === "object" && "uri" in source) {
+    return { ...(source as ImageSource), uri: optimizedUri };
+  }
+  return source;
+}
+
+export type ImageProps = ExpoImageProps & { className?: string };
+
+function CSSImage(props: ExpoImageProps) {
+  const {
+    source,
+    onError,
+    cachePolicy,
+    transition,
+    recyclingKey,
+    style: sourceStyle,
+    ...imageProps
+  } = props;
+
   // @ts-expect-error: Remap objectFit style to contentFit property
   const { objectFit, objectPosition, ...style } =
-    StyleSheet.flatten(props.style) || {};
+    StyleSheet.flatten(sourceStyle) || {};
+  const renderedWidth = typeof style.width === "number" ? style.width : undefined;
+  const sourceUri = getSourceUri(source);
+  const [failedSourceUri, setFailedSourceUri] = React.useState<string | null>(null);
+  const effectiveSource = sourceUri && failedSourceUri === sourceUri
+    ? FALLBACK_IMAGE_URI
+    : source;
+  const resolvedSource = resolveImageSource(effectiveSource, renderedWidth);
 
   return (
     <AnimatedExpoImage
       contentFit={objectFit}
       contentPosition={objectPosition}
-      {...props}
-      source={resolveImageSource(props.source)}
-      // @ts-expect-error: Style is remapped above
+      {...imageProps}
+      source={resolvedSource}
+      cachePolicy={cachePolicy ?? "memory-disk"}
+      transition={transition ?? 120}
+      recyclingKey={recyclingKey ?? sourceUri}
+      onError={(event) => {
+        if (sourceUri && sourceUri !== FALLBACK_IMAGE_URI) {
+          setFailedSourceUri(sourceUri);
+        }
+        onError?.(event);
+      }}
       style={style}
     />
   );
 }
 
 export const Image = (
-  props: React.ComponentProps<typeof CSSImage> & { className?: string }
+  props: ImageProps
 ) => {
   return useCssElement(CSSImage, props, { className: "style" });
 };
