@@ -12,10 +12,10 @@ import { WRITER_VOICE_POLICY } from './prompts';
 type FoundationRole = 'planner' | 'plan_judge' | 'writer' | 'editor' | 'revision' | 'arc';
 
 const ROLE_RULES: Record<FoundationRole, string> = {
-  planner: 'Lập beat theo điều kiện đã có và hệ quả sẽ sinh ra. Cảnh đời sống, quan hệ, khám phá hoặc suy nghĩ được phép đứng riêng khi nó làm nhân vật hay thế giới sống hơn. Không ép giao dịch, nhân chứng, tăng cấp hoặc thưởng vào một chương chưa đủ điều kiện.',
-  plan_judge: 'Đánh giá nhân quả và tri thức. Không bác plan chỉ vì một chương chưa kiếm tiền, chưa lên cấp, chưa có đám đông hoặc chủ yếu dành cho đời sống và khám phá.',
-  writer: 'Dùng nền làm canon hậu trường, không chép hồ sơ thành đoạn giới thiệu. Nhân vật chỉ được hành động từ điều họ đã biết trong state hoặc vừa học trên trang. Viết kỹ lần đầu và lựa chọn quan trọng; nén việc đã thành thói quen.',
-  editor: 'Phân biệt lỗi nền, lỗi plan và lỗi thể hiện. Không bắt prose vá một thành quả mà plan chưa chuẩn bị và không phạt cảnh có sức sống chỉ vì cảnh đó chưa tạo giao dịch hay tăng cấp.',
+  planner: 'Lập beat theo điều kiện đã có và hệ quả sẽ sinh ra. Cảnh đời sống, quan hệ, khám phá hoặc suy nghĩ được phép đứng riêng khi nó làm nhân vật hay thế giới sống hơn. Không ép giao dịch, nhân chứng, tăng cấp hoặc thưởng vào một chương chưa đủ điều kiện. Với song xuyên cửa hàng, giữ nguyên vùng an toàn tuyệt đối bất kể chênh lệch công nghệ, cảnh giới hay số lượng và dành xung đột cho giá, nguồn hàng, khách hàng cùng tăng trưởng; không tự sinh thủ tục, cơ quan, AI, hệ thống phụ, quyền năng hoặc sản phẩm ngoài premise.',
+  plan_judge: 'Đánh giá nhân quả và tri thức. Không bác plan chỉ vì một chương chưa kiếm tiền, chưa lên cấp, chưa có đám đông hoặc chủ yếu dành cho đời sống và khám phá. Bác plan song xuyên nếu nó phá vùng an toàn cửa hàng, dựng rào cản ngôn ngữ, dùng thủ tục làm filler hoặc giới thiệu món mới mà không có trải nghiệm chênh lệch giá trị.',
+  writer: 'Dùng nền làm canon hậu trường, không chép hồ sơ thành đoạn giới thiệu. Nhân vật chỉ được hành động từ điều họ đã biết trong state hoặc vừa học trên trang. Viết kỹ lần đầu và lựa chọn quan trọng; nén việc đã thành thói quen. Với món hàng song xuyên, viết phản ứng qua sử dụng và lợi ích cụ thể; không phát minh khóa quyền, giấy phép, kiểm tra, phiên dịch, AI, hệ thống phụ, quyền năng hoặc sản phẩm ngoài canon.',
+  editor: 'Phân biệt lỗi nền, lỗi plan và lỗi thể hiện. Không bắt prose vá một thành quả mà plan chưa chuẩn bị và không phạt cảnh có sức sống chỉ vì cảnh đó chưa tạo giao dịch hay tăng cấp. Đánh dấu procedural_bloat nếu thủ tục hoặc kiểm tra lặp chiếm chỗ của trải nghiệm sản phẩm và tiến triển cửa hàng.',
   revision: 'Chỉ sửa lỗi thể hiện thuộc prose. Giữ nguyên cảnh đời sống có chức năng và không thêm lời giải thích để che lỗ hổng ở nền hoặc plan.',
   arc: 'Chỉ mở rộng quy mô khi nguồn lực, hiểu biết, thời gian và quan hệ đã được tích lũy. Khám phá cơ hội, làm được mẫu và có thị trường là ba mốc khác nhau.',
 };
@@ -24,7 +24,7 @@ const LIVED_CAUSALITY_WRITER_POLICY = `Mỗi cảnh đi qua mục tiêu, năng l
 Viết kỹ trải nghiệm đầu tiên, phép thử và lựa chọn quan trọng: nhân vật quan sát gì, suy luận từ đâu, kiểm tra điều gì và sống với kết quả ra sao. Việc đã quen có thể kể gọn. Chi tiết kỹ thuật được ở trung tâm khi nó là chính điều nhân vật cần hiểu hoặc thực hiện, kể cả lúc chưa có đối thủ, deadline, phần thưởng hay giao dịch.
 Cảnh sinh hoạt, quan hệ, khám phá và suy nghĩ có thể mang trọn trọng lượng một chương khi nó tạo tính cách, cảm giác nơi chốn, tri thức hoặc một lựa chọn có căn cứ. Không tự thêm xung đột, thất bại, đám đông, khách hàng hay hook đe dọa để hợp thức hóa cảnh.
 Nhịp đến từ lượng trải nghiệm mới và tầm quan trọng của lựa chọn: mở rộng ở lần đầu và hệ quả lớn, nén thao tác đã thành thói quen. Không lặp thao tác, độc thoại lại điều đã biết hoặc kéo dài chuyển cảnh chỉ để đủ độ dài.
-Kết quả phải đúng mức chuẩn bị đã có. Phát hiện cơ hội, hiểu nguyên lý, tạo mẫu, sản xuất ổn định và có thị trường là các mốc riêng; prose không được nói tắt qua mốc chưa xảy ra.`;
+Kết quả phải đúng mức chuẩn bị đã có. Phát hiện cơ hội, hiểu nguyên lý, tạo mẫu, sản xuất ổn định và có thị trường là các mốc riêng; prose không được nói tắt qua mốc chưa xảy ra. Không biến tính hợp lý thành chuỗi giấy phép, xác minh, cảnh báo và từ chối trách nhiệm; sau lần đầu đủ hiểu, kể gọn bước lặp và đi tới lựa chọn hoặc kết quả.`;
 
 function withoutRetiredCreativeRules(prompt: string, role: FoundationRole): string {
   const plannerRole = role === 'planner' || role === 'arc';
@@ -75,6 +75,7 @@ export function foundationContext(kernel: StoryKernel) {
     characterGrounding: foundation.characters,
     livedWorlds: foundation.livedWorlds,
     advantageDiscovery: foundation.advantageDiscovery,
+    commerceFantasy: foundation.commerceFantasy ?? null,
     authorFacts: foundation.facts,
     conditionMilestones: foundation.milestones,
     knowledgeRule: 'authorFacts là canon của tác giả, không tự động là tri thức nhân vật. Chỉ dùng knownFactIds trong state hoặc knowledge delta đã diễn ra để cho nhân vật biết.',

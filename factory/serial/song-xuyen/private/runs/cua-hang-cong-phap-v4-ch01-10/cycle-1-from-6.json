@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 2,
+  "cycleNumber": 1,
+  "volumeNumber": 1,
+  "startChapter": 1,
+  "plannedEndChapter": 10,
+  "pressure": "Lâm Việt cần biến mẫu thịt tốt đã kiểm thành một đường nguồn có thể lặp lại, nhưng chưa được phép coi nó là vốn hay hàng bán. Đến hạn, Hứa An phải trả lời quyền giữ phần đổi công; Hàn Dược Sư phải xác định liệu cách ghi nguồn của Lâm Việt có đủ để bắt đầu ba lượt đối chiếu hay không.",
+  "escalation": [
+    "Hứa An mang câu trả lời của tổ trưởng: phần đổi công chỉ được giữ riêng sau khi phần chung của ca đã quyết toán, và người nhận phải ghi rõ tuyến, thời điểm cùng người giao.",
+    "Việc ghi nguồn gây một sức ép quan hệ thực: đồng đội có thể nhìn việc Hứa An tách phần hàng khỏi luồng chia chung, nên anh chỉ cam kết những phần mình có quyền nhận sau quyết toán.",
+    "Lâm Việt đem điều kiện quyền giữ phần và mẫu ghi đã sửa về cho Hàn Dược Sư; ông chấp nhận dùng chúng làm chuẩn nhận mẫu nhưng giữ nguyên yêu cầu ba lượt cùng loại, bảo quản tương đối ổn định và có thể đối chiếu.",
+    "Lâm Việt được công nhận là người biết dựng điều kiện cho một nguồn hàng, song chưa có hợp đồng mua thử, vốn nhập dược liệu hay lời hứa giao mười hai gói thuốc."
+  ],
+  "climax": {
+    "payoffKind": "duoc_cong_nhan",
+    "performedBy": "protagonist",
+    "attribution": "inner_circle",
+    "result": "Hàn Dược Sư không mua thịt và không báo giá lô. Sau khi đọc cách Lâm Việt tách quyền sở hữu, tuyến lấy, thời điểm bọc và tình trạng giữ hàng, ông chấp nhận lấy đó làm chuẩn nhận ba lượt mẫu tiếp theo. Ông thừa nhận Lâm Việt đang dựng một đường nguồn có thể kiểm, thay vì đem vận may của một miếng thịt đến bán.",
+    "witnesses": [
+      "Lâm Việt",
+      "Hàn Dược Sư"
+    ]
+  },
+  "aftermath": "Đơn mười hai gói của Hứa An vẫn chỉ là đơn đặt trước; sáu viên pin không tự biến thành vốn, còn thịt và tinh hạch giữ nguyên trạng thái đã ghi. Lâm Việt có một tiêu chuẩn kiểm nhận thực tế để theo đuổi: chỉ nhận phần thịt Hứa An thật sự có quyền giữ, ghi được nguồn và bảo quản đủ để đối chiếu qua ba lượt.",
+  "nextHook": "Muốn tiến đến mua thử, Lâm Việt phải chờ và thu được thêm hai lượt thịt cùng loại theo chuẩn mới. Nhưng mỗi lần Hứa An ghi tên người giao và phần đổi công riêng, anh cũng phải giải thích lựa chọn ấy với chính đội tuần tra đang chia nhau từng phần khẩu phần.",
+  "customerLoop": {
+    "customerId": "hua_an",
+    "entryNeed": "Hứa An cần xử lý vết cắt sạch ở bàn tay để không mất ca tuần tra, đồng thời cần một cách đổi vật tư mà anh có thể kiếm lại.",
+    "purchaseAssetId": "bot_cam_mau_pho_thong",
+    "purchaseMode": "first_acquisition",
+    "purchaseTerms": {
+      "quantity": 3,
+      "unit": "gói nhỏ",
+      "consideration": "Một mẫu tinh hạch cạn và hai viên pin."
+    },
+    "purchase": "Hứa An đổi một mẫu tinh hạch cạn cùng hai viên pin lấy ba gói bột cầm máu nhỏ, sau khi nghe rõ phạm vi dùng và chống chỉ định.",
+    "useToEarn": "Hứa An dùng một gói cho vết cắt sạch của mình, giữ được bàn tay để hoàn thành ca tuần tra và đổi công lấy phần thịt hung thú từ chuyến săn ngắn.",
+    "publicProof": "Một đồng đội bị thương nhẹ thấy Hứa An tháo băng, kiểm vết cắt đã khép và hỏi trực tiếp số gói, giá đổi cùng khả năng có hàng lần sau.",
+    "returnUpgradeAssetId": "lo_thuoc_cam_mau_doi_nho",
+    "returnUpgradeMode": "organization_scale",
+    "returnUpgradeTerms": {
+      "quantity": 1,
+      "unit": "lô 12 gói",
+      "consideration": "Thịt hung thú đã chia phần, một tinh hạch cạn hơn và tiền đặt trước bằng sáu viên pin."
+    },
+    "returnUpgrade": "Hứa An quay lại thay mặt đội tuần tra nhỏ đặt lô mười hai gói, yêu cầu ghi rõ hạn dùng, vết thương được dùng và cách báo lại hiệu quả.",
+    "schedule": {
+      "purchaseChapter": 3,
+      "useToEarnChapter": 4,
+      "publicProofChapter": 5,
+      "returnUpgradeChapter": 6
+    }
+  },
+  "beatSheets": [
+    {
+      "chapterNumber": 6,
+      "sceneMode": "negotiation",
+      "openingBridge": "Hai ngày sau khi ghi nhu cầu, Hứa An mang tờ giấy của đội tuần tra, một túi thịt đã chia phần, một mẫu tinh hạch cạn hơn và sáu viên pin đến quầy Đông Hà; lần này anh phải giải thích đối giá với cả tổ chứ không chỉ tự mình hỏi thuốc.",
+      "protagonistMove": "Lâm Việt nhận đơn theo điều kiện thay vì nhận tiền rồi hứa bừa: hắn ghi số lượng, phạm vi dùng, cách bảo quản và phản hồi sau dùng, đồng thời tách phần thịt có thông tin nguồn với phần chưa thể xác nhận.",
+      "beats": [
+        "Hứa An đặt lô mười hai gói cho vết cắt sạch, nông sau ca dọn tuyến, xác nhận đội không dùng nó thay thuốc cấp cứu hay để xử lý cơn co giật.",
+        "Lâm Việt nhận sáu viên pin làm đặt trước, ghi từng phần thịt theo lời Hứa An: mẫu cũ có tuyến và thời điểm rõ, còn các phần đội gom kèm chưa truy được con săn hay thời gian bảo quản.",
+        "Hắn niêm riêng các phần chưa rõ nguồn, không tính mẫu tinh hạch vào giá nguyên liệu, và nói chỉ trả lời khả năng nhận đơn sau khi hỏi giá dược liệu cùng đưa mẫu cho Hàn Dược Sư kiểm.",
+        "Hứa An để lại tờ ghi nhu cầu của đội, chấp nhận rằng đặt trước không biến thành lô hàng có sẵn ngay trong ngày."
+      ],
+      "materialOutcome": "Lâm Việt có đơn đặt trước lô mười hai gói, sáu viên pin, một phần thịt có nguồn rõ, các phần thịt chưa rõ nguồn được niêm riêng và một mẫu tinh hạch cạn hơn; chưa có ngày giao hàng cam kết.",
+      "emotionalTarget": "Hứng khởi vì đơn lớn được chuyển thành sự tin cậy có giới hạn: lời hứa chỉ đáng giá khi nguồn hàng và năng lực làm thuốc được kiểm.",
+      "newNamedThing": "Lô cầm máu đội nhỏ",
+      "prerequisiteIds": [
+        "giao_dich_thu_gioi_han",
+        "hieu_nhip_song_dong_ha",
+        "thuoc_cam_mau_co_han"
+      ],
+      "revealsFactIds": [],
+      "advancesMilestoneIds": [],
+      "valueContrastId": "hang_thuoc_pho_thong_sang_dong_ha",
+      "valueExperience": "Sau khi thuốc giúp Hứa An giữ được ca tuần tra và đồng đội hỏi số lượng để giữ quân số, anh đặt sáu viên pin cùng phần đổi công lên quầy cho lô dùng chung; Lâm Việt chỉ nhận đơn sau khi hai bên gọi đúng loại vết thương mà thuốc có thể hỗ trợ.",
+      "endHookKind": "declaration"
+    },
+    {
+      "chapterNumber": 7,
+      "sceneMode": "investigation",
+      "openingBridge": "Ở Thanh Lô Phường, Lâm Việt bọc kỹ phần thịt có ghi nguồn, các phần chưa rõ nguồn và tinh hạch cạn trong những gói khác nhau rồi mang chúng tới quầy Hàn Dược Sư trước khi chúng đổi mùi.",
+      "protagonistMove": "Lâm Việt không gọi tên công dụng của bất cứ thứ gì lạ; hắn trình bày sổ ghi, đề nghị kiểm mẫu tách biệt và quan sát cách Hàn Dược Sư đặt câu hỏi về nguồn, bảo quản cùng dấu nhiễm.",
+      "beats": [
+        "Hàn Dược Sư cắt một lát rất nhỏ từ phần thịt có tuyến và thời điểm rõ, ngửi, ép dịch rồi ghi màu cùng độ phản ứng khí huyết; ông để các phần chưa rõ nguồn nguyên niêm phong, không cho nhập chung mẫu.",
+        "Ông xác nhận thịt rõ nguồn không giống thịt súc vật thường ở phường và có khí huyết đáng để thử làm linh thiện, nhưng cảnh báo một miếng tốt không chứng minh các miếng còn lại an toàn hay cùng phẩm tính.",
+        "Lâm Việt đưa tinh hạch cạn; Hàn Dược Sư yêu cầu chia phần, cân khối lượng và giữ mẫu đối chứng trước khi thử bất kỳ phản ứng nào.",
+        "Lâm Việt nhận ra thứ Hàn cần để mua không phải câu chuyện về thế giới bên kia mà là một lô có thể kiểm lại từ lúc lấy đến lúc đặt lên quầy."
+      ],
+      "materialOutcome": "Phần thịt có nguồn rõ được giữ lại một lát nhỏ để kiểm; các phần chưa rõ nguồn vẫn niêm riêng; tinh hạch cạn được chuẩn bị chia mẫu và cân.",
+      "emotionalTarget": "Cảm giác cơ hội được đặt lên bàn nghề nghiêm ngặt: giá trị bắt đầu hiện ra nhưng không được phép nuốt mất sự thận trọng.",
+      "newNamedThing": null,
+      "prerequisiteIds": [
+        "thanh_huyen_thieu_hung_thu",
+        "tinh_hach_can_giam_dinh"
+      ],
+      "revealsFactIds": [],
+      "advancesMilestoneIds": [],
+      "valueContrastId": "tai_nguyen_tien_hoa_ve_thanh_huyen",
+      "valueExperience": "Hàn Dược Sư tự ép một lát thịt có nguồn rõ, cảm nhận khí huyết trong dịch thịt khác nguyên liệu cạn ở Thanh Lô rồi chủ động giữ mẫu để thử linh thiện; ông chỉ nâng việc kiểm lên bước sau chứ chưa trả giá cho các gói thịt lẫn nguồn.",
+      "endHookKind": "question"
+    },
+    {
+      "chapterNumber": 8,
+      "sceneMode": "crafting",
+      "openingBridge": "Sáng hôm sau, Hàn Dược Sư đặt cân, chén thử và hai phần tinh hạch nhỏ cạnh nhau; ông không cho Lâm Việt chạm tay đoán mò mà bắt hắn ghi từng bước như một lô thuốc thật.",
+      "protagonistMove": "Lâm Việt phụ việc trong phạm vi nghề mình biết: cân, đánh dấu, giữ phần đối chứng và ghi phản ứng, không biến sự linh giác mơ hồ thành lời quảng cáo về tinh hạch.",
+      "beats": [
+        "Hai người chia mẫu tinh hạch cạn thành phần thử và phần đối chứng, cân lại rồi quan sát bề mặt nứt cùng thay đổi khi đặt gần dụng cụ giám định.",
+        "Dụng cụ và linh giác của Hàn Dược Sư đều có phản ứng nhẹ với phần thử, nhưng phản ứng không chỉ ra nó nuôi khí huyết, giải độc hay dùng được trong đan dược.",
+        "Hàn Dược Sư thử phần thịt rõ nguồn trong một chén linh thiện nhỏ; mùi tanh rút bớt, khí huyết ấm lên rõ hơn thịt thường, đủ để ông nói mẫu này có giá trị làm nguyên liệu nếu lô sau đồng đều.",
+        "Lâm Việt ghi riêng kết luận về thịt và điều chưa biết về tinh hạch, từ chối dùng tinh hạch làm đối giá chắc chắn cho đơn thuốc Đông Hà."
+      ],
+      "materialOutcome": "Một phần tinh hạch được giữ đối chứng với kết luận chỉ có phản ứng quan sát được; mẫu thịt rõ nguồn tạo kết quả linh thiện đáng giá, nhưng chưa thành cam kết mua lô.",
+      "emotionalTarget": "Thỏa mãn của người làm nghề đến từ một kết quả nhìn thấy và một dòng kết luận biết dừng đúng chỗ.",
+      "newNamedThing": null,
+      "prerequisiteIds": [
+        "tinh_hach_can_giam_dinh",
+        "thanh_huyen_thieu_hung_thu"
+      ],
+      "revealsFactIds": [],
+      "advancesMilestoneIds": [
+        "kiem_mau_tinh_hach"
+      ],
+      "valueContrastId": "tai_nguyen_tien_hoa_ve_thanh_huyen",
+      "valueExperience": "Hàn Dược Sư dùng lát thịt có nguồn rõ nấu một chén linh thiện thử, trực tiếp cảm thấy khí huyết ấm và bền hơn thịt thường sau khi tanh rút; trải nghiệm khiến ông chuyển từ giữ mẫu sang bàn điều kiện mua lô cùng loại.",
+      "endHookKind": "opportunity"
+    }
+  ],
+  "editorialNotes": [
+    "Chương 6 [prose/world_incoherence]: Mốc nguồn của thịt bị lệch trong chính tuyến truy xuất. Chương 4 cho thấy Hứa An vừa nhận phần thịt sau chuyến dọn tuyến hôm đó và mang thẳng đến quầy; chương 6 diễn ra “Hai ngày sau” chương 5, nhưng Hứa An lại nói gói dây đỏ thuộc chuyến hôm qua, đồng thời miếng đã giao trước đó cũng từ chính chuyến ấy. Hai phần có thể cùng một con, nhưng không thể vừa là phần của chuyến hôm qua vừa là mẫu đã được giao qua các chương trước nếu không có giải thích thời gian hoặc đợt giao riêng. Hướng sửa: Chọn một canon thời gian rõ ràng. Hoặc gói dây đỏ là phần còn lại của đúng chuyến chương 4 và sửa “hôm qua” thành mốc phù hợp; hoặc nó là phần từ một chuyến mới, bỏ câu nói mẫu cũ cùng chuyến. Nếu hai phần thực sự đến từ cùng một con nhưng được giữ lại qua nhiều ngày, hãy cho Hứa An nói rõ ai đã giữ phần thứ hai, bảo quản thế nào và vì sao đến chương 6 mới giao.",
+    "Chương 10 [plan/skipped_prerequisite]: Kết thúc thực tế hợp lý của chương 10 mới là Hàn Dược Sư chấp nhận hệ thống ghi nguồn để tiếp tục kiểm, còn việc mua thử vẫn bị treo sau hai lượt hàng nữa. Tuy nhiên climax và aftermath của kế hoạch lại tuyên bố ông “chấp nhận mua thử theo lô” và Lâm Việt “có vốn để nhập dược liệu”. Hai kết quả này chưa xảy ra và đi trước điều kiện ba lượt mà prose vừa xác lập. Hướng sửa: Điều chỉnh cao trào và hậu quả của cycle này theo đúng thành quả đã có: Lâm Việt được công nhận là người biết dựng đường nguồn, có tiêu chuẩn kiểm nhận và một đầu mối tiềm năng, nhưng chưa có vốn hay đầu ra mua thử. Dời giao dịch mua lô, vốn nhập dược liệu và quyết định sản lượng thuốc sang cycle sau, sau khi ba lượt thịt được đưa đến, đối chiếu và vượt kiểm mẫu.",
+    "Chương 10 [plan/skipped_prerequisite]: Kế hoạch cao trào chương 10 yêu cầu Lâm Việt đem các điều kiện cụ thể Hứa An vừa cung cấp—tuyến phía nam, quyền giữ phần, mốc trong ngày, cách bọc và không lẫn nguồn—trở lại đối chiếu với Hàn Dược Sư. Trong prose, cuộc nói chuyện với Hàn xảy ra trước khi Hứa An cho các dữ kiện này; sau đó Lâm Việt chỉ ghi với Hứa An. Vì vậy kết quả “đường cung ứng được Hàn Dược Sư chấp nhận” đi trước cảnh xác nhận điều kiện thực tế. Hướng sửa: Sau cuộc trao đổi với Hứa An, thêm một nhịp Lâm Việt mang bản ghi quay lại quầy Hàn Dược Sư. Hàn cần đọc từng điều, chỉ ra điều nào đủ hoặc chưa đủ để kiểm nhận, rồi mới xác nhận treo mức mua thử cho lô đầu tiên. Nếu không muốn thêm cảnh, hạ kết quả chương 10 thành Lâm Việt mới có bộ điều kiện để đem hỏi Hàn ở chương sau.",
+    "Chương 7 [prose/missing_grounding]: Hai gói thịt lạ trở thành đối tượng cần tách riêng trong cuộc kiểm mẫu, nhưng các chương trước chưa cho độc giả thấy Hứa An giao riêng chúng, nói phần thông tin nguồn nào, hoặc vì sao Lâm Việt kết luận chúng “cùng một nơi” với mẫu thịt rõ nguồn. Chương 6 chỉ thiết lập một túi thịt chia phần cho đơn đặt trước. Sự xuất hiện muộn làm yếu tính truy xuất nguồn gốc mà chính tuyến thương mại đang xây dựng. Hướng sửa: Ở chương 6, cho Hứa An đặt rõ các gói: một phần là mẫu trước có tuyến và thời điểm biết được; hai phần còn lại là thịt đội gom kèm nhưng không truy được con săn hay thời gian bảo quản. Để Lâm Việt chủ động niêm riêng và ghi mức độ không biết ngay lúc nhận. Khi sang chương 7, quyết định của Hàn Dược Sư sẽ có nền cảnh rõ hơn.",
+    "Chương 7 phải chọn một canon: nếu thử phản ứng tinh hạch thì advancesMilestoneIds phải có kiem_mau_tinh_hach và diễn đủ evidenceNeeded; nếu không advance thì materialOutcome phải dừng trước phép thử, chỉ chia và cân mẫu."
+  ]
+}

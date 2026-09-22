@@ -1,0 +1,126 @@
+{
+  "verdict": {
+    "continuity": [],
+    "scorecard": {
+      "opening": 0,
+      "anticipation": 0,
+      "payoff": 0,
+      "newness": 0,
+      "endHook": 0
+    },
+    "craft": {
+      "protagonistAgency": 0,
+      "sceneLife": 0,
+      "worldLogic": 0,
+      "dialogueNaturalness": 0,
+      "structuralFreshness": 0
+    },
+    "repetition": [],
+    "aiFlavor": [],
+    "steering": [],
+    "reviewBinding": {
+      "chapterNumber": 6,
+      "title": "“Đặt Trước Không Phải Là Hàng Có Sẵn”",
+      "excerpt": "— Sáu viên này nhận làm đặt trước. Không tính thành thuốc đã giao."
+    }
+  },
+  "digest": {
+    "chapterNumber": 6,
+    "title": "“Đặt Trước Không Phải Là Hàng Có Sẵn”",
+    "summary": "Hứa An mang sáu viên pin, một mẫu tinh hạch cạn và ba gói thịt đến đặt đối giá, còn Lâm Việt tách riêng nguồn hàng, nhận đơn mười hai gói cầm máu nhưng chưa cam kết ngày giao.",
+    "payoffKind": "doi_chieu",
+    "endedOn": "Lâm Việt nhận đơn lô cầm máu đội nhỏ với điều kiện chỉ giao khi có hàng đúng phạm vi đã ghi; nếu không đúng, một gói cũng không xuất quầy.",
+    "newNamedThings": [
+      "đội tuần tra nhỏ",
+      "lô cầm máu đội nhỏ",
+      "thịt có nguồn",
+      "thịt không rõ nguồn"
+    ],
+    "narrativeEvidence": [],
+    "coreChanges": {
+      "storyDayDelta": 2,
+      "died": [],
+      "progressionChanges": [],
+      "assetEvents": [
+        {
+          "eventId": "c6_acquire_pin_nho_hua_an",
+          "kind": "acquire",
+          "assetId": "pin_nho",
+          "assetName": "pin nhỏ",
+          "quantity": 6,
+          "unit": "viên",
+          "fungible": true,
+          "sourceLotId": null,
+          "fromOwnerId": "hua_an",
+          "fromOwnerName": "Hứa An",
+          "toOwnerId": "lam_viet",
+          "toOwnerName": "Lâm Việt",
+          "note": "Hứa An đưa sáu viên pin nhỏ; Lâm Việt nhận làm đặt trước cho đơn mười hai gói, chưa tính thành thuốc đã giao."
+        },
+        {
+          "eventId": "c6_acquire_tinh_hach_can_hua_an",
+          "kind": "acquire",
+          "assetId": "tinh_hach_can",
+          "assetName": "tinh hạch cạn",
+          "quantity": 1,
+          "unit": "mẫu",
+          "fungible": false,
+          "sourceLotId": null,
+          "fromOwnerId": "hua_an",
+          "fromOwnerName": "Hứa An",
+          "toOwnerId": "lam_viet",
+          "toOwnerName": "Lâm Việt",
+          "note": "Hứa An đưa một mẫu tinh hạch xám đục, cạn hơn mẫu trước và có vết nứt; Lâm Việt nhận làm mẫu đổi chờ kiểm."
+        },
+        {
+          "eventId": "c6_acquire_thit_co_nguon_hua_an",
+          "kind": "acquire",
+          "assetId": "thit_co_nguon",
+          "assetName": "thịt có nguồn",
+          "quantity": 1,
+          "unit": "gói",
+          "fungible": false,
+          "sourceLotId": null,
+          "fromOwnerId": "hua_an",
+          "fromOwnerName": "Hứa An",
+          "toOwnerId": "lam_viet",
+          "toOwnerName": "Lâm Việt",
+          "note": "Hứa An giao một gói thịt từ chuyến dọn tuyến phía nam, trước giờ đổi ca trưa; anh giữ phần này và đã bọc tại điểm nước."
+        },
+        {
+          "eventId": "c6_acquire_thit_khong_ro_nguon_hua_an",
+          "kind": "acquire",
+          "assetId": "thit_khong_ro_nguon",
+          "assetName": "thịt không rõ nguồn",
+          "quantity": 2,
+          "unit": "gói",
+          "fungible": true,
+          "sourceLotId": null,
+          "fromOwnerId": "hua_an",
+          "fromOwnerName": "Hứa An",
+          "toOwnerId": "lam_viet",
+          "toOwnerName": "Lâm Việt",
+          "note": "Hai gói thịt từ đội gom, không rõ con nào, người giữ trước đó hoặc thời gian để ngoài; Lâm Việt niêm riêng và không tính chung với phần có nguồn."
+        }
+      ],
+      "goldenFingerRungChange": null,
+      "moved": [],
+      "worldFactsRevealed": [],
+      "newCast": [],
+      "hooksPlanted": [
+        {
+          "id": "hoi_gia_nguyen_lieu_lo_cam_mau_doi_nho",
+          "what": "Lâm Việt sẽ hỏi giá nguyên liệu, tính lượng cần cho mười hai gói và mang mẫu thịt có nguồn đi kiểm trước khi quyết định có thể làm lô hay không.",
+          "dueByChapter": 7
+        }
+      ],
+      "hooksPaid": [
+        "doi_tuan_tra_mang_to_ghi_nhu_cau"
+      ],
+      "learnedFinger": []
+    }
+  },
+  "attempts": 1,
+  "costUsd": 0.024453,
+  "inputFingerprint": "643cb68bf07f7e322427483710c13fd252175b449e94b0d4faec4e2b773fd615"
+}

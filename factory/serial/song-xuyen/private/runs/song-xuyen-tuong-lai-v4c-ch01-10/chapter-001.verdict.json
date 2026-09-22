@@ -1,0 +1,92 @@
+{
+  "verdict": {
+    "continuity": [],
+    "scorecard": {
+      "opening": 1,
+      "anticipation": 1,
+      "payoff": 1,
+      "newness": 1,
+      "endHook": 1
+    },
+    "craft": {
+      "protagonistAgency": 1,
+      "sceneLife": 1,
+      "worldLogic": 1,
+      "dialogueNaturalness": 1,
+      "structuralFreshness": 1
+    },
+    "repetition": [],
+    "aiFlavor": [],
+    "steering": [
+      "Khải hiện lên rõ là người bán lẻ sống bằng thói quen kiểm lô, giữ hàng lạnh, ghi chép và cân rủi ro; các phép thử dùng đúng năng lực sẵn có thay vì biến anh thành người giải mã siêu nhiên.",
+      "Đời sống Vân Cảng đã vận hành độc lập qua tiền thuê, hàng cận date, điện mất, cạnh tranh giá với siêu thị, chú Tư cho gối rau và viện phí. Áp lực tài chính có mặt nhưng chưa lấn át sự kiện khám phá.",
+      "Ba lượt thử có nhịp leo thang và mục đích khác nhau: kiểm vật đánh dấu, loại trừ nhầm lẫn bằng vật khác, rồi xác nhận đường lui cùng sai số thời gian. Đây là thận trọng có căn cứ, không phải trì hoãn vô cớ.",
+      "Chương giữ đúng giới hạn tri thức: Khải chỉ biết một gian phòng lạ, đường về trong phạm vi thử và thời gian gần đồng bộ; anh không tự gọi đó là tương lai, cửa hàng Tân Hải hay nguồn lợi nhuận.",
+      "Sang chương sau nên cho một quan sát hoặc tiếp xúc cụ thể ở Tân Hải tạo lựa chọn mới. Đừng kéo dài thêm các bài kiểm tra ngưỡng cửa cùng loại; một bằng chứng hiện tại đã đủ để Khải thăm dò nơi chốn và nhu cầu bên kia."
+    ],
+    "reviewBinding": {
+      "chapterNumber": 1,
+      "title": "Chai Nước Có Dấu Phấn",
+      "excerpt": "Khải dùng phấn vẽ một vòng tròn quanh nắp, thêm hai nét xiên lên thân chai."
+    }
+  },
+  "digest": {
+    "chapterNumber": 1,
+    "title": "Chai Nước Có Dấu Phấn",
+    "summary": "Trần Khải phát hiện cánh cửa sắt nối kho tiệm với một gian phòng xa lạ, rồi dùng nhiều phép thử để xác nhận vật đánh dấu, xe đẩy và chính anh đều có thể quay về nguyên vẹn.",
+    "payoffKind": "ky_ngo",
+    "endedOn": "Ngày mai, anh nên mang gì qua để biết nơi đó rốt cuộc là nơi nào?",
+    "newNamedThings": [
+      "cua_sat_cu_sau_ke",
+      "gian_phong_anh_sang_trang",
+      "chai_nuoc_co_dau_phan",
+      "oc_inox_tui_zip",
+      "xe_day_hang_nho",
+      "cua_cuon_mau_bac"
+    ],
+    "narrativeEvidence": [
+      {
+        "id": "cua_noi_hai_kho",
+        "chapterNumber": 1,
+        "quote": "Chai nước nằm cách ngưỡng chưa đến một mét, đúng chiều nó đã bị đẩy vào. Tấm carton không ướt, không bẩn. Vòng phấn quanh nắp nguyên vẹn. Hai nét xiên trên thân chai không thiếu nét nào.",
+        "learnedByCharacterIds": [
+          "tran_khai"
+        ]
+      },
+      {
+        "id": "thoi_gian_dong_bo",
+        "chapterNumber": 1,
+        "quote": "Khải nhìn đồng hồ cổ tay: ba giờ năm mươi bảy.\n\nMặt đồng hồ trên xe cũng là ba giờ năm mươi bảy.\n\nAnh hít một hơi, rồi bước qua hẳn.",
+        "learnedByCharacterIds": [
+          "tran_khai"
+        ]
+      },
+      {
+        "id": "kiem_chung_cua",
+        "chapterNumber": 1,
+        "quote": "“Lượt 1: chai nước, dấu phấn, 10 phút. Còn nguyên.”\n\n“Lượt 2: ốc inox/túi zip/chữ ký, đẩy sâu hơn. 10 phút. Còn nguyên.”",
+        "learnedByCharacterIds": [
+          "tran_khai"
+        ]
+      }
+    ],
+    "coreChanges": {
+      "storyDayDelta": 0,
+      "died": [],
+      "progressionChanges": [],
+      "assetEvents": [],
+      "goldenFingerRungChange": null,
+      "moved": [],
+      "worldFactsRevealed": [],
+      "newCast": [],
+      "hooksPlanted": [],
+      "hooksPaid": [],
+      "learnedFinger": [
+        "tran_khai"
+      ]
+    }
+  },
+  "attempts": 2,
+  "costUsd": 0.11267,
+  "inputFingerprint": "ad027094d92df3ee35e50a8a597873256023cc765bac18c72f0fa633cfe4a997"
+}

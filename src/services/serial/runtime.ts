@@ -52,7 +52,7 @@ export const mergeEditorialNotes = (fresh: string[], inherited: string[]): strin
 function parseDraftCheckpoint(value: unknown): SerialDraftCheckpoint | null {
   if (!value || typeof value !== 'object') return null;
   const candidate = value as Record<string, unknown>;
-  if (candidate.schemaVersion !== 1 || !['judge', 'revision', 'extractor', 'verifier', 'literary_review'].includes(String(candidate.resumeFrom))) {
+  if (![1, 2].includes(Number(candidate.schemaVersion)) || !['judge', 'revision', 'extractor', 'verifier', 'literary_review'].includes(String(candidate.resumeFrom))) {
     return null;
   }
   const chapterRaw = candidate.chapter as Record<string, unknown> | undefined;
@@ -62,12 +62,13 @@ function parseDraftCheckpoint(value: unknown): SerialDraftCheckpoint | null {
   const digest = candidate.digest === undefined ? null : ChapterDigestSchema.safeParse(candidate.digest);
   if (!Number.isInteger(chapterNumber) || !chapter.success || (verdict && !verdict.success) || (digest && !digest.success)) return null;
   return {
-    schemaVersion: 1,
+    schemaVersion: Number(candidate.schemaVersion) as 1 | 2,
     resumeFrom: candidate.resumeFrom as SerialDraftCheckpoint['resumeFrom'],
     chapter: { chapterNumber: chapterNumber as number, ...chapter.data },
     verdict: verdict?.data,
     digest: digest?.data,
     attempts: Number.isInteger(candidate.attempts) && Number(candidate.attempts) > 0 ? Number(candidate.attempts) : 1,
+    inputFingerprint: typeof candidate.inputFingerprint === 'string' ? candidate.inputFingerprint : undefined,
   };
 }
 
@@ -425,12 +426,13 @@ async function stageWrite(
       verdict: outcome.verdict, attempts: outcome.attempts,
       digest: outcome.rejectedDigest,
       draft_artifact: {
-        schemaVersion: 1,
+        schemaVersion: 2,
         resumeFrom: 'extractor',
         reviewKind: outcome.reviewKind,
         chapter: outcome.chapter,
         verdict: outcome.verdict,
         attempts: outcome.attempts,
+        inputFingerprint: outcome.inputFingerprint,
       },
       error: outcome.reason, finished_at: new Date().toISOString(),
     }).eq('id', runId);
@@ -471,9 +473,9 @@ async function stageWrite(
       const failedUsages = [...outcome.usages, ...reviewUsages];
       const failedCost = Number(failedUsages.reduce((sum, usage) => sum + usage.costUsd, 0).toFixed(6));
       const artifact: SerialDraftCheckpoint = {
-        schemaVersion: 1, resumeFrom: 'literary_review',
+        schemaVersion: 2, resumeFrom: 'literary_review',
         chapter: outcome.chapter, verdict: outcome.verdict, digest: outcome.digest,
-        attempts: outcome.attempts,
+        attempts: outcome.attempts, inputFingerprint: outcome.inputFingerprint,
       };
       const saved = await db.from('serial_runs').update({
         status: 'failed', usage: failedUsages, cost_usd: failedCost,
@@ -511,8 +513,9 @@ async function stageWrite(
         status: 'failed', usage: commitUsages, cost_usd: commitCostUsd,
         verdict: outcome.verdict, digest: outcome.digest, attempts: outcome.attempts,
         draft_artifact: {
-          schemaVersion: 1, resumeFrom: 'literary_review', chapter: outcome.chapter,
+          schemaVersion: 2, resumeFrom: 'literary_review', chapter: outcome.chapter,
           verdict: outcome.verdict, digest: outcome.digest, attempts: outcome.attempts,
+          inputFingerprint: outcome.inputFingerprint,
         },
         error: reason, finished_at: new Date().toISOString(),
       }).eq('id', runId);
@@ -533,13 +536,14 @@ async function stageWrite(
         status: 'failed', usage: commitUsages, cost_usd: commitCostUsd,
         verdict: outcome.verdict,
         draft_artifact: {
-          schemaVersion: 1,
+          schemaVersion: 2,
           resumeFrom: 'literary_review',
           reviewKind: 'prose',
           chapter: outcome.chapter,
           verdict: outcome.verdict,
           digest: outcome.digest,
           attempts: outcome.attempts,
+          inputFingerprint: outcome.inputFingerprint,
           openingAudit: audited.audit,
           narrativeReview: audited.narrativeReview,
         },

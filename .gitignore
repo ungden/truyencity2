@@ -107,5 +107,8 @@ factory/*-checkpoint.local.json
 # Offline serial-engine output: chapters, verdicts, cost reports
 factory/serial/runs/
 
+# Private production safety backups stay local.
+factory/serial/song-xuyen/private/backups/
+
 # Cover bake-off output
 factory/covers/

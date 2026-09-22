@@ -1,0 +1,85 @@
+{
+  "verdict": {
+    "continuity": [],
+    "scorecard": {
+      "opening": 4,
+      "anticipation": 3,
+      "payoff": 4,
+      "newness": 3,
+      "endHook": 2
+    },
+    "craft": {
+      "protagonistAgency": 3,
+      "sceneLife": 4,
+      "worldLogic": 4,
+      "dialogueNaturalness": 4,
+      "structuralFreshness": 3
+    },
+    "repetition": [],
+    "aiFlavor": [],
+    "steering": [
+      "Chương hoàn thành rõ mốc use_to_earn: hiệu quả thuốc không được kể như phép màu mà chuyển thành khả năng nắm cán xe, giữ dây và giữ trọn phần đổi công. Hứa An hiện lên bằng thói quen giữ túi áo, tính phần công và sự dè chừng với món hàng chưa hiểu hết.",
+      "Đời sống Đông Hà có sức nặng nhờ điểm tập kết, xe nước, bảng phân ca, việc dọn xác và cách phần thịt được chia. Những chi tiết này cho thấy sinh kế vẫn vận hành độc lập với cửa hàng của Lâm Việt.",
+      "Lâm Việt xử lý mẫu đúng giới hạn nghề: hỏi nguồn, phân biệt điều Hứa An tận mắt biết với điều không dám chắc, ghi tình trạng chưa kiểm và không tự gọi thịt lạ là linh tài. Đây là quyết định có căn cứ, không phải trì hoãn thủ tục vô cớ.",
+      "Cuối chương còn hơi mềm: “chờ kiểm” là hướng đi hợp lý nhưng chưa tạo áp lực chọn lựa tức thời. Chương kế tiếp nên để việc giám định mẫu buộc Lâm Việt quyết định về cách bảo quản, lượng cắt thử, hoặc điều kiện nhận hàng tiếp theo.",
+      "Quan hệ giao dịch của miếng thịt nên được chốt rõ ở lần gặp sau: đây là mẫu ký gửi thuộc Hứa An, hàng Lâm Việt tạm giữ để giám định, hay vật dùng làm đối giá khi có kết quả. Sự rõ ràng ấy sẽ bảo toàn logic tài sản và tạo nền cho giá thu mua sau này."
+    ],
+    "reviewBinding": {
+      "chapterNumber": 4,
+      "title": "“Giữ Được Tay Là Giữ Được Ca”",
+      "excerpt": "Giữ được tay, là giữ được ca.\n\nGiữ được ca, mới có phần thịt này.\n\nAnh đẩy cửa bước vào."
+    }
+  },
+  "digest": {
+    "chapterNumber": 4,
+    "title": "“Giữ Được Tay Là Giữ Được Ca”",
+    "summary": "Hứa An giữ được ca tuần tra nhờ vết thương không bật máu, rồi đem phần thịt hung thú đổi công cho Lâm Việt nhận làm mẫu chờ giám định.",
+    "payoffKind": null,
+    "endedOn": "Lâm Việt phải giữ mẫu thịt nguyên vẹn trước khi đem đi tìm người kiểm.",
+    "newNamedThings": [
+      "diem_tap_ket_tuan_tra: Điểm tập kết tuần tra",
+      "to_tuan_tra: tổ tuần tra",
+      "bai_xe_buyt_bo_hoang: bãi xe buýt bỏ hoang",
+      "hung_thu_giong_cho_hoang: hung thú giống chó hoang",
+      "mau_thit_la: mẫu thịt lạ"
+    ],
+    "narrativeEvidence": [],
+    "coreChanges": {
+      "storyDayDelta": 1,
+      "died": [],
+      "progressionChanges": [],
+      "assetEvents": [
+        {
+          "eventId": "c4_acquire_thit_hung_thu",
+          "kind": "acquire",
+          "assetId": "thit_hung_thu",
+          "assetName": "thịt hung thú",
+          "quantity": 1,
+          "unit": "miếng",
+          "fungible": false,
+          "sourceLotId": null,
+          "fromOwnerId": "hua_an",
+          "fromOwnerName": "Hứa An",
+          "toOwnerId": "lam_viet",
+          "toOwnerName": "Lâm Việt",
+          "note": "Hứa An giao một miếng thịt hung thú, là phần đổi công sau khi dọn tuyến phía nam phố Thương Điếm; Lâm Việt nhận làm mẫu chờ giám định, chưa định giá và chưa xác định công dụng hay độ an toàn."
+        }
+      ],
+      "goldenFingerRungChange": null,
+      "moved": [
+        {
+          "characterId": "lam_viet",
+          "toLocationId": "thanh_lo_phuong"
+        }
+      ],
+      "worldFactsRevealed": [],
+      "newCast": [],
+      "hooksPlanted": [],
+      "hooksPaid": [],
+      "learnedFinger": []
+    }
+  },
+  "attempts": 2,
+  "costUsd": 0.122967,
+  "inputFingerprint": "71b25d52857e351e9113b3c6c3bdfb4102622d86303afdbd52913113e003a747"
+}

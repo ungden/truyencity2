@@ -1,5 +1,5 @@
 {
-  "version": "2026-09-20.2",
+  "version": "2026-09-22.4",
   "note": "Craft that dates. Code owns contracts; this file owns taste. Edit here, not in prompts.ts.",
   "payoffKinds": [
     {
@@ -328,6 +328,22 @@
       "observedAt": "2026-09-19",
       "evidence": "https://wap.faloo.com/1446664.html",
       "text": "KHÔNG LIỆT KÊ MẶT HÀNG — GHÉP MỘT MÓN CỤ THỂ VÀO MỘT NỖI KHỔ CỤ THỂ.\nBộ 3.000 chương đang chạy của Faloo bán hàng thế này trong phần giới thiệu:\n  'Trời lạnh cóng không có nổi miếng ăn nóng? Cơm tự sôi, tìm hiểu đi!'\n  'Khí hậu khắc nghiệt, lính chết rét hàng loạt? Miếng dán giữ nhiệt, dán một cái là ấm cả người.'\nMỗi dòng là một cú 'ừ nhỉ, cái đó đúng là dùng được thật'. Đó mới là chỗ sướng.\nViết 'bán mì gói, bật lửa, pin' là liệt kê danh mục — không ai thấy gì cả. Phải nêu đích danh món hàng, đích danh nỗi khổ nó giải, và người đang chịu nỗi khổ đó là ai.\nTiêu đề chương được phép chính là câu chào hàng đó."
+    },
+    {
+      "id": "protected_store_domain",
+      "role": "shared",
+      "status": "active",
+      "observedAt": "2026-09-22",
+      "evidence": "Chỉ đạo biên tập trực tiếp của người dùng, 2026-09-22",
+      "text": "CỬA HÀNG LÀ LÃNH VỰC TUYỆT ĐỐI CỦA MAIN\nTrong truyện song xuyên cửa hàng, toàn bộ cửa hàng và ngưỡng nối là vùng an toàn tuyệt đối: hành vi thù địch, cưỡng ép vào cửa, trộm hàng và theo dõi đều vô hiệu; main có thể trục xuất khách và thu hồi hàng chưa thanh toán. Chênh lệch công nghệ, cảnh giới, quyền lực hay số lượng không thể vượt qua luật này. Không dùng hack, cướp quầy, ép mở cửa hay đánh nhau giữ cửa hàng làm xung đột. Bên ngoài cửa hàng vẫn có nguy hiểm; trong cửa hàng, truyện tập trung vào trao đổi, định giá, khách mạnh lên và cửa hàng phát triển."
+    },
+    {
+      "id": "product_value_experience",
+      "role": "shared",
+      "status": "active",
+      "observedAt": "2026-09-22",
+      "evidence": "Chỉ đạo biên tập trực tiếp của người dùng, 2026-09-22",
+      "text": "CHO ĐỘC GIẢ TRẢI NGHIỆM CHÊNH LỆCH GIÁ TRỊ\nMón hàng quen, rẻ hoặc lỗi thời ở thế giới nguồn phải giải một nhu cầu đắt đỏ ở thế giới đích. Khi giới thiệu món mới, cho một người cụ thể nhìn, ngửi, nếm, mặc, dùng hoặc thử công dụng; từ trải nghiệm đó họ mới hỏi giá, tranh suất, đặt thêm hay đổi thái độ. Không thay cảnh sướng này bằng thuyết minh, đám đông đồng thanh, giấy phép, khóa quyền, viện kiểm tra hoặc nhiều vòng xác minh. Không tự sinh AI, hệ thống phụ, quyền năng, tổ chức hay sản phẩm ngoài premise để tạo việc. Hai thế giới giao tiếp bình thường; bước kiểm đã quen phải kể gọn."
     },
     {
       "id": "conflict_changes_dimension",

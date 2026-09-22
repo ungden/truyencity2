@@ -1,0 +1,73 @@
+{
+  "verdict": {
+    "continuity": [],
+    "scorecard": {
+      "opening": 5,
+      "anticipation": 5,
+      "payoff": 5,
+      "newness": 5,
+      "endHook": 5
+    },
+    "craft": {
+      "protagonistAgency": 4,
+      "sceneLife": 5,
+      "worldLogic": 5,
+      "dialogueNaturalness": 5,
+      "structuralFreshness": 4
+    },
+    "repetition": [
+      {
+        "quote": "“Nếu mép vết thương sưng nóng, chảy mủ, sốt, hoặc tay tê co giật thì không được tiếp tục dùng”",
+        "repeatsChapter": 3,
+        "note": "Giới hạn dùng là thông tin cần cho đồng đội mới, nhưng đoạn dặn dò khá đầy đủ như lần bán đầu. Có thể để Hứa An tóm tắt, còn Lâm Việt chỉ bổ sung điểm khác biệt từ vết thương hiện tại."
+      }
+    ],
+    "aiFlavor": [],
+    "steering": [
+      "Canon và sổ tài sản khớp: ba gói của lô trước đã được tiêu thụ/chuyển giao, nên Lâm Việt từ chối bán thêm là quyết định có căn cứ; việc chỉ ghi nhu cầu thay vì nhận đặt cọc cũng giữ đúng giới hạn nguồn hàng.",
+      "Cảnh cho thấy rõ Lâm Việt là người làm nghề thận trọng: hỏi thời điểm bị thương, xem độ nông/sạch, phân biệt phạm vi dùng và không lấy lời hứa thay cho năng lực sản xuất. Thế giới Đông Hà cũng hiện qua ca tuần tra, điểm nước, pin cho bộ đàm và cách một đội tự cân phần công với vật tư.",
+      "Payoff “bằng chứng công khai” hiện đạt ở mức vừa: đồng đội tận mắt thấy bàn tay Hứa An hồi phục và tự chuyển sang hỏi giá/số lượng. Tuy nhiên, vì không còn hàng để thử trên vết thương mới, trải nghiệm sản phẩm còn gián tiếp. Chương sau nên cho lô mới có người dùng đúng phạm vi, rồi báo lại kết quả cụ thể.",
+      "Đoạn cuối có ý nghĩa kinh doanh tốt—nhu cầu thật chưa đồng nghĩa với doanh thu hay năng lực giao hàng. Có thể tăng lực kéo bằng một trở ngại sản xuất cụ thể ngay sau đó: nguyên liệu thiếu phần nào, lò nứt gây hao phí ra sao, hoặc cần Hàn Dược Sư kiểm mẫu thịt trước khi đổi thành vốn.",
+      "Lệch nhẹ so với nhịp dự kiến không phải lỗi canon: bản thảo bỏ bước rửa và mua thử vì kho đã hết hàng. Nên biến sự lệch này thành lựa chọn rõ hơn bằng một câu cho thấy Lâm Việt không cho người tuần tra dùng bột từ Hứa An, vì chưa kiểm được cách bảo quản hai gói còn lại hoặc vì đó là tài sản của Hứa An."
+    ],
+    "reviewBinding": {
+      "chapterNumber": 5,
+      "title": "“Tôi Không Hứa Nó Chữa Được Mọi Thứ”",
+      "excerpt": "— Hiện giờ không có gói nào để bán thêm. — Lâm Việt nói thẳng. — Lô trước chỉ có ba gói."
+    }
+  },
+  "digest": {
+    "chapterNumber": 5,
+    "title": "“Tôi Không Hứa Nó Chữa Được Mọi Thứ”",
+    "summary": "Một người tuần tra xác nhận hiệu quả có giới hạn của bột cầm máu và cùng Hứa An ghi nhu cầu mười hai gói cho đội, nhưng Lâm Việt chưa có hàng mới để giao.",
+    "payoffKind": "tinh_truong",
+    "endedOn": "Khả năng Lâm Việt làm ra lô mới để đáp ứng nhu cầu mười hai gói của đội tuần tra vẫn còn bỏ ngỏ.",
+    "newNamedThings": [
+      "doi_tuan_tra_nho",
+      "nhu_cau_muoi_hai_goi_bot_cam_mau"
+    ],
+    "narrativeEvidence": [],
+    "coreChanges": {
+      "storyDayDelta": 0,
+      "died": [],
+      "progressionChanges": [],
+      "assetEvents": [],
+      "goldenFingerRungChange": null,
+      "moved": [],
+      "worldFactsRevealed": [],
+      "newCast": [],
+      "hooksPlanted": [
+        {
+          "id": "doi_tuan_tra_mang_to_ghi_nhu_cau",
+          "what": "Hứa An sẽ mang một tờ ghi nhu cầu của đội tuần tra tới cửa hàng trong lần tới.",
+          "dueByChapter": 6
+        }
+      ],
+      "hooksPaid": [],
+      "learnedFinger": []
+    }
+  },
+  "attempts": 1,
+  "costUsd": 0.056334,
+  "inputFingerprint": "4232162f0cb54c2854d6cac56415f711641eb36f5aa9fb07bc7eb4be2c96d762"
+}

@@ -1,0 +1,651 @@
+{
+  "schemaVersion": 2,
+  "symbolicCore": {
+    "storyDay": 4,
+    "chapterNumber": 10,
+    "mc": {
+      "characterId": "lam_viet",
+      "locationId": "thanh_lo_phuong",
+      "keyAssetIds": [],
+      "goldenFingerRungId": "loi_di_danh_dau"
+    },
+    "cast": [
+      {
+        "id": "lam_viet",
+        "alive": true,
+        "locationId": "thanh_lo_phuong",
+        "lastSeenChapter": 4,
+        "knowsFinger": true
+      },
+      {
+        "id": "hua_an",
+        "alive": true,
+        "locationId": "pho_dong_ha",
+        "lastSeenChapter": 0,
+        "knowsFinger": false
+      },
+      {
+        "id": "han_duoc_su",
+        "alive": true,
+        "locationId": "thanh_lo_phuong",
+        "lastSeenChapter": 0,
+        "knowsFinger": false
+      }
+    ],
+    "progressions": [],
+    "activeAssetLots": [
+      {
+        "lotId": "c1_acquire_duoc_lieu_vun",
+        "assetId": "duoc_lieu_vun",
+        "assetName": "dược liệu vụn",
+        "ownerId": "lam_viet",
+        "ownerName": "Lâm Việt",
+        "quantity": 1,
+        "unit": "phần",
+        "fungible": true,
+        "provenance": "Phần dược liệu vụn được phép mang đi sau khi mất thẻ Đan đồ.",
+        "acquiredChapter": 1,
+        "updatedChapter": 1
+      },
+      {
+        "lotId": "c1_acquire_vo_binh_su",
+        "assetId": "vo_binh_su",
+        "assetName": "vỏ bình sứ chưa dùng",
+        "ownerId": "lam_viet",
+        "ownerName": "Lâm Việt",
+        "quantity": 1,
+        "unit": "vỏ bình",
+        "fungible": false,
+        "provenance": "Vỏ bình sứ chưa dùng được phép mang đi.",
+        "acquiredChapter": 1,
+        "updatedChapter": 1
+      },
+      {
+        "lotId": "c1_acquire_co_kho",
+        "assetId": "co_kho",
+        "assetName": "cỏ khô",
+        "ownerId": "lam_viet",
+        "ownerName": "Lâm Việt",
+        "quantity": 2,
+        "unit": "bao",
+        "fungible": true,
+        "provenance": "Hai bao cỏ khô bị ẩm mép được phép mang đi.",
+        "acquiredChapter": 1,
+        "updatedChapter": 1
+      },
+      {
+        "lotId": "c3_acquire_pin_hua_an",
+        "assetId": "pin_nho",
+        "assetName": "pin nhỏ",
+        "ownerId": "lam_viet",
+        "ownerName": "Lâm Việt",
+        "quantity": 2,
+        "unit": "viên",
+        "fungible": true,
+        "provenance": "Hứa An đặt hai viên pin nhỏ lên quầy làm đối giá cho ba gói thuốc.",
+        "acquiredChapter": 3,
+        "updatedChapter": 3
+      },
+      {
+        "lotId": "c3_acquire_tinh_hach_can_hua_an",
+        "assetId": "tinh_hach_can",
+        "assetName": "tinh hạch cạn",
+        "ownerId": "lam_viet",
+        "ownerName": "Lâm Việt",
+        "quantity": 1,
+        "unit": "mẫu",
+        "fungible": false,
+        "provenance": "Hứa An đưa một mẫu tinh hạch cạn lấy từ một con chuột biến dị ở kho cũ; mẫu có vết nứt và gần hết.",
+        "acquiredChapter": 3,
+        "updatedChapter": 3
+      },
+      {
+        "lotId": "c3_transfer_bot_cam_mau_pho_thong_hua_an",
+        "assetId": "bot_cam_mau_pho_thong",
+        "assetName": "bột cầm máu phổ thông",
+        "ownerId": "hua_an",
+        "ownerName": "Hứa An",
+        "quantity": 2,
+        "unit": "gói",
+        "fungible": true,
+        "provenance": "Hai gói chưa mở được Hứa An nhận mang đi; giao dịch được ghi là ba gói, trong đó một gói đã dùng tại quầy.",
+        "acquiredChapter": 3,
+        "updatedChapter": 3
+      },
+      {
+        "lotId": "c4_acquire_thit_hung_thu",
+        "assetId": "thit_hung_thu",
+        "assetName": "thịt hung thú",
+        "ownerId": "lam_viet",
+        "ownerName": "Lâm Việt",
+        "quantity": 1,
+        "unit": "miếng",
+        "fungible": false,
+        "provenance": "Hứa An giao một miếng thịt hung thú, là phần đổi công sau khi dọn tuyến phía nam phố Thương Điếm; Lâm Việt nhận làm mẫu chờ giám định, chưa định giá và chưa xác định công dụng hay độ an toàn.",
+        "acquiredChapter": 4,
+        "updatedChapter": 4
+      },
+      {
+        "lotId": "c6_acquire_pin_nho_hua_an",
+        "assetId": "pin_nho",
+        "assetName": "pin nhỏ",
+        "ownerId": "lam_viet",
+        "ownerName": "Lâm Việt",
+        "quantity": 6,
+        "unit": "viên",
+        "fungible": true,
+        "provenance": "Hứa An đưa sáu viên pin nhỏ; Lâm Việt nhận làm đặt trước cho đơn mười hai gói, chưa tính thành thuốc đã giao.",
+        "acquiredChapter": 6,
+        "updatedChapter": 6
+      },
+      {
+        "lotId": "c6_acquire_tinh_hach_can_hua_an",
+        "assetId": "tinh_hach_can",
+        "assetName": "tinh hạch cạn",
+        "ownerId": "lam_viet",
+        "ownerName": "Lâm Việt",
+        "quantity": 1,
+        "unit": "mẫu",
+        "fungible": false,
+        "provenance": "Hứa An đưa một mẫu tinh hạch xám đục, cạn hơn mẫu trước và có vết nứt; Lâm Việt nhận làm mẫu đổi chờ kiểm.",
+        "acquiredChapter": 6,
+        "updatedChapter": 6
+      },
+      {
+        "lotId": "c6_acquire_thit_co_nguon_hua_an",
+        "assetId": "thit_co_nguon",
+        "assetName": "thịt có nguồn",
+        "ownerId": "lam_viet",
+        "ownerName": "Lâm Việt",
+        "quantity": 1,
+        "unit": "gói",
+        "fungible": false,
+        "provenance": "Hứa An giao một gói thịt từ chuyến dọn tuyến phía nam, trước giờ đổi ca trưa; anh giữ phần này và đã bọc tại điểm nước.",
+        "acquiredChapter": 6,
+        "updatedChapter": 6
+      },
+      {
+        "lotId": "c6_acquire_thit_khong_ro_nguon_hua_an",
+        "assetId": "thit_khong_ro_nguon",
+        "assetName": "thịt không rõ nguồn",
+        "ownerId": "lam_viet",
+        "ownerName": "Lâm Việt",
+        "quantity": 2,
+        "unit": "gói",
+        "fungible": true,
+        "provenance": "Hai gói thịt từ đội gom, không rõ con nào, người giữ trước đó hoặc thời gian để ngoài; Lâm Việt niêm riêng và không tính chung với phần có nguồn.",
+        "acquiredChapter": 6,
+        "updatedChapter": 6
+      }
+    ],
+    "recentAssetEvents": [
+      {
+        "eventId": "c1_acquire_duoc_lieu_vun",
+        "kind": "acquire",
+        "assetId": "duoc_lieu_vun",
+        "assetName": "dược liệu vụn",
+        "quantity": 1,
+        "unit": "phần",
+        "fungible": true,
+        "sourceLotId": null,
+        "fromOwnerId": "thanh_lo_dan_cac",
+        "fromOwnerName": "Thanh Lô Đan Các",
+        "toOwnerId": "lam_viet",
+        "toOwnerName": "Lâm Việt",
+        "note": "Phần dược liệu vụn được phép mang đi sau khi mất thẻ Đan đồ.",
+        "chapterNumber": 1
+      },
+      {
+        "eventId": "c1_acquire_vo_binh_su",
+        "kind": "acquire",
+        "assetId": "vo_binh_su",
+        "assetName": "vỏ bình sứ chưa dùng",
+        "quantity": 1,
+        "unit": "vỏ bình",
+        "fungible": false,
+        "sourceLotId": null,
+        "fromOwnerId": "thanh_lo_dan_cac",
+        "fromOwnerName": "Thanh Lô Đan Các",
+        "toOwnerId": "lam_viet",
+        "toOwnerName": "Lâm Việt",
+        "note": "Vỏ bình sứ chưa dùng được phép mang đi.",
+        "chapterNumber": 1
+      },
+      {
+        "eventId": "c1_acquire_co_kho",
+        "kind": "acquire",
+        "assetId": "co_kho",
+        "assetName": "cỏ khô",
+        "quantity": 2,
+        "unit": "bao",
+        "fungible": true,
+        "sourceLotId": null,
+        "fromOwnerId": "thanh_lo_dan_cac",
+        "fromOwnerName": "Thanh Lô Đan Các",
+        "toOwnerId": "lam_viet",
+        "toOwnerName": "Lâm Việt",
+        "note": "Hai bao cỏ khô bị ẩm mép được phép mang đi.",
+        "chapterNumber": 1
+      },
+      {
+        "eventId": "c3_acquire_bot_cam_mau_pho_thong",
+        "kind": "acquire",
+        "assetId": "bot_cam_mau_pho_thong",
+        "assetName": "bột cầm máu phổ thông",
+        "quantity": 3,
+        "unit": "gói",
+        "fungible": true,
+        "sourceLotId": null,
+        "fromOwnerId": "lam_viet",
+        "fromOwnerName": "Lâm Việt",
+        "toOwnerId": "lam_viet",
+        "toOwnerName": "Lâm Việt",
+        "note": "Lâm Việt tự làm một lô ba gói từ phần dược liệu còn dùng được, hong, nghiền, sàng và chia gói tại kho thuê.",
+        "chapterNumber": 3
+      },
+      {
+        "eventId": "c3_consume_bot_cam_mau_pho_thong",
+        "kind": "consume",
+        "assetId": "bot_cam_mau_pho_thong",
+        "assetName": "bột cầm máu phổ thông",
+        "quantity": 1,
+        "unit": "gói",
+        "fungible": true,
+        "sourceLotId": "c3_acquire_bot_cam_mau_pho_thong",
+        "fromOwnerId": "lam_viet",
+        "fromOwnerName": "Lâm Việt",
+        "toOwnerId": null,
+        "toOwnerName": null,
+        "note": "Một gói được mở và dùng ngoài da cho vết cắt sạch, nông của Hứa An.",
+        "chapterNumber": 3
+      },
+      {
+        "eventId": "c3_acquire_pin_hua_an",
+        "kind": "acquire",
+        "assetId": "pin_nho",
+        "assetName": "pin nhỏ",
+        "quantity": 2,
+        "unit": "viên",
+        "fungible": true,
+        "sourceLotId": null,
+        "fromOwnerId": "hua_an",
+        "fromOwnerName": "Hứa An",
+        "toOwnerId": "lam_viet",
+        "toOwnerName": "Lâm Việt",
+        "note": "Hứa An đặt hai viên pin nhỏ lên quầy làm đối giá cho ba gói thuốc.",
+        "chapterNumber": 3
+      },
+      {
+        "eventId": "c3_acquire_tinh_hach_can_hua_an",
+        "kind": "acquire",
+        "assetId": "tinh_hach_can",
+        "assetName": "tinh hạch cạn",
+        "quantity": 1,
+        "unit": "mẫu",
+        "fungible": false,
+        "sourceLotId": null,
+        "fromOwnerId": "hua_an",
+        "fromOwnerName": "Hứa An",
+        "toOwnerId": "lam_viet",
+        "toOwnerName": "Lâm Việt",
+        "note": "Hứa An đưa một mẫu tinh hạch cạn lấy từ một con chuột biến dị ở kho cũ; mẫu có vết nứt và gần hết.",
+        "chapterNumber": 3
+      },
+      {
+        "eventId": "c3_transfer_bot_cam_mau_pho_thong_hua_an",
+        "kind": "transfer",
+        "assetId": "bot_cam_mau_pho_thong",
+        "assetName": "bột cầm máu phổ thông",
+        "quantity": 2,
+        "unit": "gói",
+        "fungible": true,
+        "sourceLotId": "c3_acquire_bot_cam_mau_pho_thong",
+        "fromOwnerId": "lam_viet",
+        "fromOwnerName": "Lâm Việt",
+        "toOwnerId": "hua_an",
+        "toOwnerName": "Hứa An",
+        "note": "Hai gói chưa mở được Hứa An nhận mang đi; giao dịch được ghi là ba gói, trong đó một gói đã dùng tại quầy.",
+        "chapterNumber": 3
+      },
+      {
+        "eventId": "c4_acquire_thit_hung_thu",
+        "kind": "acquire",
+        "assetId": "thit_hung_thu",
+        "assetName": "thịt hung thú",
+        "quantity": 1,
+        "unit": "miếng",
+        "fungible": false,
+        "sourceLotId": null,
+        "fromOwnerId": "hua_an",
+        "fromOwnerName": "Hứa An",
+        "toOwnerId": "lam_viet",
+        "toOwnerName": "Lâm Việt",
+        "note": "Hứa An giao một miếng thịt hung thú, là phần đổi công sau khi dọn tuyến phía nam phố Thương Điếm; Lâm Việt nhận làm mẫu chờ giám định, chưa định giá và chưa xác định công dụng hay độ an toàn.",
+        "chapterNumber": 4
+      },
+      {
+        "eventId": "c6_acquire_pin_nho_hua_an",
+        "kind": "acquire",
+        "assetId": "pin_nho",
+        "assetName": "pin nhỏ",
+        "quantity": 6,
+        "unit": "viên",
+        "fungible": true,
+        "sourceLotId": null,
+        "fromOwnerId": "hua_an",
+        "fromOwnerName": "Hứa An",
+        "toOwnerId": "lam_viet",
+        "toOwnerName": "Lâm Việt",
+        "note": "Hứa An đưa sáu viên pin nhỏ; Lâm Việt nhận làm đặt trước cho đơn mười hai gói, chưa tính thành thuốc đã giao.",
+        "chapterNumber": 6
+      },
+      {
+        "eventId": "c6_acquire_tinh_hach_can_hua_an",
+        "kind": "acquire",
+        "assetId": "tinh_hach_can",
+        "assetName": "tinh hạch cạn",
+        "quantity": 1,
+        "unit": "mẫu",
+        "fungible": false,
+        "sourceLotId": null,
+        "fromOwnerId": "hua_an",
+        "fromOwnerName": "Hứa An",
+        "toOwnerId": "lam_viet",
+        "toOwnerName": "Lâm Việt",
+        "note": "Hứa An đưa một mẫu tinh hạch xám đục, cạn hơn mẫu trước và có vết nứt; Lâm Việt nhận làm mẫu đổi chờ kiểm.",
+        "chapterNumber": 6
+      },
+      {
+        "eventId": "c6_acquire_thit_co_nguon_hua_an",
+        "kind": "acquire",
+        "assetId": "thit_co_nguon",
+        "assetName": "thịt có nguồn",
+        "quantity": 1,
+        "unit": "gói",
+        "fungible": false,
+        "sourceLotId": null,
+        "fromOwnerId": "hua_an",
+        "fromOwnerName": "Hứa An",
+        "toOwnerId": "lam_viet",
+        "toOwnerName": "Lâm Việt",
+        "note": "Hứa An giao một gói thịt từ chuyến dọn tuyến phía nam, trước giờ đổi ca trưa; anh giữ phần này và đã bọc tại điểm nước.",
+        "chapterNumber": 6
+      },
+      {
+        "eventId": "c6_acquire_thit_khong_ro_nguon_hua_an",
+        "kind": "acquire",
+        "assetId": "thit_khong_ro_nguon",
+        "assetName": "thịt không rõ nguồn",
+        "quantity": 2,
+        "unit": "gói",
+        "fungible": true,
+        "sourceLotId": null,
+        "fromOwnerId": "hua_an",
+        "fromOwnerName": "Hứa An",
+        "toOwnerId": "lam_viet",
+        "toOwnerName": "Lâm Việt",
+        "note": "Hai gói thịt từ đội gom, không rõ con nào, người giữ trước đó hoặc thời gian để ngoài; Lâm Việt niêm riêng và không tính chung với phần có nguồn.",
+        "chapterNumber": 6
+      }
+    ],
+    "narrativeEvidence": [
+      {
+        "id": "cua_noi_kho_dong_ha",
+        "chapterNumber": 1,
+        "quote": "— Tự đi qua, tự quay về được.\n\n— Chưa biết cửa mở được bao lâu. Chưa biết bên kia có gì ngoài căn phòng và một đoạn phố. Chưa biết người khác có thể dùng cửa hay không.",
+        "learnedByCharacterIds": [
+          "lam_viet"
+        ]
+      },
+      {
+        "id": "xac_nhan_cua_song_gioi",
+        "chapterNumber": 1,
+        "quote": "Lâm Việt đứng im, lưng quay về phía ngưỡng cửa, mắt trước hết nhìn nền nhà, sau đó mới nhìn bốn góc phòng.\n\nĐó đúng là một căn cửa hàng bỏ trống.",
+        "learnedByCharacterIds": [
+          "lam_viet"
+        ]
+      },
+      {
+        "id": "dong_ha_song_bang_doi_vat",
+        "chapterNumber": 2,
+        "quote": "ở đây, một bình nước có niêm phong và một viên pin nhỏ đều có thể thành vật đổi. Song thứ người ta cần gấp không hẳn là thứ đắt nhất",
+        "learnedByCharacterIds": [
+          "lam_viet"
+        ]
+      },
+      {
+        "id": "dong_ha_thieu_thuoc_on_dinh",
+        "chapterNumber": 2,
+        "quote": "— Không dám dùng. — Hứa An đáp ngay. — Sốt còn biết tìm hạ sốt, vết cắt còn biết rửa sạch rồi băng lại. Nhưng chai không nhãn, thuốc viên không rõ liều, thuốc để trong kho mất điện mấy tháng… ai biết uống vào thành cái gì?",
+        "learnedByCharacterIds": [
+          "lam_viet"
+        ]
+      },
+      {
+        "id": "hieu_nhip_song_dong_ha",
+        "chapterNumber": 2,
+        "quote": "Ở nơi này, thuốc không thiếu đến mức người ta uống bừa tất cả. Thứ thiếu là một món có tên, có phạm vi dùng, có người chịu đứng ra nói rõ giới hạn của nó.",
+        "learnedByCharacterIds": [
+          "lam_viet"
+        ]
+      },
+      {
+        "id": "tinh_hach_can_giam_dinh",
+        "chapterNumber": 3,
+        "quote": "Lâm Việt cầm một chiếc đũa tre, nhẹ nhàng xoay mẫu tinh hạch qua lại. Hắn quan sát màu sắc, vết nứt, mùi lạ gần như không có. Về phần bên trong, về phần có độc hay có thể luyện thành thuốc, hắn hoàn toàn không biết.",
+        "learnedByCharacterIds": [
+          "lam_viet"
+        ]
+      },
+      {
+        "id": "chuan_bi_lo_thuoc_nho",
+        "chapterNumber": 3,
+        "quote": "Ba phần nhỏ bằng nhau được gói vào lớp giấy dầu sạch, buộc dây mảnh ở miệng. Trên mỗi gói, hắn dùng than viết chữ ngay ngắn.\n\n— Bột cầm máu phổ thông.\n\nBên dưới là mấy dòng ngắn hơn",
+        "learnedByCharacterIds": [
+          "lam_viet"
+        ]
+      },
+      {
+        "id": "giao_dich_thu_gioi_han",
+        "chapterNumber": 3,
+        "quote": "— Ba gói đổi một mẫu tinh hạch cạn và hai viên pin này. Gói vừa mở tính là một gói. Anh mang cả ba đi, nhưng chỉ dùng đúng trường hợp đã ghi. Gói chưa mở, nếu không dùng, phải giữ khô.",
+        "learnedByCharacterIds": [
+          "lam_viet",
+          "hua_an"
+        ]
+      },
+      {
+        "id": "kiem_mau_tinh_hach",
+        "chapterNumber": 8,
+        "quote": "“Có phản ứng quan sát được. Công dụng chưa rõ. Không đưa vào thuốc, không dùng bảo chứng cho đơn thuốc.”",
+        "learnedByCharacterIds": [
+          "lam_viet",
+          "han_duoc_su"
+        ]
+      }
+    ],
+    "revealedNarrativeIds": [
+      "thanh_huyen_thieu_hung_thu",
+      "thuoc_cam_mau_co_han",
+      "cua_noi_kho_dong_ha",
+      "dong_ha_song_bang_doi_vat",
+      "dong_ha_thieu_thuoc_on_dinh",
+      "tinh_hach_can_giam_dinh"
+    ],
+    "achievedNarrativeMilestoneIds": [
+      "xac_nhan_cua_song_gioi",
+      "hieu_nhip_song_dong_ha",
+      "chuan_bi_lo_thuoc_nho",
+      "giao_dich_thu_gioi_han",
+      "kiem_mau_tinh_hach"
+    ],
+    "characterKnowledge": [
+      {
+        "characterId": "lam_viet",
+        "factIds": [
+          "thanh_huyen_thieu_hung_thu",
+          "thuoc_cam_mau_co_han",
+          "cua_noi_kho_dong_ha",
+          "dong_ha_song_bang_doi_vat",
+          "dong_ha_thieu_thuoc_on_dinh",
+          "tinh_hach_can_giam_dinh"
+        ]
+      },
+      {
+        "characterId": "hua_an",
+        "factIds": [
+          "dong_ha_song_bang_doi_vat",
+          "tinh_hach_can_giam_dinh",
+          "dong_ha_thieu_thuoc_on_dinh"
+        ]
+      },
+      {
+        "characterId": "han_duoc_su",
+        "factIds": [
+          "thanh_huyen_thieu_hung_thu",
+          "thuoc_cam_mau_co_han"
+        ]
+      }
+    ],
+    "openHooks": [
+      {
+        "id": "doi_tuan_tra_mang_to_ghi_nhu_cau",
+        "what": "Hứa An sẽ mang một tờ ghi nhu cầu của đội tuần tra tới cửa hàng trong lần tới.",
+        "plantedChapter": 5,
+        "dueByChapter": 6,
+        "status": "paid"
+      },
+      {
+        "id": "hoi_gia_nguyen_lieu_lo_cam_mau_doi_nho",
+        "what": "Lâm Việt sẽ hỏi giá nguyên liệu, tính lượng cần cho mười hai gói và mang mẫu thịt có nguồn đi kiểm trước khi quyết định có thể làm lô hay không.",
+        "plantedChapter": 6,
+        "dueByChapter": 7,
+        "status": "paid"
+      },
+      {
+        "id": "han_duoc_su_yeu_cau_ba_luot_mau_tuong_dong",
+        "what": "Hàn Dược Sư chỉ cân nhắc mua thịt làm nguồn thử khi Lâm Việt mang được ít nhất ba lượt hàng cùng loại, cách giữ tương đối ổn định và có nguồn gốc đủ đối chiếu.",
+        "plantedChapter": 7,
+        "dueByChapter": 10,
+        "status": "open"
+      },
+      {
+        "id": "lam_viet_di_dong_ha_hoi_nguon_thit",
+        "what": "Lâm Việt sẽ sang Đông Hà hỏi Hứa An về nơi săn, cách giữ, người chạm vào và thời gian vận chuyển để tìm các lượt thịt tương đồng.",
+        "plantedChapter": 8,
+        "dueByChapter": 9,
+        "status": "paid"
+      },
+      {
+        "id": "hua_an_hoi_quyen_giu_phan_doi_cong",
+        "what": "Hứa An sẽ hỏi tổ trưởng xem phần đổi công trong ca dọn tuyến tới có được giữ riêng hay phải nộp chung, rồi mang câu trả lời cho Lâm Việt.",
+        "plantedChapter": 9,
+        "dueByChapter": 10,
+        "status": "paid"
+      }
+    ]
+  },
+  "castSheet": [
+    {
+      "id": "lam_viet",
+      "name": "Lâm Việt",
+      "sheet": "protagonist — hiện tại: Hắn vừa bị cắt thẻ Đan đồ, còn tiền thuê kho một tháng, một lò đan nứt, bộ cân cũ, vài dụng cụ và số dược liệu vụn được phép mang đi.; năng lực: Hắn nhận biết dược liệu phổ thông, cân chia, giữ nhiệt, ghi lô, xử lý vết thương nhẹ và hiểu một mẻ thuốc phải có nguồn nguyên liệu cùng quy trình ổn định. Linh giác rất yếu của hắn chỉ từng giúp nhận chút dược khí ở khoảng gần, không thể đọc ra công dụng của vật lạ.; giới hạn: Hắn chưa phải Luyện Đan Sư, không biết xã hội Đông Hà, không hiểu tinh hạch, điện hay vũ khí hiện đại và không thể nhìn một vật lạ rồi biết ngay công dụng.; quan hệ: Hàn Dược Sư từng chỉ nghề nhưng không nuôi người vô điều kiện; quản sự Đan Các muốn hắn biến khỏi phường; Lâm Việt chưa có người thân đủ sức che chở.; thói quen: Hắn ngửi dược liệu trước khi cân, ghi ngày mở túi, giữ mẫu đối chứng và không cho người uống thuốc khi chưa biết thể trạng hoặc liều.; mong muốn: Trước khi mở cửa kho, hắn chỉ muốn giữ nghề, trả được tiền thuê và có ngày tự đứng lò mà không phải cúi đầu nhận lỗi thay người khác."
+    },
+    {
+      "id": "hua_an",
+      "name": "Hứa An",
+      "sheet": "ally — hiện tại: Anh chạy việc cho tổ dân phố, đổi pin và nước lấy thuốc, đồng thời giấu cơn co giật để không bị gạt khỏi nhóm tuần tra.; năng lực: Anh biết các điểm nước, bảng giá vật tư, ca gác và cách vận chuyển an toàn trong vài khu phố quanh trạm thành vệ.; giới hạn: Anh không biết tu tiên hay đan dược, chỉ hiểu tinh hạch theo cách người Đông Hà đang thử và không thể xác nhận một món thuốc từ lời quảng cáo.; quan hệ: Anh còn mẹ và em gái trong khu trú ẩn, nợ Chu Dã một lần cứu mạng và muốn giành suất chính thức trong đội trinh sát để có khẩu phần ổn định.; thói quen: Anh nhìn cửa thoát trước khi ngồi, kiểm niêm phong chai nước và luôn hỏi giá bằng thứ mình thật sự có thể kiếm lại.; mong muốn: Anh muốn ổn định cơ thể, giữ được suất tuần tra và đưa gia đình khỏi khu nhà sắp mất điện hoàn toàn."
+    },
+    {
+      "id": "han_duoc_su",
+      "name": "Hàn Dược Sư",
+      "sheet": "authority — hiện tại: Ông giữ một quầy nhỏ, mua đúng món có thể bán lại và đang tìm nguồn khí huyết mới để cứu biển hiệu gia đình.; năng lực: Ông biết giám định thịt yêu thú, dược tính phổ thông, dấu nhiễm độc và giá nguyên liệu trong phường.; giới hạn: Ông không biết Đông Hà, không hiểu tinh hạch tiến hóa và sẽ không xác nhận công dụng nếu chưa thử bằng dụng cụ cùng mẫu đối chứng.; quan hệ: Ông từng quý sự cẩn thận của Lâm Việt nhưng vẫn đặt sinh kế của quầy lên trước; ông tránh đối đầu trực tiếp với Đan Các.; thói quen: Ông cắt mẫu nhỏ trước, ghi mùi và phản ứng, giữ lại phần đối chứng rồi mới nói giá.; mong muốn: Ông muốn tìm một nguồn nguyên liệu đủ đều để mở lại bếp linh thiện của Hàn gia."
+    }
+  ],
+  "world": [
+    {
+      "id": "thanh_lo_phuong",
+      "name": "Thanh Lô Phường",
+      "note": "Quầy Hàn Dược Sư nằm ở cuối dãy bán nguyên liệu trong Thanh Lô Phường, giữa các quầy linh thiện và lò luyện."
+    },
+    {
+      "id": "han_gia_linh_thien",
+      "name": "Hàn Gia Linh Thiện",
+      "note": "Biển quầy ghi “Hàn gia linh thiện”; Hàn Dược Sư đang trực tiếp lựa nguyên liệu, giám định mẫu và cân nhắc nguồn thịt cho bếp linh thiện của Hàn gia."
+    }
+  ],
+  "recentSummary": [
+    {
+      "chapterNumber": 1,
+      "title": "Tro Không Đổi Mùi",
+      "summary": "Lâm Việt mất việc ở Đan Các, phát hiện cánh cửa nối kho thuê với một cửa hàng bỏ trống ở thế giới xa lạ và tự mình thử đi qua rồi trở về an toàn.",
+      "payoffKind": "dot_pha",
+      "endedOn": "Một tháng tiền thuê kho có thể mua cho hắn thời gian. Nhưng cánh cửa này, rốt cuộc sẽ đưa hắn tới đường sống—hay tới một nơi mà ngay cả đường quay về cũng không còn?"
+    },
+    {
+      "chapterNumber": 2,
+      "title": "“Không Rõ Thứ Bên Trong”",
+      "summary": "Lâm Việt khảo sát nhịp sống và nhu cầu vật tư ở Đông Hà, gặp Hứa An, rồi nhận ra thuốc chỉ có giá trị khi nguồn gốc, công dụng và giới hạn sử dụng đều được nói rõ.",
+      "payoffKind": "doi_chieu",
+      "endedOn": "Hắn bắt đầu nghĩ: trong một tháng tiền thuê kho còn lại, liệu hắn có thể làm ra một thứ đủ rõ ràng để người như Hứa An dám mang đi dùng hay không."
+    },
+    {
+      "chapterNumber": 3,
+      "title": "Lô Cầm Máu Thử Số Một",
+      "summary": "Lâm Việt tự làm ba gói bột cầm máu, thử thành công trên vết cắt của Hứa An và đổi lô thuốc lấy một mẫu tinh hạch cạn cùng hai viên pin.",
+      "payoffKind": "doi_chieu",
+      "endedOn": "Trong kho bên kia cánh cửa, hắn còn một tháng tiền thuê, nhưng hôm nay đã có lô hàng đầu tiên được mang đi bằng chính đôi tay của người cần nó."
+    },
+    {
+      "chapterNumber": 4,
+      "title": "“Giữ Được Tay Là Giữ Được Ca”",
+      "summary": "Hứa An giữ được ca tuần tra nhờ vết thương không bật máu, rồi đem phần thịt hung thú đổi công cho Lâm Việt nhận làm mẫu chờ giám định.",
+      "payoffKind": null,
+      "endedOn": "Lâm Việt phải giữ mẫu thịt nguyên vẹn trước khi đem đi tìm người kiểm."
+    },
+    {
+      "chapterNumber": 5,
+      "title": "“Tôi Không Hứa Nó Chữa Được Mọi Thứ”",
+      "summary": "Một người tuần tra xác nhận hiệu quả có giới hạn của bột cầm máu và cùng Hứa An ghi nhu cầu mười hai gói cho đội, nhưng Lâm Việt chưa có hàng mới để giao.",
+      "payoffKind": "tinh_truong",
+      "endedOn": "Khả năng Lâm Việt làm ra lô mới để đáp ứng nhu cầu mười hai gói của đội tuần tra vẫn còn bỏ ngỏ."
+    },
+    {
+      "chapterNumber": 6,
+      "title": "“Đặt Trước Không Phải Là Hàng Có Sẵn”",
+      "summary": "Hứa An mang sáu viên pin, một mẫu tinh hạch cạn và ba gói thịt đến đặt đối giá, còn Lâm Việt tách riêng nguồn hàng, nhận đơn mười hai gói cầm máu nhưng chưa cam kết ngày giao.",
+      "payoffKind": "doi_chieu",
+      "endedOn": "Lâm Việt nhận đơn lô cầm máu đội nhỏ với điều kiện chỉ giao khi có hàng đúng phạm vi đã ghi; nếu không đúng, một gói cũng không xuất quầy."
+    },
+    {
+      "chapterNumber": 7,
+      "title": "“Một Miếng Tốt Không Chứng Minh Cả Lô”",
+      "summary": "Lâm Việt đưa mẫu thịt có nguồn và hai mẫu tinh hạch cho Hàn Dược Sư kiểm tra, xác nhận chúng chưa đủ căn cứ định giá, đồng thời tính vốn thực tế cho đơn mười hai gói thuốc.",
+      "payoffKind": "doi_chieu",
+      "endedOn": "Nếu muốn giao đúng mười hai gói cho đội tuần tra, hắn sẽ lấy khoản vốn đầu tiên từ đâu—từ một mẫu thịt còn chưa thử xong, hay từ một nguồn hàng mà hắn vẫn chưa biết có thể lặp lại hay không?"
+    },
+    {
+      "chapterNumber": 8,
+      "title": "“Chỉ Biết Về Mẫu Này”",
+      "summary": "Lâm Việt cùng Hàn Dược Sư kiểm tra tinh hạch và thịt có nguồn, xác nhận tinh hạch chỉ gây phản ứng nhẹ còn thịt có tác dụng làm ấm khí huyết, từ đó đặt điều kiện cho những lô hàng sau.",
+      "payoffKind": "duoc_cong_nhan",
+      "endedOn": "Lâm Việt khép sổ và nói rằng hắn sẽ sang Đông Hà để hỏi rõ nguồn gốc, cách bảo quản và thời gian vận chuyển của thịt."
+    },
+    {
+      "chapterNumber": 9,
+      "title": "“Thứ Tôi Có Quyền Giữ, Tôi Mới Dám Ghi”",
+      "summary": "Lâm Việt sang Phố Thương Điếm Đông Hà cùng Hứa An xác lập cách ghi nguồn thịt và chỉ tiếp tục tìm hàng khi quyền giữ phần đổi công được làm rõ.",
+      "payoffKind": null,
+      "endedOn": "Hứa An mới chỉ nhận lời hỏi tổ trưởng về quyền giữ phần đổi công và mang câu trả lời trở lại, nên nguồn thịt vẫn chưa được xác lập."
+    },
+    {
+      "chapterNumber": 10,
+      "title": "“Hàng Có Thể Ăn Chưa Phải Hàng Có Thể Kiểm”",
+      "summary": "Lâm Việt xác lập mẫu ghi nguồn chặt chẽ với Hứa An và Hàn Dược Sư, nhưng chưa có thêm hàng, giao dịch hay giá mua nào được xác nhận.",
+      "payoffKind": null,
+      "endedOn": "Lâm Việt biết rõ phải chờ cái gì mới được gọi là hàng."
+    }
+  ],
+  "volumeSummaries": [],
+  "styleMemory": []
+}

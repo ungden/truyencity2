@@ -19,8 +19,8 @@
   },
   "goldenFinger": {
     "name": "Kho Hàng Ba Trăm Năm",
-    "rule": "Kho sau tiệm Khải Minh nối cố định với một cửa hàng bỏ trống ở Tân Hải Thành sau ba trăm năm. Chỉ Trần Khải có thể bước qua cửa; khách hai thời đại giao nhận tại đầu cửa hàng thuộc thế giới của họ. Trần Khải tự mang hàng, niêm yết giá và ký đổi trực tiếp; tài sản hai đầu thuộc về người giao dịch sau khi chốt.",
-    "scope": "Cánh cửa chỉ nối hai cửa hàng và không tự sản xuất, kiểm định hay bán hàng. Lợi thế đến từ nguồn cung, khả năng nhìn ra nhu cầu và việc biến công nghệ đổi được thành sản phẩm thương mại ở hiện đại.",
+    "rule": "Kho sau tiệm Khải Minh nối cố định với một cửa hàng ở Tân Hải Thành sau ba trăm năm. Hai gian cửa hàng và ngưỡng nối là lãnh vực tuyệt đối của Trần Khải: hành vi thù địch, cưỡng ép vào cửa, trộm hàng, quét và theo dõi công nghệ đều vô hiệu; Khải có thể trục xuất khách và thu hồi hàng chưa thanh toán. Khách hai thời đại giao nhận tại đầu cửa hàng thuộc thế giới của họ.",
+    "scope": "Cánh cửa không tự sản xuất, truyền kiến thức hay bán hàng. Lợi thế đến từ chênh lệch giá trị, nguồn cung và việc biến một công dụng tương lai đã hiểu thành sản phẩm hiện đại. Rủi ro bên ngoài cửa hàng vẫn tồn tại nhưng không tạo tuyến chống cướp hoặc giữ quầy.",
     "evolution": [
       { "id": "quay_doi_le", "name": "Quầy đổi lẻ", "changesUse": "Đổi từng lô thực phẩm lấy thiết bị hoặc phần mềm có thể trình diễn." },
       { "id": "kho_lanh_hai_thoi_dai", "name": "Kho lạnh hai thời đại", "changesUse": "Duy trì phẩm chất và gom đơn đều thay vì giao dịch ngẫu nhiên." },

@@ -1,0 +1,92 @@
+{
+  "verdict": {
+    "continuity": [],
+    "scorecard": {
+      "opening": 4,
+      "anticipation": 4,
+      "payoff": 3,
+      "newness": 3,
+      "endHook": 4
+    },
+    "craft": {
+      "protagonistAgency": 5,
+      "sceneLife": 4,
+      "worldLogic": 5,
+      "dialogueNaturalness": 5,
+      "structuralFreshness": 3
+    },
+    "repetition": [],
+    "aiFlavor": [],
+    "steering": [
+      "Chương giữ canon rất chắc: Khải chỉ sử dụng điều Diệp Ninh trực tiếp tháo và giải thích trong phạm vi nghề sửa; anh chủ động lập ranh giới tri thức thay vì biến dao hỏng thành “công nghệ có thể sao chép”.",
+      "Payoff hiện là một payoff điều tra tốt nhưng còn nhỏ hơn hợp đồng mở đầu: Khoa chưa trực tiếp tháo-rửa, chưa thừa nhận cơ cấu tiện hơn hàng đang bán, và chưa có bản mẫu đầu tiên. Nên để chương sau trả đúng các kết quả ấy qua phép đo và thử đối chứng, không nâng cấp bằng đối thoại xác nhận suông.",
+      "Điểm mạnh nhất là chuỗi bằng chứng vật chất: chốt, rãnh, cặn, ảnh và ba cột ghi chép. Ở bước tiếp theo, hãy cho rãnh được kiểm bằng một so sánh cụ thể với dao phổ thông—lượng cặn còn lại, số thao tác tháo-rửa, điểm kẹt—để giá trị chênh lệch đi từ quan sát sang công dụng.",
+      "Diệp Ninh có nghề nghiệp và thói quen rõ qua việc đánh dấu đường ráp, không cạy bừa và từ chối đoán phần lõi. Có thể làm đời sống Tân Hải dày thêm bằng một chi tiết ngắn về lý do món thanh lý này đáng để cô mang tới, thay vì thêm giải thích công nghệ.",
+      "Câu kết đặt đúng câu hỏi sản xuất: một xưởng hiện tại phải hiểu được gì. Khi vào pha làm mẫu, giữ rõ chi phí, vật liệu, dung sai và người thực hiện; đừng để “có ảnh” tự biến thành năng lực gia công."
+    ],
+    "reviewBinding": {
+      "chapterNumber": 4,
+      "title": "“Đừng Cấp Điện Cho Nó”",
+      "excerpt": "Khải kẻ một đường đậm trong sổ, viết: **Không cấp nguồn. Không tháo sâu.**"
+    }
+  },
+  "digest": {
+    "chapterNumber": 4,
+    "title": "“Đừng Cấp Điện Cho Nó”",
+    "summary": "Trần Khải cùng Diệp Ninh và Phạm Khoa xác nhận những gì có thể quan sát ở chiếc dao cạo hỏng, đồng thời thống nhất không cấp nguồn hay tháo sâu trước khi có phép đo và mẫu đối chứng.",
+    "payoffKind": null,
+    "endedOn": "Khải tự hỏi phải đo rãnh thoát vụn thế nào để một xưởng hiện tại còn hiểu được.",
+    "newNamedThings": [
+      "tui_vai_xam — túi vải xám",
+      "do_thanh_ly — đồ thanh lý",
+      "huong_khao_sat — hướng khảo sát"
+    ],
+    "narrativeEvidence": [
+      {
+        "id": "dao_cao_rau_dan_dung",
+        "chapterNumber": 4,
+        "quote": "“Dao dân dụng,” cô nói. “Loại này không giữ điện thì khách thường thay cả cái. Pin bên trong đã chết, lưỡi cũng quá hạn thay rồi. Phần điều khiển không hoạt động.”",
+        "learnedByCharacterIds": [
+          "tran_khai",
+          "diep_ninh"
+        ]
+      },
+      {
+        "id": "dao_cao_khac_chuan_pin",
+        "chapterNumber": 4,
+        "quote": "“Pin chết; đầu nối, điện áp với đường mạch đều chưa xác định. Tao không cấp nguồn cho nó.”\n\nKhoa không cười. Cậu cầm điện thoại, phóng to ảnh khe nối kim loại, xem một lúc rồi đặt xuống.\n\n“Đúng. Không cấp nguồn.”",
+        "learnedByCharacterIds": [
+          "tran_khai",
+          "pham_khoa"
+        ]
+      }
+    ],
+    "coreChanges": {
+      "storyDayDelta": 0,
+      "died": [],
+      "progressionChanges": [],
+      "assetEvents": [],
+      "goldenFingerRungChange": null,
+      "moved": [
+        {
+          "characterId": "tran_khai",
+          "toLocationId": "tiem_khai_minh"
+        },
+        {
+          "characterId": "pham_khoa",
+          "toLocationId": "tiem_khai_minh"
+        }
+      ],
+      "worldFactsRevealed": [],
+      "newCast": [],
+      "hooksPlanted": [],
+      "hooksPaid": [
+        "diep_ninh_mang_do_thanh_ly"
+      ],
+      "learnedFinger": []
+    }
+  },
+  "attempts": 1,
+  "costUsd": 0.055031,
+  "inputFingerprint": "b4488e10f2714c452ae9fc189d3691a65f8aff30c55916476e9309e2c1cc9540"
+}

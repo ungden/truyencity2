@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 2,
+  "cycleNumber": 1,
+  "volumeNumber": 1,
+  "startChapter": 1,
+  "plannedEndChapter": 10,
+  "pressure": "Lượt chỉnh cuối đã nằm trong chi phí V1, nhưng Khải không thể gọi mẫu là hàng bán hoặc dồn tiền vào vòng hai chỉ vì cảm giác tốt hơn. Anh cần nhận lại chính V1 sau khi bo góc rãnh, lặp đối chứng rửa trong điều kiện cũ và để Khoa xác nhận phần ưu thế nào thực sự còn đứng vững.",
+  "escalation": [
+    "Khải khóa phạm vi chỉnh sửa với xưởng: chỉ bo cung ngắn ở góc giao rãnh, không động vào chốt đã đạt 6/6 hay mặt gá lưỡi.",
+    "V1 trở về kho tiệm trong lúc Khải vẫn phải ngắt quãng để bán hàng; anh cùng Khoa lặp bài rửa bằng cùng lưỡi, lượng vật liệu mô phỏng và cách xả nước đã ghi.",
+    "Đối chứng hậu chỉnh cho thấy vùng góc trước đây giữ cặn nay tiếp cận được tốt hơn, còn lợi thế thoát vụn của khoảng rỗng vẫn giữ; đồng thời họ ghi rõ dữ liệu vẫn không nói gì về cạo trên da hoặc tuổi thọ lưỡi.",
+    "Khoa công nhận V1 đủ chứng cứ kỹ thuật có điều kiện để Khải cân nhắc vòng hai, nhưng chỉ nếu vòng đó trả lời được bài toán chi phí và thử nghiệm sử dụng thực tế thay vì biến kết quả rửa thành quảng cáo."
+  ],
+  "climax": {
+    "payoffKind": "duoc_cong_nhan",
+    "performedBy": "ally",
+    "attribution": "inner_circle",
+    "result": "Sau khi V1 trở về với góc rãnh được bo đúng dấu đo, Phạm Khoa kiểm bảng đối chứng hậu chỉnh và xác nhận hai điều trong đúng phạm vi bài thử: khoảng rỗng cùng đường rãnh giúp nước và bàn chải tiếp cận vùng bên trong tốt hơn dao phổ thông, còn góc giữ cặn của V1 cũ đã giảm rõ. Anh không xác nhận hiệu quả cạo, độ bền lưỡi hay khả năng bán hàng. Với Khải, đây là căn cứ để chọn có đầu tư vòng hai, chưa phải lý do mở bán.",
+    "witnesses": [
+      "Trần Khải",
+      "Phạm Khoa"
+    ]
+  },
+  "aftermath": "Khải cập nhật V1 thành mẫu đã hoàn tất kiểm đối chứng hậu chỉnh, giữ nguyên ghi chú rằng nó không phải tài sản thương mại và không có dữ liệu dùng trên người. Anh có một kết luận đủ hẹp để bảo vệ tiền thử đã bỏ ra: công dụng vệ sinh đáng theo tiếp, nhưng bất kỳ vòng hai nào cũng phải có ngân sách riêng, tiêu chí chi phí và bài thử mới.",
+  "nextHook": "Khi Khải vừa ghi xong kết quả, Diệp Ninh nhắc lại lời hẹn: cô có thể mang một món dân dụng thanh lý khác, nhưng chỉ khi rau quả không còn là một túi hàng may rủi. Khải phải cân giữa việc mở vòng hai cho dao cạo và xây một đợt nguồn thực phẩm nhỏ, đều hơn để giữ khách hàng đầu tiên ở Tân Hải.",
+  "customerLoop": null,
+  "beatSheets": [
+    {
+      "chapterNumber": 10,
+      "sceneMode": "investigation",
+      "openingBridge": "Từ bảng V1 còn dán trên tường kho, Khải gọi xưởng chốt lượt chỉnh cuối đã gồm trong giá: bo đúng một cung ngắn tại góc giao rãnh, giữ nguyên chốt và mặt gá lưỡi. Anh để lại số đo cũ làm mốc, không mang mẫu đi khoe.",
+      "protagonistMove": "Khải nhận lại chính V1 hậu chỉnh, lặp bài rửa theo điều kiện đã ghi và yêu cầu Khoa kết luận riêng từng hạng mục. Sau đó anh nghe đề nghị nguồn rau đều của Diệp Ninh rồi đặt hai hướng chi tiêu cạnh nhau thay vì tự gộp chúng thành một giấc mơ.",
+      "beats": [
+        "Xưởng giao V1 với cung bo đúng dấu đo. Khải kiểm chốt mở–đóng, vị trí gá lưỡi và độ nhô lưỡi trước khi thử; các phần này không đổi, nên việc sửa góc rãnh không được tính thành nâng cấp toàn bộ đầu dao.",
+        "Chuông tiệm cắt ngang khi Khải phải bán một gói thuốc lá và trả tiền thừa. Anh bỏ lượt đang dang dở, quay lại rửa tay và làm lại từ đầu với cùng loại lưỡi, giấy mỏng cùng vụn mô phỏng đã làm ướt, lượng nước và số lượt bàn chải cho V1 lẫn dao phổ thông.",
+        "Ở V1 hậu chỉnh, bàn chải chạm vào góc cũ dễ hơn, cặn tại giao rãnh giảm, còn khoảng rỗng vẫn thoát vụn tốt hơn dao phổ thông. Khoa khoanh phần còn bám ở gờ gá và ký phần kết luận có giới hạn vào Bảng đối chứng hậu chỉnh V1.",
+        "Diệp Ninh qua ngưỡng cửa hỏi liệu Khải có thể mang rau đều cho mẹ cô và vài khách quanh quầy sửa hay không. Cô nhắc sẽ đem món thanh lý khác để đổi khi nguồn không còn may rủi; Khải ghi cạnh dự toán V2 một dòng riêng về chi phí, thời gian và độ đều của đợt rau nhỏ."
+      ],
+      "materialOutcome": "V1 được nhận lại sau lượt bo góc cuối, giữ nguyên chốt và gá lưỡi. Bảng đối chứng hậu chỉnh V1 ghi giảm cặn ở góc giao rãnh trong bài rửa mô phỏng, vẫn còn cặn ở gờ gá, cùng hai hướng phân bổ nguồn lực kế tiếp: phương án vòng hai và đợt thực phẩm nguồn đều.",
+      "emotionalTarget": "Sự công nhận có trọng lượng vì Khải nhận được cả kết quả lẫn ranh giới của kết quả; cơ hội thương mại tiếp theo cũng có gương mặt, nhu cầu và mức bất định cụ thể của Diệp Ninh.",
+      "newNamedThing": "Bảng đối chứng hậu chỉnh V1",
+      "prerequisiteIds": [
+        "kiem_thu_mau_co_khi_v1",
+        "hoan_thanh_mau_co_khi_v1",
+        "xac_lap_yeu_cau_mau",
+        "co_cau_tu_lam_sach"
+      ],
+      "revealsFactIds": [],
+      "advancesMilestoneIds": [
+        "kiem_thu_mau_co_khi_v1"
+      ],
+      "valueContrastId": "do_dan_dung_tuong_lai_ve_van_cang",
+      "valueExperience": "Khải và Khoa đặt V1 hậu chỉnh cạnh dao phổ thông, dùng cùng lưỡi, vật liệu mô phỏng, nước và bàn chải. Khi nước cùng bàn chải vào góc rãnh dễ hơn và khoảng rỗng vẫn đưa vụn ra ngoài, ưu thế vệ sinh trở thành trải nghiệm đối chứng cụ thể; Khoa vì thế công nhận hướng cơ cấu đủ đáng để Khải lập phương án vòng hai.",
+      "endHookKind": "opportunity"
+    }
+  ],
+  "editorialNotes": [
+    "Beat chương 10 phải advancesMilestoneIds gồm kiem_thu_mau_co_khi_v1 theo nghĩa kiểm hậu chỉnh, không đòi lặp kiểm sơ bộ chương 9. Sau đối chứng, bắt buộc có cảnh Diệp Ninh trực tiếp qua ngưỡng hỏi nguồn rau đều và nhắc món thanh lý; Khải ghi cạnh nhau chi phí/thời gian cho nguồn rau và phương án vòng hai V1.",
+    "Chương 10 [plan/skipped_prerequisite]: Next hook của chu kỳ đòi Diệp Ninh nhắc lại lời hẹn và buộc Khải cân cụ thể giữa phương án vòng hai cho dao cạo với một đợt rau quả ổn định hơn. Chương 10 hoàn tất đối chứng hậu chỉnh rồi kết ở câu hỏi chung của Khoa về “vòng hai”; Diệp Ninh, lời hẹn, và áp lực nguồn thực phẩm không xuất hiện. Vì vậy mạch thương mại Tân Hải chưa được nối vào quyết định kế tiếp như kế hoạch đã hứa. Hướng sửa: Thêm một cảnh ngắn sau khi Khải cất V1 hoặc ở đầu chương sau: Diệp Ninh hỏi lại về rau đều cho mẹ/các khách quanh cô và đề nghị mang món thanh lý khác khi nguồn hàng bớt may rủi. Để Khải đối chiếu chi phí, thời gian và lợi ích của hai hướng thay vì chỉ nói chung là chưa biết vòng hai làm gì.",
+    "Beat chương 10 bắt buộc có cảnh cuối sau đối chứng: Diệp Ninh trực tiếp xuất hiện qua ngưỡng cửa, hỏi một đợt rau đều cho mẹ hoặc khách quanh cô và nhắc sẽ mang món dân dụng thanh lý khác nếu nguồn rau bớt may rủi. Khải ghi cạnh nhau hai nhu cầu cần tính chi phí/thời gian: phương án vòng hai V1 và một đợt nguồn rau ổn định. Không chỉ nhắc chung bằng độc thoại.",
+    "Milestone kiem_thu_mau_co_khi_v1 đã được hoàn tất ở chương 9 bằng kiểm kẹt cặn, độ bám và chi phí; beat chương 10 bắt buộc advancesMilestoneIds rỗng, không claim milestone lần nữa. Chương 10 chỉ nhận lại chính V1 hậu chỉnh, lặp rửa đối chứng, ghi payoff Khoa công nhận ưu điểm vệ sinh có điều kiện và Khải cân nhắc lập phương án vòng hai.",
+    "Chương 10 [plan/skipped_prerequisite]: Kế hoạch chu kỳ đặt cao trào ở kết luận kỹ thuật có điều kiện sau khi V1 qua kiểm thử, và aftermath nói Khải đã có dữ liệu để quyết định vòng hai. Nhưng chương 10 chỉ giao V1 đi dùng lượt chỉnh cuối; cảnh nhận lại mẫu, đối chứng sau chỉnh và sự xác nhận cuối của Khoa chưa xuất hiện. Vì thế trạng thái “đủ để quyết định đầu tư vòng hai” đi trước phần chuẩn bị cần thiết cho chính nó. Hướng sửa: Hoặc thêm cảnh V1 trở về sau khi bo góc, giữ nguyên chốt/gá lưỡi, rồi lặp bài rửa đối chứng để Khoa kết luận trong đúng phạm vi dữ liệu; hoặc sửa kế hoạch, climax, aftermath và durable state để chu kỳ này kết ở quyết định dùng lượt chỉnh cuối, còn kết luận vòng hai chuyển sang chương kế tiếp.",
+    "Chương 9 [plan/skipped_prerequisite]: Lời Khải xác định rất rõ rằng kết quả kiểm V1 hiện tại chỉ đủ để quyết định có dùng lượt chỉnh cuối, không đủ để quyết định vòng hai. Điều này mâu thuẫn với climax và durable state, vốn đã ghi sự công nhận là lý do để làm vòng hai. Hướng sửa: Tôn trọng nấc quyết định mà cảnh đã thiết lập: chỉ ghi milestone là hoàn tất kiểm ban đầu và chọn sửa góc rãnh. Sau đối chứng hậu chỉnh cùng kết luận của Khoa, mới nâng kết quả thành căn cứ cho vòng hai.",
+    "Chương 10 [prose/repetitive_padding]: Giới hạn không suy từ mô phỏng sang trải nghiệm cạo đã được chương 5 và 9 nhắc, đồng thời chương 10 vừa trước đó cũng phân biệt rửa với cạo. Lần lặp này đúng về nội dung nhưng kéo dài nhịp của một chương vốn chưa trả kết quả sau chỉnh. Hướng sửa: Giữ một lần nhắc bằng bảng tiêu chí hoặc lời Khoa, rồi dành phần dung lượng tiết kiệm được cho hệ quả cảnh: xưởng xử lý thế nào, V1 sau chỉnh thay đổi ra sao, và Khải/Khoa quyết định được gì.",
+    "Chương 10 phải hoàn tất hệ quả: Khải giao chính V1 dùng lượt chỉnh cuối đã nằm trong giá, nhận lại V1 sau khi chỉ bo cung ngắn và giữ nguyên chốt/gá lưỡi, rồi cùng Khoa lặp đối chứng rửa. Khoa chỉ công nhận ưu điểm vệ sinh trong phạm vi bài thử; sau kết quả này Khải mới có căn cứ chọn đầu tư vòng tiếp. Giảm lặp lời rào trước về cảm giác trên da."
+  ]
+}

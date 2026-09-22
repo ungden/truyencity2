@@ -1,0 +1,108 @@
+{
+  "verdict": {
+    "continuity": [],
+    "scorecard": {
+      "opening": 5,
+      "anticipation": 5,
+      "payoff": 5,
+      "newness": 4,
+      "endHook": 4
+    },
+    "craft": {
+      "protagonistAgency": 5,
+      "sceneLife": 4,
+      "worldLogic": 5,
+      "dialogueNaturalness": 5,
+      "structuralFreshness": 4
+    },
+    "repetition": [],
+    "aiFlavor": [
+      {
+        "quote": "Anh có hai lượt rửa, hai tấm ảnh đối chứng, một điều đã thấy bằng mắt và một danh sách những điều chưa được phép tin.",
+        "kind": "parallel_triple"
+      }
+    ],
+    "steering": [
+      "Cảnh bám canon tốt: Khải không biến dao hỏng thành công nghệ hoàn chỉnh, tự đặt câu hỏi hẹp, chọn đối chứng vừa sức và ghi rõ giới hạn dữ liệu. Đây là một bước tiến có căn cứ toward bản yêu cầu mẫu, chưa nhảy sang “đã có sản phẩm”.",
+      "Đời sống và năng lực sẵn có hiện rõ qua việc Khải mở tiệm, xử lý hàng cận hạn, lưu mã hàng, dùng hộp đồ lỗi; Khoa đóng vai người kiểm thử hoài nghi hợp lý thay vì chuyên gia cơ khí biết tuốt.",
+      "Kết quả rửa tĩnh tạo value contrast đúng cách: người đọc thấy vụn đi qua rãnh và mắc ở gờ trước khi nhân vật định giá nó. Giữ cách cho ưu điểm xuất phát từ trải nghiệm cụ thể này khi sau đó làm mẫu và thử người dùng.",
+      "Có một điểm đại từ hơi mơ hồ ở câu “Có điều, cậu phải dùng móng tay gạt nhẹ...”: chủ thể vừa được gọi là Khải nhưng “cậu” thường chỉ Khoa. Đổi thành “anh phải...” hoặc gọi tên sẽ làm thao tác rõ hơn.",
+      "Chương sau nên để phản hồi từ xưởng tạo lựa chọn thực: chi tiết nào giữ được bằng nhựa/cơ cấu hiện có, chi tiết nào làm đội giá hoặc khó gia công. Đừng chỉ dùng xưởng như một màn kiểm tra thủ tục rồi cho qua ngay."
+    ],
+    "reviewBinding": {
+      "chapterNumber": 5,
+      "title": "“Cặn Ra Trước”",
+      "excerpt": "“Không chứng minh nó cạo sát hơn.” Anh nói. “Cũng không chứng minh nó bền hơn. Chỉ xem lúc rửa tĩnh, cái rãnh ở đầu dao có làm cặn thoát ra dễ hơn không.”"
+    }
+  },
+  "digest": {
+    "chapterNumber": 5,
+    "title": "“Cặn Ra Trước”",
+    "summary": "Trần Khải và Phạm Khoa tháo, rửa đối chứng dao cạo Tân Hải với dao phổ thông, xác nhận đường rãnh giúp cặn thoát ra dễ hơn nhưng vẫn chưa có dữ liệu về khả năng cạo, độ bền hay tính thương mại.",
+    "payoffKind": "ky_ngo",
+    "endedOn": "Khải sẽ mang đi một bản phác, không mang đi một giấc mơ.",
+    "newNamedThings": [
+      "dao cạo phổ thông",
+      "cặn mô phỏng",
+      "bản phác cơ cấu đầu dao"
+    ],
+    "narrativeEvidence": [
+      {
+        "id": "co_cau_tu_lam_sach",
+        "chapterNumber": 5,
+        "quote": "Ở đầu dao Tân Hải, vài sợi vụn đầu tiên bị nước kéo ra từ phía sau, lướt theo rãnh nhỏ rồi rơi xuống. Khải nhìn thấy rõ một mảng cặn dính ở góc trong tách ra, không nhanh, nhưng liên tục. Khi nước dừng, phần quanh mép lưỡi vẫn còn bẩn, song khoảng rỗng phía dưới đã thoáng hơn.",
+        "learnedByCharacterIds": [
+          "tran_khai",
+          "pham_khoa"
+        ]
+      },
+      {
+        "id": "hieu_mau_dau_tien",
+        "chapterNumber": 5,
+        "quote": "“Cơ cấu mở và đường rãnh của mẫu kia làm việc rửa tĩnh dễ hơn trong hai lượt thử này. Cặn có đường đi ra. Dao phổ thông vẫn rửa được, nhưng phần khó chạm hơn.”\n\n“Còn cạo?”\n\n“Không có dữ liệu.”\n\n“Độ bền?”\n\n“Không có dữ liệu.”",
+        "learnedByCharacterIds": [
+          "tran_khai",
+          "pham_khoa"
+        ]
+      }
+    ],
+    "coreChanges": {
+      "storyDayDelta": 0,
+      "died": [],
+      "progressionChanges": [],
+      "assetEvents": [
+        {
+          "eventId": "c5_acquire_dao_cao_pho_thong",
+          "kind": "acquire",
+          "assetId": "dao_cao_pho_thong",
+          "assetName": "dao cạo phổ thông",
+          "quantity": 1,
+          "unit": "chiếc",
+          "fungible": false,
+          "sourceLotId": null,
+          "fromOwnerId": null,
+          "fromOwnerName": "cửa hàng dụng cụ cá nhân đầu phố",
+          "toOwnerId": "tran_khai",
+          "toOwnerName": "Trần Khải",
+          "note": "Trần Khải mua một chiếc dao cạo phổ thông ở cửa hàng dụng cụ cá nhân đầu phố để làm mẫu đối chứng."
+        }
+      ],
+      "goldenFingerRungChange": null,
+      "moved": [],
+      "worldFactsRevealed": [],
+      "newCast": [],
+      "hooksPlanted": [
+        {
+          "id": "dan_manh_toi_xuong_nho",
+          "what": "Nếu Khải đo được kích thước cơ bản và vẽ lại bản phác cho đàng hoàng, Phạm Khoa sẽ dẫn anh tới một xưởng nhỏ để hỏi ý kiến.",
+          "dueByChapter": 6
+        }
+      ],
+      "hooksPaid": [],
+      "learnedFinger": []
+    }
+  },
+  "attempts": 1,
+  "costUsd": 0.065192,
+  "inputFingerprint": "3dbbce1662b65d7bf506b529337402bf73e9f6583df08352ec65c3b611520cc9"
+}

@@ -1,0 +1,82 @@
+{
+  "verdict": {
+    "continuity": [],
+    "scorecard": {
+      "opening": 2,
+      "anticipation": 2,
+      "payoff": 2,
+      "newness": 2,
+      "endHook": 2
+    },
+    "craft": {
+      "protagonistAgency": 2,
+      "sceneLife": 2,
+      "worldLogic": 2,
+      "dialogueNaturalness": 2,
+      "structuralFreshness": 2
+    },
+    "repetition": [],
+    "aiFlavor": [
+      {
+        "quote": "Chi phí. Thời gian. Độ tươi. Số người nhận được. Tiền quay lại chậm hay nhanh.",
+        "kind": "parallel_triple"
+      }
+    ],
+    "steering": [
+      "Cảnh kiểm thử làm tốt việc giới hạn kết luận: Khải không biến một góc bo thành “nâng cấp toàn bộ”, còn Khoa tách rõ kết quả bài rửa khỏi độ bền và trải nghiệm cạo. Đây là payoff kỹ thuật có căn cứ, đồng thời cho thấy Khải là người biết quản trị rủi ro tiền mỏng.",
+      "Nhịp bị ngắt bởi khách mua thuốc lá rất hiệu quả: tiệm vẫn phải sống trong khi dự án diễn ra. Chi tiết này khiến lựa chọn làm lại bài thử có giá trị hơn một lời khẳng định chung về tính nghiêm ngặt.",
+      "Đề nghị của Diệp Ninh có động cơ sống rõ—mẹ cô, quầy sửa, đổi công lấy đồ ăn—và không hứa hẹn làm giàu. Chương sau nên cụ thể hóa nguồn rau bằng lượng có thể lấy, giá vốn, độ tươi, người nhận và nhịp đổi công trước khi Khải coi đó là một dòng hàng đều.",
+      "Hook hai cột chi tiêu đặt đúng mâu thuẫn của truyện: V2 là vốn bị khóa lâu cho năng lực sản phẩm, còn rau là cơ hội dòng tiền/quan hệ nhưng dễ hỏng. Hãy để Khải chọn theo một tiêu chí ưu tiên cụ thể, thay vì cho cả hai tiến triển thuận lợi cùng lúc."
+    ],
+    "reviewBinding": {
+      "chapterNumber": 10,
+      "title": "“Bảng Đối Chứng Hậu Chỉnh V1”",
+      "excerpt": "Không phải toàn bộ cặn đều đi ra; sát gờ gá lưỡi vẫn còn một mảng nhỏ bám lại. Nhưng khi anh đổi góc quan sát, phần giao giữa rãnh và khoảng rỗng đã không còn bị bịt kín."
+    }
+  },
+  "digest": {
+    "chapterNumber": 10,
+    "title": "“Bảng Đối Chứng Hậu Chỉnh V1”",
+    "summary": "Trần Khải và Phạm Khoa xác nhận cung bo hậu chỉnh giúp V1 thoát cặn tốt hơn nhưng vẫn còn giới hạn, trong khi Diệp Ninh đề nghị đổi nguồn rau đều hơn lấy cơ hội tìm đồ dân dụng thanh lý.",
+    "payoffKind": "doi_chieu",
+    "endedOn": "Khải phải chọn tiền mỏng của tiệm Khải Minh nên ưu tiên làm vòng hai cho đầu dao hay thử vài chuyến rau có nguồn đều hơn.",
+    "newNamedThings": [
+      "Bảng đối chứng hậu chỉnh V1",
+      "V1 hậu chỉnh",
+      "vòng hai",
+      "đợt rau nhỏ, nguồn đều"
+    ],
+    "narrativeEvidence": [
+      {
+        "id": "kiem_thu_mau_co_khi_v1",
+        "chapterNumber": 10,
+        "quote": "**Kết quả: cung bo tại góc giao rãnh giúp bàn chải và nước tiếp cận tốt hơn; cặn tại góc giảm so với trước chỉnh, khoảng rỗng tiếp tục thoát vụn tốt hơn dao phổ thông trong bài rửa này.**\n\n**Giới hạn: vẫn còn cặn ở gờ gá lưỡi; kết quả chỉ áp dụng cho bài rửa mô phỏng, không nói về độ bền hoặc trải nghiệm cạo.**",
+        "learnedByCharacterIds": [
+          "tran_khai",
+          "pham_khoa"
+        ]
+      }
+    ],
+    "coreChanges": {
+      "storyDayDelta": 0,
+      "died": [],
+      "progressionChanges": [],
+      "assetEvents": [],
+      "goldenFingerRungChange": null,
+      "moved": [
+        {
+          "characterId": "diep_ninh",
+          "toLocationId": "tiem_khai_minh"
+        }
+      ],
+      "worldFactsRevealed": [],
+      "newCast": [],
+      "hooksPlanted": [],
+      "hooksPaid": [],
+      "learnedFinger": []
+    }
+  },
+  "attempts": 1,
+  "costUsd": 0.053821,
+  "inputFingerprint": "a74bfb2254729fecf1958744273eedd0f5a90ec7ff1ff8709ca6f86b5449a05a"
+}

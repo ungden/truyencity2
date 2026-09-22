@@ -1,13 +1,21 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import {
+  LEGACY_NARRATIVE_FOUNDATION_VERSION,
   NARRATIVE_FOUNDATION_VERSION,
   NarrativeFoundationSchema,
   NarrativeReviewSchema,
+  narrativeCraft,
   narrativeReviewGate,
 } from '@/services/narrative/foundation';
-import { BibleSchema, PremiseSchema, CyclePlanSchema, ChapterDigestSchema } from '@/services/serial/contracts';
-import { assertNarrativeDigest, assertNarrativePlan, reviewNarrativeSequence, serialSystemPrompt } from '@/services/serial/foundation';
+import { BibleSchema, PremiseSchema, CyclePlanSchema, ChapterDigestSchema, type CyclePlan } from '@/services/serial/contracts';
+import {
+  assertNarrativeDigest,
+  assertNarrativePlan,
+  canonicalizeNarrativeLearnerIds,
+  reviewNarrativeSequence,
+  serialSystemPrompt,
+} from '@/services/serial/foundation';
 import { applyDigest, seedBible } from '@/services/serial/state';
 import { earlyPayoffsForChapterRange } from '@/services/story-factory/planner';
 import { foundationSystemPrompt, reviewNarrativeWindow } from '@/services/story-factory/foundation';
@@ -39,6 +47,45 @@ function v3Premise() {
     schemaVersion: 3,
     narrativeFoundation: {
       craftProfile: profile,
+      commerceFantasy: {
+        protectedStore: {
+          ownerCharacterId: protagonistId,
+          domain: 'Toàn bộ gian cửa hàng và ngưỡng cửa nối hai kho thuộc quyền tuyệt đối của Trần Khải.',
+          protections: [
+            'hostile_action_nullified', 'forced_entry_denied', 'theft_blocked',
+            'surveillance_blocked', 'owner_can_eject', 'unpaid_goods_recalled',
+          ],
+          outsideRisk: 'Rời cửa hàng, Khải vẫn chịu luật lệ, cạnh tranh và giới hạn thể chất bình thường.',
+        },
+        valueContrasts: [
+          {
+            id: 'rau_tuoi_sang_tuong_lai',
+            sourceWorldId: legacy.worldKernel.worlds[0]!.id,
+            destinationWorldId: legacy.worldKernel.worlds[1]!.id,
+            item: 'Rau quả tươi',
+            ordinaryAtSource: 'Rau quả là hàng chợ quen thuộc, có nguồn đều và giá ai cũng hiểu.',
+            valuableAtDestination: 'Thực phẩm thật hiếm ở khu hạ tầng tương lai và có giá trị cảm giác lẫn dinh dưỡng.',
+            experienceProof: 'Khách nhìn, ngửi và nếm một phần nhỏ trước khi tự hỏi giá bằng khả năng chi trả của họ.',
+            commercialConsequence: 'Một lần dùng thật dẫn tới đơn mua nhỏ và nhu cầu giữ nguồn hàng đều.',
+          },
+          {
+            id: 'do_dan_dung_ve_hien_tai',
+            sourceWorldId: legacy.worldKernel.worlds[1]!.id,
+            destinationWorldId: legacy.worldKernel.worlds[0]!.id,
+            item: 'Đồ dân dụng tương lai lỗi thời',
+            ordinaryAtSource: 'Đây là đồ sửa chữa phổ thông đã bị khu lõi thay thế bằng đời mới.',
+            valuableAtDestination: 'Một cơ cấu nhỏ vẫn vượt hàng hiện đại ở độ bền và cách sử dụng.',
+            experienceProof: 'Khải và người có nghề thử đúng một công dụng nhìn thấy được trước khi định giá.',
+            commercialConsequence: 'Công dụng đã chứng minh mở ra mẫu sản phẩm nhỏ có người dùng cụ thể.',
+          },
+        ],
+        simplicityRules: {
+          sharedLanguage: true,
+          compressRepeatedVerification: true,
+          noRoutinePermissionPlots: true,
+          noUnseededSubsystems: true,
+        },
+      },
       characters: [{
         characterId: protagonistId,
         background: 'Trần Khải lớn lên trong tiệm tạp hóa của gia đình và quen tự kiểm hàng.',
@@ -153,6 +200,21 @@ function digest(chapterNumber: number, narrativeEvidence: Array<{
 }
 
 describe('versioned narrative foundation', () => {
+  test('current two-world foundations require the store fantasy while old artifacts remain readable', () => {
+    const current = v3Premise().narrativeFoundation!;
+    expect(NarrativeFoundationSchema.safeParse({ ...current, commerceFantasy: undefined }).success).toBe(false);
+    expect(NarrativeFoundationSchema.safeParse({
+      ...current,
+      craftProfile: { ...current.craftProfile, version: LEGACY_NARRATIVE_FOUNDATION_VERSION },
+      commerceFantasy: undefined,
+    }).success).toBe(true);
+    expect(current.commerceFantasy?.protectedStore.protections).toHaveLength(6);
+    expect(current.commerceFantasy?.simplicityRules.noUnseededSubsystems).toBe(true);
+    expect(narrativeCraft(current.craftProfile)).toMatch(/không dựng rào cản ngôn ngữ/i);
+    expect(narrativeCraft(current.craftProfile)).toMatch(/lãnh vực tuyệt đối/i);
+    expect(narrativeCraft(current.craftProfile)).toMatch(/không tự thêm AI, hệ thống phụ/i);
+  });
+
   test('legacy packages remain legacy and keep their customer loop contract', () => {
     const legacy = SERIAL_PREMISE_CATALOG[1]!.premise;
     expect(legacy.schemaVersion).toBe(2);
@@ -171,6 +233,30 @@ describe('versioned narrative foundation', () => {
       beatSheets: [{ ...planned.beatSheets[1], chapterNumber: 1 }],
     });
     expect(() => assertNarrativePlan(premise, bible, skipped)).toThrow(/before the reader has seen it/);
+  });
+
+  test('product beats bind to an approved value contrast and an on-page experience', () => {
+    const premise = v3Premise();
+    const bible = seedBible({ premise });
+    const planned = explorationCycle();
+    const withProduct = CyclePlanSchema.parse({
+      ...planned,
+      beatSheets: [{
+        ...planned.beatSheets[0],
+        valueContrastId: 'rau_tuoi_sang_tuong_lai',
+        valueExperience: 'Diệp Ninh ngửi, cắn thử lát dưa rồi chủ động hỏi giá cho phần mang về.',
+      }],
+    });
+    expect(() => assertNarrativePlan(premise, bible, withProduct)).not.toThrow();
+    const unknown = CyclePlanSchema.parse({
+      ...withProduct,
+      beatSheets: [{ ...withProduct.beatSheets[0], valueContrastId: 'hang_tu_bia' }],
+    });
+    expect(() => assertNarrativePlan(premise, bible, unknown)).toThrow(/unknown value contrast/i);
+    expect(() => CyclePlanSchema.parse({
+      ...planned,
+      beatSheets: [{ ...planned.beatSheets[0], valueContrastId: 'rau_tuoi_sang_tuong_lai' }],
+    })).toThrow(/experience/i);
   });
 
   test('Story Factory disables fixed payoff deadlines only for an opted-in profile', () => {
@@ -234,6 +320,44 @@ describe('versioned narrative foundation', () => {
     })).toThrow(/before cua_noi_hai_kho/);
   });
 
+  test('extractor cannot omit planned evidence and same-chapter facts unlock milestones regardless of output order', () => {
+    const premise = v3Premise();
+    const bible = seedBible({ premise });
+    const base = explorationCycle();
+    const sameChapter = CyclePlanSchema.parse({
+      ...base,
+      beatSheets: [{
+        ...base.beatSheets[0],
+        revealsFactIds: ['cua_noi_hai_kho'],
+        advancesMilestoneIds: ['kiem_chung_cua'],
+      }],
+    });
+    expect(() => assertNarrativeDigest({
+      premise,
+      bible,
+      cycle: sameChapter,
+      digest: digest(1, []),
+      prose: 'Khải chưa ghi lại bằng chứng.',
+    })).toThrow(/omitted planned evidence/);
+    const prose = 'Khải tự bước qua rồi quay lại. Cánh cửa mở sang một căn kho khác.';
+    expect(() => assertNarrativeDigest({
+      premise,
+      bible,
+      cycle: sameChapter,
+      digest: digest(1, [
+        {
+          id: 'kiem_chung_cua', chapterNumber: 1,
+          quote: 'Khải tự bước qua rồi quay lại.', learnedByCharacterIds: [],
+        },
+        {
+          id: 'cua_noi_hai_kho', chapterNumber: 1,
+          quote: 'Cánh cửa mở sang một căn kho khác.', learnedByCharacterIds: [],
+        },
+      ]),
+      prose,
+    })).not.toThrow();
+  });
+
   test('later character learning is preserved as a separate evidence event', () => {
     const premise = v3Premise();
     const protagonistId = premise.castSeed.find(member => member.role === 'protagonist')!.id;
@@ -257,6 +381,66 @@ describe('versioned narrative foundation', () => {
       expect.objectContaining({ id: 'cua_noi_hai_kho', chapterNumber: 1, learnedByCharacterIds: [] }),
       expect.objectContaining({ id: 'cua_noi_hai_kho', chapterNumber: 2, learnedByCharacterIds: [protagonistId] }),
     ]));
+  });
+
+  test('a character introduced in the chapter may learn narrative evidence in that chapter', () => {
+    const premise = v3Premise();
+    const prose = 'Lan đứng cạnh Khải khi cánh cửa mở sang một căn kho khác.';
+    const baseDigest = digest(1, [{
+      id: 'cua_noi_hai_kho', chapterNumber: 1,
+      quote: prose, learnedByCharacterIds: ['lan'],
+    }]);
+    const introduced = ChapterDigestSchema.parse({
+      ...baseDigest,
+      coreChanges: {
+        ...baseDigest.coreChanges,
+        newCast: [{
+          id: 'lan', name: 'Lan',
+          sheet: 'Người giao hàng cẩn thận, trực tiếp chứng kiến phép thử cánh cửa trong kho.',
+          role: 'Người giao hàng',
+          locationId: premise.castSeed[0]!.startLocationId,
+          startingProgressions: [],
+        }],
+      },
+    });
+    const bible = seedBible({ premise });
+
+    expect(() => assertNarrativeDigest({
+      premise, bible, cycle: explorationCycle(), digest: introduced, prose,
+    })).not.toThrow();
+    const next = applyDigest({ premise, bible, digest: introduced });
+    expect(next.symbolicCore.characterKnowledge).toContainEqual({
+      characterId: 'lan', factIds: ['cua_noi_hai_kho'],
+    });
+  });
+
+  test('unique trailing learner aliases are canonicalized but ambiguous aliases remain invalid', () => {
+    const premise = v3Premise();
+    const bible = seedBible({ premise });
+    const protagonistId = premise.castSeed.find(member => member.role === 'protagonist')!.id;
+    const aliased = digest(1, [{
+      id: 'cua_noi_hai_kho', chapterNumber: 1,
+      quote: 'Cánh cửa mở sang một căn kho khác.', learnedByCharacterIds: ['khai'],
+    }]);
+    const canonical = canonicalizeNarrativeLearnerIds(bible, aliased);
+    expect(canonical.narrativeEvidence[0]?.learnedByCharacterIds).toEqual([protagonistId]);
+
+    const ambiguousBible = BibleSchema.parse({
+      ...bible,
+      symbolicCore: {
+        ...bible.symbolicCore,
+        cast: [
+          ...bible.symbolicCore.cast,
+          { id: 'pham_khai', alive: true, locationId: premise.castSeed[0]!.startLocationId, lastSeenChapter: 0, knowsFinger: false },
+        ],
+      },
+      castSheet: [
+        ...bible.castSheet,
+        { id: 'pham_khai', name: 'Phạm Khải', sheet: 'Một người trùng tên gọi.' },
+      ],
+    });
+    const unresolved = canonicalizeNarrativeLearnerIds(ambiguousBible, aliased);
+    expect(unresolved.narrativeEvidence[0]?.learnedByCharacterIds).toEqual(['khai']);
   });
 
   test('legacy Bible evidence backfills character knowledge before its quote ages out', () => {
@@ -382,6 +566,7 @@ describe('versioned narrative foundation', () => {
           ? { title: 'Ca tối', content: prose }
           : input.system.startsWith('Bạn soát canon')
             ? {
+                reviewBinding: { chapterNumber: 1, title: 'Ca tối', excerpt: prose.slice(0, 40) },
                 continuity: [],
                 scorecard: { opening: 4, anticipation: 4, payoff: 3, newness: 3, endHook: 3 },
                 craft: { protagonistAgency: 3, sceneLife: 4, worldLogic: 4, dialogueNaturalness: 4, structuralFreshness: 3 },
@@ -406,7 +591,7 @@ describe('versioned narrative foundation', () => {
     expect(result.status).toBe('needs_review');
     if (result.status !== 'needs_review') return;
     expect(result.reason).toContain('narrative_evidence_semantics');
-    expect(calls.filter(call => call === 'Bạn kiểm chứng bằng chứng truyện theo nghĩa, không viết lại truyện. Với từng claim, supported=true chỉ khi quote và ngữ cảnh chương thực sự cho độc giả thấy claim đó. Việc một câu xuất hiện nguyên văn không đủ. Milestone chỉ đúng khi evidenceNeeded đã xảy ra trên trang; ý định, lời hứa, suy đoán hoặc thao tác không liên quan đều là false. Với learnedByCharacterIds, nhân vật phải trực tiếp quan sát hoặc được truyền đạt thông tin trong chương. Trả đúng một check cho mỗi claim, giữ nguyên id và quote.')).toHaveLength(2);
+    expect(calls.filter(call => call === 'Bạn kiểm chứng bằng chứng truyện theo nghĩa, không viết lại truyện. Với từng claim, supported=true chỉ khi quote và ngữ cảnh chương thực sự cho độc giả thấy claim đó. Việc một câu xuất hiện nguyên văn không đủ. Milestone chỉ đúng khi evidenceNeeded đã xảy ra trên trang; ý định, lời hứa, suy đoán hoặc thao tác không liên quan đều là false. Với learnedByCharacterIds, nhân vật phải trực tiếp quan sát hoặc được truyền đạt thông tin trong chương. Trả đúng một check cho mỗi claim, giữ nguyên id và quote.')).toHaveLength(1);
   });
 
   test('Story Factory chapter-zero knowledge must mirror the foundation', () => {
@@ -451,6 +636,12 @@ describe('versioned narrative foundation', () => {
     expect(voice).toContain('Chi tiết kỹ thuật được ở trung tâm');
   });
 
+  test('extractor does not restate durable facts when no new character learns them', () => {
+    expect(serialSystemPrompt('extractor', v3Premise())).toMatch(
+      /không lặp evidence chỉ vì chương nhắc lại hoặc hành động theo kiến thức cũ/,
+    );
+  });
+
   test('a blocking prose finding closes the publication gate while minor prose does not', () => {
     const assessment = {
       protagonist: 'Nhân vật chính có nghề nghiệp, giới hạn và mong muốn đủ rõ để theo dõi.',
@@ -480,8 +671,10 @@ describe('versioned narrative foundation', () => {
   test('v3 rolling plans may continue a developing discovery scene mode', async () => {
     const premise = v3Premise();
     const active = explorationCycle();
-    const candidate = CyclePlanSchema.parse({
+    const candidate = {
       ...active,
+      startChapter: 3,
+      plannedEndChapter: 5,
       beatSheets: [{
         ...active.beatSheets[1],
         chapterNumber: 3,
@@ -495,7 +688,7 @@ describe('versioned narrative foundation', () => {
         revealsFactIds: [],
         advancesMilestoneIds: [],
       }],
-    });
+    } as CyclePlan;
     const provider = {
       async text() { throw new Error('unused'); },
       async json<T>(input: { model: string }) {
@@ -524,14 +717,17 @@ describe('versioned narrative foundation', () => {
     expect(planned.usages).toHaveLength(1);
   });
 
-  test('the future two-world pilot remains a private, schema-valid review artifact', () => {
-    const artifact = JSON.parse(readFileSync(join(
-      process.cwd(),
-      'factory/serial/song-xuyen/private/song-xuyen-tuong-lai-v3-review.json',
-    ), 'utf8')) as { reviewState: string; replacesPublicContent: boolean; foundation: unknown };
-    expect(artifact.reviewState).toBe('private_foundation_only');
-    expect(artifact.replacesPublicContent).toBe(false);
-    expect(() => NarrativeFoundationSchema.parse(artifact.foundation)).not.toThrow();
+  test('both two-world pilots carry the current protected-store contract', () => {
+    for (const file of ['song-xuyen-tuong-lai-v3-review.json', 'cua-hang-cong-phap-v3-review.json']) {
+      const artifact = JSON.parse(readFileSync(join(
+        process.cwd(), 'factory/serial/song-xuyen/private', file,
+      ), 'utf8')) as { reviewState: string; replacesPublicContent: boolean; foundation: unknown };
+      expect(artifact.reviewState).toBe('private_foundation_only');
+      expect(artifact.replacesPublicContent).toBe(false);
+      const foundation = NarrativeFoundationSchema.parse(artifact.foundation);
+      expect(foundation.commerceFantasy?.protectedStore.protections).toHaveLength(6);
+      expect(foundation.commerceFantasy?.valueContrasts).toHaveLength(2);
+    }
   });
 
   test('Story Factory adds a grounded literary review only for opted-in kernels', async () => {
@@ -636,6 +832,44 @@ describe('versioned narrative foundation', () => {
       approvedPlan: { schemaVersion: 2, startChapter: 1 },
       stateAtSequenceStart: { chapterNumber: 0 },
       durableNarrativeState: { revealedNarrativeIds: [] },
+    });
+  });
+
+  test('Serial literary review grounds a unique quote and repairs its chapter number without another call', async () => {
+    const premise = v3Premise();
+    let calls = 0;
+    const provider = {
+      async text() { throw new Error('unused'); },
+      async json<T>(input: { model: string }) {
+        calls += 1;
+        return {
+          value: {
+            findings: [{
+              target: 'prose', kind: 'unlived_scene', severity: 'minor', chapterNumber: 2,
+              quote: 'Khải đánh dấu chai nước', explanation: 'Chi tiết cần được sống kỹ hơn.',
+              direction: 'Giữ phép thử ở trên trang.',
+            }],
+            readerAssessment: {
+              protagonist: 'Khải hiện rõ.', world: 'Đời sống đủ rõ.', causality: 'Có bước chuẩn bị.',
+              sceneLife: 'Cảnh có thao tác.', desireToContinue: 'Có câu hỏi tiếp theo.',
+            },
+          } as T,
+          usage: { ...baseUsage, model: input.model },
+        };
+      },
+    } as StoryModelProvider;
+    const result = await reviewNarrativeSequence({
+      provider, routes: DEFAULT_SERIAL_ROUTES, premise,
+      chapters: [
+        { chapterNumber: 1, title: 'Ca tối', content: 'Khải đánh dấu chai nước rồi đặt qua cửa.' },
+        { chapterNumber: 2, title: 'Sáng hôm sau', content: 'Anh khóa cửa và kiểm sổ.' },
+      ],
+    });
+
+    expect(calls).toBe(1);
+    expect(result?.review.findings[0]).toMatchObject({
+      chapterNumber: 1,
+      quote: 'Khải đánh dấu chai nước',
     });
   });
 

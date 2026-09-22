@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 2,
+  "cycleNumber": 1,
+  "volumeNumber": 1,
+  "startChapter": 1,
+  "plannedEndChapter": 10,
+  "pressure": "Lượt chỉnh cuối đã nằm trong chi phí V1, nhưng Khải không thể gọi mẫu là hàng bán hoặc dồn tiền vào vòng hai chỉ vì cảm giác tốt hơn. Anh cần nhận lại chính V1 sau khi bo góc rãnh, lặp đối chứng rửa trong điều kiện cũ và để Khoa xác nhận phần ưu thế nào thực sự còn đứng vững.",
+  "escalation": [
+    "Khải khóa phạm vi chỉnh sửa với xưởng: chỉ bo cung ngắn ở góc giao rãnh, không động vào chốt đã đạt 6/6 hay mặt gá lưỡi.",
+    "V1 trở về kho tiệm trong lúc Khải vẫn phải ngắt quãng để bán hàng; anh cùng Khoa lặp bài rửa bằng cùng lưỡi, lượng vật liệu mô phỏng và cách xả nước đã ghi.",
+    "Đối chứng hậu chỉnh cho thấy vùng góc trước đây giữ cặn nay tiếp cận được tốt hơn, còn lợi thế thoát vụn của khoảng rỗng vẫn giữ; đồng thời họ ghi rõ dữ liệu vẫn không nói gì về cạo trên da hoặc tuổi thọ lưỡi.",
+    "Khoa công nhận V1 đủ chứng cứ kỹ thuật có điều kiện để Khải cân nhắc vòng hai, nhưng chỉ nếu vòng đó trả lời được bài toán chi phí và thử nghiệm sử dụng thực tế thay vì biến kết quả rửa thành quảng cáo."
+  ],
+  "climax": {
+    "payoffKind": "duoc_cong_nhan",
+    "performedBy": "ally",
+    "attribution": "inner_circle",
+    "result": "Sau khi V1 trở về với góc rãnh được bo đúng dấu đo, Phạm Khoa kiểm bảng đối chứng hậu chỉnh và xác nhận hai điều trong đúng phạm vi bài thử: khoảng rỗng cùng đường rãnh giúp nước và bàn chải tiếp cận vùng bên trong tốt hơn dao phổ thông, còn góc giữ cặn của V1 cũ đã giảm rõ. Anh không xác nhận hiệu quả cạo, độ bền lưỡi hay khả năng bán hàng. Với Khải, đây là căn cứ để chọn có đầu tư vòng hai, chưa phải lý do mở bán.",
+    "witnesses": [
+      "Trần Khải",
+      "Phạm Khoa"
+    ]
+  },
+  "aftermath": "Khải cập nhật V1 thành mẫu đã hoàn tất kiểm đối chứng hậu chỉnh, giữ nguyên ghi chú rằng nó không phải tài sản thương mại và không có dữ liệu dùng trên người. Anh có một kết luận đủ hẹp để bảo vệ tiền thử đã bỏ ra: công dụng vệ sinh đáng theo tiếp, nhưng bất kỳ vòng hai nào cũng phải có ngân sách riêng, tiêu chí chi phí và bài thử mới.",
+  "nextHook": "Khi Khải vừa ghi xong kết quả, Diệp Ninh nhắc lại lời hẹn: cô có thể mang một món dân dụng thanh lý khác, nhưng chỉ khi rau quả không còn là một túi hàng may rủi. Khải phải cân giữa việc mở vòng hai cho dao cạo và xây một đợt nguồn thực phẩm nhỏ, đều hơn để giữ khách hàng đầu tiên ở Tân Hải.",
+  "customerLoop": null,
+  "beatSheets": [
+    {
+      "chapterNumber": 7,
+      "sceneMode": "crafting",
+      "openingBridge": "Từ tờ báo giá từng phần của xưởng, Khải mở tiệm như thường lệ, kiểm hàng cận hạn rồi đem bảng chi phí V1 vào kho sau cho Khoa. Anh không hỏi bạn liệu chiếc dao có bán được không; anh hỏi phải chốt điều gì để xưởng có thể làm đúng một mẫu cơ khí.",
+      "protagonistMove": "Khải dùng nhật ký rửa tĩnh, dao phổ thông và giới hạn tiền thử để cùng Khoa viết yêu cầu mẫu hẹp, tách phần có thể làm tại Vân Cảng khỏi mọi phần điện tử chưa hiểu.",
+      "beats": [
+        "Khoa buộc Khải viết từng yêu cầu theo cách kiểm được: rãnh phải có đường thoát nhìn thấy, đầu dao phải mở được để rửa bằng thao tác có thể lặp, tay cầm không trơn khi ướt, còn hiệu quả cạo và tuổi thọ lưỡi phải để thành bài thử sau.",
+        "Khải gạch khỏi bản yêu cầu pin, đầu nối, mạch điều khiển và mọi suy đoán từ mẫu Tân Hải. Anh chỉ giữ cấu trúc đầu dao, hướng rãnh, phương án gá lưỡi phổ thông và giới hạn giá thành do xưởng đã nêu.",
+        "Anh đối chiếu báo giá với tiền nhập hàng trong tuần và khoản phải giữ cho viện phí, rồi chốt một mức tiền thử không được động tới các khoản đó. Phần vượt mức sẽ buộc anh dừng, không vay nóng để chạy theo mẫu.",
+        "Khoa đọc lại bản yêu cầu và đồng ý nó đủ để trả lời phản hồi của xưởng: đây là mẫu cơ khí cần kiểm, không phải một sản phẩm đã được chứng minh."
+      ],
+      "materialOutcome": "Khải có bản yêu cầu mẫu cơ khí V1, ngân sách thử tách riêng và danh sách tiêu chí kiểm sau gia công.",
+      "emotionalTarget": "Sự căng thẳng của tiền bạc chuyển thành một lựa chọn có giới hạn rõ ràng; Khải không còn dựa vào chiếc dao tương lai như một lời hứa mơ hồ.",
+      "newNamedThing": null,
+      "prerequisiteIds": [
+        "hieu_mau_dau_tien",
+        "dao_cao_khac_chuan_pin",
+        "co_cau_tu_lam_sach",
+        "xuong_can_ban_ve"
+      ],
+      "revealsFactIds": [],
+      "advancesMilestoneIds": [
+        "xac_lap_yeu_cau_mau"
+      ],
+      "valueContrastId": "do_dan_dung_tuong_lai_ve_van_cang",
+      "valueExperience": "Khải và Khoa đặt đầu dao Tân Hải cạnh dao phổ thông, chỉ giữ lại điều họ đã trực tiếp thấy khi rửa: vụn có đường thoát và đầu dao có thể mở để làm sạch. Việc phải gạch bỏ pin, mạch và lời hứa cạo sát khiến giá trị của mẫu được định đúng ở tiện ích vệ sinh cơ khí.",
+      "endHookKind": "declaration"
+    },
+    {
+      "chapterNumber": 8,
+      "sceneMode": "negotiation",
+      "openingBridge": "Khải quay lại xưởng với bản yêu cầu đã có vật liệu dự kiến, kích thước cần giữ, ngân sách thử và những phần anh chấp nhận để thợ sửa. Lần này, ông chủ xưởng không phải đoán xem khách đang muốn sao chép một món đồ không rõ nguyên lý.",
+      "protagonistMove": "Anh thương lượng một mẫu duy nhất cùng hai lượt chỉnh lỗi nằm trong mức tiền đã chốt, yêu cầu xưởng ghi rõ phần nào làm theo bản vẽ và phần nào chỉ có thể điều chỉnh sau khi cầm mẫu thật.",
+      "beats": [
+        "Người thợ rà bản vẽ, yêu cầu Khải chọn chốt mở đơn giản thay vì cơ cấu nhiều lớp của mẫu tham chiếu. Khải chọn phương án chốt cơ khí dễ gia công, chấp nhận nó chưa thể mượt như dao Tân Hải.",
+        "Xưởng chốt vật liệu vỏ, dung sai của rãnh, phương án gá lưỡi phổ thông và lịch giao một mẫu V1. Khải thanh toán tiền thử từ khoản đã tách, không lấy vào tiền nhập hàng đang quay vòng.",
+        "Khi nhận mẫu, Khải thấy rãnh đã thành hình nhưng chốt mở cứng hơn dự kiến và một góc trong còn giữ cặn. Anh ghi đó là lỗi mẫu đầu, không yêu cầu xưởng sửa vô hạn ngoài hai lượt đã thỏa thuận.",
+        "Khoa đề nghị không thử cạo ngay: trước hết phải kiểm thao tác mở-rửa, độ bám tay và khả năng lắp lại; sau đó mới quyết định có nên dùng lưỡi để thử kẹt râu hay không."
+      ],
+      "materialOutcome": "Mẫu cơ khí V1 xuất hiện với vật liệu, dung sai, chi phí và hai lỗi ban đầu được ghi rõ: chốt mở cứng và một góc rãnh còn giữ cặn.",
+      "emotionalTarget": "Niềm vui có trọng lượng của một vật thật đi cùng sự tỉnh táo: Khải đã mua một lần học hỏi hữu hạn, không mua một phép màu.",
+      "newNamedThing": "Mẫu cơ khí V1",
+      "prerequisiteIds": [
+        "xac_lap_yeu_cau_mau",
+        "xuong_can_ban_ve"
+      ],
+      "revealsFactIds": [],
+      "advancesMilestoneIds": [
+        "hoan_thanh_mau_co_khi_v1"
+      ],
+      "valueContrastId": "do_dan_dung_tuong_lai_ve_van_cang",
+      "valueExperience": "Khải tự mở chốt V1, xả nước qua rãnh rồi nhìn cặn mắc lại ở góc trong. So với đầu dao phổ thông, cấu trúc mới đã cho một thao tác vệ sinh khác biệt nhưng lỗi chốt cứng buộc anh định giá nó là mẫu cần sửa, chưa phải hàng tốt hơn.",
+      "endHookKind": "opportunity"
+    },
+    {
+      "chapterNumber": 9,
+      "sceneMode": "investigation",
+      "openingBridge": "Trên bàn kho, Khải đặt V1 cạnh dao phổ thông và chiếc dao Tân Hải hỏng. Anh dán bốn nhãn thử Khoa đã yêu cầu: kẹt râu, tháo-rửa, độ bám tay và chi phí; không nhãn nào ghi chữ “bán được”.",
+      "protagonistMove": "Khải chuẩn bị đối chứng vừa sức, ghi kết quả từng lượt và chỉ cho xưởng chỉnh lỗi nằm trong thỏa thuận. Anh để Khoa là người kết luận giới hạn dữ liệu thay vì tự diễn giải kết quả có lợi.",
+      "beats": [
+        "Khải cùng Khoa cho lượng vụn gần tương đương vào V1 và dao phổ thông, rửa trong cùng điều kiện. V1 xả được nhiều cặn hơn nhờ rãnh và đầu mở, nhưng góc trong vẫn cần chà tay sau khi nước dừng.",
+        "Ở bài thao tác, Khoa mở-rửa-lắp lại nhiều lượt, xác nhận V1 có ít bước vệ sinh hơn dao phổ thông nhưng chốt cứng khiến thao tác một tay chưa ổn. Khải dùng một lượt chỉnh lỗi đã chốt để giảm độ cứng chốt, không thay toàn bộ cấu trúc.",
+        "Bài kiểm độ bám cho thấy tay cầm V1 không trơn hơn khi ướt, còn bài thử với lưỡi chỉ được ghi là dữ liệu sơ bộ: chưa đủ để kết luận độ bền hay cảm giác cạo. Khải giữ nguyên giới hạn đó trong bảng kết quả.",
+        "Khoa xác nhận ưu điểm có điều kiện: cơ cấu tháo-rửa và đường thoát cặn đáng làm vòng hai; còn chốt, vị trí lưỡi và thử cạo phải là mục tiêu tiếp theo. Khải đánh dấu V1 là mẫu kiểm đã hoàn thành, không phải hàng thương mại."
+      ],
+      "materialOutcome": "Khải có bảng kiểm V1 với kết quả cụ thể về kẹt cặn, thao tác tháo-rửa, độ bám tay, chi phí đã dùng và các dữ liệu còn thiếu về lưỡi.",
+      "emotionalTarget": "Được công nhận theo cách khó hơn lời khen: Khải có bằng chứng cho một ưu điểm thật và đủ kỷ luật để không biến nó thành thành công giả.",
+      "newNamedThing": null,
+      "prerequisiteIds": [
+        "hoan_thanh_mau_co_khi_v1"
+      ],
+      "revealsFactIds": [],
+      "advancesMilestoneIds": [
+        "kiem_thu_mau_co_khi_v1"
+      ],
+      "valueContrastId": "do_dan_dung_tuong_lai_ve_van_cang",
+      "valueExperience": "Trong hai lượt rửa đối chứng, Khoa trực tiếp thấy V1 để cặn rời khỏi rãnh nhiều hơn dao phổ thông và mở đầu dao nhanh hơn để chà phần còn lại. Anh đồng thời phải dùng lực với chốt cứng và từ chối công nhận độ bền lưỡi khi chưa có bài thử đủ dài.",
+      "endHookKind": "reveal"
+    }
+  ],
+  "editorialNotes": [
+    "Chương 10 [plan/skipped_prerequisite]: Kế hoạch chu kỳ đặt cao trào ở kết luận kỹ thuật có điều kiện sau khi V1 qua kiểm thử, và aftermath nói Khải đã có dữ liệu để quyết định vòng hai. Nhưng chương 10 chỉ giao V1 đi dùng lượt chỉnh cuối; cảnh nhận lại mẫu, đối chứng sau chỉnh và sự xác nhận cuối của Khoa chưa xuất hiện. Vì thế trạng thái “đủ để quyết định đầu tư vòng hai” đi trước phần chuẩn bị cần thiết cho chính nó. Hướng sửa: Hoặc thêm cảnh V1 trở về sau khi bo góc, giữ nguyên chốt/gá lưỡi, rồi lặp bài rửa đối chứng để Khoa kết luận trong đúng phạm vi dữ liệu; hoặc sửa kế hoạch, climax, aftermath và durable state để chu kỳ này kết ở quyết định dùng lượt chỉnh cuối, còn kết luận vòng hai chuyển sang chương kế tiếp.",
+    "Chương 9 [plan/skipped_prerequisite]: Lời Khải xác định rất rõ rằng kết quả kiểm V1 hiện tại chỉ đủ để quyết định có dùng lượt chỉnh cuối, không đủ để quyết định vòng hai. Điều này mâu thuẫn với climax và durable state, vốn đã ghi sự công nhận là lý do để làm vòng hai. Hướng sửa: Tôn trọng nấc quyết định mà cảnh đã thiết lập: chỉ ghi milestone là hoàn tất kiểm ban đầu và chọn sửa góc rãnh. Sau đối chứng hậu chỉnh cùng kết luận của Khoa, mới nâng kết quả thành căn cứ cho vòng hai.",
+    "Chương 10 [prose/repetitive_padding]: Giới hạn không suy từ mô phỏng sang trải nghiệm cạo đã được chương 5 và 9 nhắc, đồng thời chương 10 vừa trước đó cũng phân biệt rửa với cạo. Lần lặp này đúng về nội dung nhưng kéo dài nhịp của một chương vốn chưa trả kết quả sau chỉnh. Hướng sửa: Giữ một lần nhắc bằng bảng tiêu chí hoặc lời Khoa, rồi dành phần dung lượng tiết kiệm được cho hệ quả cảnh: xưởng xử lý thế nào, V1 sau chỉnh thay đổi ra sao, và Khải/Khoa quyết định được gì.",
+    "Chương 10 phải hoàn tất hệ quả: Khải giao chính V1 dùng lượt chỉnh cuối đã nằm trong giá, nhận lại V1 sau khi chỉ bo cung ngắn và giữ nguyên chốt/gá lưỡi, rồi cùng Khoa lặp đối chứng rửa. Khoa chỉ công nhận ưu điểm vệ sinh trong phạm vi bài thử; sau kết quả này Khải mới có căn cứ chọn đầu tư vòng tiếp. Giảm lặp lời rào trước về cảm giác trên da.",
+    "Chương 10 [plan/skipped_prerequisite]: V2 được gọi là “một mẫu tiếp theo”, trong khi thỏa thuận ở chương 8 nói hai lượt chỉnh lỗi là chỉnh trên chính mẫu đang có, không phải đổi cả ý tưởng để làm lại từ đầu. Nếu V2 là mẫu mới, truyện chưa xác lập chi phí, vật liệu, phạm vi gia công, hay việc khoản tiền thử còn lại có đủ để tạo một mẫu khác. Nếu chỉ là V1 được chỉnh, cách gọi và điều kiện của xưởng lại gây mơ hồ. Hướng sửa: Xác định rõ V2 là V1 được sửa hay một mẫu mới. Nếu là mẫu mới, hãy cho xưởng báo phần việc và chi phí phát sinh, rồi để Khải đối chiếu khoản tiền thử còn lại trước khi chốt. Nếu là sửa V1, sửa lời xác nhận của xưởng để nó nhất quán với hai lượt chỉnh đã thỏa thuận.",
+    "Chương 10 [plan/skipped_prerequisite]: Chương 9 đã cho kết quả sau chỉnh chốt: V1 mở một tay trong 6/6 lượt, kể cả hai lượt đầu ngón tay ướt, và Khoa kết luận nó không còn là lỗi khiến người dùng “vừa mở đã bực”. Chương 10 không có lần thử mới cho thấy chốt vẫn buộc phải dùng lực bẻ cổ tay, nhưng lại dùng lượt chỉnh cuối để giảm độ cứng chốt thêm lần nữa. Hướng sửa vì vậy đi trước bằng chứng mới của chính nó. Hướng sửa: Hoặc thêm một phép thử cụ thể ở chương 10—ví dụ chuỗi mở-đóng dài hơn, tay có bọt, hoặc thao tác khi đầu dao đang có cặn—cho thấy chốt vẫn gây lực xoắn hay làm lệch thao tác; hoặc giữ chốt nguyên trạng và dành lượt chỉnh cuối chỉ cho góc rãnh đã được đo đạc.",
+    "Chương 10 phải xác định đây là lượt chỉnh cuối trên chính V1 trong phạm vi chi phí đã trả ở chương 8, không gọi là mẫu V2 hay mẫu mới. Chốt đã đạt 6/6 ở chương 9 nên giữ nguyên; lượt chỉnh chỉ bo cung ngắn ở góc rãnh theo số đo, không đổi gá lưỡi. Không tự thêm AI, hệ thống phụ, giấy phép, khóa quyền hay viện kiểm tra.",
+    "Chương 4 phải cho Khải nói trực tiếp với Phạm Khoa rằng pin chết, đầu nối/điện áp/đường mạch chưa xác định và vì vậy không cấp nguồn. Quote chứng minh dao_cao_khac_chuan_pin phải chứa Khoa trực tiếp nhận thông tin; không gắn Khoa vào đoạn diễn ra trước khi anh xuất hiện. Không tự thêm AI, hệ thống phụ, giấy phép, khóa quyền hay viện kiểm tra."
+  ]
+}

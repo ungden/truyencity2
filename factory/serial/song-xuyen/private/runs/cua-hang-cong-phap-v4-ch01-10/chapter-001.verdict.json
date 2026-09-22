@@ -1,0 +1,129 @@
+{
+  "verdict": {
+    "continuity": [],
+    "scorecard": {
+      "opening": 0,
+      "anticipation": 0,
+      "payoff": 0,
+      "newness": 0,
+      "endHook": 0
+    },
+    "craft": {
+      "protagonistAgency": 0,
+      "sceneLife": 0,
+      "worldLogic": 0,
+      "dialogueNaturalness": 0,
+      "structuralFreshness": 0
+    },
+    "repetition": [],
+    "aiFlavor": [],
+    "steering": [
+      "Chương mở rất chắc: việc mất thẻ Đan đồ lập tức cho thấy Lâm Việt là người có nghề nhưng địa vị thấp, đồng thời tạo áp lực tiền thuê kho khiến mọi hành động sau đó có động cơ cụ thể.",
+      "Phép thử cửa được triển khai đúng tinh thần thận trọng có nghề: hắn dập lửa, dọn đường rút, đánh dấu túi tro, đối chiếu mùi và khối lượng, rồi mới tự qua. Các kết luận đều giữ đúng giới hạn điều đã kiểm chứng.",
+      "Đời sống Thanh Lô Phường hiện lên tự nhiên qua ca phụ lò, nguyên liệu vụn, giá thịt linh thỏ, quầy thuốc và thái độ của người cùng ca. Không cần thêm giao dịch trong chương này; đây là chương phát hiện lợi thế, chưa phải lúc ép payoff thương mại.",
+      "Ở chương kế tiếp, nên cho Lâm Việt bắt đầu quan sát nhịp sống Đông Hà qua một tiếp xúc hoặc chuyến thăm có mục tiêu rõ, thay vì lặp lại nhiều vòng thử cửa. Khi hàng đầu tiên xuất hiện, cần có trải nghiệm dùng trực tiếp của khách rồi mới đến định giá và trao đổi."
+    ],
+    "reviewBinding": {
+      "chapterNumber": 1,
+      "title": "Tro Không Đổi Mùi",
+      "excerpt": "Lâm Việt dập lửa trước.\n\nHắn không lao tới. Trong đan phòng, người chết vì tự tin với một vị thuốc lạ thường nhiều hơn người chết vì thiếu thuốc."
+    }
+  },
+  "digest": {
+    "chapterNumber": 1,
+    "title": "Tro Không Đổi Mùi",
+    "summary": "Lâm Việt mất việc ở Đan Các, phát hiện cánh cửa nối kho thuê với một cửa hàng bỏ trống ở thế giới xa lạ và tự mình thử đi qua rồi trở về an toàn.",
+    "payoffKind": "dot_pha",
+    "endedOn": "Một tháng tiền thuê kho có thể mua cho hắn thời gian. Nhưng cánh cửa này, rốt cuộc sẽ đưa hắn tới đường sống—hay tới một nơi mà ngay cả đường quay về cũng không còn?",
+    "newNamedThings": [
+      "dan_cac",
+      "han_gia",
+      "cua_hang_bo_trong"
+    ],
+    "narrativeEvidence": [
+      {
+        "id": "cua_noi_kho_dong_ha",
+        "chapterNumber": 1,
+        "quote": "— Tự đi qua, tự quay về được.\n\n— Chưa biết cửa mở được bao lâu. Chưa biết bên kia có gì ngoài căn phòng và một đoạn phố. Chưa biết người khác có thể dùng cửa hay không.",
+        "learnedByCharacterIds": [
+          "lam_viet"
+        ]
+      },
+      {
+        "id": "xac_nhan_cua_song_gioi",
+        "chapterNumber": 1,
+        "quote": "Lâm Việt đứng im, lưng quay về phía ngưỡng cửa, mắt trước hết nhìn nền nhà, sau đó mới nhìn bốn góc phòng.\n\nĐó đúng là một căn cửa hàng bỏ trống.",
+        "learnedByCharacterIds": [
+          "lam_viet"
+        ]
+      }
+    ],
+    "coreChanges": {
+      "storyDayDelta": 0,
+      "died": [],
+      "progressionChanges": [],
+      "assetEvents": [
+        {
+          "eventId": "c1_acquire_duoc_lieu_vun",
+          "kind": "acquire",
+          "assetId": "duoc_lieu_vun",
+          "assetName": "dược liệu vụn",
+          "quantity": 1,
+          "unit": "phần",
+          "fungible": true,
+          "sourceLotId": null,
+          "fromOwnerId": "thanh_lo_dan_cac",
+          "fromOwnerName": "Thanh Lô Đan Các",
+          "toOwnerId": "lam_viet",
+          "toOwnerName": "Lâm Việt",
+          "note": "Phần dược liệu vụn được phép mang đi sau khi mất thẻ Đan đồ."
+        },
+        {
+          "eventId": "c1_acquire_vo_binh_su",
+          "kind": "acquire",
+          "assetId": "vo_binh_su",
+          "assetName": "vỏ bình sứ chưa dùng",
+          "quantity": 1,
+          "unit": "vỏ bình",
+          "fungible": false,
+          "sourceLotId": null,
+          "fromOwnerId": "thanh_lo_dan_cac",
+          "fromOwnerName": "Thanh Lô Đan Các",
+          "toOwnerId": "lam_viet",
+          "toOwnerName": "Lâm Việt",
+          "note": "Vỏ bình sứ chưa dùng được phép mang đi."
+        },
+        {
+          "eventId": "c1_acquire_co_kho",
+          "kind": "acquire",
+          "assetId": "co_kho",
+          "assetName": "cỏ khô",
+          "quantity": 2,
+          "unit": "bao",
+          "fungible": true,
+          "sourceLotId": null,
+          "fromOwnerId": "thanh_lo_dan_cac",
+          "fromOwnerName": "Thanh Lô Đan Các",
+          "toOwnerId": "lam_viet",
+          "toOwnerName": "Lâm Việt",
+          "note": "Hai bao cỏ khô bị ẩm mép được phép mang đi."
+        }
+      ],
+      "goldenFingerRungChange": null,
+      "moved": [
+        {
+          "characterId": "lam_viet",
+          "toLocationId": "kho_lam_viet"
+        }
+      ],
+      "worldFactsRevealed": [],
+      "newCast": [],
+      "hooksPlanted": [],
+      "hooksPaid": [],
+      "learnedFinger": []
+    }
+  },
+  "attempts": 1,
+  "costUsd": 0.060139,
+  "inputFingerprint": "6c63fe4cbd6aa6402b2c0d17e42b264b3a418e022203ccc49cb9b48650d02ca6"
+}

@@ -1,0 +1,93 @@
+{
+  "verdict": {
+    "continuity": [],
+    "scorecard": {
+      "opening": 0,
+      "anticipation": 0,
+      "payoff": 0,
+      "newness": 0,
+      "endHook": 0
+    },
+    "craft": {
+      "protagonistAgency": 0,
+      "sceneLife": 0,
+      "worldLogic": 0,
+      "dialogueNaturalness": 0,
+      "structuralFreshness": 0
+    },
+    "repetition": [],
+    "aiFlavor": [],
+    "steering": [
+      "Cảnh xác lập Lâm Việt là người làm nghề cẩn trọng: hắn quan sát niêm phong, đối chiếu phản ứng mua bán và tự giới hạn phạm vi thuốc trước khi nghĩ tới hàng hóa. Đây là căn cứ tốt cho quyết định chưa bán ngay.",
+      "Đông Hà có sinh hoạt và lợi ích riêng khá rõ qua xe nước, bảng đổi, quầy thuốc mất nhãn, ca tuần tra và rào chắn. Có thể giữ nhịp này ở chương sau bằng một nhu cầu cụ thể của Hứa An thay vì lặp thêm cảnh giải thích chung về pin, nước và tinh hạch.",
+      "Cảnh súng bị ép hạ nòng tuân thủ protectedStore và tránh biến cửa hàng thành tuyến giao đấu. Tuy nhiên, nếu mục tiêu của chương là chứng minh rõ quyền chủ quán có thể trục xuất khách, bản thảo hiện mới cho thấy Hứa An tự lùi ra ngoài; nên hoặc bổ sung một lần Lâm Việt chủ động dùng quyền đó, hoặc hạ mức cam kết trong hợp đồng mở đầu.",
+      "Kết luận của Lâm Việt về thuốc có trách nhiệm là hợp với nghề và trải nghiệm vừa thấy. Chương 3 nên chuyển kết luận này thành lô thử có nguồn nguyên liệu, số gói, liều và cách nhận phản hồi, rồi mới để Hứa An thực sự đổi hàng.",
+      "Không cần ép giao dịch vào chương này: phần thăm dò đã đủ ngắn và tạo được nhu cầu thật. Payoff kế tiếp nên là trải nghiệm trực tiếp của Hứa An với bột cầm máu trong đúng phạm vi, không phải lời quảng cáo."
+    ],
+    "reviewBinding": {
+      "chapterNumber": 2,
+      "title": "“Không Rõ Thứ Bên Trong”",
+      "excerpt": "Lâm Việt không lập tức mở cửa lần nữa.\n\nTrời bên ngoài kho đã sáng hẳn."
+    }
+  },
+  "digest": {
+    "chapterNumber": 2,
+    "title": "“Không Rõ Thứ Bên Trong”",
+    "summary": "Lâm Việt khảo sát nhịp sống và nhu cầu vật tư ở Đông Hà, gặp Hứa An, rồi nhận ra thuốc chỉ có giá trị khi nguồn gốc, công dụng và giới hạn sử dụng đều được nói rõ.",
+    "payoffKind": "doi_chieu",
+    "endedOn": "Hắn bắt đầu nghĩ: trong một tháng tiền thuê kho còn lại, liệu hắn có thể làm ra một thứ đủ rõ ràng để người như Hứa An dám mang đi dùng hay không.",
+    "newNamedThings": [
+      "xe_day_bon_banh",
+      "bang_doi_vat_tu",
+      "tinh_hach",
+      "khau_sung"
+    ],
+    "narrativeEvidence": [
+      {
+        "id": "dong_ha_song_bang_doi_vat",
+        "chapterNumber": 2,
+        "quote": "ở đây, một bình nước có niêm phong và một viên pin nhỏ đều có thể thành vật đổi. Song thứ người ta cần gấp không hẳn là thứ đắt nhất",
+        "learnedByCharacterIds": [
+          "lam_viet"
+        ]
+      },
+      {
+        "id": "dong_ha_thieu_thuoc_on_dinh",
+        "chapterNumber": 2,
+        "quote": "— Không dám dùng. — Hứa An đáp ngay. — Sốt còn biết tìm hạ sốt, vết cắt còn biết rửa sạch rồi băng lại. Nhưng chai không nhãn, thuốc viên không rõ liều, thuốc để trong kho mất điện mấy tháng… ai biết uống vào thành cái gì?",
+        "learnedByCharacterIds": [
+          "lam_viet"
+        ]
+      },
+      {
+        "id": "hieu_nhip_song_dong_ha",
+        "chapterNumber": 2,
+        "quote": "Ở nơi này, thuốc không thiếu đến mức người ta uống bừa tất cả. Thứ thiếu là một món có tên, có phạm vi dùng, có người chịu đứng ra nói rõ giới hạn của nó.",
+        "learnedByCharacterIds": [
+          "lam_viet"
+        ]
+      }
+    ],
+    "coreChanges": {
+      "storyDayDelta": 0,
+      "died": [],
+      "progressionChanges": [],
+      "assetEvents": [],
+      "goldenFingerRungChange": null,
+      "moved": [
+        {
+          "characterId": "lam_viet",
+          "toLocationId": "pho_dong_ha"
+        }
+      ],
+      "worldFactsRevealed": [],
+      "newCast": [],
+      "hooksPlanted": [],
+      "hooksPaid": [],
+      "learnedFinger": []
+    }
+  },
+  "attempts": 1,
+  "costUsd": 0.065428,
+  "inputFingerprint": "a214f4e9602d70230e2953da7a59b8dc4951762757b51b0084a46a11caa292b2"
+}

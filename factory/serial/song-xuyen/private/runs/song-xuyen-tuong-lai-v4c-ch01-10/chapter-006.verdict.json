@@ -1,0 +1,73 @@
+{
+  "verdict": {
+    "continuity": [],
+    "scorecard": {
+      "opening": 1,
+      "anticipation": 1,
+      "payoff": 1,
+      "newness": 1,
+      "endHook": 1
+    },
+    "craft": {
+      "protagonistAgency": 1,
+      "sceneLife": 1,
+      "worldLogic": 1,
+      "dialogueNaturalness": 1,
+      "structuralFreshness": 1
+    },
+    "repetition": [],
+    "aiFlavor": [],
+    "steering": [
+      "Cảnh giữ canon rất chắc: Khải không đem mẫu tương lai đi khoe, không giả vờ hiểu kỹ thuật, và dùng phản hồi xưởng để biến quan sát thành các điều kiện sản xuất. Đây là bước tiến có căn cứ, không phải trì hoãn giả tạo.",
+      "Payoff hiện là “khoảng trống được gọi tên”, hợp với giai đoạn mẫu thử nhưng độ bật vừa phải. Chương sau nên chọn một câu hỏi ưu tiên có thể kiểm được ngay—chẳng hạn kiểu đầu tháo/rãnh thoát và thao tác một tay—thay vì cùng lúc mở rộng mọi hạng mục kỹ thuật.",
+      "Phân biệt thêm giữa yêu cầu có thể thử ở bàn hiện tại (độ mở, đường thoát cặn, độ bám tay) với dữ liệu chưa thể suy ra từ mẫu hỏng (góc lưỡi tối ưu, hiệu quả cạo, tuổi thọ). Điều này sẽ làm quyết định chốt V1 sắc hơn.",
+      "Chi tiết quỹ viện phí, tiền nhập hàng và tiền thử được tách rõ, cho thấy Khải là người bán lẻ sống bằng dòng tiền thực. Khi xuống tiền, hãy cho một nguồn tiền thử cụ thể và hệ quả quay vòng hàng tương ứng.",
+      "Xưởng, xe chở phôi, khách mua nước và tiếng tủ mát đã tạo được đời sống Vân Cảng ngoài tuyến cửa xuyên. Có thể giữ nhịp này bằng một ràng buộc thực tế mới từ xưởng, thay vì lặp lại cảnh cảnh báo chung rằng làm mẫu tốn tiền."
+    ],
+    "reviewBinding": {
+      "chapterNumber": 6,
+      "title": "“Khoảng Trống Chưa Có Giá”",
+      "excerpt": "Người thợ gật đầu, kéo hai chiếc ghế nhựa lại gần bàn nguội. Khải đặt bản phác xuống."
+    }
+  },
+  "digest": {
+    "chapterNumber": 6,
+    "title": "“Khoảng Trống Chưa Có Giá”",
+    "summary": "Trần Khải và Phạm Khoa đưa bản phác dao cạo tới một xưởng nhỏ, nhận ra mẫu cơ khí chưa thể báo giá trọn gói khi còn thiếu vật liệu, dung sai, cơ cấu chốt và tiêu chí thử, rồi lập bảng chi phí V1 nhưng chưa xuống tiền.",
+    "payoffKind": null,
+    "endedOn": "Yêu cầu kỹ thuật cho phần chốt mở vẫn chưa được xác định; Phạm Khoa chỉ vào đó và bảo bắt đầu từ đây.",
+    "newNamedThings": [
+      "xuong_gia_cong_co_khi_nho",
+      "chi_phi_v1"
+    ],
+    "narrativeEvidence": [
+      {
+        "id": "xuong_can_ban_ve",
+        "chapterNumber": 6,
+        "quote": "“Có bản vẽ đủ để làm, có dung sai phần quan trọng, có số lượng, có người chịu tiền thử thì nhận.” Ông chủ xưởng đẩy tờ giấy về phía anh. “Còn bây giờ, tôi chỉ báo được từng phần việc. Báo một cục cho cậu rồi lúc làm phải sửa tới sửa lui thì cả hai bên đều khó nói.”",
+        "learnedByCharacterIds": [
+          "tran_khai",
+          "pham_khoa"
+        ]
+      }
+    ],
+    "coreChanges": {
+      "storyDayDelta": 0,
+      "died": [],
+      "progressionChanges": [],
+      "assetEvents": [],
+      "goldenFingerRungChange": null,
+      "moved": [],
+      "worldFactsRevealed": [],
+      "newCast": [],
+      "hooksPlanted": [],
+      "hooksPaid": [
+        "dan_manh_toi_xuong_nho"
+      ],
+      "learnedFinger": []
+    }
+  },
+  "attempts": 1,
+  "costUsd": 0.055122,
+  "inputFingerprint": "78fac2e8eee28609892c48f8041fecd9336d21ec310b9ee8424bafd147fc3f76"
+}

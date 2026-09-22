@@ -29,6 +29,7 @@
     "serial:rewrite:report": "node --import tsx scripts/serial-editorial-report.ts",
     "serial:rewrite:apply": "node --import tsx scripts/serial-apply-editorial-rewrites.ts",
     "serial:rewrite:finalize": "node --import tsx scripts/serial-finalize-editorial-bundle.ts",
+    "serial:replace-reviewed": "node --import tsx scripts/serial-replace-reviewed.ts",
     "serial:premises": "node --import tsx scripts/serial-premises.ts",
     "cover:bakeoff": "node --import tsx scripts/cover-bakeoff.ts",
     "craft:audit": "node --import tsx scripts/craft-audit.ts"

@@ -19,8 +19,8 @@
   },
   "goldenFinger": {
     "name": "Song Giới Thương Điếm",
-    "rule": "Cửa hàng thật nằm tại Đông Hà; cửa sau nối thẳng nơi ở và kho của Lâm Việt tại Thanh Huyền Giới. Chỉ Lâm Việt có thể bước qua cửa sau; khách và người làm ở hai giới giao nhận tại đầu cửa hàng thuộc thế giới của họ. Lâm Việt tự chọn hàng, giá bán và chính sách thu mua. Cửa hàng định giá, ghi nhận hàng khách giao và hoàn tất thanh toán bằng tinh hạch, huyết nhục hung thú, linh thực hoặc vật liệu tiến hóa.",
-    "scope": "Cửa hàng là nơi giao dịch và lưu kho, không tự tạo hàng hay ban sức mạnh. Giá trị đến từ hàng Lâm Việt luyện, mua và tổ chức được ở hai giới.",
+    "rule": "Cửa hàng thật nằm tại Đông Hà; cửa sau nối thẳng nơi ở và kho của Lâm Việt tại Thanh Huyền Giới. Toàn bộ cửa hàng và ngưỡng nối là lãnh vực tuyệt đối của Lâm Việt: hành vi thù địch, cưỡng ép vào cửa, trộm hàng và theo dõi đều vô hiệu; hắn có thể trục xuất khách và thu hồi hàng chưa thanh toán. Lâm Việt tự chọn hàng, giá bán và chính sách thu mua.",
+    "scope": "Cửa hàng không tự tạo hàng, truyền kiến thức hay ban sức mạnh. Giá trị đến từ chênh lệch giữa hai giới và hàng Lâm Việt luyện, mua hoặc tổ chức được. Rủi ro bên ngoài vẫn tồn tại nhưng không tạo tuyến chống cướp hay đánh nhau giữ quầy.",
     "evolution": [
       { "id": "ke_ban_le", "name": "Kệ bán lẻ", "changesUse": "Niêm yết hàng có tên, phẩm cấp và giá; khách tự chọn rồi thanh toán tại quầy." },
       { "id": "kho_thu_mua", "name": "Kho thu mua", "changesUse": "Công khai danh mục tinh hạch, thịt hung thú và linh thực cần mua theo giai." },

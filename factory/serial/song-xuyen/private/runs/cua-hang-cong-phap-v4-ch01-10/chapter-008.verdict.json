@@ -1,0 +1,90 @@
+{
+  "verdict": {
+    "continuity": [],
+    "scorecard": {
+      "opening": 4,
+      "anticipation": 4,
+      "payoff": 4,
+      "newness": 3,
+      "endHook": 4
+    },
+    "craft": {
+      "protagonistAgency": 5,
+      "sceneLife": 4,
+      "worldLogic": 5,
+      "dialogueNaturalness": 5,
+      "structuralFreshness": 3
+    },
+    "repetition": [],
+    "aiFlavor": [
+      {
+        "quote": "Không đổi màu. Không bốc khói. Cũng không có mùi dược liệu nào tản ra.",
+        "kind": "parallel_triple"
+      },
+      {
+        "quote": "Một bên là tinh hạch chỉ mới có phản ứng nhẹ, một bên là lát thịt khiến người làm nghề tự mình ăn thêm miếng thứ hai.",
+        "kind": "report_prose"
+      }
+    ],
+    "steering": [
+      "Canon và tri thức được giữ chắc: Lâm Việt chỉ ghi điều quan sát được; Hàn Dược Sư dùng đúng chuyên môn giám định, tự thử mẫu và không biến phản ứng nhẹ của tinh hạch thành công dụng đã xác nhận.",
+      "Payoff giá trị đối chiếu hoạt động tốt ở chén thịt: mùi thay đổi, Hàn Dược Sư ăn, bắt mạch và cảm nhận khí huyết ấm bền hơn rồi mới chủ động hỏi về lô sau. Đây là trải nghiệm dẫn tới định giá, không phải thuyết minh áp đặt.",
+      "Cảnh cho thấy rõ Lâm Việt là người làm nghề thận trọng: giữ đối chứng, tách thịt rõ nguồn khỏi hai gói mơ hồ, và từ chối hứa khả năng cung ứng chưa kiểm chứng. Quyết định cuối sang Đông Hà hỏi chuỗi giữ hàng có căn cứ trực tiếp từ yêu cầu ba lượt của Hàn Dược Sư.",
+      "Nhịp chương hơi nghiêng về biên bản thử mẫu ở nửa đầu. Có thể giữ tính nghề nhưng cài thêm một chi tiết sinh kế cụ thể của quầy Hàn gia—ví dụ khách đang chờ món bổ khí huyết hay áp lực nguyên liệu thiếu—để kết quả chén thịt tác động rõ hơn tới đời sống của ông.",
+      "Hook cuối mở đúng lựa chọn nguồn hàng. Chương sau nên để cuộc hỏi Hứa An tạo ra một điều kiện thực tế phải chọn, như đổi thời gian tuần tra, cách giữ lạnh, phần chia của đội hoặc giá mà Hứa An có thể tái tạo, thay vì chỉ thu thêm thông tin rồi xác nhận lô hàng."
+    ],
+    "reviewBinding": {
+      "chapterNumber": 8,
+      "title": "“Chỉ Biết Về Mẫu Này”",
+      "excerpt": "— Chỉ thế thôi. — Hàn Dược Sư đáp. — Nó khiến kim giám định và linh giác của ta phản ứng nhẹ."
+    }
+  },
+  "digest": {
+    "chapterNumber": 8,
+    "title": "“Chỉ Biết Về Mẫu Này”",
+    "summary": "Lâm Việt cùng Hàn Dược Sư kiểm tra tinh hạch và thịt có nguồn, xác nhận tinh hạch chỉ gây phản ứng nhẹ còn thịt có tác dụng làm ấm khí huyết, từ đó đặt điều kiện cho những lô hàng sau.",
+    "payoffKind": "duoc_cong_nhan",
+    "endedOn": "Lâm Việt khép sổ và nói rằng hắn sẽ sang Đông Hà để hỏi rõ nguồn gốc, cách bảo quản và thời gian vận chuyển của thịt.",
+    "newNamedThings": [
+      "cân đồng",
+      "chén men trắng",
+      "kim giám định",
+      "hộp gỗ đối chứng",
+      "túi giấy",
+      "giấy dầu"
+    ],
+    "narrativeEvidence": [
+      {
+        "id": "kiem_mau_tinh_hach",
+        "chapterNumber": 8,
+        "quote": "“Có phản ứng quan sát được. Công dụng chưa rõ. Không đưa vào thuốc, không dùng bảo chứng cho đơn thuốc.”",
+        "learnedByCharacterIds": [
+          "lam_viet",
+          "han_duoc_su"
+        ]
+      }
+    ],
+    "coreChanges": {
+      "storyDayDelta": 1,
+      "died": [],
+      "progressionChanges": [],
+      "assetEvents": [],
+      "goldenFingerRungChange": null,
+      "moved": [],
+      "worldFactsRevealed": [],
+      "newCast": [],
+      "hooksPlanted": [
+        {
+          "id": "lam_viet_di_dong_ha_hoi_nguon_thit",
+          "what": "Lâm Việt sẽ sang Đông Hà hỏi Hứa An về nơi săn, cách giữ, người chạm vào và thời gian vận chuyển để tìm các lượt thịt tương đồng.",
+          "dueByChapter": 9
+        }
+      ],
+      "hooksPaid": [],
+      "learnedFinger": []
+    }
+  },
+  "attempts": 1,
+  "costUsd": 0.064557,
+  "inputFingerprint": "652dcc7eb7bed94f1ad4652df30bc222e721f221dcfa92a2ccd26e4e21952750"
+}

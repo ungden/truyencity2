@@ -1,5 +1,5 @@
 import type { ProviderUsage, StoryModelProvider } from '@/services/story-factory/provider';
-import type { ChapterDigest, ChapterDraft, CyclePlan, JudgeVerdict, OpeningAudit } from '@/services/serial/contracts';
+import type { ChapterDigest, ChapterDraft, CyclePlan, JudgeVerdict, OpeningAudit, SceneMode } from '@/services/serial/contracts';
 import { DEFAULT_SERIAL_ROUTES } from '@/services/serial/routes';
 import {
   auditFourChapterOpening, cycleReadyToClose, foldVolume, planNextCycle, readingHealth,
@@ -82,12 +82,26 @@ function stubProvider(script: {
   return {
     calls,
     async text() { throw new Error('unused'); },
-    async json<T>(input: { model: string; system: string }): Promise<{ value: T; usage: ProviderUsage }> {
+    async json<T>(input: { model: string; system: string; prompt: string }): Promise<{ value: T; usage: ProviderUsage }> {
       const role = roleOf(input.system);
       calls.push(role);
       const queue = queues[role];
       const next = queue.shift();
       if (next === undefined) throw new Error(`stub provider ran out of ${role} responses`);
+      if (role === 'judge' && !(next as JudgeVerdict).reviewBinding) {
+        const supplied = JSON.parse(input.prompt) as { chuongSo: number; tieuDe: string; chuong: string };
+        return {
+          value: {
+            ...(next as JudgeVerdict),
+            reviewBinding: {
+              chapterNumber: supplied.chuongSo,
+              title: supplied.tieuDe,
+              excerpt: supplied.chuong.slice(0, 80),
+            },
+          } as T,
+          usage: usage(input.model),
+        };
+      }
       return { value: next as T, usage: usage(input.model) };
     },
   };
@@ -121,18 +135,40 @@ describe('chapter loop', () => {
     expect(provider.calls).toEqual(['writer', 'judge', 'extractor']);
   });
 
+  test('a judge that did not bind its verdict to the supplied prose cannot commit', async () => {
+    const provider = stubProvider({
+      writer: [draft()],
+      judge: [cleanVerdict({
+        reviewBinding: { chapterNumber: 8, title: draft().title, excerpt: 'đoạn không tồn tại trong bản thảo' },
+      })],
+    });
+    await expect(writeOneChapter(chapterInput(provider))).rejects.toMatchObject({
+      name: 'SerialCheckpointError',
+      checkpoint: { schemaVersion: 2, resumeFrom: 'judge' },
+    });
+    expect(provider.calls).toEqual(['writer', 'judge']);
+  });
+
   test('an extractor transport failure resumes from the saved draft without buying Writer or Judge again', async () => {
     const calls: string[] = [];
     const failingProvider = {
       async text() { throw new Error('unused'); },
-      async json<T>(input: { system: string; model: string }) {
+      async json<T>(input: { system: string; model: string; prompt: string }) {
         if (input.system.startsWith(WRITER_SYSTEM_PROMPT)) {
           calls.push('writer');
           return { value: draft() as T, usage: usage(input.model) };
         }
         if (input.system === JUDGE_SYSTEM_PROMPT) {
           calls.push('judge');
-          return { value: cleanVerdict() as T, usage: usage(input.model) };
+          const supplied = JSON.parse(input.prompt) as { chuongSo: number; tieuDe: string; chuong: string };
+          return { value: {
+            ...cleanVerdict(),
+            reviewBinding: {
+              chapterNumber: supplied.chuongSo,
+              title: supplied.tieuDe,
+              excerpt: supplied.chuong.slice(0, 80),
+            },
+          } as T, usage: usage(input.model) };
         }
         calls.push('extractor');
         throw new Error('extractor timeout');
@@ -146,7 +182,7 @@ describe('chapter loop', () => {
       else throw error;
     }
     expect(checkpoint?.checkpoint).toMatchObject({
-      resumeFrom: 'extractor', chapter: { title: draft().title }, verdict: cleanVerdict(),
+      resumeFrom: 'extractor', chapter: { title: draft().title },
     });
     expect(checkpoint?.usages).toHaveLength(2);
     expect(calls).toEqual(['writer', 'judge', 'extractor']);
@@ -362,6 +398,45 @@ describe('cycle lifecycle', () => {
     });
     expect(result.cycle.beatSheets.map(sheet => sheet.sceneMode)).toEqual(['transaction', 'investigation', 'crafting']);
     expect(result.usages).toHaveLength(2);
+  });
+
+  test('a final rolling window plans only the exact remaining chapter', async () => {
+    const makeBeat = (chapterNumber: number, sceneMode: SceneMode) => ({
+      chapterNumber,
+      sceneMode,
+      openingBridge: `Trả ngay câu cuối chương ${chapterNumber - 1}.`,
+      protagonistMove: `Lâm Việt tự kiểm chứng mốc ${chapterNumber}.`,
+      beats: ['Kiểm chứng điều kiện còn thiếu', 'Ghi lại kết quả nhìn thấy'],
+      materialOutcome: `Mốc ${chapterNumber} có một kết quả kiểm chứng được.`,
+      emotionalTarget: 'Thỏa mãn vì kết luận không vượt quá bằng chứng.',
+      newNamedThing: `Mốc ${chapterNumber}`,
+      endHookKind: 'question' as const,
+      prerequisiteIds: [],
+      revealsFactIds: [],
+      advancesMilestoneIds: [],
+    });
+    const active = cycle({
+      startChapter: 1,
+      plannedEndChapter: 10,
+      beatSheets: [makeBeat(4, 'transaction'), makeBeat(5, 'investigation'), makeBeat(6, 'crafting')],
+    });
+    const rolling = {
+      ...active,
+      startChapter: 10,
+      plannedEndChapter: 10,
+      beatSheets: [makeBeat(10, 'reflection')],
+    } as CyclePlan;
+    const provider = stubProvider({ planner: [rolling] });
+
+    const result = await planNextCycle({
+      provider, routes: DEFAULT_SERIAL_ROUTES, premise, bible: baseBible(),
+      previousCycle: null, activeCycle: active,
+      cycleNumber: 1, volumeNumber: 1, startChapter: 10, fixedEndChapter: 10, recentVerdicts: [],
+    });
+
+    expect(result.cycle.plannedEndChapter).toBe(10);
+    expect(result.cycle.beatSheets.map(sheet => sheet.chapterNumber)).toEqual([10]);
+    expect(result.usages).toHaveLength(1);
   });
 
   test('a cycle cannot close early or with an overdue hook', () => {

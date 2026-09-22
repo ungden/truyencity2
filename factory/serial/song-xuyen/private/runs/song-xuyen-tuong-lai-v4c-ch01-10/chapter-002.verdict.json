@@ -1,0 +1,97 @@
+{
+  "verdict": {
+    "continuity": [],
+    "scorecard": {
+      "opening": 1,
+      "anticipation": 1,
+      "payoff": 1,
+      "newness": 1,
+      "endHook": 1
+    },
+    "craft": {
+      "protagonistAgency": 1,
+      "sceneLife": 1,
+      "worldLogic": 1,
+      "dialogueNaturalness": 1,
+      "structuralFreshness": 1
+    },
+    "repetition": [],
+    "aiFlavor": [],
+    "steering": [
+      "Khải hiện rõ là một chủ tiệm thận trọng: kiểm hàng, chịu áp lực viện phí, mang vật đánh dấu, ghi kết luận theo mức độ chắc chắn và không tự diễn giải công nghệ ngoài điều đã thấy. Các quyết định của anh có căn cứ từ nghề bán lẻ lẫn giới hạn an toàn thực tế.",
+      "Canon và tri thức được giữ sạch. Khải chỉ biết cửa có thể qua lại từ chương trước; ở đây anh quan sát thiết bị mất tín hiệu, thử thu hồi trong phạm vi cửa hàng, rồi tự xác nhận giới hạn khi bước ra hành lang. Anh không biến hiện tượng thành hiểu biết về công nghệ Tân Hải.",
+      "Luật protectedStore được thể hiện đúng chức năng, không biến thành tuyến thủ quầy: quét bị chặn, món bị cầm trong gian hàng quay về, còn rủi ro bên ngoài vẫn thuộc về Khải. Phép thử con ốc ngoài ngưỡng đặc biệt hữu ích vì nó đặt ranh giới vận hành thay vì chỉ khoe quyền năng.",
+      "Diệp Ninh có đời sống nghề nghiệp trước khi thành đầu mối cốt truyện: túi dụng cụ nặng, vết mỡ tay, nhu cầu linh kiện và cảnh giác về nguồn hàng đều khớp nghề sửa chữa. Câu về người cần đồ ăn nhưng không chắc trả nổi cũng mở đúng logic nhu cầu/khả năng chi trả của Tân Hải.",
+      "Chương chưa cần valueContrast vì chưa đưa món hàng ra giao dịch; việc Khải chỉ hẹn mang một món phổ thông để hỏi công dụng và giá là lựa chọn đúng nhịp thăm dò. Chương sau nên cho một vật cụ thể được nhìn hoặc dùng trực tiếp, rồi để phản ứng của Diệp Ninh dẫn tới định giá thay vì giải thích giá trị thay cô."
+    ],
+    "reviewBinding": {
+      "chapterNumber": 2,
+      "title": "“Đồ Chưa Thanh Toán Biết Đường Về Quầy”",
+      "excerpt": "Con ốc rời khỏi tay người kia.\n\nNó không bay vọt như trong phim. Chỉ chớp mắt đã nằm trên đúng mặt quầy, sát bên hai con còn lại, đầu sơn trắng hướng về phía Khải."
+    }
+  },
+  "digest": {
+    "chapterNumber": 2,
+    "title": "“Đồ Chưa Thanh Toán Biết Đường Về Quầy”",
+    "summary": "Khải thử giới hạn thu hồi đồ chưa thanh toán trong cửa hàng Tân Hải, gặp Diệp Ninh và hẹn ngày mai cùng mang một món phổ thông đến đối chứng.",
+    "payoffKind": "tri_thang",
+    "endedOn": "Ngày mai Khải sẽ mang một món quen thuộc để Diệp Ninh giúp anh hiểu vì sao nó có giá trị ở nơi này.",
+    "newNamedThings": [
+      "cua_cuon_mau_bac",
+      "loi_di_ong_dan",
+      "tua_vit_can_do",
+      "oc_inox_cham_son_trang",
+      "thiet_bi_mep_phat_anh_xanh",
+      "nguoi_dan_ong_ao_khoac_xam",
+      "tu_dung_cu_cua_diep_ninh"
+    ],
+    "narrativeEvidence": [],
+    "coreChanges": {
+      "storyDayDelta": 1,
+      "died": [],
+      "progressionChanges": [],
+      "assetEvents": [
+        {
+          "eventId": "c2_acquire_nuoc_ngot",
+          "kind": "acquire",
+          "assetId": "nuoc_ngot",
+          "assetName": "nước ngọt",
+          "quantity": 2,
+          "unit": "két",
+          "fungible": true,
+          "sourceLotId": null,
+          "fromOwnerId": null,
+          "fromOwnerName": "người giao",
+          "toOwnerId": "tran_khai",
+          "toOwnerName": "Trần Khải",
+          "note": "Khải nhận hai két nước ngọt và ký số lượng với người giao."
+        }
+      ],
+      "goldenFingerRungChange": null,
+      "moved": [
+        {
+          "characterId": "tran_khai",
+          "toLocationId": "cua_hang_tan_hai"
+        },
+        {
+          "characterId": "tran_khai",
+          "toLocationId": "tiem_khai_minh"
+        }
+      ],
+      "worldFactsRevealed": [],
+      "newCast": [],
+      "hooksPlanted": [
+        {
+          "id": "doi_chieu_mot_mon_pho_thong_voi_diep_ninh",
+          "what": "Khải và Diệp Ninh mỗi người mang một món phổ thông đến cửa hàng Tân Hải để xem công dụng và giá thường, chưa đổi ngay.",
+          "dueByChapter": 3
+        }
+      ],
+      "hooksPaid": [],
+      "learnedFinger": []
+    }
+  },
+  "attempts": 1,
+  "costUsd": 0.053663,
+  "inputFingerprint": "777f53f488c4328078e758eaf0b68e8189033676caac589abf27e2ddd44a59b2"
+}

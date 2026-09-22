@@ -1,0 +1,109 @@
+{
+  "verdict": {
+    "continuity": [],
+    "scorecard": {
+      "opening": 4,
+      "anticipation": 4,
+      "payoff": 4,
+      "newness": 3,
+      "endHook": 4
+    },
+    "craft": {
+      "protagonistAgency": 5,
+      "sceneLife": 4,
+      "worldLogic": 5,
+      "dialogueNaturalness": 4,
+      "structuralFreshness": 4
+    },
+    "repetition": [],
+    "aiFlavor": [
+      {
+        "quote": "Một vật thật nằm trên bàn luôn có sức nặng riêng.",
+        "kind": "empty_lyricism"
+      },
+      {
+        "quote": "Đó chưa phải một sản phẩm. Càng không phải đơn hàng hay công ty.",
+        "kind": "theme_spoken"
+      },
+      {
+        "quote": "Không phải tiền nhập nước, không phải tiền sữa, càng không phải khoản viện phí anh luôn để riêng.",
+        "kind": "parallel_triple"
+      }
+    ],
+    "steering": [
+      "Canon và tri thức được giữ chắc: Khải không giả làm kỹ sư, quyết định chốt gạt dựa trên năng lực xưởng, chi phí thử và mục tiêu kiểm chứng; Khoa cũng chỉ đề xuất bước thử kế tiếp trong phạm vi đã quan sát.",
+      "Cảnh xưởng có đời sống nghề nghiệp tốt: thợ phân biệt giữa mẫu làm được, chi tiết khó sửa và thứ chỉ chỉnh được sau khi cầm vật thật. Điều này khiến quyết định hai lượt chỉnh có căn cứ, không phải ưu đãi tiện tay của cốt truyện.",
+      "Payoff V1 hiệu quả vì người đọc được thấy tay mở chốt, nước đi qua rãnh và vụn mắc ở góc. Ở vòng sau, hãy biến phần “độ bám khi ướt” thành một thao tác so sánh cụ thể thay vì chỉ nêu trong checklist, rồi mới chuyển sang mô phỏng kẹt râu.",
+      "Đoạn kết hứa bài kiểm tiếp theo đúng nhịp, nhưng có thể sắc hơn nếu chốt bằng một lựa chọn thực tế ngay trước mắt—vật liệu mô phỏng nào, tiêu chí dừng là gì, hoặc lỗi nào sẽ quyết định có dùng lượt chỉnh đầu tiên—thay vì khái quát lại ý nghĩa của cả hành trình.",
+      "Nên tiết chế vài câu tổng kết mang giọng chủ đề. Bản thân chốt nặng, mẩu giấy mắc góc và phiếu hai lượt chỉnh đã đủ cho thấy đây là “một lần học hỏi hữu hạn” mà không cần giải thích thêm."
+    ],
+    "reviewBinding": {
+      "chapterNumber": 8,
+      "title": "“Chốt Này Cứng Quá”",
+      "excerpt": "Chốt chỉ nhúc nhích một đoạn ngắn rồi khựng lại.\n\nKhải đổi ngón tay, tăng lực thêm."
+    }
+  },
+  "digest": {
+    "chapterNumber": 8,
+    "title": "“Chốt Này Cứng Quá”",
+    "summary": "Trần Khải cùng Phạm Khoa chốt thiết kế, nhận mẫu cơ khí V1 và phát hiện chốt mở cứng cùng một góc rãnh giữ cặn qua bài kiểm tra mở, rửa và lắp lưỡi.",
+    "payoffKind": "dot_pha",
+    "endedOn": "Bài kiểm tiếp theo với vật liệu mô phỏng và cùng điều kiện thử vẫn đang chờ phía trước.",
+    "newNamedThings": [
+      "mau_v1",
+      "chot_gat_co_khi",
+      "ranh_thoat_can",
+      "bai_thu_ket_rau"
+    ],
+    "narrativeEvidence": [
+      {
+        "id": "hoan_thanh_mau_co_khi_v1",
+        "chapterNumber": 8,
+        "quote": "Mẫu V1 được giao vào buổi trưa hai ngày sau.\n\nXưởng không đóng hộp đẹp. Nó nằm trong túi chống xước, kèm một mảnh giấy ghi vật liệu, phần dung sai chính và mấy dòng nhắc về chốt. Khải đặt nó lên bàn trong kho tiệm Khải Minh, cạnh chiếc đầu dao Tân Hải và chiếc dao cạo phổ thông đã dùng làm đối chứng.\n\nThoạt nhìn, V1 không có vẻ gì thuộc về tương lai.\n\nTay cầm nhôm màu bạc mờ, vài rãnh ngang phay nông. Đầu dao vuông hơn mẫu tham chiếu, các cạnh đã được bo nhưng vẫn mang cái cảm giác của đồ gia công mẫu lẻ: không xấu, chỉ chưa có gì để khoe.",
+        "learnedByCharacterIds": [
+          "tran_khai"
+        ]
+      }
+    ],
+    "coreChanges": {
+      "storyDayDelta": 2,
+      "died": [],
+      "progressionChanges": [],
+      "assetEvents": [
+        {
+          "eventId": "c8_acquire_mau_v1",
+          "kind": "acquire",
+          "assetId": "mau_v1",
+          "assetName": "mẫu cơ khí V1",
+          "quantity": 1,
+          "unit": "chiếc",
+          "fungible": false,
+          "sourceLotId": null,
+          "fromOwnerId": null,
+          "fromOwnerName": "xưởng",
+          "toOwnerId": "tran_khai",
+          "toOwnerName": "Trần Khải",
+          "note": "Xưởng giao mẫu V1 cho Trần Khải sau khi hoàn thành gia công; mẫu kèm thông tin vật liệu, dung sai chính và hướng dẫn về chốt."
+        }
+      ],
+      "goldenFingerRungChange": null,
+      "moved": [],
+      "worldFactsRevealed": [],
+      "newCast": [],
+      "hooksPlanted": [
+        {
+          "id": "bai_thu_ket_rau",
+          "what": "Trần Khải và Phạm Khoa sẽ thử kẹt râu bằng vật liệu mô phỏng, cùng loại lưỡi, lượng nước và số lượt rửa.",
+          "dueByChapter": 9
+        }
+      ],
+      "hooksPaid": [
+        "goi_xuong_chot_thong_so_mau"
+      ],
+      "learnedFinger": []
+    }
+  },
+  "attempts": 1,
+  "costUsd": 0.067578,
+  "inputFingerprint": "e147b6c2d74dfb8b33c4e32ca06159c3cc58959b392c4c41d9c4181db8a7e2df"
+}

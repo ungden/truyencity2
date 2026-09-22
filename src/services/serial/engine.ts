@@ -1,7 +1,9 @@
+import { createHash } from 'node:crypto';
 import { mergeProviderUsage, type ProviderUsage, type StoryModelProvider } from '@/services/story-factory/provider';
 import { StoryFactoryError } from '@/services/story-factory/contracts';
+import { groundEvidenceSpan } from '@/services/story-factory/validation';
 import {
-  BibleSchema, CyclePlanSchema, scorecardAverage,
+  BibleSchema, ChapterDigestSchema, CyclePlanSchema, RollingCyclePlanSchema, scorecardAverage,
   type Bible, type ChapterDigest, type ChapterDraft, type CyclePlan, type JudgeVerdict,
   OpeningAuditSchema, type OpeningAudit, type Premise, type SerialRoutes,
 } from './contracts';
@@ -13,7 +15,10 @@ import {
 import {
   applyDigest, assertBibleCoherence, assertCycleAssetCoherence, assertPayoffRotation, overdueHooks, SerialStateError,
 } from './state';
-import { assertNarrativeDigest, assertNarrativePlan, reviewNarrativeSequence, verifyNarrativeEvidence } from './foundation';
+import {
+  assertNarrativeDigest, assertNarrativePlan, canonicalizeNarrativeLearnerIds, recoverNarrativeEvidence,
+  reviewNarrativeSequence, verifyNarrativeEvidence,
+} from './foundation';
 import type { NarrativeReview } from '@/services/narrative/foundation';
 
 /**
@@ -32,6 +37,7 @@ export interface ChapterCommitted {
   attempts: number;
   usages: ProviderUsage[];
   costUsd: number;
+  inputFingerprint: string;
 }
 
 export interface ChapterNeedsReplan {
@@ -47,7 +53,7 @@ export interface ChapterNeedsReplan {
 
 export interface ChapterNeedsReview {
   status: 'needs_review';
-  reviewKind: 'extractor' | 'prose';
+  reviewKind: 'extractor' | 'prose' | 'upstream';
   chapterNumber: number;
   chapter: { chapterNumber: number; title: string; content: string };
   reason: string;
@@ -57,17 +63,19 @@ export interface ChapterNeedsReview {
   costUsd: number;
   verdict: JudgeVerdict;
   attempts: number;
+  inputFingerprint: string;
 }
 
 export type ChapterOutcome = ChapterCommitted | ChapterNeedsReplan | ChapterNeedsReview;
 
 export interface SerialDraftCheckpoint {
-  schemaVersion: 1;
+  schemaVersion: 1 | 2;
   resumeFrom: 'judge' | 'revision' | 'extractor' | 'verifier' | 'literary_review';
   chapter: { chapterNumber: number; title: string; content: string };
   verdict?: JudgeVerdict;
   digest?: ChapterDigest;
   attempts: number;
+  inputFingerprint?: string;
 }
 
 /** A paid downstream step failed after prose already existed. */
@@ -84,6 +92,32 @@ export class SerialCheckpointError extends Error {
 
 const totalCost = (usages: ProviderUsage[]): number =>
   Number(usages.reduce((sum, usage) => sum + usage.costUsd, 0).toFixed(6));
+
+export function serialChapterInputFingerprint(input: {
+  premise: Premise;
+  bible: Bible;
+  cycle: CyclePlan;
+  chapterNumber: number;
+  previousChapter: string | null;
+}): string {
+  return createHash('sha256').update(JSON.stringify({
+    premise: input.premise,
+    bible: input.bible,
+    cycle: input.cycle,
+    chapterNumber: input.chapterNumber,
+    previousChapter: input.previousChapter,
+  })).digest('hex');
+}
+
+function verdictMatchesChapter(verdict: JudgeVerdict | undefined, chapter: ChapterDraft, chapterNumber: number): boolean {
+  const binding = verdict?.reviewBinding;
+  if (!binding) return false;
+  const comparable = (value: string): string => value.normalize('NFKC').toLowerCase()
+    .replace(/^#{1,6}\s*/, '').replace(/^chương\s+\d+\s*:\s*/u, '').replace(/[“”"'‘’`*_#:\s]/gu, '');
+  return binding.chapterNumber === chapterNumber
+    && comparable(binding.title) === comparable(chapter.title)
+    && chapter.content.includes(binding.excerpt);
+}
 
 export async function auditFourChapterOpening(input: {
   provider: StoryModelProvider;
@@ -168,6 +202,9 @@ export async function writeOneChapter(input: {
     ...cycle,
     beatSheets: cycle.beatSheets.filter(beat => beat.chapterNumber >= chapterNumber),
   });
+  const inputFingerprint = serialChapterInputFingerprint({
+    premise, bible, cycle, chapterNumber, previousChapter: input.previousChapter,
+  });
   const usages: ProviderUsage[] = [];
   const writerBrief = buildWriterBrief({ premise, bible, cycle, chapterNumber, previousChapter: input.previousChapter });
 
@@ -180,12 +217,13 @@ export async function writeOneChapter(input: {
     extracted?: ChapterDigest,
   ): never => {
     throw new SerialCheckpointError({
-      schemaVersion: 1,
+      schemaVersion: 2,
       resumeFrom,
       chapter: { chapterNumber, title: draft.title, content: draft.content },
       verdict,
       digest: extracted,
       attempts,
+      inputFingerprint,
     }, [...usages], underlying);
   };
 
@@ -194,14 +232,19 @@ export async function writeOneChapter(input: {
       provider, routes,
       premise,
       judgeBrief: buildJudgeBrief({ premise, bible, cycle, chapterNumber, title: draft.title, prose: draft.content }),
+      chapter: { chapterNumber, title: draft.title, content: draft.content },
     });
     usages.push(result.usage);
     return result.value;
   };
 
-  const resumed = input.resumeArtifact?.chapter.chapterNumber === chapterNumber
-    ? input.resumeArtifact
-    : null;
+  const resumeCandidate = input.resumeArtifact?.chapter.chapterNumber === chapterNumber
+    ? input.resumeArtifact : null;
+  const resumed = resumeCandidate
+    && (premise.schemaVersion !== 3 || resumeCandidate.inputFingerprint === inputFingerprint)
+    && (!resumeCandidate.verdict || premise.schemaVersion !== 3
+      || verdictMatchesChapter(resumeCandidate.verdict, resumeCandidate.chapter, chapterNumber))
+    ? resumeCandidate : null;
   let draft: ChapterDraft;
   let verdict: JudgeVerdict | undefined = resumed?.verdict;
   let attempts = resumed?.attempts ?? 1;
@@ -263,7 +306,7 @@ export async function writeOneChapter(input: {
     };
   }
 
-  const extractorBrief = buildExtractorBrief({ premise, bible, chapterNumber, title: draft.title, prose: draft.content });
+  const extractorBrief = buildExtractorBrief({ premise, bible, cycle, chapterNumber, title: draft.title, prose: draft.content });
   let extracted: { value: ChapterDigest; usage?: ProviderUsage };
   if (resumed?.digest && ['verifier', 'literary_review'].includes(resumed.resumeFrom)) {
     extracted = { value: resumed.digest };
@@ -276,6 +319,16 @@ export async function writeOneChapter(input: {
       return checkpoint(error, 'extractor', draft, attempts, verdict);
     }
   }
+  const groundDigestEvidence = (digest: ChapterDigest): ChapterDigest => ChapterDigestSchema.parse(canonicalizeNarrativeLearnerIds(bible, {
+    ...digest,
+    narrativeEvidence: digest.narrativeEvidence.map(evidence => ({
+      ...evidence,
+      quote: draft.content.includes(evidence.quote)
+        ? evidence.quote
+        : groundEvidenceSpan(draft.content, evidence.quote) ?? evidence.quote,
+    })),
+  }));
+  extracted = { ...extracted, value: groundDigestEvidence(extracted.value) };
 
   let nextBible: Bible;
   const validateExtracted = async (digest: ChapterDigest): Promise<void> => {
@@ -292,11 +345,71 @@ export async function writeOneChapter(input: {
       if (rejected) throw new SerialStateError(rejected.rule, rejected.message);
     }
   };
+  const upstreamRules = new Set([
+    'narrative_evidence_semantics', 'narrative_evidence_unplanned',
+    'narrative_milestone_unplanned', 'narrative_milestone_unearned',
+  ]);
+  const evidenceRecoveryRules = new Set(['narrative_evidence_missing', 'narrative_evidence_quote']);
+  const reviewOutcome = (error: SerialStateError, reviewKind: ChapterNeedsReview['reviewKind']): ChapterNeedsReview => ({
+    status: 'needs_review', reviewKind, chapterNumber,
+    chapter: { chapterNumber, title: draft.title, content: draft.content },
+    reason: `State merge rejected the digest (${error.rule}): ${error.message}`,
+    rejectedDigest: extracted.value,
+    findings: [], verdict: verdict!, attempts, usages, costUsd: totalCost(usages), inputFingerprint,
+  });
+  const recoverPlannedEvidence = async (): Promise<Bible> => {
+    const beat = cycle.beatSheets.find(item => item.chapterNumber === chapterNumber);
+    const requiredIds = [...new Set([
+      ...(beat?.revealsFactIds ?? []),
+      ...(beat?.advancesMilestoneIds ?? []),
+    ])];
+    const recovered = await recoverNarrativeEvidence({
+      provider, routes, premise, bible, chapterNumber, prose: draft.content, requiredIds,
+    });
+    usages.push(recovered.usage);
+    const required = new Set(requiredIds);
+    extracted = {
+      ...extracted,
+      value: groundDigestEvidence(ChapterDigestSchema.parse({
+        ...extracted.value,
+        narrativeEvidence: [
+          ...extracted.value.narrativeEvidence.filter(item => !required.has(item.id)),
+          ...recovered.evidence,
+        ],
+      })),
+    };
+    await validateExtracted(extracted.value);
+    return applyDigest({ premise, bible, digest: extracted.value });
+  };
   try {
     if (resumed?.resumeFrom !== 'literary_review') await validateExtracted(extracted.value);
     nextBible = applyDigest({ premise, bible, digest: extracted.value });
   } catch (error) {
     if (!(error instanceof SerialStateError)) throw error;
+    if (error.rule === 'narrative_evidence_verification_shape') {
+      return checkpoint(error, 'verifier', draft, attempts, verdict, extracted.value);
+    }
+    if (upstreamRules.has(error.rule)) return reviewOutcome(error, 'upstream');
+    if (evidenceRecoveryRules.has(error.rule)) {
+      try {
+        const recoveredBible = await recoverPlannedEvidence();
+        nextBible = recoveredBible;
+      } catch (recoveryError) {
+        if (!(recoveryError instanceof SerialStateError)) {
+          return checkpoint(recoveryError, 'extractor', draft, attempts, verdict, extracted.value);
+        }
+        if (recoveryError.rule === 'narrative_evidence_verification_shape') {
+          return checkpoint(recoveryError, 'verifier', draft, attempts, verdict, extracted.value);
+        }
+        return reviewOutcome(recoveryError, upstreamRules.has(recoveryError.rule) ? 'upstream' : 'extractor');
+      }
+      return {
+        status: 'committed',
+        chapter: { chapterNumber, title: draft.title, content: draft.content },
+        bible: BibleSchema.parse({ ...nextBible, styleMemory: refreshStyleMemory(nextBible, [verdict]) }),
+        verdict, digest: extracted.value, attempts, usages, costUsd: totalCost(usages), inputFingerprint,
+      };
+    }
     // The prose already passed. Give the cheap extractor one visible, bounded repair
     // against the deterministic merge error before throwing away an entire private cycle.
     try {
@@ -310,7 +423,7 @@ export async function writeOneChapter(input: {
         },
       });
       usages.push(repaired.usage);
-      extracted = repaired;
+      extracted = { ...repaired, value: groundDigestEvidence(repaired.value) };
     } catch (repairCallError) {
       return checkpoint(repairCallError, 'extractor', draft, attempts, verdict);
     }
@@ -319,13 +432,31 @@ export async function writeOneChapter(input: {
       nextBible = applyDigest({ premise, bible, digest: extracted.value });
     } catch (repairError) {
       if (!(repairError instanceof SerialStateError)) throw repairError;
-      return {
-        status: 'needs_review', reviewKind: 'extractor', chapterNumber,
-        chapter: { chapterNumber, title: draft.title, content: draft.content },
-        reason: `State merge rejected the digest after one extractor repair (${repairError.rule}): ${repairError.message}`,
-        rejectedDigest: extracted.value,
-        findings: [], verdict, attempts, usages, costUsd: totalCost(usages),
-      };
+      if (repairError.rule === 'narrative_evidence_verification_shape') {
+        return checkpoint(repairError, 'verifier', draft, attempts, verdict, extracted.value);
+      }
+      if (upstreamRules.has(repairError.rule)) return reviewOutcome(repairError, 'upstream');
+      if (evidenceRecoveryRules.has(repairError.rule)) {
+        try {
+          const recoveredBible = await recoverPlannedEvidence();
+          nextBible = recoveredBible;
+          return {
+            status: 'committed',
+            chapter: { chapterNumber, title: draft.title, content: draft.content },
+            bible: BibleSchema.parse({ ...nextBible, styleMemory: refreshStyleMemory(nextBible, [verdict]) }),
+            verdict, digest: extracted.value, attempts, usages, costUsd: totalCost(usages), inputFingerprint,
+          };
+        } catch (recoveryError) {
+          if (!(recoveryError instanceof SerialStateError)) {
+            return checkpoint(recoveryError, 'extractor', draft, attempts, verdict, extracted.value);
+          }
+          if (recoveryError.rule === 'narrative_evidence_verification_shape') {
+            return checkpoint(recoveryError, 'verifier', draft, attempts, verdict, extracted.value);
+          }
+          return reviewOutcome(recoveryError, upstreamRules.has(recoveryError.rule) ? 'upstream' : 'extractor');
+        }
+      }
+      return reviewOutcome(repairError, 'extractor');
     }
   }
 
@@ -333,7 +464,7 @@ export async function writeOneChapter(input: {
     status: 'committed',
     chapter: { chapterNumber, title: draft.title, content: draft.content },
     bible: BibleSchema.parse({ ...nextBible, styleMemory: refreshStyleMemory(nextBible, [verdict]) }),
-    verdict, digest: extracted.value, attempts, usages, costUsd: totalCost(usages),
+    verdict, digest: extracted.value, attempts, usages, costUsd: totalCost(usages), inputFingerprint,
   };
 }
 
@@ -370,9 +501,13 @@ export async function planNextCycle(input: {
     steering: [...new Set([...(input.editorialNotes ?? []), ...collectSteering(input.recentVerdicts)])].slice(0, 8),
   });
 
-  const first = await planCycle({ provider: input.provider, routes: input.routes, premise: input.premise, plannerBrief });
+  const rolling = Boolean(input.activeCycle);
+  const planSchema = rolling ? RollingCyclePlanSchema : CyclePlanSchema;
+  const first = await planCycle({
+    provider: input.provider, routes: input.routes, premise: input.premise, plannerBrief, rolling,
+  });
   usages.push(first.usage);
-  const firstCycle = CyclePlanSchema.parse({ ...first.value, editorialNotes: input.editorialNotes ?? [] });
+  const firstCycle = planSchema.parse({ ...first.value, editorialNotes: input.editorialNotes ?? [] }) as CyclePlan;
   const assertPlan = (candidate: CyclePlan): void => {
     if (candidate.beatSheets[0]?.chapterNumber !== input.startChapter) {
       throw new SerialStateError(
@@ -380,10 +515,22 @@ export async function planNextCycle(input: {
         `First beat sheet must be chapter ${input.startChapter}, got ${candidate.beatSheets[0]?.chapterNumber ?? 'none'}.`,
       );
     }
-    if (input.fixedEndChapter && candidate.plannedEndChapter !== input.fixedEndChapter) {
+    if (input.fixedEndChapter && !input.activeCycle && candidate.plannedEndChapter !== input.fixedEndChapter) {
       throw new SerialStateError(
         'cycle_window_end',
         `Cycle end is fixed at ${input.fixedEndChapter}, got ${candidate.plannedEndChapter}.`,
+      );
+    }
+    if (input.activeCycle && candidate.startChapter !== input.startChapter) {
+      throw new SerialStateError(
+        'cycle_window_start',
+        `Rolling plan must start at chapter ${input.startChapter}, got ${candidate.startChapter}.`,
+      );
+    }
+    if (input.fixedEndChapter && input.activeCycle && candidate.plannedEndChapter !== input.fixedEndChapter) {
+      throw new SerialStateError(
+        'cycle_window_end',
+        `Rolling plan must end at the fixed cycle end ${input.fixedEndChapter}, got ${candidate.plannedEndChapter}.`,
       );
     }
     if (!input.activeCycle && candidate.startChapter !== input.startChapter) {
@@ -410,9 +557,19 @@ export async function planNextCycle(input: {
         );
       }
     }
-    assertPayoffRotation(input.previousCycle, candidate);
-    assertCycleAssetCoherence(input.bible, candidate, input.startChapter);
-    assertNarrativePlan(input.premise, input.bible, candidate);
+    if (!input.activeCycle) {
+      assertPayoffRotation(input.previousCycle, candidate);
+      assertCycleAssetCoherence(input.bible, candidate, input.startChapter);
+      assertNarrativePlan(input.premise, input.bible, candidate);
+    } else {
+      const merged = CyclePlanSchema.parse({
+        ...input.activeCycle,
+        beatSheets: candidate.beatSheets,
+        editorialNotes: input.editorialNotes ?? [],
+      });
+      assertCycleAssetCoherence(input.bible, merged, input.startChapter);
+      assertNarrativePlan(input.premise, input.bible, merged);
+    }
   };
   try {
     assertPlan(firstCycle);
@@ -423,9 +580,10 @@ export async function planNextCycle(input: {
       provider: input.provider, routes: input.routes,
       premise: input.premise,
       plannerBrief: { ...plannerBrief, loiVuaMacPhai: error.message },
+      rolling,
     });
     usages.push(retry.usage);
-    const retryCycle = CyclePlanSchema.parse({ ...retry.value, editorialNotes: input.editorialNotes ?? [] });
+    const retryCycle = planSchema.parse({ ...retry.value, editorialNotes: input.editorialNotes ?? [] }) as CyclePlan;
     assertPlan(retryCycle);
     return { cycle: retryCycle, usages, costUsd: totalCost(usages) };
   }

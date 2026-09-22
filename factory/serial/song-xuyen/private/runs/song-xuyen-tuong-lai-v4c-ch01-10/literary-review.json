@@ -1,0 +1,24 @@
+{
+  "review": {
+    "findings": [],
+    "readerAssessment": {
+      "protagonist": "Khải hiện rõ là một chủ tiệm dòng tiền mỏng nhưng có kỷ luật nghề nghiệp: anh biết tách tiền sống khỏi tiền thử, ghi giới hạn dữ liệu và không biến vật lạ thành lời quảng cáo. Quyết định cuối giữa V1 và rau quả vì thế đúng với đời sống của anh, không phải lựa chọn được áp đặt để tạo hook.",
+      "world": "Hai thế giới vận hành có đời sống riêng và tương phản giá trị thuyết phục. Vân Cảng tạo sức ép bằng hàng tồn, viện phí và tiền quay vòng; Tân Hải cho thực phẩm tươi giá trị qua cảm giác ăn, khả năng bảo quản và sức trả có hạn. Lãnh vực an toàn của cửa hàng được dùng như điểm giao dịch, không bị biến thành nguồn thủ tục cản trở.",
+      "causality": "Chuỗi nhân quả chính đã đủ: quan sát dao hỏng dẫn đến đối chứng rửa, rồi yêu cầu mẫu, gia công V1, sửa chốt, nhận ra lỗi góc rãnh, hậu chỉnh và đối chứng lại. Kết luận của Khoa giữ đúng phạm vi bài rửa mô phỏng; nó chỉ mở quyền lập phương án vòng hai chứ không nhảy thành hàng bán.",
+      "sceneLife": "Các cảnh có vật liệu và hành động cụ thể: tem lô, khay rửa, phiếu hai lượt chỉnh, máy móc xưởng, khách mua thuốc lá cắt ngang bài thử. Diệp Ninh không chỉ là người cung cấp đồ tương lai mà có nhu cầu cho mẹ, nghề sửa và điều kiện đổi chác riêng, nên cảnh cuối tạo được quan hệ thương mại có người thật.",
+      "desireToContinue": "Có mong muốn đọc tiếp tốt vì hai hướng tiếp theo đều hữu hình và xung đột nguồn lực: vòng hai cho cơ cấu dao cạo cần tiền cùng bài thử mới, còn đợt rau đều có khách đầu tiên và rủi ro nguồn cung/bảo quản. Câu hỏi không phải cơ hội có tồn tại hay không, mà Khải sẽ dùng vốn mỏng thế nào."
+    }
+  },
+  "gate": {
+    "upstreamFindings": [],
+    "blockingProseFindings": [],
+    "mayPublish": true
+  },
+  "usage": {
+    "model": "gpt-5.6-terra",
+    "inputTokens": 53128,
+    "outputTokens": 1022,
+    "costUsd": 0.05926,
+    "finishReason": "completed"
+  }
+}

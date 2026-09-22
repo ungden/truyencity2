@@ -1,0 +1,95 @@
+{
+  "verdict": {
+    "continuity": [],
+    "scorecard": {
+      "opening": 4,
+      "anticipation": 4,
+      "payoff": 4,
+      "newness": 3,
+      "endHook": 4
+    },
+    "craft": {
+      "protagonistAgency": 5,
+      "sceneLife": 4,
+      "worldLogic": 5,
+      "dialogueNaturalness": 4,
+      "structuralFreshness": 3
+    },
+    "repetition": [],
+    "aiFlavor": [
+      {
+        "quote": "Không phải toàn bộ.\n\nKhông sạch tuyệt đối.\n\nNhưng không còn chỉ là nét rãnh trên bản vẽ.",
+        "kind": "parallel_triple"
+      },
+      {
+        "quote": "Không có báo giá mới. Không có hóa đơn mới.",
+        "kind": "report_prose"
+      }
+    ],
+    "steering": [
+      "Chương giữ canon tốt: Khải chỉ dùng điều anh và Khoa đã kiểm chứng, không biến bài thử mô phỏng thành dữ liệu cạo thật, độ bền hay khả năng bán hàng. Quyết định dùng lượt chỉnh đầu cũng có căn cứ tài chính và kỹ thuật rõ.",
+      "Payoff nằm ở chỗ lỗi chốt được tách khỏi lỗi rãnh: sửa chốt để phép thử tiếp tục có ý nghĩa, rồi chính bài thử làm góc rãnh lộ ra. Đây là tiến trình nhân quả thuyết phục hơn một màn “nâng cấp V1”.",
+      "Để cảnh có đời sống hơn, có thể thay một phần câu tổng kết bảng biểu bằng một chi tiết hành vi hoặc hệ quả cụ thể của tiệm—ví dụ Khải phải ngắt bài thử để bán thuốc lá, rồi trở lại với thời gian và sức tập trung bị đứt. Hiện chi tiết chuông cửa đã mở đúng hướng nhưng chưa ảnh hưởng đáng kể tới nhịp cảnh.",
+      "Hook cuối hợp lý nhưng vẫn là biến thể của câu hỏi “sửa tiếp hay chờ dữ liệu”. Chương sau nên tạo bài thử kế tiếp có thể thật sự làm thay đổi lựa chọn này, thay vì chỉ xác nhận thêm rằng góc rãnh còn giữ cặn.",
+      "Tránh lặp nhịp phủ định ba vế ở các chương kiểm thử sau. Các giới hạn khoa học là điểm mạnh của truyện, nhưng nên được bộc lộ qua thao tác, tranh luận và dữ liệu quan sát thay vì liên tục đóng nhịp bằng “không phải/không có/chưa”."
+    ],
+    "reviewBinding": {
+      "chapterNumber": 9,
+      "title": "“Còn Một Lượt Chỉnh”",
+      "excerpt": "Tờ phiếu công việc của xưởng được Khải dán cạnh mẫu V1 bằng một miếng băng keo trong."
+    }
+  },
+  "digest": {
+    "chapterNumber": 9,
+    "title": "“Còn Một Lượt Chỉnh”",
+    "summary": "Trần Khải và Phạm Khoa chỉnh nhẹ chốt V1 rồi kiểm tra đối chứng, xác nhận thao tác mở, độ bám tay ướt và khả năng thoát vụn đã cải thiện nhưng vẫn còn cặn ở một góc rãnh.",
+    "payoffKind": "doi_chieu",
+    "endedOn": "Lượt chỉnh cuối cùng của V1, anh nên dùng để bo ngắn góc rãnh ấy ngay bây giờ—hay giữ nó lại đến khi bài thử kế tiếp cho thấy một lỗi lớn hơn?",
+    "newNamedThings": [],
+    "narrativeEvidence": [
+      {
+        "id": "kiem_thu_mau_co_khi_v1",
+        "chapterNumber": 9,
+        "quote": "Khải viết dòng tổng kết vào cuối bảng:\n\n**Chốt sau chỉnh: mở–đóng 6/6, lắp lưỡi phổ thông được, chưa thấy cấn khi đóng.**\n\nDòng thứ hai:\n\n**Tay ướt: rãnh cán cho độ bám tốt hơn cán trơn trong thao tác kéo trên khăn ẩm; không đại diện cho an toàn khi cạo.**\n\nDòng thứ ba:\n\n**Rửa vật liệu mô phỏng: V1 thoát vụn nhiều hơn quanh khoảng rỗng; còn cặn ở góc giao rãnh và gờ gá.**\n\nKhoa đọc lại, chậm rãi gật đầu.",
+        "learnedByCharacterIds": [
+          "tran_khai",
+          "pham_khoa"
+        ]
+      }
+    ],
+    "coreChanges": {
+      "storyDayDelta": 0,
+      "died": [],
+      "progressionChanges": [],
+      "assetEvents": [
+        {
+          "eventId": "c9_acquire_tra_dong_chai",
+          "kind": "acquire",
+          "assetId": "tra_dong_chai",
+          "assetName": "trà đóng chai",
+          "quantity": 2,
+          "unit": "chai",
+          "fungible": true,
+          "sourceLotId": null,
+          "fromOwnerId": null,
+          "fromOwnerName": "máy bán nước đối diện",
+          "toOwnerId": "pham_khoa",
+          "toOwnerName": "Phạm Khoa",
+          "note": "Phạm Khoa mua hai chai trà đóng chai ở máy bán nước đối diện xưởng khi chờ chỉnh mẫu V1."
+        }
+      ],
+      "goldenFingerRungChange": null,
+      "moved": [],
+      "worldFactsRevealed": [],
+      "newCast": [],
+      "hooksPlanted": [],
+      "hooksPaid": [
+        "bai_thu_ket_rau"
+      ],
+      "learnedFinger": []
+    }
+  },
+  "attempts": 1,
+  "costUsd": 0.075151,
+  "inputFingerprint": "5938f651fe4e94089ea33f79a099e29bba46f953b90e9c671dfbde3c8ff3b3a8"
+}

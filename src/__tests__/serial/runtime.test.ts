@@ -77,6 +77,45 @@ const livedPremise = () => {
     schemaVersion: 3,
     narrativeFoundation: {
       craftProfile: { version: NARRATIVE_FOUNDATION_VERSION, genre: 'two_world_commerce' },
+      commerceFantasy: {
+        protectedStore: {
+          ownerCharacterId: protagonistId,
+          domain: 'Toàn bộ cửa hàng nối hai giới thuộc quyền tuyệt đối của Lâm Việt.',
+          protections: [
+            'hostile_action_nullified', 'forced_entry_denied', 'theft_blocked',
+            'surveillance_blocked', 'owner_can_eject', 'unpaid_goods_recalled',
+          ],
+          outsideRisk: 'Ngoài cửa hàng, Lâm Việt vẫn chịu nguy hiểm và luật lệ bình thường của từng thế giới.',
+        },
+        valueContrasts: [
+          {
+            id: 'hang_pho_thuong_sang_mat_the',
+            sourceWorldId: premise.worldKernel.worlds[0]!.id,
+            destinationWorldId: premise.worldKernel.worlds[1]!.id,
+            item: 'Thuốc và vật dụng phổ thông',
+            ordinaryAtSource: 'Đây là hàng quen thuộc có thể mua hoặc chuẩn bị đều ở thế giới nguồn.',
+            valuableAtDestination: 'Nó giải quyết một thiếu hụt cấp thiết và được khách trực tiếp nhận ra.',
+            experienceProof: 'Khách dùng đúng công dụng trước quầy rồi mới tự quyết định mua.',
+            commercialConsequence: 'Kết quả thật dẫn tới lần quay lại với đơn lớn hơn.',
+          },
+          {
+            id: 'tai_nguyen_mat_the_hoi_luu',
+            sourceWorldId: premise.worldKernel.worlds[1]!.id,
+            destinationWorldId: premise.worldKernel.worlds[0]!.id,
+            item: 'Tài nguyên tiến hóa',
+            ordinaryAtSource: 'Đội săn coi đây là chiến lợi phẩm có thể đổi sau mỗi chuyến đi.',
+            valuableAtDestination: 'Nguồn tài nguyên này lại hiếm và có người biết dùng ở thế giới còn lại.',
+            experienceProof: 'Người có nghề kiểm một mẫu rồi chứng minh đúng một công dụng.',
+            commercialConsequence: 'Giá mua rõ ràng tạo vòng thu mua hai chiều.',
+          },
+        ],
+        simplicityRules: {
+          sharedLanguage: true,
+          compressRepeatedVerification: true,
+          noRoutinePermissionPlots: true,
+          noUnseededSubsystems: true,
+        },
+      },
       characters: [{
         characterId: protagonistId,
         background: 'Lâm Việt lớn lên trong một cửa hàng nhỏ và quen tự kiểm hàng.',
@@ -277,6 +316,7 @@ describe('serial runtime', () => {
           ? { title: 'Ca kiểm hàng', content: prose }
           : input.system.startsWith('Bạn đọc và soát')
             ? {
+                reviewBinding: { chapterNumber: 8, title: 'Ca kiểm hàng', excerpt: prose.slice(0, 40) },
                 continuity: [],
                 scorecard: { opening: 4, anticipation: 4, payoff: 3, newness: 3, endHook: 3 },
                 craft: { protagonistAgency: 4, sceneLife: 4, worldLogic: 4, dialogueNaturalness: 4, structuralFreshness: 3 },

@@ -1,0 +1,24 @@
+{
+  "review": {
+    "findings": [],
+    "readerAssessment": {
+      "protagonist": "Lâm Việt hiện rõ là một đan đồ mất chỗ dựa nhưng còn giữ được phẩm chất nghề nghiệp: biết giới hạn tri thức, ghi nguồn, giữ mẫu và không biến nhu cầu cấp bách thành cớ để hứa bừa. Mỗi bước tiến của hắn đến từ năng lực sẵn có được đặt đúng chỗ, không phải từ việc bỗng biết hết hai thế giới.",
+      "world": "Hai thế giới vận hành có đời sống và áp lực riêng. Thanh Lô có độc quyền nghề, thiếu nguyên liệu và chi phí sản xuất; Đông Hà có ca nước, phần đổi công, hàng thiếu nhãn và quyền sở hữu trong đội. Cửa hàng được giữ đúng là lãnh vực an toàn, không bị biến thành nơi phải vượt cấp giao chiến hay làm thủ tục trì hoãn vô ích.",
+      "causality": "Chuỗi nhân quả chặt: thuốc được chuẩn bị có giới hạn, Hứa An dùng đúng phạm vi, giữ được ca, có phần thịt; thịt được tách nguồn, kiểm mẫu, trải nghiệm linh thiện rồi mới dẫn tới yêu cầu về đường nguồn. Chương 10 đã hoàn tất nhịp cần thiết khi Lâm Việt đem điều kiện quyền giữ phần quay lại để Hàn Dược Sư đọc và chấp nhận làm chuẩn kiểm nhận, nhưng chưa đẩy thành mua bán hay vốn thật.",
+      "sceneLife": "Cảnh có vật chất và hành động cụ thể: thay băng, kéo xe nước, tách gói thịt, ép dịch, nấu chén linh thiện, sửa mẫu ghi nguồn. Đời sống, quan hệ hợp tác dè dặt và suy nghĩ nghề nghiệp đều được thể hiện qua lựa chọn chứ không chỉ được tóm tắt.",
+      "desireToContinue": "Có mong muốn đọc tiếp vì phần thưởng hiện tại vừa đủ thật—một tiêu chuẩn kiểm nhận được Hàn Dược Sư chấp nhận—trong khi nút tiếp theo vẫn có giá phải trả: Hứa An phải có quyền giữ phần rõ ràng và Lâm Việt phải gom được thêm hai lượt hàng tương đồng trước khi nguồn này có thể trở thành vốn."
+    }
+  },
+  "gate": {
+    "upstreamFindings": [],
+    "blockingProseFindings": [],
+    "mayPublish": true
+  },
+  "usage": {
+    "model": "gpt-5.6-terra",
+    "inputTokens": 50115,
+    "outputTokens": 1145,
+    "costUsd": 0.056985,
+    "finishReason": "completed"
+  }
+}

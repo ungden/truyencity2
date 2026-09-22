@@ -1,0 +1,165 @@
+{
+  "verdict": {
+    "continuity": [],
+    "scorecard": {
+      "opening": 1,
+      "anticipation": 1,
+      "payoff": 1,
+      "newness": 1,
+      "endHook": 1
+    },
+    "craft": {
+      "protagonistAgency": 1,
+      "sceneLife": 1,
+      "worldLogic": 1,
+      "dialogueNaturalness": 1,
+      "structuralFreshness": 1
+    },
+    "repetition": [],
+    "aiFlavor": [],
+    "steering": [
+      "Cảnh giao dịch đứng vững về canon: Lâm Việt chỉ dùng nghề và vật liệu có nguồn, không tự biết công dụng tinh hạch hay pin, còn Hứa An chỉ định giá sau khi trực tiếp thấy máu ngừng và lớp bột bám khi co tay.",
+      "Phần mạnh nhất là chuỗi trải nghiệm → đối chiếu với băng cũ → hỏi số lần dùng, giá và nguồn hàng → chốt đối giá. Đây là value contrast cụ thể, không dùng đám đông hay lời quảng cáo để ép giá trị.",
+      "Có thể gọn bớt vài lượt nhắc lại cùng một giới hạn thuốc sau khi Hứa An đã đọc bảng, trả lời sàng lọc và nghe dặn lúc nhận hàng. Giữ một lời dặn cuối gắn với hành động của anh ta là đủ, để nhịp sau thử thuốc tiến nhanh hơn.",
+      "Đoạn cuối tự kiềm chế tốt khi tách hiệu quả một lô khỏi năng lực sản xuất lâu dài. Tuy nhiên, hook sẽ sắc hơn nếu dòng ghi chép về mẫu tinh hạch dẫn tới một lựa chọn hoặc trở ngại cụ thể ở chương sau, thay vì chủ yếu tổng kết ý nghĩa của giao dịch."
+    ],
+    "reviewBinding": {
+      "chapterNumber": 3,
+      "title": "Lô Cầm Máu Thử Số Một",
+      "excerpt": "Máu không còn rịn ra ở mép vết cắt.\n\nKhông phải vết thương biến mất, càng không phải da thịt tự khép lại."
+    }
+  },
+  "digest": {
+    "chapterNumber": 3,
+    "title": "Lô Cầm Máu Thử Số Một",
+    "summary": "Lâm Việt tự làm ba gói bột cầm máu, thử thành công trên vết cắt của Hứa An và đổi lô thuốc lấy một mẫu tinh hạch cạn cùng hai viên pin.",
+    "payoffKind": "doi_chieu",
+    "endedOn": "Trong kho bên kia cánh cửa, hắn còn một tháng tiền thuê, nhưng hôm nay đã có lô hàng đầu tiên được mang đi bằng chính đôi tay của người cần nó.",
+    "newNamedThings": [
+      "bột cầm máu phổ thông",
+      "tinh hạch cạn",
+      "hai viên pin nhỏ",
+      "mẫu chờ giám định",
+      "lô cầm máu thử số một"
+    ],
+    "narrativeEvidence": [
+      {
+        "id": "tinh_hach_can_giam_dinh",
+        "chapterNumber": 3,
+        "quote": "Lâm Việt cầm một chiếc đũa tre, nhẹ nhàng xoay mẫu tinh hạch qua lại. Hắn quan sát màu sắc, vết nứt, mùi lạ gần như không có. Về phần bên trong, về phần có độc hay có thể luyện thành thuốc, hắn hoàn toàn không biết.",
+        "learnedByCharacterIds": [
+          "lam_viet"
+        ]
+      },
+      {
+        "id": "chuan_bi_lo_thuoc_nho",
+        "chapterNumber": 3,
+        "quote": "Ba phần nhỏ bằng nhau được gói vào lớp giấy dầu sạch, buộc dây mảnh ở miệng. Trên mỗi gói, hắn dùng than viết chữ ngay ngắn.\n\n— Bột cầm máu phổ thông.\n\nBên dưới là mấy dòng ngắn hơn",
+        "learnedByCharacterIds": [
+          "lam_viet"
+        ]
+      },
+      {
+        "id": "giao_dich_thu_gioi_han",
+        "chapterNumber": 3,
+        "quote": "— Ba gói đổi một mẫu tinh hạch cạn và hai viên pin này. Gói vừa mở tính là một gói. Anh mang cả ba đi, nhưng chỉ dùng đúng trường hợp đã ghi. Gói chưa mở, nếu không dùng, phải giữ khô.",
+        "learnedByCharacterIds": [
+          "lam_viet",
+          "hua_an"
+        ]
+      }
+    ],
+    "coreChanges": {
+      "storyDayDelta": 0,
+      "died": [],
+      "progressionChanges": [],
+      "assetEvents": [
+        {
+          "eventId": "c3_acquire_bot_cam_mau_pho_thong",
+          "kind": "acquire",
+          "assetId": "bot_cam_mau_pho_thong",
+          "assetName": "bột cầm máu phổ thông",
+          "quantity": 3,
+          "unit": "gói",
+          "fungible": true,
+          "sourceLotId": null,
+          "fromOwnerId": "lam_viet",
+          "fromOwnerName": "Lâm Việt",
+          "toOwnerId": "lam_viet",
+          "toOwnerName": "Lâm Việt",
+          "note": "Lâm Việt tự làm một lô ba gói từ phần dược liệu còn dùng được, hong, nghiền, sàng và chia gói tại kho thuê."
+        },
+        {
+          "eventId": "c3_consume_bot_cam_mau_pho_thong",
+          "kind": "consume",
+          "assetId": "bot_cam_mau_pho_thong",
+          "assetName": "bột cầm máu phổ thông",
+          "quantity": 1,
+          "unit": "gói",
+          "fungible": true,
+          "sourceLotId": "c3_acquire_bot_cam_mau_pho_thong",
+          "fromOwnerId": "lam_viet",
+          "fromOwnerName": "Lâm Việt",
+          "toOwnerId": null,
+          "toOwnerName": null,
+          "note": "Một gói được mở và dùng ngoài da cho vết cắt sạch, nông của Hứa An."
+        },
+        {
+          "eventId": "c3_acquire_pin_hua_an",
+          "kind": "acquire",
+          "assetId": "pin_nho",
+          "assetName": "pin nhỏ",
+          "quantity": 2,
+          "unit": "viên",
+          "fungible": true,
+          "sourceLotId": null,
+          "fromOwnerId": "hua_an",
+          "fromOwnerName": "Hứa An",
+          "toOwnerId": "lam_viet",
+          "toOwnerName": "Lâm Việt",
+          "note": "Hứa An đặt hai viên pin nhỏ lên quầy làm đối giá cho ba gói thuốc."
+        },
+        {
+          "eventId": "c3_acquire_tinh_hach_can_hua_an",
+          "kind": "acquire",
+          "assetId": "tinh_hach_can",
+          "assetName": "tinh hạch cạn",
+          "quantity": 1,
+          "unit": "mẫu",
+          "fungible": false,
+          "sourceLotId": null,
+          "fromOwnerId": "hua_an",
+          "fromOwnerName": "Hứa An",
+          "toOwnerId": "lam_viet",
+          "toOwnerName": "Lâm Việt",
+          "note": "Hứa An đưa một mẫu tinh hạch cạn lấy từ một con chuột biến dị ở kho cũ; mẫu có vết nứt và gần hết."
+        },
+        {
+          "eventId": "c3_transfer_bot_cam_mau_pho_thong_hua_an",
+          "kind": "transfer",
+          "assetId": "bot_cam_mau_pho_thong",
+          "assetName": "bột cầm máu phổ thông",
+          "quantity": 2,
+          "unit": "gói",
+          "fungible": true,
+          "sourceLotId": "c3_acquire_bot_cam_mau_pho_thong",
+          "fromOwnerId": "lam_viet",
+          "fromOwnerName": "Lâm Việt",
+          "toOwnerId": "hua_an",
+          "toOwnerName": "Hứa An",
+          "note": "Hai gói chưa mở được Hứa An nhận mang đi; giao dịch được ghi là ba gói, trong đó một gói đã dùng tại quầy."
+        }
+      ],
+      "goldenFingerRungChange": null,
+      "moved": [],
+      "worldFactsRevealed": [],
+      "newCast": [],
+      "hooksPlanted": [],
+      "hooksPaid": [],
+      "learnedFinger": []
+    }
+  },
+  "attempts": 2,
+  "costUsd": 0.147858,
+  "inputFingerprint": "508112f0e8d97d091c7b55c4b66d0fd43ef33b0cc0494bbe2b2649703a33b103"
+}

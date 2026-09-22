@@ -1,7 +1,8 @@
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
 
-export const NARRATIVE_FOUNDATION_VERSION = 'lived-causality-2026-09-21.1' as const;
+export const LEGACY_NARRATIVE_FOUNDATION_VERSION = 'lived-causality-2026-09-21.1' as const;
+export const NARRATIVE_FOUNDATION_VERSION = 'lived-causality-2026-09-22.2' as const;
 
 // Shared with Serial's persisted IDs. A foundation accepted here must remain
 // writable to Bible snapshots and plans without a second, narrower contract.
@@ -9,13 +10,75 @@ const id = z.string().trim().regex(/^[a-z0-9_]{2,64}$/);
 const prose = z.string().trim().min(8).max(2_000);
 
 export const NarrativeCraftProfileSchema = z.object({
-  version: z.literal(NARRATIVE_FOUNDATION_VERSION),
+  version: z.union([
+    z.literal(LEGACY_NARRATIVE_FOUNDATION_VERSION),
+    z.literal(NARRATIVE_FOUNDATION_VERSION),
+  ]),
   genre: z.enum(['two_world_commerce', 'cultivation_growth', 'civilization_technology']),
 }).strict();
 export type NarrativeCraftProfile = z.infer<typeof NarrativeCraftProfileSchema>;
 
+const STORE_PROTECTIONS = [
+  'hostile_action_nullified',
+  'forced_entry_denied',
+  'theft_blocked',
+  'surveillance_blocked',
+  'owner_can_eject',
+  'unpaid_goods_recalled',
+] as const;
+
+export const CommerceFantasySchema = z.object({
+  protectedStore: z.object({
+    ownerCharacterId: id,
+    domain: prose,
+    protections: z.array(z.enum(STORE_PROTECTIONS)).length(STORE_PROTECTIONS.length),
+    outsideRisk: prose,
+  }).strict(),
+  valueContrasts: z.array(z.object({
+    id,
+    sourceWorldId: id,
+    destinationWorldId: id,
+    item: z.string().trim().min(2).max(120),
+    ordinaryAtSource: prose,
+    valuableAtDestination: prose,
+    experienceProof: prose,
+    commercialConsequence: prose,
+  }).strict()).min(2).max(16),
+  simplicityRules: z.object({
+    sharedLanguage: z.literal(true),
+    compressRepeatedVerification: z.literal(true),
+    noRoutinePermissionPlots: z.literal(true),
+    noUnseededSubsystems: z.literal(true),
+  }).strict(),
+}).strict().superRefine((fantasy, ctx) => {
+  const protections = new Set(fantasy.protectedStore.protections);
+  for (const protection of STORE_PROTECTIONS) {
+    if (!protections.has(protection)) ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['protectedStore', 'protections'],
+      message: `Protected store is missing ${protection}.`,
+    });
+  }
+  const contrastIds = fantasy.valueContrasts.map(item => item.id);
+  if (new Set(contrastIds).size !== contrastIds.length) ctx.addIssue({
+    code: z.ZodIssueCode.custom,
+    path: ['valueContrasts'],
+    message: 'Value contrast ids must be unique.',
+  });
+  fantasy.valueContrasts.forEach((contrast, index) => {
+    if (contrast.sourceWorldId === contrast.destinationWorldId) ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['valueContrasts', index],
+      message: 'A value contrast must cross worlds.',
+    });
+  });
+});
+export type CommerceFantasy = z.infer<typeof CommerceFantasySchema>;
+
 export const NarrativeFoundationSchema = z.object({
   craftProfile: NarrativeCraftProfileSchema,
+  /** Required for newly reviewed two-world commerce stories; optional keeps v1 artifacts readable. */
+  commerceFantasy: CommerceFantasySchema.optional(),
   characters: z.array(z.object({
     characterId: id,
     background: prose,
@@ -63,6 +126,15 @@ export const NarrativeFoundationSchema = z.object({
   unique(foundation.livedWorlds.map(item => item.worldId), 'livedWorlds');
   unique(foundation.facts.map(item => item.id), 'facts');
   unique(foundation.milestones.map(item => item.id), 'milestones');
+  if (foundation.craftProfile.version === NARRATIVE_FOUNDATION_VERSION
+      && foundation.craftProfile.genre === 'two_world_commerce'
+      && !foundation.commerceFantasy) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['commerceFantasy'],
+      message: 'Current two-world commerce foundations require the protected-store and value-contrast contract.',
+    });
+  }
   const characterIds = new Set(foundation.characters.map(item => item.characterId));
   const factIds = new Set(foundation.facts.map(item => item.id));
   const milestoneIds = new Set(foundation.milestones.map(item => item.id));
@@ -116,6 +188,7 @@ export const NarrativeReviewSchema = z.object({
     kind: z.enum([
       'missing_grounding', 'unearned_knowledge', 'skipped_prerequisite',
       'unlived_scene', 'world_incoherence', 'repetitive_padding',
+      'store_sanctuary_violation', 'value_asymmetry_missing', 'procedural_bloat',
     ]),
     severity: z.enum(['blocking', 'important', 'minor']),
     chapterNumber: z.number().int().min(1).nullable(),
@@ -165,7 +238,10 @@ const COMMON_CRAFT = `NỀN SÁNG TÁC ${NARRATIVE_FOUNDATION_VERSION}
 
 const GENRE_CRAFT: Record<NarrativeCraftProfile['genre'], string> = {
   two_world_commerce: `SONG XUYÊN–KINH DOANH
-Hai thế giới đều có cư dân, việc làm, hạ tầng và lợi ích. Giai đoạn thăm dò có thể chưa có khách hàng. Khi kinh doanh, phân biệt mẫu vật, hiểu công dụng, quyền sử dụng, khả năng cung ứng hoặc sản xuất, kiểm tra chất lượng, nhu cầu và người trả tiền. Giao dịch riêng tư vẫn hợp lệ; không bắt buộc đám đông hay công ty xuất hiện sớm.`,
+Hai thế giới đều có cư dân, việc làm, hạ tầng và lợi ích. Cửa hàng nối hai giới là lãnh vực tuyệt đối của chủ cửa hàng: hành vi thù địch, cưỡng ép vào cửa, trộm hàng và theo dõi công nghệ đều vô hiệu; chủ cửa hàng có thể trục xuất khách và thu hồi hàng chưa thanh toán. Chênh lệch công nghệ, cảnh giới, quyền lực hay số lượng không thể vượt qua luật này. Rủi ro bên ngoài vẫn tồn tại nhưng không được lặp thành tuyến giữ quầy hay chống cướp cửa hàng.
+Động cơ sảng là chênh lệch giá trị: món quen thuộc, rẻ hoặc lỗi thời ở thế giới nguồn giải quyết một nhu cầu đắt đỏ ở thế giới đích. Khi một món mới xuất hiện, cho người mua trực tiếp nhìn, dùng, nếm, mặc hoặc thử hiệu quả; phản ứng đi từ trải nghiệm tới định giá, trả giá, đặt thêm hoặc đổi địa vị. Không thay trải nghiệm ấy bằng lời thuyết minh hay đám đông đồng thanh.
+Hai phía giao tiếp bình thường; không dựng rào cản ngôn ngữ, phiên dịch hoặc trợ thoại. Không tự sinh giấy phép, chứng nhận, sở hữu trí tuệ, khóa quyền, rà soát hay cơ quan mới chỉ để trì hoãn một giao dịch. Không tự thêm AI, hệ thống phụ, quyền năng, sản phẩm hoặc tổ chức ngoài premise để tạo việc cho truyện. Một thủ tục chỉ được giữ khi premise đã xác lập nó là xung đột trung tâm và nó tạo lựa chọn mới. Việc kiểm tra đã thành thông lệ phải được kể gọn.
+Giai đoạn thăm dò có thể chưa có khách hàng, nhưng không kéo dài chỉ để chứng minh sự thận trọng. Khi kinh doanh, giữ rõ nguồn hàng, công dụng, khả năng cung ứng, nhu cầu và người trả tiền; một bằng chứng đủ cho quyết định hiện tại, không đòi hiểu toàn bộ nền văn minh.`,
   cultivation_growth: `TU LUYỆN–TRƯỞNG THÀNH
 Cho độc giả điểm xuất phát để so sánh. Tiến bộ gắn với cơ thể, thời gian, đời sống và quan hệ. Đốn ngộ, truyền thừa hoặc hệ thống chỉ hợp lệ theo luật riêng đã dựng; không dùng chúng để vá việc nhân vật bỗng có kiến thức ngoài kinh nghiệm.`,
   civilization_technology: `XÂY DỰNG–CÔNG NGHỆ
@@ -199,6 +275,16 @@ export function assertFoundationReferences(input: {
   for (const item of foundation.livedWorlds) {
     if (!worldIds.has(item.worldId)) throw new Error(`Narrative foundation references unknown world ${item.worldId}.`);
   }
+  if (foundation.commerceFantasy) {
+    if (foundation.commerceFantasy.protectedStore.ownerCharacterId !== input.protagonistId) {
+      throw new Error('The protected store must belong to the protagonist.');
+    }
+    for (const contrast of foundation.commerceFantasy.valueContrasts) {
+      if (!worldIds.has(contrast.sourceWorldId) || !worldIds.has(contrast.destinationWorldId)) {
+        throw new Error(`Value contrast ${contrast.id} references an unknown world.`);
+      }
+    }
+  }
   const protagonistKnown = new Set(foundation.facts
     .filter(fact => fact.initiallyKnownByCharacterIds.includes(input.protagonistId))
     .map(fact => fact.id));
@@ -213,4 +299,5 @@ export const NARRATIVE_REVIEW_SYSTEM_PROMPT = `Bạn là biên tập viên văn 
 Chỉ nêu finding có bằng chứng. Quote phải chép đúng từ prose; nếu thiếu một cảnh thì để quote=null và chỉ rõ kết quả nào đang thiếu chuẩn bị.
 Phân tầng chính xác: foundation khi năng lực/động cơ/thế giới gốc thiếu; plan khi kết quả đi trước điều kiện; prose khi plan đủ nhưng cảnh thể hiện hụt.
 Không phạt cảnh đời sống, quan hệ, khám phá hoặc suy nghĩ chỉ vì chưa có giao dịch, tăng cấp, tên mới, nhân chứng hay hook đe dọa.
+Với song xuyên kinh doanh, chặn việc phá lãnh vực an toàn của cửa hàng, dựng rào cản ngôn ngữ hoặc sinh thủ tục lặp để trì hoãn giao dịch. Khi một món mới là trọng tâm, kiểm tra độc giả có thấy rõ nó bình thường ở nơi xuất phát, đáng giá ở nơi đến, được trải nghiệm và tạo hệ quả thương mại hay không.
 Không dùng điểm tổng hợp thay cho nhận xét cụ thể. Đánh giá main là ai, thế giới vận hành ra sao, nhân quả, sức sống của cảnh và mong muốn đọc tiếp.`;

@@ -1,0 +1,87 @@
+{
+  "verdict": {
+    "continuity": [],
+    "scorecard": {
+      "opening": 1,
+      "anticipation": 1,
+      "payoff": 1,
+      "newness": 0,
+      "endHook": 1
+    },
+    "craft": {
+      "protagonistAgency": 2,
+      "sceneLife": 1,
+      "worldLogic": 2,
+      "dialogueNaturalness": 2,
+      "structuralFreshness": 1
+    },
+    "repetition": [
+      {
+        "quote": "“Thứ Tôi Có Quyền Giữ, Tôi Mới Dám Ghi”",
+        "repeatsChapter": 9,
+        "note": "Chương 10 lặp trực tiếp trục của chương 9: Hứa An hỏi về quyền giữ phần đổi công, Lâm Việt giới hạn điều được ghi, rồi nguồn thịt vẫn chưa thành nguồn hàng. Chương này có cụ thể hóa mẫu kiểm nhận, nhưng nhịp xung đột và kết quả cảm giác vẫn quá gần."
+      },
+      {
+        "quote": "“Một miếng tốt chỉ chứng minh được một miếng tốt.”",
+        "repeatsChapter": 7,
+        "note": "Ý này tiếp tục kết luận trung tâm của chương 7–8: mẫu thịt tốt chưa đủ để định giá lô. Lần này có thêm tiêu chuẩn ba lượt và biểu mẫu, nhưng nên để lượt hàng kế tiếp đem đến biến số thực tế thay vì nhắc lại nguyên tắc."
+      }
+    ],
+    "aiFlavor": [
+      {
+        "quote": "Hàng có thể ăn chưa phải hàng có thể kiểm.",
+        "kind": "theme_spoken"
+      },
+      {
+        "quote": "Đường hàng này, thiếu một đoạn thì thà để nó chưa thành đường.",
+        "kind": "theme_spoken"
+      },
+      {
+        "quote": "không có thêm linh thạch, không có hợp đồng mua thịt, cũng không có lời hứa",
+        "kind": "parallel_triple"
+      }
+    ],
+    "steering": [
+      "Chương giữ canon tốt: Lâm Việt chỉ dựa vào nghề ghi lô và giới hạn đã có; Hứa An chỉ báo điều anh trực tiếp hỏi được; Hàn Dược Sư hành động đúng lợi ích biển hiệu và chuyên môn kiểm mẫu. Không có vi phạm luật cửa hàng, tài sản hay tri thức nhân vật.",
+      "Điểm mạnh là biến một điều kiện mơ hồ thành lựa chọn có trách nhiệm: Hứa An phải lộ việc có phần riêng được phép giữ hay từ bỏ khả năng làm nguồn hàng; Lâm Việt từ chối nhận hàng thiếu căn cứ thay vì ép giao dịch.",
+      "Tuy nhiên, sau chương 7–9, đây là lần nữa truyện dừng ở quy trình và lời xác nhận. Chương kế tiếp nên cho một lượt thịt thực sự đến với một sai khác cụ thể—thiếu giờ bọc, khác mùi, hoặc cùng tuyến nhưng người giao đổi—để mẫu ghi buộc nhân vật quyết định, thay vì tiếp tục thảo luận tiêu chuẩn.",
+      "Value contrast đã có nền trải nghiệm nghề qua chén linh thiện thử, nhưng cảnh này chỉ hồi cố nó. Khi có lượt hàng mới, hãy cho Hàn Dược Sư trực tiếp cắt, ngửi, nấu hoặc loại mẫu trước mắt; phản ứng nghề nghiệp đó sẽ làm ba-lượt-đối-chiếu thành payoff sống động.",
+      "Kết chương có sự công nhận nhỏ, nhưng hook còn là một tuyên bố tổng kết. Có thể thay bằng một tín hiệu hành động gần: Hứa An mang tờ mẫu vào ca, hoặc Lâm Việt phải quyết định cách xử lý đơn mười hai gói trong lúc chờ nguồn thịt."
+    ],
+    "reviewBinding": {
+      "chapterNumber": 10,
+      "title": "“Hàng Có Thể Ăn Chưa Phải Hàng Có Thể Kiểm”",
+      "excerpt": "— Nếu thiếu một mục?\n\n— Thì nó vẫn có thể là thức ăn của ngươi. Có thể đem đổi ở nơi khác. Nhưng với ta, nó chưa phải mẫu để mang đi kiểm."
+    }
+  },
+  "digest": {
+    "chapterNumber": 10,
+    "title": "“Hàng Có Thể Ăn Chưa Phải Hàng Có Thể Kiểm”",
+    "summary": "Lâm Việt xác lập mẫu ghi nguồn chặt chẽ với Hứa An và Hàn Dược Sư, nhưng chưa có thêm hàng, giao dịch hay giá mua nào được xác nhận.",
+    "payoffKind": null,
+    "endedOn": "Lâm Việt biết rõ phải chờ cái gì mới được gọi là hàng.",
+    "newNamedThings": [
+      "mẫu ghi nguồn mới",
+      "chuẩn kiểm nhận"
+    ],
+    "narrativeEvidence": [],
+    "coreChanges": {
+      "storyDayDelta": 0,
+      "died": [],
+      "progressionChanges": [],
+      "assetEvents": [],
+      "goldenFingerRungChange": null,
+      "moved": [],
+      "worldFactsRevealed": [],
+      "newCast": [],
+      "hooksPlanted": [],
+      "hooksPaid": [
+        "hua_an_hoi_quyen_giu_phan_doi_cong"
+      ],
+      "learnedFinger": []
+    }
+  },
+  "attempts": 2,
+  "costUsd": 0.118191,
+  "inputFingerprint": "37d9c50b0930b3615405e08aa5288585a9fcfa46cc180d90f3b7204c4e1026ef"
+}

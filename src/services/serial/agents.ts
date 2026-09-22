@@ -1,6 +1,7 @@
 import type { StoryModelProvider, ProviderUsage } from '@/services/story-factory/provider';
 import {
-  ChapterDigestSchema, ChapterDraftSchema, CyclePlanSchema, JudgeVerdictSchema, OpeningAuditSchema, PremiseSchema,
+  ChapterDigestSchema, ChapterDraftSchema, CyclePlanSchema, JudgeProviderVerdictSchema, OpeningAuditSchema, PremiseSchema,
+  RollingCyclePlanSchema,
   type ChapterDigest, type ChapterDraft, type CyclePlan, type JudgeVerdict, type OpeningAudit, type Premise,
   type SerialRoutes,
 } from './contracts';
@@ -8,6 +9,7 @@ import {
   PREMISE_SYSTEM_PROMPT, WRITER_SYSTEM_PANEL_RULE,
 } from './prompts';
 import { narrativeCraft, type NarrativeCraftProfile } from '@/services/narrative/foundation';
+import { StoryFactoryError } from '@/services/story-factory/contracts';
 import { serialSystemPrompt } from './foundation';
 
 /**
@@ -117,15 +119,30 @@ export async function judgeChapter(input: {
   routes: SerialRoutes;
   premise: Premise;
   judgeBrief: unknown;
+  chapter: { chapterNumber: number; title: string; content: string };
 }): Promise<AgentResult<JudgeVerdict>> {
   const result = await input.provider.json({
     model: input.routes.judge,
     system: serialSystemPrompt('judge', input.premise),
     prompt: brief(input.judgeBrief),
-    schema: JudgeVerdictSchema,
+    schema: JudgeProviderVerdictSchema,
     temperature: 0.2,
     timeoutMs: SUPPORT_TIMEOUT_MS,
   });
+  const binding = result.value.reviewBinding;
+  const deniedInput = (result.value.steering ?? []).some(line =>
+    /(?:không|chưa) (?:có|được (?:cấp|cung cấp|gửi)) (?:truyện|văn bản|nội dung|phần văn|bản thảo)/iu.test(line));
+  if (!binding
+      || binding.chapterNumber !== input.chapter.chapterNumber
+      || comparableTitle(binding.title) !== comparableTitle(input.chapter.title)
+      || !input.chapter.content.includes(binding.excerpt)
+      || deniedInput) {
+    throw new StoryFactoryError(
+      'infra_blocked',
+      'Judge response is not grounded in the supplied chapter.',
+      { usage: result.usage },
+    );
+  }
   return { value: result.value, usage: result.usage };
 }
 
@@ -151,12 +168,13 @@ export async function planCycle(input: {
   routes: SerialRoutes;
   premise: Premise;
   plannerBrief: unknown;
+  rolling?: boolean;
 }): Promise<AgentResult<CyclePlan>> {
   const result = await input.provider.json({
     model: input.routes.planner,
     system: serialSystemPrompt('planner', input.premise),
     prompt: brief(input.plannerBrief),
-    schema: CyclePlanSchema,
+    schema: input.rolling ? RollingCyclePlanSchema : CyclePlanSchema,
     temperature: 0.8,
     timeoutMs: SUPPORT_TIMEOUT_MS,
   });
@@ -173,7 +191,7 @@ export async function proposePremise(input: {
   const result = await input.provider.json({
     model: input.routes.premise,
     system: input.craftProfile
-      ? `Bạn dựng premise schemaVersion 3 với narrativeFoundation đầy đủ.\n\n${narrativeCraft(input.craftProfile)}\n\nKhông khóa số chương phải bán hàng hoặc lên cấp. World Kernel vẫn dùng stable IDs; các mảng thương mại/cấp bậc có thể rỗng nếu chưa thuộc mở đầu.`
+      ? `Bạn dựng premise schemaVersion 3 với narrativeFoundation đầy đủ.\n\n${narrativeCraft(input.craftProfile)}\n\nKhông khóa số chương phải bán hàng hoặc lên cấp. World Kernel vẫn dùng stable IDs; các mảng thương mại/cấp bậc có thể rỗng nếu chưa thuộc mở đầu. Với two_world_commerce phiên bản hiện tại, commerceFantasy là bắt buộc và phải dùng đúng stable character/world IDs.`
       : PREMISE_SYSTEM_PROMPT,
     prompt: brief({ lane: input.lane, craftProfile: input.craftProfile ?? null, khongDuocTrungVoi: input.avoid }),
     schema: PremiseSchema,

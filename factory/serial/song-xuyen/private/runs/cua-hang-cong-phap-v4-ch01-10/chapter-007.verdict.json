@@ -1,0 +1,98 @@
+{
+  "verdict": {
+    "continuity": [],
+    "scorecard": {
+      "opening": 4,
+      "anticipation": 4,
+      "payoff": 3,
+      "newness": 3,
+      "endHook": 4
+    },
+    "craft": {
+      "protagonistAgency": 4,
+      "sceneLife": 4,
+      "worldLogic": 5,
+      "dialogueNaturalness": 4,
+      "structuralFreshness": 3
+    },
+    "repetition": [
+      {
+        "quote": "Thứ hắn thật sự có lúc này chỉ là một đơn đặt trước, một nhu cầu đã xác nhận, cùng vài món hàng chờ giám định.\n\nKhông phải tiền.",
+        "repeatsChapter": 6,
+        "note": "Cùng nhấn lại luận điểm chương 6: đặt trước và đối giá chưa thể xem là hàng/vốn có thể sử dụng. Lần này có thêm bảng giá và lựa chọn thực tế, nên không lỗi nặng, nhưng có thể rút bớt phần tự kết luận."
+      }
+    ],
+    "aiFlavor": [
+      {
+        "quote": "Không phải tiền.\n\nCàng không phải mười hai gói thuốc đã làm xong.",
+        "kind": "parallel_triple"
+      },
+      {
+        "quote": "Cơ hội được đặt dưới kỷ luật nghề: có thứ đáng giá, nhưng giá trị chỉ tồn tại khi người bán chịu gọi đúng phần mình biết và phần mình chưa biết.",
+        "kind": "theme_spoken"
+      }
+    ],
+    "steering": [
+      "Cảnh giám định giữ canon rất chắc: Lâm Việt chỉ nói điều mình truy được, Hàn Dược Sư chỉ kết luận trong phạm vi lát mẫu và từ chối biến phản ứng ban đầu thành giá mua. Đây là quyết định có căn cứ, không phải thận trọng giả tạo.",
+      "Chương đã hoàn thành đúng nút phải trả của chương 6: có bảng vốn cho đơn mười hai gói và nguyên tắc nguồn hàng lặp lại. Tuy nhiên, nhiều đoạn sau đó lặp lại cùng một kết luận rằng mẫu chưa phải vốn; nên nhường thêm chỗ cho một lựa chọn cụ thể của Lâm Việt ở chương tới.",
+      "Payoff đối chiếu mới hiện dừng ở trải nghiệm nghề của Hàn Dược Sư khi ép dịch thịt. Lượt tiếp theo nên cho mẫu này đi vào thử linh thiện với một kết quả ăn/uống hoặc chế biến quan sát được, rồi mới để Hàn chủ động nêu điều kiện giá hay đặt lô.",
+      "Móc cuối đặt đúng câu hỏi vốn, nhưng lựa chọn sẽ sắc hơn nếu sớm cho thấy phương án thứ ba ngoài ‘bán mẫu chưa xong’ và ‘nguồn chưa lặp’: giảm quy mô đơn, thương lượng thời hạn, hoặc dùng sáu pin vào một nhu cầu Đông Hà có thể đổi ngược thành dược liệu."
+    ],
+    "reviewBinding": {
+      "chapterNumber": 7,
+      "title": "“Một Miếng Tốt Không Chứng Minh Cả Lô”",
+      "excerpt": "— Một miếng tốt không chứng minh cả lô. Ngươi làm ở đan phòng sáu năm rồi, không cần ta dạy lại câu này."
+    }
+  },
+  "digest": {
+    "chapterNumber": 7,
+    "title": "“Một Miếng Tốt Không Chứng Minh Cả Lô”",
+    "summary": "Lâm Việt đưa mẫu thịt có nguồn và hai mẫu tinh hạch cho Hàn Dược Sư kiểm tra, xác nhận chúng chưa đủ căn cứ định giá, đồng thời tính vốn thực tế cho đơn mười hai gói thuốc.",
+    "payoffKind": "doi_chieu",
+    "endedOn": "Nếu muốn giao đúng mười hai gói cho đội tuần tra, hắn sẽ lấy khoản vốn đầu tiên từ đâu—từ một mẫu thịt còn chưa thử xong, hay từ một nguồn hàng mà hắn vẫn chưa biết có thể lặp lại hay không?",
+    "newNamedThings": [
+      "thit_day_do",
+      "mau_mot",
+      "mau_hai",
+      "don_muoi_hai_goi_bot_cam_mau",
+      "muc_von_thap",
+      "muc_von_giua",
+      "muc_von_cao",
+      "ba_luot_hang_doi_chieu"
+    ],
+    "narrativeEvidence": [],
+    "coreChanges": {
+      "storyDayDelta": 0,
+      "died": [],
+      "progressionChanges": [],
+      "assetEvents": [],
+      "goldenFingerRungChange": null,
+      "moved": [],
+      "worldFactsRevealed": [
+        {
+          "id": "thanh_lo_phuong",
+          "note": "Quầy Hàn Dược Sư nằm ở cuối dãy bán nguyên liệu trong Thanh Lô Phường, giữa các quầy linh thiện và lò luyện."
+        },
+        {
+          "id": "han_gia_linh_thien",
+          "note": "Biển quầy ghi “Hàn gia linh thiện”; Hàn Dược Sư đang trực tiếp lựa nguyên liệu, giám định mẫu và cân nhắc nguồn thịt cho bếp linh thiện của Hàn gia."
+        }
+      ],
+      "newCast": [],
+      "hooksPlanted": [
+        {
+          "id": "han_duoc_su_yeu_cau_ba_luot_mau_tuong_dong",
+          "what": "Hàn Dược Sư chỉ cân nhắc mua thịt làm nguồn thử khi Lâm Việt mang được ít nhất ba lượt hàng cùng loại, cách giữ tương đối ổn định và có nguồn gốc đủ đối chiếu.",
+          "dueByChapter": 10
+        }
+      ],
+      "hooksPaid": [
+        "hoi_gia_nguyen_lieu_lo_cam_mau_doi_nho"
+      ],
+      "learnedFinger": []
+    }
+  },
+  "attempts": 1,
+  "costUsd": 0.074532,
+  "inputFingerprint": "c7391d1497d3a3c1e587ff64363beb80970fcecf49209bd43f6a44894b64cb08"
+}

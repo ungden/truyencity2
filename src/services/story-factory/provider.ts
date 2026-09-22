@@ -15,6 +15,32 @@ function retryDelays(limit: TransportRetryLimit | undefined): number[] {
   return RETRY_DELAYS_MS.slice(0, limit ?? RETRY_DELAYS_MS.length);
 }
 
+export function parseAfterTrimmingArrayOverflows<T>(
+  schema: z.ZodType<T, z.ZodTypeDef, unknown>, raw: unknown,
+): { data: T } | null {
+  const parsed = schema.safeParse(raw);
+  if (parsed.success) return { data: parsed.data };
+  const issues = parsed.error.issues;
+  type ArrayOverflowIssue = z.ZodIssue & { code: 'too_big'; type: 'array'; maximum: number };
+  const arrayOverflows = issues.filter((issue): issue is ArrayOverflowIssue => issue.code === 'too_big'
+    && 'type' in issue && issue.type === 'array'
+    && 'maximum' in issue && typeof issue.maximum === 'number');
+  if (arrayOverflows.length === 0 || arrayOverflows.length !== issues.length) return null;
+  const trimmed = structuredClone(raw) as unknown;
+  for (const issue of [...arrayOverflows].sort((left, right) => right.path.length - left.path.length)) {
+    let target: unknown = trimmed;
+    for (const segment of issue.path) {
+      if ((typeof target !== 'object' || target === null)
+          || !(segment in (target as Record<string | number, unknown>))) return null;
+      target = (target as Record<string | number, unknown>)[segment];
+    }
+    if (!Array.isArray(target)) return null;
+    target.splice(issue.maximum);
+  }
+  const trimmedParsed = schema.safeParse(trimmed);
+  return trimmedParsed.success ? { data: trimmedParsed.data } : null;
+}
+
 /**
  * Default per-request timeout. Setup and planner calls legitimately run long — a
  * pro-class model emitting a full three-chapter window of structured JSON, or a
@@ -740,6 +766,10 @@ export const geminiProvider: StoryModelProvider = {
       return { value: raw as T, usage };
     }
     let parsed = input.schema.safeParse(raw);
+    if (!parsed.success) {
+      const trimmed = parseAfterTrimmingArrayOverflows<T>(input.schema, raw);
+      if (trimmed) return { value: trimmed.data, usage };
+    }
     if (!parsed.success && (
       input.model.startsWith('gpt-')
       || input.model.includes('/')
@@ -777,6 +807,8 @@ Trả lại đúng một object JSON đã sửa, không giải thích.`,
       const usageTotal = mergeProviderUsage(usage, corrective.usage);
       parsed = input.schema.safeParse(raw);
       if (!parsed.success) {
+        const trimmed = parseAfterTrimmingArrayOverflows<T>(input.schema, raw);
+        if (trimmed) return { value: trimmed.data, usage: usageTotal };
         throw new StoryFactoryError('infra_blocked', 'Provider output failed application schema validation after one correction.', {
           issues: parsed.error.issues,
           usage: usageTotal,

@@ -229,6 +229,8 @@ export function buildWriterBrief(input: {
       openingBridge: sheet.openingBridge,
       protagonistMove: sheet.protagonistMove,
       materialOutcome: sheet.materialOutcome,
+      valueContrastId: sheet.valueContrastId,
+      valueExperience: sheet.valueExperience,
     },
     nhipChuong: sheet.beats,
     mucTieuCamXuc: sheet.emotionalTarget,
@@ -293,6 +295,8 @@ export function buildJudgeBrief(input: {
       protagonistMove: sheet.protagonistMove,
       nhip: sheet.beats,
       materialOutcome: sheet.materialOutcome,
+      valueContrastId: sheet.valueContrastId,
+      valueExperience: sheet.valueExperience,
       camXuc: sheet.emotionalTarget,
       thuMoi: sheet.newNamedThing,
       hook: sheet.endHookKind,
@@ -319,6 +323,7 @@ export function buildJudgeBrief(input: {
 export function buildExtractorBrief(input: {
   premise: Premise;
   bible: Bible;
+  cycle?: CyclePlan;
   chapterNumber: number;
   title: string;
   prose: string;
@@ -332,6 +337,7 @@ export function buildExtractorBrief(input: {
     rung => rung.id === input.bible.symbolicCore.mc.goldenFingerRungId,
   );
   const assetLedger = assetLedgerSlice(input.bible, castIds, input.prose);
+  const plannedNarrative = input.cycle?.beatSheets.find(beat => beat.chapterNumber === input.chapterNumber);
   return {
     chuongSo: input.chapterNumber,
     tieuDe: input.title,
@@ -373,6 +379,10 @@ export function buildExtractorBrief(input: {
       ...input.premise.worldKernel.worlds.flatMap(world => world.factions.map(faction => ({ id: faction.id, ten: faction.name }))),
     ],
     narrativeFoundation: input.premise.narrativeFoundation ?? null,
+    bangChungNarrativeTheoBeat: plannedNarrative ? {
+      factIds: plannedNarrative.revealsFactIds,
+      milestoneIds: plannedNarrative.advancesMilestoneIds,
+    } : null,
     narrativeEvidenceDaCo: input.bible.symbolicCore.narrativeEvidence,
     narrativeStateBenVung: {
       revealedNarrativeIds: input.bible.symbolicCore.revealedNarrativeIds,
@@ -425,11 +435,17 @@ export function buildCyclePlannerBrief(input: {
     kimThuChi: premise.goldenFinger,
     nguonDoiKhang: premise.oppositionEngine,
     worldKernel: premise.worldKernel,
+    commerceFantasy: premise.narrativeFoundation?.commerceFantasy ?? null,
     luatPhanUng: premise.voiceSheet.reactionRule,
     chuKySo: input.cycleNumber,
     quyenSo: input.volumeNumber,
     chuongBatDau: input.startChapter,
     chuongKetThucCoDinh: input.fixedEndChapter ?? null,
+    phamViRolling: input.activeCycle ? {
+      startChapter: input.startChapter,
+      endChapter: input.fixedEndChapter ?? input.startChapter + 2,
+      instruction: 'Chỉ trả beatSheets từ startChapter đến endChapter. startChapter/plannedEndChapter của output phải bằng đúng hai mốc này; không tạo beat kỹ thuật vượt cuối chu kỳ.',
+    } : null,
     trangThaiHienTai: mustNotContradict(bible, premise, bible.symbolicCore.cast.map(member => member.id)),
     soTaiSanHienTai: assetLedgerSlice(bible, bible.symbolicCore.cast.map(member => member.id), [
       input.activeCycle?.customerLoop?.purchase,

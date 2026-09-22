@@ -1,0 +1,529 @@
+{
+  "schemaVersion": 2,
+  "symbolicCore": {
+    "storyDay": 3,
+    "chapterNumber": 10,
+    "mc": {
+      "characterId": "tran_khai",
+      "locationId": "tiem_khai_minh",
+      "keyAssetIds": [],
+      "goldenFingerRungId": "nguong_cua_danh_dau"
+    },
+    "cast": [
+      {
+        "id": "tran_khai",
+        "alive": true,
+        "locationId": "tiem_khai_minh",
+        "lastSeenChapter": 4,
+        "knowsFinger": true
+      },
+      {
+        "id": "diep_ninh",
+        "alive": true,
+        "locationId": "tiem_khai_minh",
+        "lastSeenChapter": 10,
+        "knowsFinger": false
+      },
+      {
+        "id": "pham_khoa",
+        "alive": true,
+        "locationId": "tiem_khai_minh",
+        "lastSeenChapter": 4,
+        "knowsFinger": false
+      }
+    ],
+    "progressions": [],
+    "activeAssetLots": [
+      {
+        "lotId": "c2_acquire_nuoc_ngot",
+        "assetId": "nuoc_ngot",
+        "assetName": "nước ngọt",
+        "ownerId": "tran_khai",
+        "ownerName": "Trần Khải",
+        "quantity": 2,
+        "unit": "két",
+        "fungible": true,
+        "provenance": "Khải nhận hai két nước ngọt và ký số lượng với người giao.",
+        "acquiredChapter": 2,
+        "updatedChapter": 2
+      },
+      {
+        "lotId": "c3_acquire_dao_cao_hong",
+        "assetId": "dao_cao_hong",
+        "assetName": "dao cạo dân dụng hỏng",
+        "ownerId": "tran_khai",
+        "ownerName": "Trần Khải",
+        "quantity": 1,
+        "unit": "chiếc",
+        "fungible": false,
+        "provenance": "Diệp Ninh đổi chiếc dao cạo dân dụng hỏng, không giữ điện và đã quá hạn thay lưỡi, lấy túi rau quả để Trần Khải khảo sát.",
+        "acquiredChapter": 3,
+        "updatedChapter": 3
+      },
+      {
+        "lotId": "c3_transfer_tui_rau_qua",
+        "assetId": "tui_rau_qua",
+        "assetName": "túi rau quả",
+        "ownerId": "diep_ninh",
+        "ownerName": "Diệp Ninh",
+        "quantity": 1,
+        "unit": "túi",
+        "fungible": true,
+        "provenance": "Trần Khải giao túi rau quả cho Diệp Ninh trong giao dịch đổi lấy dao cạo hỏng.",
+        "acquiredChapter": 3,
+        "updatedChapter": 3
+      },
+      {
+        "lotId": "c5_acquire_dao_cao_pho_thong",
+        "assetId": "dao_cao_pho_thong",
+        "assetName": "dao cạo phổ thông",
+        "ownerId": "tran_khai",
+        "ownerName": "Trần Khải",
+        "quantity": 1,
+        "unit": "chiếc",
+        "fungible": false,
+        "provenance": "Trần Khải mua một chiếc dao cạo phổ thông ở cửa hàng dụng cụ cá nhân đầu phố để làm mẫu đối chứng.",
+        "acquiredChapter": 5,
+        "updatedChapter": 5
+      },
+      {
+        "lotId": "c8_acquire_mau_v1",
+        "assetId": "mau_v1",
+        "assetName": "mẫu cơ khí V1",
+        "ownerId": "tran_khai",
+        "ownerName": "Trần Khải",
+        "quantity": 1,
+        "unit": "chiếc",
+        "fungible": false,
+        "provenance": "Xưởng giao mẫu V1 cho Trần Khải sau khi hoàn thành gia công; mẫu kèm thông tin vật liệu, dung sai chính và hướng dẫn về chốt.",
+        "acquiredChapter": 8,
+        "updatedChapter": 8
+      },
+      {
+        "lotId": "c9_acquire_tra_dong_chai",
+        "assetId": "tra_dong_chai",
+        "assetName": "trà đóng chai",
+        "ownerId": "pham_khoa",
+        "ownerName": "Phạm Khoa",
+        "quantity": 2,
+        "unit": "chai",
+        "fungible": true,
+        "provenance": "Phạm Khoa mua hai chai trà đóng chai ở máy bán nước đối diện xưởng khi chờ chỉnh mẫu V1.",
+        "acquiredChapter": 9,
+        "updatedChapter": 9
+      }
+    ],
+    "recentAssetEvents": [
+      {
+        "eventId": "c2_acquire_nuoc_ngot",
+        "kind": "acquire",
+        "assetId": "nuoc_ngot",
+        "assetName": "nước ngọt",
+        "quantity": 2,
+        "unit": "két",
+        "fungible": true,
+        "sourceLotId": null,
+        "fromOwnerId": null,
+        "fromOwnerName": "người giao",
+        "toOwnerId": "tran_khai",
+        "toOwnerName": "Trần Khải",
+        "note": "Khải nhận hai két nước ngọt và ký số lượng với người giao.",
+        "chapterNumber": 2
+      },
+      {
+        "eventId": "c3_acquire_tui_rau_qua",
+        "kind": "acquire",
+        "assetId": "tui_rau_qua",
+        "assetName": "túi rau quả",
+        "quantity": 1,
+        "unit": "túi",
+        "fungible": true,
+        "sourceLotId": null,
+        "fromOwnerId": null,
+        "fromOwnerName": "chú Tư",
+        "toOwnerId": "tran_khai",
+        "toOwnerName": "Trần Khải",
+        "note": "Trần Khải nhận một túi gồm hai quả cà chua, một quả dưa leo, ít rau cải và một quả quýt từ hàng chú Tư giao quen cho tiệm; anh chụp ngày nhập và ghi giá vốn trước khi mang đi đối chiếu ở Tân Hải.",
+        "chapterNumber": 3
+      },
+      {
+        "eventId": "c3_acquire_dao_cao_hong",
+        "kind": "acquire",
+        "assetId": "dao_cao_hong",
+        "assetName": "dao cạo dân dụng hỏng",
+        "quantity": 1,
+        "unit": "chiếc",
+        "fungible": false,
+        "sourceLotId": null,
+        "fromOwnerId": "diep_ninh",
+        "fromOwnerName": "Diệp Ninh",
+        "toOwnerId": "tran_khai",
+        "toOwnerName": "Trần Khải",
+        "note": "Diệp Ninh đổi chiếc dao cạo dân dụng hỏng, không giữ điện và đã quá hạn thay lưỡi, lấy túi rau quả để Trần Khải khảo sát.",
+        "chapterNumber": 3
+      },
+      {
+        "eventId": "c3_transfer_tui_rau_qua",
+        "kind": "transfer",
+        "assetId": "tui_rau_qua",
+        "assetName": "túi rau quả",
+        "quantity": 1,
+        "unit": "túi",
+        "fungible": true,
+        "sourceLotId": "c3_acquire_tui_rau_qua",
+        "fromOwnerId": "tran_khai",
+        "fromOwnerName": "Trần Khải",
+        "toOwnerId": "diep_ninh",
+        "toOwnerName": "Diệp Ninh",
+        "note": "Trần Khải giao túi rau quả cho Diệp Ninh trong giao dịch đổi lấy dao cạo hỏng.",
+        "chapterNumber": 3
+      },
+      {
+        "eventId": "c5_acquire_dao_cao_pho_thong",
+        "kind": "acquire",
+        "assetId": "dao_cao_pho_thong",
+        "assetName": "dao cạo phổ thông",
+        "quantity": 1,
+        "unit": "chiếc",
+        "fungible": false,
+        "sourceLotId": null,
+        "fromOwnerId": null,
+        "fromOwnerName": "cửa hàng dụng cụ cá nhân đầu phố",
+        "toOwnerId": "tran_khai",
+        "toOwnerName": "Trần Khải",
+        "note": "Trần Khải mua một chiếc dao cạo phổ thông ở cửa hàng dụng cụ cá nhân đầu phố để làm mẫu đối chứng.",
+        "chapterNumber": 5
+      },
+      {
+        "eventId": "c8_acquire_mau_v1",
+        "kind": "acquire",
+        "assetId": "mau_v1",
+        "assetName": "mẫu cơ khí V1",
+        "quantity": 1,
+        "unit": "chiếc",
+        "fungible": false,
+        "sourceLotId": null,
+        "fromOwnerId": null,
+        "fromOwnerName": "xưởng",
+        "toOwnerId": "tran_khai",
+        "toOwnerName": "Trần Khải",
+        "note": "Xưởng giao mẫu V1 cho Trần Khải sau khi hoàn thành gia công; mẫu kèm thông tin vật liệu, dung sai chính và hướng dẫn về chốt.",
+        "chapterNumber": 8
+      },
+      {
+        "eventId": "c9_acquire_tra_dong_chai",
+        "kind": "acquire",
+        "assetId": "tra_dong_chai",
+        "assetName": "trà đóng chai",
+        "quantity": 2,
+        "unit": "chai",
+        "fungible": true,
+        "sourceLotId": null,
+        "fromOwnerId": null,
+        "fromOwnerName": "máy bán nước đối diện",
+        "toOwnerId": "pham_khoa",
+        "toOwnerName": "Phạm Khoa",
+        "note": "Phạm Khoa mua hai chai trà đóng chai ở máy bán nước đối diện xưởng khi chờ chỉnh mẫu V1.",
+        "chapterNumber": 9
+      }
+    ],
+    "narrativeEvidence": [
+      {
+        "id": "cua_noi_hai_kho",
+        "chapterNumber": 1,
+        "quote": "Chai nước nằm cách ngưỡng chưa đến một mét, đúng chiều nó đã bị đẩy vào. Tấm carton không ướt, không bẩn. Vòng phấn quanh nắp nguyên vẹn. Hai nét xiên trên thân chai không thiếu nét nào.",
+        "learnedByCharacterIds": [
+          "tran_khai"
+        ]
+      },
+      {
+        "id": "thoi_gian_dong_bo",
+        "chapterNumber": 1,
+        "quote": "Khải nhìn đồng hồ cổ tay: ba giờ năm mươi bảy.\n\nMặt đồng hồ trên xe cũng là ba giờ năm mươi bảy.\n\nAnh hít một hơi, rồi bước qua hẳn.",
+        "learnedByCharacterIds": [
+          "tran_khai"
+        ]
+      },
+      {
+        "id": "kiem_chung_cua",
+        "chapterNumber": 1,
+        "quote": "“Lượt 1: chai nước, dấu phấn, 10 phút. Còn nguyên.”\n\n“Lượt 2: ốc inox/túi zip/chữ ký, đẩy sâu hơn. 10 phút. Còn nguyên.”",
+        "learnedByCharacterIds": [
+          "tran_khai"
+        ]
+      },
+      {
+        "id": "thuc_pham_that_tan_hai",
+        "chapterNumber": 3,
+        "quote": "“Thứ này cũng có nước,” cô nói, giọng bình thường hơn lúc đầu, “nhưng nó trôi xuống là hết. Có vị muối, vị ngọt, đủ no. Không có mùi. Cũng không phải nhai.”\n\nCô ăn miếng thứ hai, lần này không vội.\n\n“Cái này giòn.”",
+        "learnedByCharacterIds": [
+          "tran_khai"
+        ]
+      },
+      {
+        "id": "dao_cao_rau_dan_dung",
+        "chapterNumber": 4,
+        "quote": "“Dao dân dụng,” cô nói. “Loại này không giữ điện thì khách thường thay cả cái. Pin bên trong đã chết, lưỡi cũng quá hạn thay rồi. Phần điều khiển không hoạt động.”",
+        "learnedByCharacterIds": [
+          "tran_khai",
+          "diep_ninh"
+        ]
+      },
+      {
+        "id": "dao_cao_khac_chuan_pin",
+        "chapterNumber": 4,
+        "quote": "“Pin chết; đầu nối, điện áp với đường mạch đều chưa xác định. Tao không cấp nguồn cho nó.”\n\nKhoa không cười. Cậu cầm điện thoại, phóng to ảnh khe nối kim loại, xem một lúc rồi đặt xuống.\n\n“Đúng. Không cấp nguồn.”",
+        "learnedByCharacterIds": [
+          "tran_khai",
+          "pham_khoa"
+        ]
+      },
+      {
+        "id": "co_cau_tu_lam_sach",
+        "chapterNumber": 5,
+        "quote": "Ở đầu dao Tân Hải, vài sợi vụn đầu tiên bị nước kéo ra từ phía sau, lướt theo rãnh nhỏ rồi rơi xuống. Khải nhìn thấy rõ một mảng cặn dính ở góc trong tách ra, không nhanh, nhưng liên tục. Khi nước dừng, phần quanh mép lưỡi vẫn còn bẩn, song khoảng rỗng phía dưới đã thoáng hơn.",
+        "learnedByCharacterIds": [
+          "tran_khai",
+          "pham_khoa"
+        ]
+      },
+      {
+        "id": "hieu_mau_dau_tien",
+        "chapterNumber": 5,
+        "quote": "“Cơ cấu mở và đường rãnh của mẫu kia làm việc rửa tĩnh dễ hơn trong hai lượt thử này. Cặn có đường đi ra. Dao phổ thông vẫn rửa được, nhưng phần khó chạm hơn.”\n\n“Còn cạo?”\n\n“Không có dữ liệu.”\n\n“Độ bền?”\n\n“Không có dữ liệu.”",
+        "learnedByCharacterIds": [
+          "tran_khai",
+          "pham_khoa"
+        ]
+      },
+      {
+        "id": "xuong_can_ban_ve",
+        "chapterNumber": 6,
+        "quote": "“Có bản vẽ đủ để làm, có dung sai phần quan trọng, có số lượng, có người chịu tiền thử thì nhận.” Ông chủ xưởng đẩy tờ giấy về phía anh. “Còn bây giờ, tôi chỉ báo được từng phần việc. Báo một cục cho cậu rồi lúc làm phải sửa tới sửa lui thì cả hai bên đều khó nói.”",
+        "learnedByCharacterIds": [
+          "tran_khai",
+          "pham_khoa"
+        ]
+      },
+      {
+        "id": "xac_lap_yeu_cau_mau",
+        "chapterNumber": 7,
+        "quote": "Cuối cùng, trên tờ giấy chỉ còn những dòng họ dám chịu trách nhiệm:\n\n- Mẫu cơ khí một chiếc, dùng lưỡi phổ thông có thể mua tại Vân Cảng.\n- Đầu dao mở được bằng thao tác lặp lại để nước chạm vào khu vực bên trong.\n- Có đường rãnh hoặc khoảng hở nhìn thấy được cho vụn thoát khi rửa tĩnh.\n- Cơ cấu giữ lưỡi không cấn khi đóng, không để cạnh sắc lộ ở vị trí cầm.\n- Tay cầm cần có hình dạng hoặc bề mặt giảm trơn khi ướt.\n- Vật liệu, dung sai quan trọng và kiểu chốt sẽ hỏi lại xưởng trước khi chốt bản vẽ.",
+        "learnedByCharacterIds": [
+          "tran_khai",
+          "pham_khoa"
+        ]
+      },
+      {
+        "id": "hoan_thanh_mau_co_khi_v1",
+        "chapterNumber": 8,
+        "quote": "Mẫu V1 được giao vào buổi trưa hai ngày sau.\n\nXưởng không đóng hộp đẹp. Nó nằm trong túi chống xước, kèm một mảnh giấy ghi vật liệu, phần dung sai chính và mấy dòng nhắc về chốt. Khải đặt nó lên bàn trong kho tiệm Khải Minh, cạnh chiếc đầu dao Tân Hải và chiếc dao cạo phổ thông đã dùng làm đối chứng.\n\nThoạt nhìn, V1 không có vẻ gì thuộc về tương lai.\n\nTay cầm nhôm màu bạc mờ, vài rãnh ngang phay nông. Đầu dao vuông hơn mẫu tham chiếu, các cạnh đã được bo nhưng vẫn mang cái cảm giác của đồ gia công mẫu lẻ: không xấu, chỉ chưa có gì để khoe.",
+        "learnedByCharacterIds": [
+          "tran_khai"
+        ]
+      },
+      {
+        "id": "kiem_thu_mau_co_khi_v1",
+        "chapterNumber": 9,
+        "quote": "Khải viết dòng tổng kết vào cuối bảng:\n\n**Chốt sau chỉnh: mở–đóng 6/6, lắp lưỡi phổ thông được, chưa thấy cấn khi đóng.**\n\nDòng thứ hai:\n\n**Tay ướt: rãnh cán cho độ bám tốt hơn cán trơn trong thao tác kéo trên khăn ẩm; không đại diện cho an toàn khi cạo.**\n\nDòng thứ ba:\n\n**Rửa vật liệu mô phỏng: V1 thoát vụn nhiều hơn quanh khoảng rỗng; còn cặn ở góc giao rãnh và gờ gá.**\n\nKhoa đọc lại, chậm rãi gật đầu.",
+        "learnedByCharacterIds": [
+          "tran_khai",
+          "pham_khoa"
+        ]
+      },
+      {
+        "id": "kiem_thu_mau_co_khi_v1",
+        "chapterNumber": 10,
+        "quote": "**Kết quả: cung bo tại góc giao rãnh giúp bàn chải và nước tiếp cận tốt hơn; cặn tại góc giảm so với trước chỉnh, khoảng rỗng tiếp tục thoát vụn tốt hơn dao phổ thông trong bài rửa này.**\n\n**Giới hạn: vẫn còn cặn ở gờ gá lưỡi; kết quả chỉ áp dụng cho bài rửa mô phỏng, không nói về độ bền hoặc trải nghiệm cạo.**",
+        "learnedByCharacterIds": [
+          "tran_khai",
+          "pham_khoa"
+        ]
+      }
+    ],
+    "revealedNarrativeIds": [
+      "cua_noi_hai_kho",
+      "thoi_gian_dong_bo",
+      "thuc_pham_that_tan_hai",
+      "dao_cao_rau_dan_dung",
+      "dao_cao_khac_chuan_pin",
+      "co_cau_tu_lam_sach",
+      "xuong_can_ban_ve"
+    ],
+    "achievedNarrativeMilestoneIds": [
+      "kiem_chung_cua",
+      "hieu_mau_dau_tien",
+      "xac_lap_yeu_cau_mau",
+      "hoan_thanh_mau_co_khi_v1",
+      "kiem_thu_mau_co_khi_v1"
+    ],
+    "characterKnowledge": [
+      {
+        "characterId": "diep_ninh",
+        "factIds": [
+          "dao_cao_rau_dan_dung",
+          "thuc_pham_that_tan_hai",
+          "dao_cao_khac_chuan_pin",
+          "co_cau_tu_lam_sach"
+        ]
+      },
+      {
+        "characterId": "tran_khai",
+        "factIds": [
+          "cua_noi_hai_kho",
+          "thoi_gian_dong_bo",
+          "thuc_pham_that_tan_hai",
+          "dao_cao_rau_dan_dung",
+          "dao_cao_khac_chuan_pin",
+          "co_cau_tu_lam_sach",
+          "xuong_can_ban_ve"
+        ]
+      },
+      {
+        "characterId": "pham_khoa",
+        "factIds": [
+          "dao_cao_khac_chuan_pin",
+          "co_cau_tu_lam_sach",
+          "xuong_can_ban_ve"
+        ]
+      }
+    ],
+    "openHooks": [
+      {
+        "id": "doi_chieu_mot_mon_pho_thong_voi_diep_ninh",
+        "what": "Khải và Diệp Ninh mỗi người mang một món phổ thông đến cửa hàng Tân Hải để xem công dụng và giá thường, chưa đổi ngay.",
+        "plantedChapter": 2,
+        "dueByChapter": 3,
+        "status": "paid"
+      },
+      {
+        "id": "diep_ninh_mang_do_thanh_ly",
+        "what": "Diệp Ninh sẽ mang thêm vài món thanh lý phổ thông, đồ hỏng hoặc đồ cũ mà cô biết giá, đến lần gặp sau.",
+        "plantedChapter": 3,
+        "dueByChapter": 4,
+        "status": "paid"
+      },
+      {
+        "id": "dan_manh_toi_xuong_nho",
+        "what": "Nếu Khải đo được kích thước cơ bản và vẽ lại bản phác cho đàng hoàng, Phạm Khoa sẽ dẫn anh tới một xưởng nhỏ để hỏi ý kiến.",
+        "plantedChapter": 5,
+        "dueByChapter": 6,
+        "status": "paid"
+      },
+      {
+        "id": "goi_xuong_chot_thong_so_mau",
+        "what": "Trần Khải gọi lại cho xưởng để hỏi vật liệu, kiểu chốt và dung sai trước khi chốt bản vẽ mẫu cơ khí.",
+        "plantedChapter": 7,
+        "dueByChapter": 8,
+        "status": "paid"
+      },
+      {
+        "id": "bai_thu_ket_rau",
+        "what": "Trần Khải và Phạm Khoa sẽ thử kẹt râu bằng vật liệu mô phỏng, cùng loại lưỡi, lượng nước và số lượt rửa.",
+        "plantedChapter": 8,
+        "dueByChapter": 9,
+        "status": "paid"
+      }
+    ]
+  },
+  "castSheet": [
+    {
+      "id": "tran_khai",
+      "name": "Trần Khải",
+      "sheet": "protagonist — hiện tại: Anh đang tự mở cửa từ sáu giờ sáng, nhận hàng, bán lẻ, kiểm hạn dùng và trả khoản nợ viện phí của cha từ một dòng tiền rất mỏng.; năng lực: Anh biết đọc nhãn lô, so giá, thương lượng với nhà cung cấp nhỏ, dùng bảng tính và nhận ra khác biệt giữa mẫu thử với hàng có thể nhập đều.; giới hạn: Anh không phải kỹ sư vật liệu, không biết chế tạo chip hay AI, không hiểu pháp luật và tiêu chuẩn của tương lai, cũng chưa từng vận hành công ty công nghệ.; quan hệ: Anh tin chị gái Trần Mai nhưng giấu khó khăn tài chính; chú Tư giao rau cho tiệm nhiều năm; bạn học cũ Phạm Khoa đang làm kiểm thử phần mềm và không dễ tin lời quảng cáo.; thói quen: Khải chụp tem lô hàng, ghi số tiền cuối ca, giữ một hộp đồ lỗi để đối chiếu và luôn thử món mới trên quy mô nhỏ trước khi nhập.; mong muốn: Trước khi thấy cánh cửa, anh chỉ muốn tiệm sống được sáu tháng nữa và không phải bán căn nhà của cha mẹ."
+    },
+    {
+      "id": "diep_ninh",
+      "name": "Diệp Ninh",
+      "sheet": "ally — hiện tại: Cô nhận sửa dao cạo, khóa cửa và bộ lọc khí theo ca, đổi công lấy vật tư và chăm mẹ đang lệ thuộc dịch dinh dưỡng rẻ tiền.; năng lực: Cô biết phân loại linh kiện phổ thông, kiểm tra độ bền và tìm chợ sửa chữa không chính thức.; giới hạn: Cô không biết xã hội hiện đại của Khải, không có quyền truy cập thiết kế lõi và chỉ hiểu công nghệ đúng phạm vi nghề sửa chữa.; quan hệ: Cô nợ chủ xưởng một kỳ tiền thuê, có khách quen trong phố hạ tầng và dè chừng người lạ hỏi nguồn linh kiện.; thói quen: Cô tháo thiết bị trước mặt khách, đánh dấu linh kiện thay và không nhận món không thể kiếm phụ tùng.; mong muốn: Cô muốn giữ quầy sửa chữa và tìm thức ăn thật cho mẹ mà không phải ký hợp đồng lệ thuộc tập đoàn."
+    },
+    {
+      "id": "pham_khoa",
+      "name": "Phạm Khoa",
+      "sheet": "rival — Chỉ tham gia nếu mẫu qua kiểm thử và Khải không biến tình bạn thành lời quảng cáo vô căn cứ."
+    }
+  ],
+  "world": [
+    {
+      "id": "tan_hai_tuong_lai",
+      "name": "Tân Hải Thành ba trăm năm sau",
+      "note": "Tại khu hạ tầng Tân Hải, cư dân quen dùng dịch dinh dưỡng có vị và độ no nhưng thiếu mùi, nước cùng cảm giác nhai; thực phẩm tươi có nhu cầu thực tế nhưng khả năng trả tiền của người cần không đồng đều."
+    }
+  ],
+  "recentSummary": [
+    {
+      "chapterNumber": 1,
+      "title": "Chai Nước Có Dấu Phấn",
+      "summary": "Trần Khải phát hiện cánh cửa sắt nối kho tiệm với một gian phòng xa lạ, rồi dùng nhiều phép thử để xác nhận vật đánh dấu, xe đẩy và chính anh đều có thể quay về nguyên vẹn.",
+      "payoffKind": "ky_ngo",
+      "endedOn": "Ngày mai, anh nên mang gì qua để biết nơi đó rốt cuộc là nơi nào?"
+    },
+    {
+      "chapterNumber": 2,
+      "title": "“Đồ Chưa Thanh Toán Biết Đường Về Quầy”",
+      "summary": "Khải thử giới hạn thu hồi đồ chưa thanh toán trong cửa hàng Tân Hải, gặp Diệp Ninh và hẹn ngày mai cùng mang một món phổ thông đến đối chứng.",
+      "payoffKind": "tri_thang",
+      "endedOn": "Ngày mai Khải sẽ mang một món quen thuộc để Diệp Ninh giúp anh hiểu vì sao nó có giá trị ở nơi này."
+    },
+    {
+      "chapterNumber": 3,
+      "title": "“Cần Không Có Nghĩa Là Trả Nổi”",
+      "summary": "Trần Khải đổi một túi rau quả tươi lấy dao cạo dân dụng hỏng của Diệp Ninh, qua đó xác nhận nhu cầu thực phẩm thật ở Tân Hải nhưng cũng thấy rõ giới hạn chi trả và nguồn cung.",
+      "payoffKind": "doi_chieu",
+      "endedOn": "Mùi dưa leo còn lại khiến cửa hàng bỏ trống Tân Hải bỗng không còn hoàn toàn vô chủ."
+    },
+    {
+      "chapterNumber": 4,
+      "title": "“Đừng Cấp Điện Cho Nó”",
+      "summary": "Trần Khải cùng Diệp Ninh và Phạm Khoa xác nhận những gì có thể quan sát ở chiếc dao cạo hỏng, đồng thời thống nhất không cấp nguồn hay tháo sâu trước khi có phép đo và mẫu đối chứng.",
+      "payoffKind": null,
+      "endedOn": "Khải tự hỏi phải đo rãnh thoát vụn thế nào để một xưởng hiện tại còn hiểu được."
+    },
+    {
+      "chapterNumber": 5,
+      "title": "“Cặn Ra Trước”",
+      "summary": "Trần Khải và Phạm Khoa tháo, rửa đối chứng dao cạo Tân Hải với dao phổ thông, xác nhận đường rãnh giúp cặn thoát ra dễ hơn nhưng vẫn chưa có dữ liệu về khả năng cạo, độ bền hay tính thương mại.",
+      "payoffKind": "ky_ngo",
+      "endedOn": "Khải sẽ mang đi một bản phác, không mang đi một giấc mơ."
+    },
+    {
+      "chapterNumber": 6,
+      "title": "“Khoảng Trống Chưa Có Giá”",
+      "summary": "Trần Khải và Phạm Khoa đưa bản phác dao cạo tới một xưởng nhỏ, nhận ra mẫu cơ khí chưa thể báo giá trọn gói khi còn thiếu vật liệu, dung sai, cơ cấu chốt và tiêu chí thử, rồi lập bảng chi phí V1 nhưng chưa xuống tiền.",
+      "payoffKind": null,
+      "endedOn": "Yêu cầu kỹ thuật cho phần chốt mở vẫn chưa được xác định; Phạm Khoa chỉ vào đó và bảo bắt đầu từ đây."
+    },
+    {
+      "chapterNumber": 7,
+      "title": "“Một Mẫu Thử Không Được Phép Ăn Nhầm Vào Tiền Sống”",
+      "summary": "Trần Khải và Phạm Khoa chuyển kết quả kiểm tra dao cạo Tân Hải thành bản yêu cầu mẫu cơ khí có tiêu chí thử rõ ràng, đồng thời đặt ngân sách thử riêng không ảnh hưởng tiền nhập hàng và viện phí.",
+      "payoffKind": "dot_pha",
+      "endedOn": "Khải gọi để làm một mẫu biết mình phải kiểm cái gì."
+    },
+    {
+      "chapterNumber": 8,
+      "title": "“Chốt Này Cứng Quá”",
+      "summary": "Trần Khải cùng Phạm Khoa chốt thiết kế, nhận mẫu cơ khí V1 và phát hiện chốt mở cứng cùng một góc rãnh giữ cặn qua bài kiểm tra mở, rửa và lắp lưỡi.",
+      "payoffKind": "dot_pha",
+      "endedOn": "Bài kiểm tiếp theo với vật liệu mô phỏng và cùng điều kiện thử vẫn đang chờ phía trước."
+    },
+    {
+      "chapterNumber": 9,
+      "title": "“Còn Một Lượt Chỉnh”",
+      "summary": "Trần Khải và Phạm Khoa chỉnh nhẹ chốt V1 rồi kiểm tra đối chứng, xác nhận thao tác mở, độ bám tay ướt và khả năng thoát vụn đã cải thiện nhưng vẫn còn cặn ở một góc rãnh.",
+      "payoffKind": "doi_chieu",
+      "endedOn": "Lượt chỉnh cuối cùng của V1, anh nên dùng để bo ngắn góc rãnh ấy ngay bây giờ—hay giữ nó lại đến khi bài thử kế tiếp cho thấy một lỗi lớn hơn?"
+    },
+    {
+      "chapterNumber": 10,
+      "title": "“Bảng Đối Chứng Hậu Chỉnh V1”",
+      "summary": "Trần Khải và Phạm Khoa xác nhận cung bo hậu chỉnh giúp V1 thoát cặn tốt hơn nhưng vẫn còn giới hạn, trong khi Diệp Ninh đề nghị đổi nguồn rau đều hơn lấy cơ hội tìm đồ dân dụng thanh lý.",
+      "payoffKind": "doi_chieu",
+      "endedOn": "Khải phải chọn tiền mỏng của tiệm Khải Minh nên ưu tiên làm vòng hai cho đầu dao hay thử vài chuyến rau có nguồn đều hơn."
+    }
+  ],
+  "volumeSummaries": [],
+  "styleMemory": [
+    "Chi phí. Thời gian. Độ tươi. Số người nhận được. Tiền quay lại chậm hay nhanh."
+  ]
+}

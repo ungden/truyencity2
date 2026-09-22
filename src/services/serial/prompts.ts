@@ -11,7 +11,7 @@ import playbookData from './playbook.json';
  * composed in at the marked point. Changing craft is a data edit; changing the
  * contract is a code change. They rot at different speeds.
  */
-export const SERIAL_PROMPT_VERSION = `serial-prompts-29-narrative-foundation + playbook-${playbookData.version}`;
+export const SERIAL_PROMPT_VERSION = `serial-prompts-31-protected-store-value-contrast + playbook-${playbookData.version}`;
 
 export const WRITER_SYSTEM_PROMPT = `Bạn là tác giả truyện mạng tiếng Việt, viết truyện dài nhiều chương ra hằng ngày.
 
@@ -57,6 +57,8 @@ Phần khongDuocTrai là trạng thái ở đầu chương, không phải trần
 - structuralFreshness: cách tạo và trả thưởng khác thật so với các chương gần đây.
 
 Kèm trích dẫn cho repetition (cảnh/thủ pháp lặp so với tóm tắt được cấp) và aiFlavor: ba vế song song, trữ tình rỗng, chuyển cảnh/tính từ vạn năng, gán nhãn cảm xúc, văn như báo cáo, nhân vật nói thẳng chủ đề, hoặc đám đông đồng thanh cùng một phản ứng.
+
+reviewBinding là bằng chứng bạn đã đọc đúng bản thảo: chép lại đúng chuongSo, tieuDe và một excerpt liên tiếp 24–400 ký tự có nguyên văn trong trường chuong. Không được nói thiếu văn bản nếu trường chuong có nội dung.
 
 steering phải gọi đúng việc cần làm ở chu kỳ sau bằng hướng dương tính: đặt ai vào cảnh nào, cho họ muốn gì, hành động nào chứng minh giá trị và payoff nào phải trả. Nếu một lời hẹn từ chương trước chưa được thực hiện, đưa việc thực hiện nó lên đầu steering.
 

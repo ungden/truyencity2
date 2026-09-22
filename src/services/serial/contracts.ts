@@ -467,7 +467,7 @@ export const SceneModeSchema = z.enum([
 export type SceneMode = z.infer<typeof SceneModeSchema>;
 
 /** A 副本: pressure, escalation, release. 5–15 chapters. */
-export const CyclePlanSchema = z.object({
+const CyclePlanObjectSchema = z.object({
   schemaVersion: z.union([z.literal(1), z.literal(2)]),
   cycleNumber: z.number().int().min(1),
   volumeNumber: z.number().int().min(1),
@@ -536,14 +536,30 @@ export const CyclePlanSchema = z.object({
     prerequisiteIds: z.array(id).max(24).default([]),
     revealsFactIds: z.array(id).max(24).default([]),
     advancesMilestoneIds: z.array(id).max(12).default([]),
+    /** Bind a product scene to the approved cross-world value gap instead of generic amazement. */
+    valueContrastId: id.nullable().optional(),
+    /** Concrete use/reaction/result that makes the value gap pleasurable on the page. */
+    valueExperience: line.nullable().optional(),
     endHookKind: z.enum(['threat', 'question', 'declaration', 'opportunity', 'reward', 'reveal']),
-  }).strict()).min(1).max(3),
+  }).strict().superRefine((beat, ctx) => {
+    if (Boolean(beat.valueContrastId) !== Boolean(beat.valueExperience)) ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: beat.valueContrastId ? ['valueExperience'] : ['valueContrastId'],
+      message: 'A value contrast id and its on-page experience must be planned together.',
+    });
+  })).min(1).max(3),
   /** Human/auditor findings carried unchanged into every Writer brief for this replan. */
   editorialNotes: z.array(para).max(8).default([]),
-}).strict().superRefine((cycle, ctx) => {
+}).strict();
+
+function validateCyclePlan(cycle: z.infer<typeof CyclePlanObjectSchema>, ctx: z.RefinementCtx, minimumSpan: number): void {
   const span = cycle.plannedEndChapter - cycle.startChapter + 1;
-  if (span < 5 || span > 15) {
-    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['plannedEndChapter'], message: 'A cycle spans 5-15 chapters.' });
+  if (span < minimumSpan || span > 15) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['plannedEndChapter'],
+      message: minimumSpan === 1 ? 'A rolling window spans 1-15 chapters.' : 'A cycle spans 5-15 chapters.',
+    });
   }
   cycle.beatSheets.forEach((sheet, index) => {
     if (index > 0 && sheet.chapterNumber !== cycle.beatSheets[index - 1].chapterNumber + 1) {
@@ -562,21 +578,21 @@ export const CyclePlanSchema = z.object({
     }
   });
   const plannedModes = cycle.beatSheets.map(sheet => sheet.sceneMode);
-  if (cycle.schemaVersion === 1 && new Set(plannedModes).size !== plannedModes.length) {
+  if (minimumSpan === 5 && cycle.schemaVersion === 1 && new Set(plannedModes).size !== plannedModes.length) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: ['beatSheets'],
       message: 'A rolling beat window must use a different dominant scene mode for each chapter.',
     });
   }
-  if (cycle.schemaVersion === 1 && (!cycle.customerLoop
+  if (minimumSpan === 5 && cycle.schemaVersion === 1 && (!cycle.customerLoop
     || cycle.climax.witnesses.length === 0
     || cycle.beatSheets.some(sheet => !sheet.newNamedThing))) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Legacy cycle v1 requires a customer loop, witnesses, and one new named thing per beat.' });
   }
   const schedule = cycle.customerLoop?.schedule;
   if (!schedule) return;
-  if (cycle.schemaVersion === 1 && (schedule.purchaseChapter < cycle.startChapter || schedule.purchaseChapter > cycle.startChapter + 1)) {
+  if (minimumSpan === 5 && cycle.schemaVersion === 1 && (schedule.purchaseChapter < cycle.startChapter || schedule.purchaseChapter > cycle.startChapter + 1)) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: ['customerLoop', 'schedule', 'purchaseChapter'],
@@ -596,14 +612,20 @@ export const CyclePlanSchema = z.object({
       message: 'Purchase, use-to-earn, public proof and return upgrade must land in four consecutive-order chapter slots.',
     });
   }
-  if (cycle.schemaVersion === 1 && schedule.returnUpgradeChapter > Math.min(cycle.plannedEndChapter, cycle.startChapter + 4)) {
+  if (minimumSpan === 5 && cycle.schemaVersion === 1 && schedule.returnUpgradeChapter > Math.min(cycle.plannedEndChapter, cycle.startChapter + 4)) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: ['customerLoop', 'schedule', 'returnUpgradeChapter'],
       message: 'The full customer loop must close within the first five chapters of the cycle.',
     });
   }
-});
+}
+
+/** Durable cycle contract. A new cycle owns a five-to-fifteen chapter promise. */
+export const CyclePlanSchema = CyclePlanObjectSchema.superRefine((cycle, ctx) => validateCyclePlan(cycle, ctx, 5));
+
+/** Rolling planning contract. It may cover the final one or two chapters of a durable cycle. */
+export const RollingCyclePlanSchema = CyclePlanObjectSchema.superRefine((cycle, ctx) => validateCyclePlan(cycle, ctx, 1));
 export type CyclePlan = z.infer<typeof CyclePlanSchema>;
 
 // ----------------------------------------------------------------- Digest
@@ -648,6 +670,12 @@ const score = z.number().int().min(0).max(5);
  * quote — the finding has to be something a reader could point at. Everything else
  * steers the next cycle plan instead of stopping the line.
  */
+export const JudgeReviewBindingSchema = z.object({
+  chapterNumber: z.number().int().min(1),
+  title: z.string().trim().min(3).max(160),
+  excerpt: z.string().trim().min(24).max(400),
+}).strict();
+
 export const JudgeVerdictSchema = z.object({
   continuity: z.array(z.object({
     kind: z.enum([
@@ -693,7 +721,12 @@ export const JudgeVerdictSchema = z.object({
   }).strict()).max(10),
   /** Free-form direction for the next cycle plan. Never applied to this chapter. */
   steering: z.array(line).max(5),
+  /** Optional only so verdicts persisted before prompt v30 remain readable. New calls require it. */
+  reviewBinding: JudgeReviewBindingSchema.optional(),
 }).strict();
+export const JudgeProviderVerdictSchema = JudgeVerdictSchema.extend({
+  reviewBinding: JudgeReviewBindingSchema,
+});
 export type JudgeVerdict = z.infer<typeof JudgeVerdictSchema>;
 
 // ---------------------------------------------------------- Opening audit

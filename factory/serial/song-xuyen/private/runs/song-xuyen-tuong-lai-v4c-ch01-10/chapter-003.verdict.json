@@ -1,0 +1,141 @@
+{
+  "verdict": {
+    "continuity": [],
+    "scorecard": {
+      "opening": 4,
+      "anticipation": 4,
+      "payoff": 4,
+      "newness": 3,
+      "endHook": 3
+    },
+    "craft": {
+      "protagonistAgency": 5,
+      "sceneLife": 4,
+      "worldLogic": 4,
+      "dialogueNaturalness": 4,
+      "structuralFreshness": 3
+    },
+    "repetition": [],
+    "aiFlavor": [
+      {
+        "quote": "gian phòng trống bỗng không còn hoàn toàn vô chủ nữa",
+        "kind": "empty_lyricism"
+      },
+      {
+        "quote": "Một túi rau không đáng bao nhiêu ở Vân Cảng, nhưng cũng không phải thứ tự nhiên mọc mãi trong kho anh.",
+        "kind": "generic_transition"
+      }
+    ],
+    "steering": [
+      "Cảnh làm đúng payoff thương mại: Diệp Ninh được nhìn, ngửi, nếm và tự đối chiếu với khẩu phần trước khi hỏi về độ đều của nguồn hàng. Giá trị không bị thay bằng lời thuyết minh hay tiếng hò reo.",
+      "Khải có agency rõ: anh chọn lô nhỏ từ nguồn quen, chủ động hỏi về bảo quản và sức mua, rồi chỉ cam kết điều mình kiểm soát. Ghi chép cuối cảnh biến giao dịch thành dữ liệu cho lựa chọn sau, không phải chiến thắng đã hoàn tất.",
+      "Nên để chương sau làm rõ hơn chi phí và khả năng lặp lại của lô rau: giá nhập, hao hụt, thời gian bảo quản phía Tân Hải và giới hạn số lượng Diệp Ninh thực sự đổi nổi. Điều này sẽ nối tốt từ ‘một lần đổi’ sang thử nghiệm mô hình cung ứng.",
+      "Chiếc dao cạo hiện mới là vật khảo sát hợp lý. Khi tháo nó, hãy giữ Khải ở vai trò người đặt câu hỏi, đo đạc và gọi người có nghề; đừng để anh suy ra ngay vật liệu, pin hay cơ cấu lõi chỉ từ việc cầm món đồ.",
+      "Cú kết hiện có dư vị nhưng hook còn mềm. Có thể kết chương sau bằng một chi tiết thực dụng từ dao cạo—đầu nối lạ, vết cặn, khớp tháo rửa—buộc Khải chọn giữa tự phá mẫu, giữ nguyên để đổi giá, hoặc nhờ Khoa xem mà phải giải thích nguồn gốc."
+    ],
+    "reviewBinding": {
+      "chapterNumber": 3,
+      "title": "“Cần Không Có Nghĩa Là Trả Nổi”",
+      "excerpt": "“Có.” Cô đặt quả quýt xuống. “Người cần thì nhiều. Người đổi nổi thì ít.”"
+    }
+  },
+  "digest": {
+    "chapterNumber": 3,
+    "title": "“Cần Không Có Nghĩa Là Trả Nổi”",
+    "summary": "Trần Khải đổi một túi rau quả tươi lấy dao cạo dân dụng hỏng của Diệp Ninh, qua đó xác nhận nhu cầu thực phẩm thật ở Tân Hải nhưng cũng thấy rõ giới hạn chi trả và nguồn cung.",
+    "payoffKind": "doi_chieu",
+    "endedOn": "Mùi dưa leo còn lại khiến cửa hàng bỏ trống Tân Hải bỗng không còn hoàn toàn vô chủ.",
+    "newNamedThings": [
+      "chu_tu",
+      "tui_rau_qua",
+      "dao_cao_hong",
+      "dich_dinh_duong",
+      "tin_dung_dia_phuong"
+    ],
+    "narrativeEvidence": [
+      {
+        "id": "thuc_pham_that_tan_hai",
+        "chapterNumber": 3,
+        "quote": "“Thứ này cũng có nước,” cô nói, giọng bình thường hơn lúc đầu, “nhưng nó trôi xuống là hết. Có vị muối, vị ngọt, đủ no. Không có mùi. Cũng không phải nhai.”\n\nCô ăn miếng thứ hai, lần này không vội.\n\n“Cái này giòn.”",
+        "learnedByCharacterIds": [
+          "tran_khai"
+        ]
+      }
+    ],
+    "coreChanges": {
+      "storyDayDelta": 0,
+      "died": [],
+      "progressionChanges": [],
+      "assetEvents": [
+        {
+          "eventId": "c3_acquire_tui_rau_qua",
+          "kind": "acquire",
+          "assetId": "tui_rau_qua",
+          "assetName": "túi rau quả",
+          "quantity": 1,
+          "unit": "túi",
+          "fungible": true,
+          "sourceLotId": null,
+          "fromOwnerId": null,
+          "fromOwnerName": "chú Tư",
+          "toOwnerId": "tran_khai",
+          "toOwnerName": "Trần Khải",
+          "note": "Trần Khải nhận một túi gồm hai quả cà chua, một quả dưa leo, ít rau cải và một quả quýt từ hàng chú Tư giao quen cho tiệm; anh chụp ngày nhập và ghi giá vốn trước khi mang đi đối chiếu ở Tân Hải."
+        },
+        {
+          "eventId": "c3_acquire_dao_cao_hong",
+          "kind": "acquire",
+          "assetId": "dao_cao_hong",
+          "assetName": "dao cạo dân dụng hỏng",
+          "quantity": 1,
+          "unit": "chiếc",
+          "fungible": false,
+          "sourceLotId": null,
+          "fromOwnerId": "diep_ninh",
+          "fromOwnerName": "Diệp Ninh",
+          "toOwnerId": "tran_khai",
+          "toOwnerName": "Trần Khải",
+          "note": "Diệp Ninh đổi chiếc dao cạo dân dụng hỏng, không giữ điện và đã quá hạn thay lưỡi, lấy túi rau quả để Trần Khải khảo sát."
+        },
+        {
+          "eventId": "c3_transfer_tui_rau_qua",
+          "kind": "transfer",
+          "assetId": "tui_rau_qua",
+          "assetName": "túi rau quả",
+          "quantity": 1,
+          "unit": "túi",
+          "fungible": true,
+          "sourceLotId": "c3_acquire_tui_rau_qua",
+          "fromOwnerId": "tran_khai",
+          "fromOwnerName": "Trần Khải",
+          "toOwnerId": "diep_ninh",
+          "toOwnerName": "Diệp Ninh",
+          "note": "Trần Khải giao túi rau quả cho Diệp Ninh trong giao dịch đổi lấy dao cạo hỏng."
+        }
+      ],
+      "goldenFingerRungChange": null,
+      "moved": [],
+      "worldFactsRevealed": [
+        {
+          "id": "tan_hai_tuong_lai",
+          "note": "Tại khu hạ tầng Tân Hải, cư dân quen dùng dịch dinh dưỡng có vị và độ no nhưng thiếu mùi, nước cùng cảm giác nhai; thực phẩm tươi có nhu cầu thực tế nhưng khả năng trả tiền của người cần không đồng đều."
+        }
+      ],
+      "newCast": [],
+      "hooksPlanted": [
+        {
+          "id": "diep_ninh_mang_do_thanh_ly",
+          "what": "Diệp Ninh sẽ mang thêm vài món thanh lý phổ thông, đồ hỏng hoặc đồ cũ mà cô biết giá, đến lần gặp sau.",
+          "dueByChapter": 4
+        }
+      ],
+      "hooksPaid": [
+        "doi_chieu_mot_mon_pho_thong_voi_diep_ninh"
+      ],
+      "learnedFinger": []
+    }
+  },
+  "attempts": 1,
+  "costUsd": 0.04822,
+  "inputFingerprint": "37d9227071f54a8d0442e214ad999160313c8f1d9441e73bbb89534779dce07d"
+}

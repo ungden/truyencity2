@@ -1,0 +1,93 @@
+{
+  "verdict": {
+    "continuity": [],
+    "scorecard": {
+      "opening": 5,
+      "anticipation": 5,
+      "payoff": 5,
+      "newness": 5,
+      "endHook": 5
+    },
+    "craft": {
+      "protagonistAgency": 5,
+      "sceneLife": 4,
+      "worldLogic": 5,
+      "dialogueNaturalness": 5,
+      "structuralFreshness": 4
+    },
+    "repetition": [
+      {
+        "quote": "“Sáu viên pin chỉ là đặt trước. Nó không đủ để ta mua nốt phần dược liệu thiếu...”",
+        "repeatsChapter": 6,
+        "note": "Thông tin đặt trước chưa phải hàng có sẵn đã là trọng tâm chương 6. Ở đây nó có chức năng tính vốn, nhưng có thể nén còn một câu rồi dành thêm chỗ cho hệ quả của lựa chọn nguồn thịt."
+      },
+      {
+        "quote": "“Nhưng giá bao nhiêu, có nhận hay không, phải xem đủ ba lượt...”",
+        "repeatsChapter": 8,
+        "note": "Điều kiện ba lượt hàng cùng loại, bảo quản tương đối ổn định và có nguồn đã được chốt ở chương 8. Nhắc lại là cần cho cuộc thương lượng, song có thể để Hứa An phản ứng vào một điều kiện cụ thể thay vì trình bày lại toàn bộ."
+      }
+    ],
+    "aiFlavor": [
+      {
+        "quote": "“Không có ai đưa ra lời hứa dễ nghe. Nhưng vì thế, khoảng lặng sau câu nói lại không nặng nề.”",
+        "kind": "emotion_label"
+      },
+      {
+        "quote": "“Với hắn, như vậy đã là một bước đủ thật.”",
+        "kind": "theme_spoken"
+      }
+    ],
+    "steering": [
+      "Chương giữ canon rất chắc: Lâm Việt không biến đơn mười hai gói, sáu viên pin hay mẫu thịt đã nếm thành vốn/hàng hóa đã xác nhận. Mỗi thứ được gọi đúng trạng thái hiện tại, làm rõ hắn là người làm nghề coi trọng nguồn gốc hơn lời hứa.",
+      "Cảnh thương lượng có đời sống nhờ quyền giữ phần đổi công không thuộc riêng Hứa An: anh phải hỏi tổ trưởng thay vì tự mang khẩu phần hoặc tài sản của đội đi cam kết. Đây là một quyết định có giá phải trả, không phải thủ tục câu giờ.",
+      "Để tăng lực cảnh, hãy buộc mẫu ghi tối giản chạm vào một chi tiết khó chịu hơn trong đời sống Hứa An: chẳng hạn việc ghi tên người giao phần có thể khiến đồng đội biết anh đang tách hàng khỏi luồng chia chung. Khi ấy lựa chọn hỏi tổ trưởng sẽ có xung lực quan hệ rõ hơn.",
+      "Đoạn cuối là một kết chương đúng tinh thần tiến trình nhưng hook còn thiên về tuyên ngôn. Có thể kết bằng một điều kiện cụ thể Hứa An phải mang về—quy định chia phần, cái giá tổ trưởng đòi, hoặc việc tuyến nam đổi ca—để bước kế tiếp có sức kéo hơn mà không cần dựng nguy cơ giả.",
+      "Không cần ép giao dịch hay payoff vật chất trong chương này. Nó hoàn thành chức năng quan trọng: biến “nguồn hàng” từ một ý tưởng thành câu hỏi về quyền sở hữu, truy xuất và khả năng lặp lại."
+    ],
+    "reviewBinding": {
+      "chapterNumber": 9,
+      "title": "“Thứ Tôi Có Quyền Giữ, Tôi Mới Dám Ghi”",
+      "excerpt": "Mười hai gói bột cầm máu là đơn đã đặt trước, không phải mười hai gói đã có."
+    }
+  },
+  "digest": {
+    "chapterNumber": 9,
+    "title": "“Thứ Tôi Có Quyền Giữ, Tôi Mới Dám Ghi”",
+    "summary": "Lâm Việt sang Phố Thương Điếm Đông Hà cùng Hứa An xác lập cách ghi nguồn thịt và chỉ tiếp tục tìm hàng khi quyền giữ phần đổi công được làm rõ.",
+    "payoffKind": null,
+    "endedOn": "Hứa An mới chỉ nhận lời hỏi tổ trưởng về quyền giữ phần đổi công và mang câu trả lời trở lại, nên nguồn thịt vẫn chưa được xác lập.",
+    "newNamedThings": [
+      "lo_muoi_hai_goi",
+      "phan_doi_cong",
+      "doi_gom",
+      "tuyen_phia_nam",
+      "diem_nuoc",
+      "to_ghi_chep"
+    ],
+    "narrativeEvidence": [],
+    "coreChanges": {
+      "storyDayDelta": 0,
+      "died": [],
+      "progressionChanges": [],
+      "assetEvents": [],
+      "goldenFingerRungChange": null,
+      "moved": [],
+      "worldFactsRevealed": [],
+      "newCast": [],
+      "hooksPlanted": [
+        {
+          "id": "hua_an_hoi_quyen_giu_phan_doi_cong",
+          "what": "Hứa An sẽ hỏi tổ trưởng xem phần đổi công trong ca dọn tuyến tới có được giữ riêng hay phải nộp chung, rồi mang câu trả lời cho Lâm Việt.",
+          "dueByChapter": 10
+        }
+      ],
+      "hooksPaid": [
+        "lam_viet_di_dong_ha_hoi_nguon_thit"
+      ],
+      "learnedFinger": []
+    }
+  },
+  "attempts": 1,
+  "costUsd": 0.05839,
+  "inputFingerprint": "c988b27607afd0532302cebb727dc512ef1309398257389191ff664280feeef5"
+}

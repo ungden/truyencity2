@@ -1,0 +1,468 @@
+{
+  "schemaVersion": 3,
+  "narrativeFoundation": {
+    "craftProfile": {
+      "version": "lived-causality-2026-09-22.2",
+      "genre": "two_world_commerce"
+    },
+    "commerceFantasy": {
+      "protectedStore": {
+        "ownerCharacterId": "lam_viet",
+        "domain": "Toàn bộ kho thuê Thanh Lô, cửa hàng Đông Hà và ngưỡng nối là lãnh vực tuyệt đối của Lâm Việt; cảnh giới, pháp bảo, quyền lực hay số người đều không thể ghi đè quyền này.",
+        "protections": [
+          "hostile_action_nullified",
+          "forced_entry_denied",
+          "theft_blocked",
+          "surveillance_blocked",
+          "owner_can_eject",
+          "unpaid_goods_recalled"
+        ],
+        "outsideRisk": "Rời cửa hàng, Lâm Việt vẫn chịu cảnh giới, luật lệ, cạnh tranh nguồn hàng và nguy hiểm bình thường của từng thế giới."
+      },
+      "valueContrasts": [
+        {
+          "id": "hang_thuoc_pho_thong_sang_dong_ha",
+          "sourceWorldId": "thanh_huyen_gioi",
+          "destinationWorldId": "dong_ha_mat_the",
+          "item": "Thuốc, phù và công pháp phổ thông",
+          "ordinaryAtSource": "Đây là hàng nhập môn quen thuộc ở Thanh Lô Phường, giá thấp hơn nhiều so với vật phẩm dành cho tu sĩ có địa vị.",
+          "valuableAtDestination": "Tại Đông Hà, một món nhập môn đúng công dụng có thể ổn định thức tỉnh, chữa vết thương hoặc mở con đường mạnh lên chưa từng có.",
+          "experienceProof": "Một khách cụ thể dùng đúng món trước quầy, cảm nhận thay đổi trên cơ thể hoặc hoàn thành một việc trước đây không làm được rồi mới tự định giá nó.",
+          "commercialConsequence": "Kết quả khiến khách trả tài nguyên, quay lại mua cấp cao hơn hoặc giới thiệu người có nhu cầu thật."
+        },
+        {
+          "id": "tai_nguyen_tien_hoa_ve_thanh_huyen",
+          "sourceWorldId": "dong_ha_mat_the",
+          "destinationWorldId": "thanh_huyen_gioi",
+          "item": "Thịt hung thú, tinh hạch và linh thực tiến hóa",
+          "ordinaryAtSource": "Đây là chiến lợi phẩm đội săn phải xử lý sau mỗi chuyến đi và có thể đổi lấy nhu yếu phẩm.",
+          "valuableAtDestination": "Thanh Huyền Giới đang cạn nguồn yêu thú nên nguyên liệu tương đương trở thành hàng hiếm đối với linh thiện, luyện đan và luyện khí.",
+          "experienceProof": "Người có nghề kiểm một mẫu, dùng nó tạo kết quả nhìn thấy rồi chủ động nâng giá hoặc đặt lô sau.",
+          "commercialConsequence": "Khoản bán ngược tạo vốn nhập hàng và nâng nghề cho Lâm Việt, khép vòng giá trị hai chiều."
+        }
+      ],
+      "simplicityRules": {
+        "sharedLanguage": true,
+        "compressRepeatedVerification": true,
+        "noRoutinePermissionPlots": true,
+        "noUnseededSubsystems": true
+      }
+    },
+    "characters": [
+      {
+        "characterId": "lam_viet",
+        "background": "Lâm Việt lớn lên ở xóm dược phu, được nhận vào Đan Các nhờ biết chữ và phân dược liệu rồi mất sáu năm làm việc phụ trong đan phòng.",
+        "presentLife": "Hắn vừa bị cắt thẻ Đan đồ, còn tiền thuê kho một tháng, một lò đan nứt, bộ cân cũ, vài dụng cụ và số dược liệu vụn được phép mang đi.",
+        "existingCompetence": "Hắn nhận biết dược liệu phổ thông, cân chia, giữ nhiệt, ghi lô, xử lý vết thương nhẹ và hiểu một mẻ thuốc phải có nguồn nguyên liệu cùng quy trình ổn định. Linh giác rất yếu của hắn chỉ từng giúp nhận chút dược khí ở khoảng gần, không thể đọc ra công dụng của vật lạ.",
+        "limitsOfKnowledge": "Hắn chưa phải Luyện Đan Sư, không biết xã hội Đông Hà, không hiểu tinh hạch, điện hay vũ khí hiện đại và không thể nhìn một vật lạ rồi biết ngay công dụng.",
+        "relationships": "Hàn Dược Sư từng chỉ nghề nhưng không nuôi người vô điều kiện; quản sự Đan Các muốn hắn biến khỏi phường; Lâm Việt chưa có người thân đủ sức che chở.",
+        "habits": "Hắn ngửi dược liệu trước khi cân, ghi ngày mở túi, giữ mẫu đối chứng và không cho người uống thuốc khi chưa biết thể trạng hoặc liều.",
+        "desireBeforeAdvantage": "Trước khi mở cửa kho, hắn chỉ muốn giữ nghề, trả được tiền thuê và có ngày tự đứng lò mà không phải cúi đầu nhận lỗi thay người khác."
+      },
+      {
+        "characterId": "hua_an",
+        "background": "Hứa An từng là nhân viên giao nhận, quen đường phố và kho hàng Đông Hà trước khi virus thức tỉnh làm cơ thể anh xuất hiện năng lực lôi điện bất ổn.",
+        "presentLife": "Anh chạy việc cho tổ dân phố, đổi pin và nước lấy thuốc, đồng thời giấu cơn co giật để không bị gạt khỏi nhóm tuần tra.",
+        "existingCompetence": "Anh biết các điểm nước, bảng giá vật tư, ca gác và cách vận chuyển an toàn trong vài khu phố quanh trạm thành vệ.",
+        "limitsOfKnowledge": "Anh không biết tu tiên hay đan dược, chỉ hiểu tinh hạch theo cách người Đông Hà đang thử và không thể xác nhận một món thuốc từ lời quảng cáo.",
+        "relationships": "Anh còn mẹ và em gái trong khu trú ẩn, nợ Chu Dã một lần cứu mạng và muốn giành suất chính thức trong đội trinh sát để có khẩu phần ổn định.",
+        "habits": "Anh nhìn cửa thoát trước khi ngồi, kiểm niêm phong chai nước và luôn hỏi giá bằng thứ mình thật sự có thể kiếm lại.",
+        "desireBeforeAdvantage": "Anh muốn ổn định cơ thể, giữ được suất tuần tra và đưa gia đình khỏi khu nhà sắp mất điện hoàn toàn."
+      },
+      {
+        "characterId": "han_duoc_su",
+        "background": "Hàn Dược Sư xuất thân từ gia đình làm linh thiện, chuyển sang thu mua và giám định nguyên liệu sau khi nguồn yêu thú quanh Thanh Lô Phường cạn dần.",
+        "presentLife": "Ông giữ một quầy nhỏ, mua đúng món có thể bán lại và đang tìm nguồn khí huyết mới để cứu biển hiệu gia đình.",
+        "existingCompetence": "Ông biết giám định thịt yêu thú, dược tính phổ thông, dấu nhiễm độc và giá nguyên liệu trong phường.",
+        "limitsOfKnowledge": "Ông không biết Đông Hà, không hiểu tinh hạch tiến hóa và sẽ không xác nhận công dụng nếu chưa thử bằng dụng cụ cùng mẫu đối chứng.",
+        "relationships": "Ông từng quý sự cẩn thận của Lâm Việt nhưng vẫn đặt sinh kế của quầy lên trước; ông tránh đối đầu trực tiếp với Đan Các.",
+        "habits": "Ông cắt mẫu nhỏ trước, ghi mùi và phản ứng, giữ lại phần đối chứng rồi mới nói giá.",
+        "desireBeforeAdvantage": "Ông muốn tìm một nguồn nguyên liệu đủ đều để mở lại bếp linh thiện của Hàn gia."
+      }
+    ],
+    "livedWorlds": [
+      {
+        "worldId": "thanh_huyen_gioi",
+        "everydayLife": "Thanh Lô Phường thức dậy theo giờ mở lò, người học nghề xếp hàng nhận việc, dược phu giao sọt và khách mua thuốc theo túi nhỏ vì không phải ai cũng đủ linh thạch.",
+        "livelihoods": "Đan đồ sống bằng ca phụ lò, dược phu bán nguyên liệu, quầy thuốc và tửu lâu kiếm chênh lệch từ khả năng giám định; tư cách nghề quyết định ai được nhận đơn lớn.",
+        "infrastructure": "Lò, hỏa thất, kho chống ẩm, cân dược, chợ và dấu quầy tạo thành chuỗi làm thuốc; có đan phương mà thiếu lò hoặc nguyên liệu vẫn không tạo được hàng.",
+        "inequality": "Tông môn và thế gia giữ đan phương, lò tốt và quyền thi nghề, còn Đan đồ nghèo phải làm thuê hoặc mua nguyên liệu vụn theo ngày.",
+        "institutionsWithoutProtagonist": "Đan Các giữ độc quyền nghề, quầy dược tranh nguồn hàng, dược phu chọn nơi trả giá tốt và Hàn gia tìm đường cứu sinh kế dù Lâm Việt có xuất hiện hay không."
+      },
+      {
+        "worldId": "dong_ha_mat_the",
+        "everydayLife": "Đông Hà sau thức tỉnh sống theo ca lấy nước, điện luân phiên và bảng đổi vật tư; cư dân vá nhà, nấu phần ăn chung và tránh ra đường khi đội săn chưa dọn tuyến.",
+        "livelihoods": "Người còn nghề sửa máy, y tá, lái xe và giao nhận đổi công lấy khẩu phần; đội săn mang tinh hạch về nhưng phải chi cho đạn, thuốc và người bị thương.",
+        "infrastructure": "Trạm thành vệ, máy phát, bộ đàm, kho lạnh hỏng dần và chợ tinh hạch tạo nên trật tự mới; hàng có giá khi dùng được, bảo quản được và không kéo nguy hiểm về khu trú ẩn.",
+        "inequality": "Đội có vũ khí và máy phát giữ phần ăn tốt, người chưa thức tỉnh làm việc nặng để đổi nước; người có năng lực bất ổn có thể bị dùng rồi bỏ.",
+        "institutionsWithoutProtagonist": "Thành vệ cần giữ phố, đầu nậu muốn gom tinh hạch, đội săn tranh tuyến an toàn và cư dân tự lập tổ nước trước khi biết Lâm Việt là ai."
+      }
+    ],
+    "advantageDiscovery": {
+      "acquisitionEvent": "Đêm đầu chuyển vào kho thuê, Lâm Việt đốt lò sấy ẩm; khi nhiệt làm lớp sáp trên khung cửa sau bong ra, cánh cửa vốn mở vào tường lại lộ một căn phòng có kính vỡ và ánh đèn chớp xanh.",
+      "initialReaction": "Hắn dập lửa, kiểm xem có mê hương, dùng tro đánh dấu nền và đóng cửa nhiều lần trước khi chạm tay qua ngưỡng.",
+      "firstExperiments": [
+        "Lâm Việt đặt một túi tro có dấu chỉ đỏ qua cửa, đóng lại một tuần hương rồi kiểm khối lượng, mùi và vị trí.",
+        "Hắn buộc chỉ tơ vào cổ tay, để đồng hồ cát ở hai phía và chỉ bước qua khi đã dọn sạch đường rút.",
+        "Hắn mang theo khăn che mặt, nước và dao hái thuốc để quan sát căn phòng cùng con phố, chưa lấy vật vô chủ hay cho ai dùng thuốc."
+      ],
+      "initiallyKnownFactIds": [
+        "thanh_huyen_thieu_hung_thu",
+        "thuoc_cam_mau_co_han"
+      ],
+      "unresolvedOrigin": "Một đường vân giống trận văn bị cháy nằm dưới lớp sáp khung cửa, nhưng Lâm Việt chưa đủ kiến thức trận pháp để giải thích."
+    },
+    "facts": [
+      {
+        "id": "thanh_huyen_thieu_hung_thu",
+        "truth": "Thịt yêu thú quanh Thanh Lô Phường tăng giá và nguồn nguyên liệu của Hàn gia không còn ổn định.",
+        "initiallyKnownByCharacterIds": [
+          "lam_viet",
+          "han_duoc_su"
+        ],
+        "revealThrough": "Đây là kinh nghiệm nghề sẵn có của Lâm Việt và được Hàn Dược Sư xác nhận bằng sổ giá cùng cách thử mẫu."
+      },
+      {
+        "id": "thuoc_cam_mau_co_han",
+        "truth": "Bột cầm máu phổ thông của Thanh Huyền hỗ trợ vết cắt sạch, nông.",
+        "initiallyKnownByCharacterIds": [
+          "lam_viet",
+          "han_duoc_su"
+        ],
+        "revealThrough": "Lâm Việt từng pha và dùng đúng phạm vi trong đan phòng; hắn nói rõ giới hạn này trước khi đưa cho người Đông Hà."
+      },
+      {
+        "id": "cua_noi_kho_dong_ha",
+        "truth": "Trong lượt tự mình bước qua đầu tiên, cửa sau kho cho Lâm Việt đi tới một cửa hàng bỏ trống bên phố lạ và quay về trước khi đồng hồ cát chảy hết.",
+        "initiallyKnownByCharacterIds": [],
+        "revealThrough": "Túi tro đánh dấu, đồng hồ cát, sợi chỉ và hai lượt đi về cho bằng chứng trong phạm vi đã thử."
+      },
+      {
+        "id": "dong_ha_song_bang_doi_vat",
+        "truth": "Tại khu phố Đông Hà, nước và vật tư được đổi bằng thẻ, kim loại, pin hoặc tinh hạch; từng hạt tinh hạch bị kiểm riêng nên chưa có một mức giá đơn giản áp cho tất cả.",
+        "initiallyKnownByCharacterIds": [
+          "hua_an"
+        ],
+        "revealThrough": "Lâm Việt quan sát bảng đổi, ca gác và nghe Hứa An giải thích những mức giá anh thực sự đã giao dịch."
+      },
+      {
+        "id": "tinh_hach_can_giam_dinh",
+        "truth": "Mẫu tinh hạch từ sinh vật tiến hóa làm linh giác của tu sĩ phản ứng, nhưng phản ứng đó chưa đủ để xác định công dụng.",
+        "initiallyKnownByCharacterIds": [
+          "hua_an"
+        ],
+        "revealThrough": "Hứa An đưa một mẫu gần cạn; Lâm Việt chỉ quan sát, sau đó Hàn Dược Sư kiểm mẫu nhỏ và ghi phản ứng thay vì tuyên bố công dụng ngay."
+      },
+      {
+        "id": "dong_ha_thieu_thuoc_on_dinh",
+        "truth": "Thuốc mất nhãn và không rõ thứ bên trong bị coi là không an toàn để dùng.",
+        "initiallyKnownByCharacterIds": [
+          "hua_an"
+        ],
+        "revealThrough": "Lâm Việt nhìn sổ thuốc trạm, nghe danh sách thiếu và chứng kiến cách người dân từ chối một chai không còn nhãn."
+      }
+    ],
+    "milestones": [
+      {
+        "id": "xac_nhan_cua_song_gioi",
+        "intention": "Lâm Việt có đủ bằng chứng để tin cánh cửa mở sang một nơi khác và hắn đã quay về được trong phạm vi thử nhỏ, đồng thời ghi rõ thời lượng mở cửa cùng khả năng người khác sử dụng vẫn chưa biết.",
+        "prerequisiteIds": [],
+        "evidenceNeeded": "Hai phép thử phải diễn trên trang; kết luận ghi rõ lượt đi về đã thành công và tách điều quan sát được khỏi thời lượng mở cửa, sinh vật quanh đó cùng khả năng người khác sử dụng còn chưa biết."
+      },
+      {
+        "id": "hieu_nhip_song_dong_ha",
+        "intention": "Lâm Việt hiểu những nhu cầu, giới hạn chi trả và rủi ro căn bản của một khu phố Đông Hà trước khi nghĩ tới mở quầy.",
+        "prerequisiteIds": [
+          "xac_nhan_cua_song_gioi",
+          "dong_ha_song_bang_doi_vat",
+          "dong_ha_thieu_thuoc_on_dinh"
+        ],
+        "evidenceNeeded": "Có cảnh trạm nước, bảng đổi, ca gác, sổ thuốc và lựa chọn của Hứa An; Lâm Việt ghi cả thứ người ta cần lẫn thứ họ không dám dùng."
+      },
+      {
+        "id": "kiem_mau_tinh_hach",
+        "intention": "Lâm Việt và Hàn Dược Sư xác định được một vài tính chất của mẫu tinh hạch mà không gọi nó thành nguyên liệu hoàn chỉnh.",
+        "prerequisiteIds": [
+          "tinh_hach_can_giam_dinh",
+          "thanh_huyen_thieu_hung_thu"
+        ],
+        "evidenceNeeded": "Mẫu được chia, cân, thử phản ứng và giữ đối chứng; kết luận chỉ ghi phản ứng quan sát được cùng điều chưa biết."
+      },
+      {
+        "id": "chuan_bi_lo_thuoc_nho",
+        "intention": "Lâm Việt chuẩn bị một lô nhỏ có nguồn, liều, hướng dẫn và cách nhận báo cáo để kiểm nhu cầu thật ở Đông Hà.",
+        "prerequisiteIds": [
+          "hieu_nhip_song_dong_ha",
+          "thuoc_cam_mau_co_han"
+        ],
+        "evidenceNeeded": "Nguyên liệu, hao phí, số gói, phạm vi dùng, chống chỉ định và thỏa thuận báo lại cả trường hợp đã dùng lẫn chưa dùng đều xuất hiện trước khi giao."
+      },
+      {
+        "id": "giao_dich_thu_gioi_han",
+        "intention": "Một giao dịch nhỏ hoàn tất với người đã biết công dụng và giới hạn, đồng thời xác lập cách thu dữ liệu cho quyết định tiếp theo chứ chưa thành cửa hàng lớn.",
+        "prerequisiteIds": [
+          "chuan_bi_lo_thuoc_nho"
+        ],
+        "evidenceNeeded": "Người mua trực tiếp dùng món phổ thông, thấy đúng công dụng, tự hỏi giá rồi hoàn tất số lượng và đối giá rõ ràng."
+      }
+    ]
+  },
+  "lane": "thuc_tinh_toan_dan",
+  "title": "Song Xuyên Mạt Thế: Cửa Hàng Của Ta Bán Công Pháp Tu Tiên",
+  "hook": "Ngày bị Đan Các đuổi khỏi đan phòng, Lâm Việt phát hiện cửa sau kho thuê nối tới một thành phố vừa thức tỉnh; trước khi bán công pháp, hắn phải hiểu người bên kia sống bằng gì và thứ mình mang qua có thật sự dùng được hay không.",
+  "blurb": "Lâm Việt hai mươi ba tuổi là một Đan đồ quen phân dược liệu, giữ lửa và chép sổ lô đan nhưng chưa đủ tư cách tự đứng lò. Sau khi bị Đan Các cắt chỗ làm vì không chịu nhận lỗi thay quản sự, hắn chuyển số đồ ít ỏi tới một kho thuê ở Thanh Lô Phường. Cửa gỗ sau kho bất ngờ mở sang một cửa hàng bỏ trống tại Đông Hà, nơi virus thức tỉnh đã làm điện lưới và chuỗi cung ứng tan vỡ. Lâm Việt không biết luật ở đó, càng không biết tinh hạch và hung thú có tác dụng gì với tu sĩ. Hắn thử đường lui, quan sát phố, đổi một ít nước và thuốc cầm máu để tìm hiểu đời sống mới, rồi mang mẫu tinh hạch về nhờ người có nghề kiểm. Chỉ khi hiểu công dụng, nguồn hàng và giới hạn của cả hai phía, hắn mới chuẩn bị lô giao dịch đầu tiên. Cửa hàng tương lai sẽ bán con đường đi lên, nhưng nó bắt đầu từ những món nhỏ được kiểm chứng và những người có mục tiêu riêng.",
+  "readerFantasy": "Theo Lâm Việt biến hiểu biết nghề thuốc và một lối đi bí mật thành lợi thế từng bước, nhìn hai thế giới tự bộc lộ nhu cầu rồi mới hình thành cửa hàng công pháp có nguồn hàng và khách thật.",
+  "presentation": {
+    "coverPath": "/covers/serial-pilots/cua-hang-cong-phap-tu-tien.webp",
+    "tagline": "Công pháp đặt lên kệ, tinh hạch mang tới quầy.",
+    "shortDescription": "Xuyên thành Đan đồ sắp bị đuổi, Lâm Việt mở một cửa hàng thật giữa Đông Hà thời đại tiến hóa. Hắn bán đan dược, bí tịch và pháp khí để thu tinh hạch, thịt hung thú cùng linh thực — những tài nguyên đang trở nên tuyệt tích ở tu tiên giới.",
+    "tags": [
+      "Song Xuyên",
+      "Tu Tiên",
+      "Mạt Thế Tiến Hóa",
+      "Kinh Doanh",
+      "Luyện Đan",
+      "Sảng Văn"
+    ],
+    "sellingPoints": [
+      "Cửa hàng là kim thủ chỉ hữu hình: hàng đặt lên kệ, khách trả giá và tranh mua ngay tại quầy.",
+      "Công pháp bán lấy tiền và tài nguyên; khách hàng tự tu luyện, lập đội, mở võ quán rồi quay lại bằng đơn lớn hơn.",
+      "Tinh hạch, thịt hung thú và linh thực mạt thế trở thành nhiên liệu tăng nghề, luyện đan và dựng thương hội ở tu tiên giới.",
+      "Cảnh giới, nghề nghiệp, phẩm cấp hàng hóa và cấp thương điếm cùng tăng theo những trục độc lập, dễ nhớ và có thành quả nhìn thấy."
+    ]
+  },
+  "goldenFinger": {
+    "name": "Cửa Kho Song Giới",
+    "rule": "Cửa gỗ sau kho thuê của Lâm Việt nối với một cửa hàng tại Đông Hà. Toàn bộ hai gian cửa hàng và ngưỡng nối là lãnh vực tuyệt đối của hắn: hành vi thù địch bị vô hiệu, không ai cưỡng ép vào cửa, trộm hàng hay theo dõi qua cửa; Lâm Việt có thể trục xuất khách và thu hồi hàng chưa thanh toán. Cảnh giới, pháp bảo, quyền lực hay số người đều không thể vô hiệu hoặc vượt quyền cửa hàng. Cửa không định giá, tạo hàng, chữa thương hay truyền kiến thức.",
+    "scope": "Giá trị đến từ nghề sẵn có, nguồn hàng thật và chênh lệch nhu cầu giữa hai giới. Sau khi xác nhận an toàn cùng nhu cầu đầu tiên, truyện chuyển sang giao dịch thật và vòng khách quay lại; các phép kiểm đã quen được kể gọn. Bên ngoài cửa hàng Lâm Việt vẫn chịu rủi ro bình thường.",
+    "evolution": [
+      {
+        "id": "loi_di_danh_dau",
+        "name": "Lối đi đánh dấu",
+        "changesUse": "Chỉ vận chuyển vật nhỏ và ghi lại từng lượt qua cửa."
+      },
+      {
+        "id": "ke_thu_nghiem",
+        "name": "Kệ thử nghiệm",
+        "changesUse": "Tách mẫu, đối chứng và lô nhỏ trước khi nhận giao dịch."
+      },
+      {
+        "id": "quay_hang_co_nguon",
+        "name": "Quầy hàng có nguồn",
+        "changesUse": "Niêm yết hàng đã có nguồn, giới hạn dùng và điều khoản đổi rõ."
+      }
+    ]
+  },
+  "conflictLadder": {
+    "survival": "Lâm Việt cần tài nguyên luyện đan để giữ thân phận ngoại môn, còn khách Đông Hà cần phương pháp mạnh lên trước hung thú tiến hóa.",
+    "rules": "Đan Các muốn kiểm soát lò và đan phương; Liên minh Đông Hà muốn cấp phép mọi hàng hóa giúp thức tỉnh.",
+    "ideology": "Công pháp là truyền thừa phải khóa trong tông môn hay thương phẩm ai trả đúng giá cũng có thể mua để đổi đời.",
+    "self": "Từ kẻ chỉ muốn thoát bị đuổi, Lâm Việt chủ động chọn trở thành người đặt giá cho con đường tu luyện của cả hai giới."
+  },
+  "hiddenThread": "Virus thức tỉnh và sự cạn kiệt yêu thú tại Thanh Huyền Giới đều để lại cùng một loại đạo văn trong tinh hạch. Ban đầu nó chỉ là ký hiệu người mua dùng để phân loại thuộc tính; khoảng giữa truyện, các lò cổ chứng minh hai tai biến là hai pha của một chu kỳ linh khí nhân tạo, buộc thương hội của Lâm Việt bước vào tuyến chính.",
+  "payoffStance": "mixed",
+  "oppositionEngine": "Đối thủ tranh nguồn hàng, khách, giá và ảnh hưởng ở ngoài cửa hàng; họ có thể mua trước, trả giá cao hơn hoặc lôi kéo khách bằng sản phẩm riêng. Trong cửa hàng không ai tấn công, cướp, ép giá bằng vũ lực hay buộc Lâm Việt giao bí mật, nên xung đột luôn quay lại chất lượng hàng, khả năng cung ứng và khách dùng hàng để mạnh lên.",
+  "castSeed": [
+    {
+      "id": "lam_viet",
+      "name": "Lâm Việt",
+      "role": "protagonist",
+      "agenda": "Giữ nghề thuốc, trả tiền kho và tự đứng lò bằng nguồn lực đã kiểm chứng.",
+      "antagonistClass": null,
+      "startLocationId": "kho_lam_viet",
+      "startingProgressions": [],
+      "milestones": [
+        {
+          "name": "Tự đứng lò",
+          "progressionTarget": null,
+          "socialResult": "Có nguồn hàng, dụng cụ và khách đủ rõ để tự chịu trách nhiệm một lô thuốc."
+        }
+      ]
+    },
+    {
+      "id": "hua_an",
+      "name": "Hứa An",
+      "role": "ally",
+      "agenda": "Ổn định năng lực và giành suất tuần tra để giữ khẩu phần cho gia đình.",
+      "antagonistClass": null,
+      "startLocationId": "pho_dong_ha",
+      "startingProgressions": [],
+      "milestones": [
+        {
+          "name": "Suất tuần tra ổn định",
+          "progressionTarget": null,
+          "socialResult": "Được trạm thành vệ tin dùng nhờ cơ thể ổn định và hiểu tuyến phố."
+        }
+      ]
+    },
+    {
+      "id": "han_duoc_su",
+      "name": "Hàn Dược Sư",
+      "role": "authority",
+      "agenda": "Tìm nguồn nguyên liệu có thể giám định để mở lại bếp linh thiện Hàn gia.",
+      "antagonistClass": null,
+      "startLocationId": "thanh_lo_phuong",
+      "startingProgressions": [],
+      "milestones": [
+        {
+          "name": "Nguồn nguyên liệu mới",
+          "progressionTarget": null,
+          "socialResult": "Có mẫu đối chứng và nguồn cung đủ ổn định để tự đặt giá mua."
+        }
+      ]
+    }
+  ],
+  "worldKernel": {
+    "worlds": [
+      {
+        "id": "thanh_huyen_gioi",
+        "name": "Thanh Huyền Giới",
+        "civilizationState": "Tu tiên văn minh đã khai thác yêu thú và linh khoáng qua nhiều thế hệ. Bí tịch, lò đan và nghề nghiệp bị tông môn cùng thế gia nắm giữ; huyết nhục hung thú và tinh hạch thuần khiết trở thành tài nguyên hiếm có giá cao.",
+        "locations": [
+          {
+            "id": "kho_lam_viet",
+            "name": "Kho của Lâm Việt",
+            "note": "Kho nhỏ cạnh nơi ở ngoại môn, là đầu bên Thanh Huyền của cửa sau thương điếm."
+          },
+          {
+            "id": "thanh_lo_phuong",
+            "name": "Thanh Lô Phường",
+            "note": "Phường thị dưới chân tông môn, tập trung lò đan, tửu lâu linh thiện và cửa hàng vật liệu."
+          },
+          {
+            "id": "dan_cac_ngoai_mon",
+            "name": "Đan Các Ngoại Môn",
+            "note": "Nơi Đan đồ làm việc và bị kiểm soát bằng tư cách, lò cùng đan phương."
+          }
+        ],
+        "factions": [
+          {
+            "id": "thanh_lo_dan_cac",
+            "name": "Thanh Lô Đan Các",
+            "agenda": "Giữ độc quyền đào tạo Luyện Đan Sư và phân phối đan dược ngoại môn."
+          },
+          {
+            "id": "han_gia_linh_thien",
+            "name": "Hàn Gia Linh Thiện",
+            "agenda": "Khôi phục chuỗi tửu lâu bằng nguyên liệu hung thú ổn định, rõ phẩm cấp."
+          }
+        ]
+      },
+      {
+        "id": "dong_ha_mat_the",
+        "name": "Đông Hà Thức Tỉnh",
+        "civilizationState": "Virus thức tỉnh không tạo zombie mà khiến sinh vật đồng loạt tiến hóa. Điện lưới, logistics và chính quyền liên vùng đứt đoạn; các thành khu giữ được công nghệ cũ nhưng thiếu hệ thống tu luyện, nên dị năng giả và đội săn đang tự đặt luật mới.",
+        "locations": [
+          {
+            "id": "pho_dong_ha",
+            "name": "Phố Thương Điếm Đông Hà",
+            "note": "Dãy phố đông người sống sót, nơi cửa hàng của Lâm Việt mở quầy và mọi phản ứng đều công khai."
+          },
+          {
+            "id": "tram_dong_ha",
+            "name": "Trạm Thành Vệ Đông Hà",
+            "note": "Đầu mối nhiệm vụ, phân phối vật tư và hợp đồng đội săn."
+          },
+          {
+            "id": "cho_tinh_hach",
+            "name": "Chợ Tinh Hạch",
+            "note": "Thị trường đầu nậu mua bán tinh hạch theo giai và thuộc tính."
+          }
+        ],
+        "factions": [
+          {
+            "id": "thanh_ve_dong_ha",
+            "name": "Thành Vệ Đông Hà",
+            "agenda": "Ổn định thành khu và mua năng lực chiến đấu có thể nhân rộng cho cả đội."
+          },
+          {
+            "id": "lien_minh_doi_san",
+            "name": "Liên Minh Đội Săn",
+            "agenda": "Nắm quyền chia bãi săn, tinh hạch và giá vật tư tiến hóa."
+          }
+        ]
+      }
+    ],
+    "progressionSystems": [
+      {
+        "id": "duong_nghe_thuoc",
+        "name": "Đường nghề thuốc",
+        "kind": "profession",
+        "subjectType": "character",
+        "tracks": [],
+        "ranks": [
+          {
+            "id": "hoc_viec",
+            "name": "Người học việc",
+            "note": "Làm được thao tác nhưng chưa tự chịu trách nhiệm một lô."
+          },
+          {
+            "id": "tu_dung_lo",
+            "name": "Người tự đứng lò",
+            "note": "Tự chịu nguồn, quy trình và kết quả của lô thuốc."
+          }
+        ],
+        "minorStages": []
+      }
+    ],
+    "progressionSubjects": [],
+    "gradeSystems": [],
+    "equivalences": [],
+    "economyLoops": [],
+    "launchProducts": [],
+    "openingContract": [
+      {
+        "chapterNumber": 1,
+        "proves": "Lâm Việt có nghề và áp lực sống rõ; cánh cửa xuất hiện ngay trong đêm hắn chuyển tới kho thuê.",
+        "namedLevelOrGrade": "Đan đồ.",
+        "visibleResult": "Sau ca phân dược cuối và lúc bị lấy lại thẻ Đan Các, hắn chuyển lò hỏng tới kho; nhiệt sấy làm cửa hiện ra và một túi tro đánh dấu đi về nguyên vẹn.",
+        "witnessReaction": "Người cùng ca tránh dính líu, còn Hàn Dược Sư chỉ cho hắn giữ lại bộ cân cũ vì biết hắn chép sổ cẩn thận.",
+        "commercialAction": null
+      },
+      {
+        "chapterNumber": 2,
+        "proves": "Cửa nối hai gian hàng và cửa hàng là lãnh vực tuyệt đối của Lâm Việt, đủ để hắn giao dịch mà không cần tuyến đánh nhau giữ quầy.",
+        "namedLevelOrGrade": null,
+        "visibleResult": "Lâm Việt tự bước qua rồi quay lại; khi Hứa An vì cảnh giác chĩa vũ khí, lực trong cửa hàng ép mũi vũ khí hạ xuống và Lâm Việt có thể mời anh ra ngoài bằng một ý niệm.",
+        "witnessReaction": "Hứa An hiểu chủ quán không cần tranh sức trong cửa hàng nên chuyển sang hỏi nước sạch và thuốc cầm máu.",
+        "commercialAction": null
+      },
+      {
+        "chapterNumber": 3,
+        "proves": "Thuốc phổ thông ở Thanh Huyền trở thành món có giá tại Đông Hà khi một người thật dùng đúng công dụng.",
+        "namedLevelOrGrade": "Bột cầm máu phổ thông.",
+        "visibleResult": "Hứa An rửa một vết cắt sạch rồi dùng phần bột nhỏ; máu ngừng nhanh, lớp thuốc không bong khi anh co bàn tay và anh tự so với số băng còn lại.",
+        "witnessReaction": "Hứa An hỏi ngay một gói dùng được bao nhiêu lần, giá bao nhiêu và liệu lần sau có hàng nữa hay không.",
+        "commercialAction": "Hứa An đổi một mẫu tinh hạch cạn cùng hai viên pin lấy ba gói nhỏ và hướng dẫn dùng."
+      },
+      {
+        "chapterNumber": 4,
+        "proves": "Khách dùng hàng có kết quả sẽ quay lại bằng tài nguyên tốt hơn, mở vòng giao dịch hai chiều.",
+        "namedLevelOrGrade": "Người thức tỉnh Nhất giai sơ kỳ chưa ổn định.",
+        "visibleResult": "Hứa An trở lại với vết cắt đã khép, dẫn thêm một đồng đội bị thương nhẹ và đặt thịt hung thú lên quầy; Lâm Việt nhận ra khí huyết trong miếng thịt mạnh hơn nguyên liệu quanh Thanh Lô.",
+        "witnessReaction": "Người đồng đội tận mắt thấy Hứa An tháo băng, thôi nghi ngờ rồi hỏi mua; Hàn Dược Sư xem mẫu thịt mang về và chủ động báo giá cao.",
+        "commercialAction": "Lâm Việt bán lô thuốc nhỏ thứ hai, thu mua một phần thịt hung thú rồi dùng tiền bán mẫu cho Hàn Dược Sư để nhập lô hàng kế tiếp."
+      }
+    ],
+    "openingLedger": []
+  },
+  "arena": "Thanh Huyền Giới cạn tài nguyên yêu thú và Đông Hà thức tỉnh sau đứt gãy văn minh, nối với nhau bằng một cửa hàng thương mại thật.",
+  "novelty": "Công pháp tu tiên được bán như hàng trên kệ; khách mạt thế có đường tăng cấp và địa vị riêng rồi quay lại tạo đơn hàng ngày càng lớn.",
+  "endingDirection": "Lâm Việt biến cửa hàng thành thương hội hai giới, công khai phẩm cấp và nguồn hàng để phá thế độc quyền tu luyện, đồng thời dùng mạng khách hàng đã tự trưởng thành ngăn chu kỳ linh khí nhân tạo nuốt cả hai thế giới.",
+  "voiceSheet": {
+    "pov": "third_limited",
+    "register": "Nam tần song xuyên gần góc nhìn Lâm Việt, ưu tiên công việc, vật dụng, quan sát và đối thoại có mục đích. Nhịp tiến lên bằng điều vừa được kiểm chứng; cảnh đời sống có sức nặng khi nó làm rõ con người hoặc lựa chọn.",
+    "chapterTitleRule": "Lấy một câu nói, ý nghĩ hoặc hình ảnh cụ thể xuất hiện trong chương, gợi đúng lựa chọn hay phát hiện đang diễn ra.",
+    "showsSystemPanel": false,
+    "reactionRule": "Nhân vật phản ứng theo nghề, lợi ích và điều họ trực tiếp chứng kiến. Chỉ người đủ chuyên môn mới gọi tên cấp hay công dụng; một cuộc trao đổi riêng không cần đám đông hoặc tranh giá.",
+    "taboos": [
+      "Không có bảng hệ thống hoặc thông báo xác nhận cơ chế cửa",
+      "Không để Lâm Việt biết điều chưa thử hoặc chưa được người có nghề giải thích",
+      "Không mở cửa hàng, bán công pháp hay nhận đơn tổ chức trước khi có nguồn và phép kiểm",
+      "Không biến người Đông Hà thành đám đông đồng thanh; phản ứng phải đến từ người mua cụ thể đã dùng hàng",
+      "Không dùng thất bại giả để kéo dài thao tác đã hiểu",
+      "Không dựng rào cản ngôn ngữ, phiên dịch hoặc học nói giữa hai thế giới",
+      "Không sinh tuyến cướp cửa hàng, phá quầy hoặc ép Lâm Việt giao bí mật"
+    ]
+  }
+}

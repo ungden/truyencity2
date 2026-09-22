@@ -1,0 +1,16 @@
+{
+  "chapters": 10,
+  "totalUsd": 0.334,
+  "perChapterUsd": 0.033,
+  "reading": {
+    "chapters": 10,
+    "average": 2.31,
+    "weakest": "structuralFreshness"
+  },
+  "narrativeReview": {
+    "mayPublish": true,
+    "upstreamFindings": 0,
+    "blockingProseFindings": 0,
+    "totalFindings": 0
+  }
+}

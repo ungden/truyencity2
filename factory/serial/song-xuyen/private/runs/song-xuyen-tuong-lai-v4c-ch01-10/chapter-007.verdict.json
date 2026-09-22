@@ -1,0 +1,104 @@
+{
+  "verdict": {
+    "continuity": [],
+    "scorecard": {
+      "opening": 4,
+      "anticipation": 4,
+      "payoff": 3,
+      "newness": 3,
+      "endHook": 3
+    },
+    "craft": {
+      "protagonistAgency": 5,
+      "sceneLife": 4,
+      "worldLogic": 5,
+      "dialogueNaturalness": 4,
+      "structuralFreshness": 3
+    },
+    "repetition": [
+      {
+        "quote": "“Đừng gọi để đặt một giấc mơ.”",
+        "repeatsChapter": 6,
+        "note": "Lặp lại mô-típ chương 6: Khải “không mang đi một giấc mơ”. Ý nghĩa vẫn đúng, nhưng cú chốt sẽ mạnh hơn nếu Khoa nói một yêu cầu kỹ thuật hay giới hạn chi phí mới, cụ thể hơn."
+      },
+      {
+        "quote": "“Không có dữ liệu” / “chưa có”",
+        "repeatsChapter": 5,
+        "note": "Sự thận trọng về bằng chứng là canon tốt và cần thiết, nhưng các nhịp gạch bỏ lặp nhiều qua chương 5–7. Có thể nén một lượt phủ định để dành chỗ cho một quyết định kỹ thuật khó hơn."
+      }
+    ],
+    "aiFlavor": [
+      {
+        "quote": "“Tao đang học cách không bán hộ thứ mình chưa làm.”",
+        "kind": "theme_spoken"
+      },
+      {
+        "quote": "“Nó giống một việc nhỏ, có thể làm hỏng, có thể tốn tiền...”",
+        "kind": "empty_lyricism"
+      },
+      {
+        "quote": "“Đừng gọi để đặt một giấc mơ.”",
+        "kind": "theme_spoken"
+      }
+    ],
+    "steering": [
+      "Chương giữ canon rất chắc: Khải chỉ dùng điều anh và Khoa đã trực tiếp thử ở chương 4–5; pin, mạch, góc lưỡi, độ sát và độ bền đều bị loại khỏi phần khẳng định. Không có lạm dụng công nghệ tương lai hay nhảy cóc năng lực sản xuất.",
+      "Khải hiện rõ là người bán lẻ biết bảo toàn dòng tiền: xử lý rau dập, nhận đơn nhỏ, giữ quỹ nhập hàng và viện phí, rồi mới chốt trần tiền thử. Quyết định dừng thay vì vay nóng có căn cứ đời sống, không phải khẩu hiệu làm giàu.",
+      "Cảnh cho thấy xưởng, hàng giao, khách mua rẻ hơn và viện phí cùng tồn tại với dự án; Vân Cảng không đứng yên chờ sản phẩm. Khoa cũng làm đúng vai trò: biến cảm nhận thành điều kiện kiểm được, không đột ngột thành kỹ sư chế tạo toàn năng.",
+      "Điểm yếu chính là phần giữa khá gần với một biên bản yêu cầu kỹ thuật: nhiều lượt “chưa biết/chưa có dữ liệu/gạch bỏ” cùng một chức năng. Khi gọi lại xưởng, hãy để phản hồi về vật liệu, chốt hoặc dung sai buộc Khải phải chọn giữa hai phương án có giá và hệ quả khác nhau.",
+      "Chưa cần ép valueContrast thành cảnh khách hàng ở chương crafting này: giá trị cơ khí đã được neo đúng vào trải nghiệm rửa đối chứng. Nhưng mẫu thật sau này cần người dùng cầm, rửa hoặc cạo so trực tiếp với dao đang bán trước khi xuất hiện định giá hay đơn hàng."
+    ],
+    "reviewBinding": {
+      "chapterNumber": 7,
+      "title": "“Một Mẫu Thử Không Được Phép Ăn Nhầm Vào Tiền Sống”",
+      "excerpt": "“Tiền nhập nước, mì, sữa không đụng.” Anh nói.\n\n“Ừ.”\n\n“Viện phí cũng không.”"
+    }
+  },
+  "digest": {
+    "chapterNumber": 7,
+    "title": "“Một Mẫu Thử Không Được Phép Ăn Nhầm Vào Tiền Sống”",
+    "summary": "Trần Khải và Phạm Khoa chuyển kết quả kiểm tra dao cạo Tân Hải thành bản yêu cầu mẫu cơ khí có tiêu chí thử rõ ràng, đồng thời đặt ngân sách thử riêng không ảnh hưởng tiền nhập hàng và viện phí.",
+    "payoffKind": "dot_pha",
+    "endedOn": "Khải gọi để làm một mẫu biết mình phải kiểm cái gì.",
+    "newNamedThings": [
+      "chu_tu",
+      "dau_dao_tan_hai",
+      "chi_phi_v1",
+      "ban_yeu_cau_mau_co_khi",
+      "tien_thu"
+    ],
+    "narrativeEvidence": [
+      {
+        "id": "xac_lap_yeu_cau_mau",
+        "chapterNumber": 7,
+        "quote": "Cuối cùng, trên tờ giấy chỉ còn những dòng họ dám chịu trách nhiệm:\n\n- Mẫu cơ khí một chiếc, dùng lưỡi phổ thông có thể mua tại Vân Cảng.\n- Đầu dao mở được bằng thao tác lặp lại để nước chạm vào khu vực bên trong.\n- Có đường rãnh hoặc khoảng hở nhìn thấy được cho vụn thoát khi rửa tĩnh.\n- Cơ cấu giữ lưỡi không cấn khi đóng, không để cạnh sắc lộ ở vị trí cầm.\n- Tay cầm cần có hình dạng hoặc bề mặt giảm trơn khi ướt.\n- Vật liệu, dung sai quan trọng và kiểu chốt sẽ hỏi lại xưởng trước khi chốt bản vẽ.",
+        "learnedByCharacterIds": [
+          "tran_khai",
+          "pham_khoa"
+        ]
+      }
+    ],
+    "coreChanges": {
+      "storyDayDelta": 0,
+      "died": [],
+      "progressionChanges": [],
+      "assetEvents": [],
+      "goldenFingerRungChange": null,
+      "moved": [],
+      "worldFactsRevealed": [],
+      "newCast": [],
+      "hooksPlanted": [
+        {
+          "id": "goi_xuong_chot_thong_so_mau",
+          "what": "Trần Khải gọi lại cho xưởng để hỏi vật liệu, kiểu chốt và dung sai trước khi chốt bản vẽ mẫu cơ khí.",
+          "dueByChapter": 8
+        }
+      ],
+      "hooksPaid": [],
+      "learnedFinger": []
+    }
+  },
+  "attempts": 1,
+  "costUsd": 0.062559,
+  "inputFingerprint": "2c939b46cd0b5b0a1e8bdaafb0a64ba71ec8f8f065d9fdf8ebcb6718ce15cacc"
+}
