@@ -90,6 +90,25 @@ export function renderLedgerLines(events: AssetEvent[]): string[] {
 }
 
 /**
+ * The shop's system only sees the shop. A customer's purse has to enter the ledger before
+ * it can pay ("Hứa An nhận 3 viên tinh hạch"), but printing that as a 【】 notice told the
+ * reader the customer was just handed his own money. Only events the protagonist is a
+ * party to become panel lines; the rest are facts the prose must not contradict.
+ */
+export function splitLedgerLines(events: AssetEvent[], protagonistId: string | undefined): {
+  panel: string[];
+  background: string[];
+} {
+  const involvesProtagonist = (event: AssetEvent) =>
+    event.toOwnerId === protagonistId || event.fromOwnerId === protagonistId;
+  const panelEvents = events.filter(involvesProtagonist);
+  const backgroundEvents = events.filter(event => !involvesProtagonist(event)
+    // A customer's pre-existing purse is not news at all.
+    && !(event.kind === 'acquire' && events.some(later => later.sourceLotId === event.eventId && later.toOwnerId === protagonistId)));
+  return { panel: renderLedgerLines(panelEvents), background: renderLedgerLines(backgroundEvents) };
+}
+
+/**
  * Cast the chapter can reasonably touch: whoever the beats name, whoever shares the
  * protagonist's location, and whoever was on stage most recently. Capped so a cast of
  * eighty at chapter 400 does not quietly become the whole prompt.
@@ -272,7 +291,10 @@ export function buildWriterBrief(input: {
     soGiaoDichMoDau: chapterNumber <= 4
       ? premise.worldKernel.openingLedger.filter(entry => entry.chapterNumber <= chapterNumber)
       : [],
-    bangSoLieu: renderLedgerLines(sheet.ledger ?? []),
+    ...(() => {
+      const lines = splitLedgerLines(sheet.ledger ?? [], premise.castSeed.find(member => member.role === 'protagonist')?.id);
+      return { bangSoLieu: lines.panel, soLieuNgoaiQuay: lines.background };
+    })(),
     nhanVatLienQuan: castIds.map(id => ({
       ten: nameOf(bible, id),
       hoSo: bible.castSheet.find(entry => entry.id === id)?.sheet ?? '',
@@ -326,7 +348,10 @@ export function buildJudgeBrief(input: {
     } : null,
     vongKhachHangChuKy: cycle.customerLoop,
     mocVongKhachHangChuongNay: customerLoopMilestone(cycle, chapterNumber),
-    bangSoLieu: renderLedgerLines(sheet?.ledger ?? []),
+    ...(() => {
+      const lines = splitLedgerLines(sheet?.ledger ?? [], premise.castSeed.find(member => member.role === 'protagonist')?.id);
+      return { bangSoLieu: lines.panel, soLieuNgoaiQuay: lines.background };
+    })(),
     narrativeFoundation: premise.narrativeFoundation ?? null,
     narrativeEvidence: bible.symbolicCore.narrativeEvidence,
     durableNarrativeState: {

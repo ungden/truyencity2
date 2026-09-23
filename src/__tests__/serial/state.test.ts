@@ -361,7 +361,7 @@ describe('writer prompt encodes the measured Faloo rules', () => {
     expect(JUDGE_SYSTEM_PROMPT).toMatch(/chỉ báo lỗi có bằng chứng nguyên văn/);
     expect(JUDGE_SYSTEM_PROMPT).toMatch(/golden_finger_scope/);
     expect(JUDGE_SYSTEM_PROMPT).toMatch(/transaction_contradiction/);
-    expect(JUDGE_SYSTEM_PROMPT).toMatch(/bangSoLieu là con số đúng của chương/);
+    expect(JUDGE_SYSTEM_PROMPT).toMatch(/bangSoLieu và soLieuNgoaiQuay là con số đúng của chương/);
     expect(JUDGE_SYSTEM_PROMPT).toMatch(/không bao giờ vứt chương/);
     expect(JUDGE_SYSTEM_PROMPT).toMatch(/không bao giờ chặn chương/);
   });

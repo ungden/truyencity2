@@ -7,7 +7,7 @@ import {
   type SerialDraftCheckpoint,
 } from '@/services/serial/engine';
 import { normalizeChapterDraft, reviewBindingMismatch } from '@/services/serial/agents';
-import { assetLedgerSlice, buildCyclePlannerBrief, buildExtractorBrief, buildJudgeBrief, buildWriterBrief, collectSteering, refreshStyleMemory, relevantCast } from '@/services/serial/context';
+import { assetLedgerSlice, splitLedgerLines, buildCyclePlannerBrief, buildExtractorBrief, buildJudgeBrief, buildWriterBrief, collectSteering, refreshStyleMemory, relevantCast } from '@/services/serial/context';
 import { seedBible } from '@/services/serial/state';
 import { premise, baseBible, cycle } from './fixtures';
 import {
@@ -649,6 +649,23 @@ describe('code-owned ledger and reader-facing gates', () => {
       '2. Giao dịch: Lâm Việt → Bảy Thạch: 1 lá Hộ Thân Phù',
     ]);
     expect(WRITER_SYSTEM_PROMPT).toMatch(/bangSoLieu/);
+  });
+
+  test("a customer's own purse never shows up as a shop notice", () => {
+    const purse = {
+      eventId: 'c8_tui_bay_thach', kind: 'acquire' as const, assetId: 'tinh_hach_nhat_giai', assetName: 'Tinh hạch Nhất giai',
+      quantity: 3, unit: 'viên', fungible: true, sourceLotId: null, fromOwnerId: null, fromOwnerName: null,
+      toOwnerId: 'bay_thach', toOwnerName: 'Bảy Thạch', note: 'Tinh hạch Bảy Thạch mang theo.',
+    };
+    const pay = {
+      ...purse, eventId: 'c8_tra_tien', kind: 'transfer' as const, sourceLotId: 'c8_tui_bay_thach',
+      fromOwnerId: 'bay_thach', fromOwnerName: 'Bảy Thạch', toOwnerId: 'lam_viet', toOwnerName: 'Lâm Việt', note: 'Trả tiền phù.',
+    };
+    const gift = { ...pay, eventId: 'c8_tang', toOwnerId: 'to_van', toOwnerName: 'Tô Vãn', quantity: 1 };
+    const lines = splitLedgerLines([...ledger, purse, pay, gift], 'lam_viet');
+    expect(lines.panel.join('\n')).not.toMatch(/Bảy Thạch nhận/);
+    expect(lines.panel.join('\n')).toMatch(/Bảy Thạch → Lâm Việt: 3 viên/);
+    expect(lines.background).toEqual(['1. Giao dịch: Bảy Thạch → Tô Vãn: 1 viên Tinh hạch Nhất giai']);
   });
 
   test('the committed ledger is the plan, whatever the extractor thought changed hands', async () => {
