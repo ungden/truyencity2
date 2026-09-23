@@ -14,6 +14,7 @@ import {
   CYCLE_PLANNER_SYSTEM_PROMPT, EXTRACTOR_SYSTEM_PROMPT, JUDGE_SYSTEM_PROMPT,
   OPENING_AUDITOR_SYSTEM_PROMPT, promptsFor, WRITER_SYSTEM_PROMPT,
 } from '@/services/serial/prompts';
+import { archetypeIds } from '@/services/serial/playbook';
 
 const usage = (model: string, costUsd = 0.02): ProviderUsage => ({
   model, inputTokens: 1_000, outputTokens: 1_000, costUsd, finishReason: 'STOP',
@@ -579,6 +580,22 @@ describe('context selection', () => {
     expect(brief.loaiSuongHopLe).toContain('tri_thang');
     expect(brief.loaiSuongHopLe).toContain('chan_dong');
     expect(brief.loaiSuongHopLe).not.toContain('deal');
+  });
+
+  test('the planner is shown the opening contract of the chapters it plans, and must deliver it', () => {
+    const window = buildCyclePlannerBrief({
+      premise, bible: baseBible(), previousCycle: null, activeCycle: cycle({ cycleNumber: 1, startChapter: 1, plannedEndChapter: 5 }),
+      cycleNumber: 1, volumeNumber: 1, startChapter: 4, fixedEndChapter: 5, steering: [],
+    });
+    expect(window.hopDongTrongCuaSo.map(row => row.chapterNumber)).toEqual([4]);
+    const later = buildCyclePlannerBrief({
+      premise, bible: baseBible(), previousCycle: null,
+      cycleNumber: 2, volumeNumber: 1, startChapter: 8, steering: [],
+    });
+    expect(later.hopDongTrongCuaSo).toEqual([]);
+    for (const archetype of archetypeIds()) {
+      expect(promptsFor(archetype).planner).toMatch(/materialOutcome chính là visibleResult/);
+    }
   });
 
   test('chapter roles receive only the relevant active and recently consumed asset lots', () => {

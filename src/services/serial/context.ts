@@ -497,6 +497,12 @@ export function buildCyclePlannerBrief(input: {
     quyenSo: input.volumeNumber,
     chuongBatDau: input.startChapter,
     chuongKetThucCoDinh: input.fixedEndChapter ?? null,
+    // The premise's promise for the chapters being planned, surfaced rather than left
+    // inside worldKernel: a planner that could not see it turned "the clan takes the
+    // field back" into "the field is sealed pending a ruling".
+    hopDongTrongCuaSo: premise.worldKernel.openingContract.filter(row =>
+      row.chapterNumber >= input.startChapter
+      && row.chapterNumber <= (input.fixedEndChapter ?? input.startChapter + 2)),
     phamViRolling: input.activeCycle ? {
       startChapter: input.startChapter,
       endChapter: input.fixedEndChapter ?? input.startChapter + 2,
