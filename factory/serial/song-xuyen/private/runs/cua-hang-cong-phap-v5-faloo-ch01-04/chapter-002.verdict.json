@@ -1,0 +1,182 @@
+{
+  "verdict": {
+    "continuity": [],
+    "scorecard": {
+      "opening": 4,
+      "anticipation": 4,
+      "payoff": 4,
+      "newness": 5,
+      "endHook": 3
+    },
+    "craft": {
+      "protagonistAgency": 4,
+      "sceneLife": 4,
+      "worldLogic": 4,
+      "dialogueNaturalness": 4,
+      "structuralFreshness": 3
+    },
+    "repetition": [
+      {
+        "quote": "“Ba bản.”\n\n“Đội Tro Tàn trả trước toàn bộ.”",
+        "repeatsChapter": 1,
+        "note": "Tiếp tục đúng nhịp chương 1: một thương phẩm được chứng minh công khai, đám đông/chức năng tổ chức lập tức mua hoặc ưu tiên đặt hàng. Hiệu quả thương mại tốt nhưng cách trả thưởng đã quen."
+      }
+    ],
+    "aiFlavor": [
+      {
+        "quote": "“Thật là Luyện Khí tầng một?”\n\n“Không có dị năng cũng luyện được?”\n\n“Chủ quầy, lô sau bao giờ tới?”",
+        "kind": "crowd_chorus"
+      },
+      {
+        "quote": "【Giao dịch: Lâm Việt → Chu Dã: 1 bản Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm. Bán giao ngay theo giá bốn tinh hạch Nhất giai.】",
+        "kind": "report_prose"
+      },
+      {
+        "quote": "“Không dị năng.\n\nChỉ có thể khuân đồ, vá tường, chia phần ít nhất.”",
+        "kind": "parallel_triple"
+      }
+    ],
+    "steering": [
+      "Mở chương kế bằng việc Thành Vệ Đông Hà thực hiện lời hẹn còn thiếu: Tô Vãn mang danh sách người thức tỉnh đến quầy, còn Hứa An mang đủ đối giá để giành suất đầu của lô Tịnh Mạch Đan mới cho đồng đội.",
+      "Đặt Hứa An tại Trạm Thành Vệ với thẻ nhiệm vụ và bốn tinh hạch Lôi hệ; để người từng coi hắn là ca thức tỉnh thất bại kiểm tra chiến lợi phẩm, gọi đúng “Nhất giai sơ kỳ Lôi hệ”, rồi đổi thái độ bằng một lời mời hoặc điều kiện nhiệm vụ có giá trị.",
+      "Cho Lâm Việt dùng sổ đơn ba bản để chốt một hành động nguồn hàng cụ thể ở Thanh Huyền Giới: mua hoặc chép hợp lệ đủ ba bản, qua đó biến tiền trả trước thành hàng giao được thay vì chỉ để đơn treo.",
+      "Để Cao Nguyên đưa ra một phương án thu mua hay điều kiện đội săn có lợi cho hắn ngay ngoài quầy; Lâm Việt đáp bằng chính sách giá hoặc đổi tài nguyên khiến khách tự chọn cửa hàng, không biến xung đột thành cướp quầy."
+    ],
+    "reviewBinding": {
+      "chapterNumber": 2,
+      "title": "“Bốn Tinh Hạch, Ai Dám Mua?”",
+      "excerpt": "Chu Dã cắn răng, đổ tinh hạch lên quầy.\n\n“Bốn tinh hạch.”\n\n“Ta mua.”"
+    }
+  },
+  "digest": {
+    "chapterNumber": 2,
+    "title": "“Bốn Tinh Hạch, Ai Dám Mua?”",
+    "summary": "Chu Dã dùng bốn tinh hạch mua Man Ngưu Luyện Thể Quyết và đột phá Luyện Khí tầng một, khiến Đội Tro Tàn đặt trước ba bản còn Hứa An thu được bốn tinh hạch Lôi hệ.",
+    "payoffKind": "dot_pha",
+    "endedOn": "Cao Nguyên phải mang tinh hạch tới quầy nếu muốn mua hàng sau.",
+    "newNamedThings": [
+      "man_nguu_luyen_the_quyet_nhat_giai_trung_pham",
+      "doi_tro_tan",
+      "la_phong",
+      "lo_tinh_hach_loi_he"
+    ],
+    "narrativeEvidence": [],
+    "coreChanges": {
+      "storyDayDelta": 0,
+      "died": [],
+      "progressionChanges": [],
+      "assetEvents": [
+        {
+          "eventId": "c2_acq_man_nguu_ban_giao_ngay",
+          "kind": "acquire",
+          "assetId": "man_nguu_luyen_the_quyet",
+          "assetName": "Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm",
+          "quantity": 1,
+          "unit": "bản",
+          "fungible": false,
+          "sourceLotId": null,
+          "fromOwnerId": "quay_bi_tich_pho_thong",
+          "fromOwnerName": "Quầy bí tịch phổ thông Thanh Lô Phường",
+          "toOwnerId": "lam_viet",
+          "toOwnerName": "Lâm Việt",
+          "note": "Bản chép được phép bán, mua bằng một linh thạch hạ phẩm."
+        },
+        {
+          "eventId": "c2_transfer_man_nguu_chu_da",
+          "kind": "transfer",
+          "assetId": "man_nguu_luyen_the_quyet",
+          "assetName": "Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm",
+          "quantity": 1,
+          "unit": "bản",
+          "fungible": false,
+          "sourceLotId": "c2_acq_man_nguu_ban_giao_ngay",
+          "fromOwnerId": "lam_viet",
+          "fromOwnerName": "Lâm Việt",
+          "toOwnerId": "chu_da",
+          "toOwnerName": "Chu Dã",
+          "note": "Bán giao ngay theo giá bốn tinh hạch Nhất giai."
+        },
+        {
+          "eventId": "c2_acq_tinh_hach_chu_da",
+          "kind": "acquire",
+          "assetId": "tinh_hach_nhat_giai_hon_hop",
+          "assetName": "Tinh hạch Nhất giai hỗn hợp",
+          "quantity": 4,
+          "unit": "viên",
+          "fungible": true,
+          "sourceLotId": null,
+          "fromOwnerId": "chu_da",
+          "fromOwnerName": "Chu Dã",
+          "toOwnerId": "lam_viet",
+          "toOwnerName": "Lâm Việt",
+          "note": "Khoản thanh toán đủ của Chu Dã."
+        },
+        {
+          "eventId": "c2_acq_tinh_hach_dat_truoc_tro_tan",
+          "kind": "acquire",
+          "assetId": "tinh_hach_nhat_giai_hon_hop",
+          "assetName": "Tinh hạch Nhất giai hỗn hợp",
+          "quantity": 12,
+          "unit": "viên",
+          "fungible": true,
+          "sourceLotId": null,
+          "fromOwnerId": "doi_tro_tan",
+          "fromOwnerName": "Đội Tro Tàn",
+          "toOwnerId": "lam_viet",
+          "toOwnerName": "Lâm Việt",
+          "note": "Đội Tro Tàn trả trước toàn bộ đơn ba bản, bốn tinh hạch mỗi bản."
+        },
+        {
+          "eventId": "c2_acq_tinh_hach_loi_hua_an_chien_loi_pham",
+          "kind": "acquire",
+          "assetId": "tinh_hach_loi_nhat_giai",
+          "assetName": "Tinh hạch Lôi hệ Nhất giai",
+          "quantity": 4,
+          "unit": "viên",
+          "fungible": true,
+          "sourceLotId": null,
+          "fromOwnerId": "muc_tieu_tien_hoa_ngoai_pho",
+          "fromOwnerName": "Chiến lợi phẩm nhiệm vụ trinh sát của Hứa An",
+          "toOwnerId": "hua_an",
+          "toOwnerName": "Hứa An",
+          "note": "Hứa An tự giữ bốn viên làm chiến lợi phẩm sau khi dùng Lôi Quang hoàn thành nhiệm vụ."
+        }
+      ],
+      "goldenFingerRungChange": null,
+      "moved": [],
+      "worldFactsRevealed": [
+        {
+          "id": "thanh_huyen_gioi",
+          "note": "Lâm Việt vừa từ kho nhỏ ở Thanh Huyền Giới bước sang quầy hàng."
+        }
+      ],
+      "newCast": [
+        {
+          "id": "la_phong",
+          "name": "La Phong",
+          "sheet": "Đội trưởng Đội Tro Tàn, dẫn đội đặt trước ba bản Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm.",
+          "role": "Đội trưởng Đội Tro Tàn",
+          "locationId": "pho_dong_ha",
+          "startingProgressions": []
+        }
+      ],
+      "hooksPlanted": [
+        {
+          "id": "doi_tro_tan_doi_tiep",
+          "what": "Đội Tro Tàn sẽ tiếp tục săn, mang tinh hạch về đổi thêm Man Ngưu Luyện Thể Quyết.",
+          "dueByChapter": 3
+        },
+        {
+          "id": "chu_da_mua_lo_sau",
+          "what": "Chu Dã sẽ mua thêm Man Ngưu Luyện Thể Quyết ở lô sau.",
+          "dueByChapter": 3
+        }
+      ],
+      "hooksPaid": [],
+      "learnedFinger": []
+    }
+  },
+  "attempts": 2,
+  "costUsd": 0.106093,
+  "inputFingerprint": "1a86b58c0c6d0d3ad3026c8741ac2c59401a700627d974dfa81cb0604e271b6c"
+}

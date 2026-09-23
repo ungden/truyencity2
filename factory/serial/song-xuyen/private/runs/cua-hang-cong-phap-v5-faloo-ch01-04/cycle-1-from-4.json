@@ -1,0 +1,205 @@
+{
+  "schemaVersion": 1,
+  "cycleNumber": 1,
+  "volumeNumber": 1,
+  "startChapter": 1,
+  "plannedEndChapter": 5,
+  "pressure": "Lâm Việt phải chứng minh Song Giới Thương Điếm bán được hàng tu tiên thật, biến tài nguyên mạt thế thành vốn Thanh Huyền và giữ được nhịp giao hàng trước khi đầu nậu Cao Nguyên dùng quyền chia bãi săn bóp chết nguồn khách. Mục tiêu của hắn là để Hứa An trở thành biển hiệu sống, hoàn tất đơn Đội Tro Tàn và kéo Thành Vệ vào đơn tổ chức đầu tiên.",
+  "escalation": [
+    "Hứa An dùng Tịnh Mạch Đan Nhất giai hạ phẩm ngay trước quầy, thức tỉnh Lôi Quang và trả đủ tinh hạch, khiến lô đầu tiên bị Thành Vệ mua sạch.",
+    "Chu Dã mua Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm, chứng minh người không dị năng vẫn có đường tu luyện; Đội Tro Tàn trả trước đơn ba bản rồi mang công pháp vào chuyến săn.",
+    "Hứa An dùng Lôi Quang giành chiến lợi phẩm trong nhiệm vụ trinh sát, công khai mang tinh hạch Lôi hệ về quầy; cùng lúc Lâm Việt bán thịt và tinh hạch Hỏa của Đội Tro Tàn tại Thanh Lô Phường, đổi được linh thạch để nhập hàng.",
+    "Đơn ba bí tịch của Đội Tro Tàn được giao đúng hẹn, còn Tô Vãn ký đơn sáu viên Tịnh Mạch Đan cho Thành Vệ, buộc Cao Nguyên thấy rõ khách và tinh hạch đang rời chợ của hắn.",
+    "Hứa An trở lại bằng tinh hạch tự kiếm được, mua Man Ngưu Luyện Thể Quyết như một con đường tăng trưởng thứ hai; trước người sống sót và người của Thành Vệ, cửa hàng từ nơi bán thuốc lạ thành nơi bán lộ trình mạnh lên có giá niêm yết."
+  ],
+  "climax": {
+    "payoffKind": "duoc_cong_nhan",
+    "performedBy": "ally",
+    "attribution": "public",
+    "result": "Hứa An công khai dùng bốn tinh hạch Lôi hệ Nhất giai do mình kiếm được để mua Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm. Việc một trinh sát Lôi hệ vẫn chủ động mua công pháp khiến mọi người hiểu quầy của Lâm Việt không chỉ cứu người thức tỉnh mà còn bán con đường mạnh lên lâu dài. Tô Vãn xác nhận Thành Vệ sẽ giữ đơn sáu viên Tịnh Mạch Đan và ưu tiên bàn đơn đội săn; Cao Nguyên mất quyền gọi giá duy nhất đối với người muốn đổi tinh hạch lấy tương lai.",
+    "witnesses": [
+      "Hứa An",
+      "Tô Vãn",
+      "Chu Dã",
+      "Ba thành viên Đội Tro Tàn",
+      "Người sống sót Phố Thương Điếm Đông Hà",
+      "Người của chợ Tinh Hạch do Cao Nguyên cử tới"
+    ]
+  },
+  "aftermath": "Lâm Việt có vốn linh thạch từ Thanh Huyền, đơn bí tịch đã thanh toán được giao đúng hẹn và một đơn tổ chức Tịnh Mạch Đan đã khóa giá. Hứa An có vị trí trinh sát cùng một công pháp mới; Chu Dã có nhóm người chờ nhìn kết quả luyện thể. Cao Nguyên không thể động vào quầy, nhưng bắt đầu dùng lợi ích ngoài phố: tăng phí bãi săn và lôi kéo đội săn đừng bán tài nguyên cho cửa hàng.",
+  "nextHook": "Cao Nguyên tung lời mời độc quyền cho các đội săn trước ngày Thành Vệ nhận hàng. Để giao được đơn sáu viên mà không lệ thuộc chợ tinh hạch, Lâm Việt phải quyết định dùng linh thạch vừa kiếm để nhập Tịnh Mạch Đan, hay đầu tư vào lò và tư cách Luyện Đan Sư của chính mình.",
+  "customerLoop": {
+    "customerId": "hua_an",
+    "entryNeed": "Hứa An đang bị năng lượng Lôi hệ thức tỉnh xung kích, cần ổn định kinh mạch để không bị loại khỏi tuyến trinh sát.",
+    "purchaseAssetId": "tinh_mach_dan",
+    "purchaseMode": "first_acquisition",
+    "purchaseTerms": {
+      "quantity": 1,
+      "unit": "viên",
+      "consideration": "Ba tinh hạch Lôi hệ Nhất giai, thanh toán đủ ngay tại quầy."
+    },
+    "purchase": "Hứa An mua và dùng Tịnh Mạch Đan Nhất giai hạ phẩm tại chương 1.",
+    "useToEarn": "Sau khi thức tỉnh Lôi Quang, Hứa An tham gia nhiệm vụ trinh sát, tự hạ mục tiêu tiến hóa và giữ lại bốn tinh hạch Lôi hệ Nhất giai làm chiến lợi phẩm tại chương 2.",
+    "publicProof": "Hứa An trình tinh hạch chiến lợi phẩm và kết quả nhiệm vụ tại Trạm Thành Vệ ở chương 3; người từng coi hắn là ca thức tỉnh thất bại phải gọi hắn là Nhất giai sơ kỳ Lôi hệ.",
+    "returnUpgradeAssetId": "man_nguu_luyen_the_quyet",
+    "returnUpgradeMode": "new_capability",
+    "returnUpgradeTerms": {
+      "quantity": 1,
+      "unit": "bản",
+      "consideration": "Bốn tinh hạch Lôi hệ Nhất giai do Hứa An tự kiếm được."
+    },
+    "returnUpgrade": "Hứa An quay lại mua Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm ở chương 5, mở thêm con đường luyện thể thay vì chỉ lệ thuộc vào dị năng Lôi hệ.",
+    "schedule": {
+      "purchaseChapter": 1,
+      "useToEarnChapter": 2,
+      "publicProofChapter": 3,
+      "returnUpgradeChapter": 5
+    }
+  },
+  "beatSheets": [
+    {
+      "chapterNumber": 4,
+      "sceneMode": "organization",
+      "openingBridge": "Lời đe dọa của Cao Nguyên được thực hiện từ sáng: hắn đứng ngoài phố đưa giá thu mua kèm điều kiện độc quyền cho các đội săn. Đúng lúc ấy, La Phong dẫn Đội Tro Tàn tới cửa hàng để nhận ba bản bí tịch đã trả đủ tiền.",
+      "protagonistMove": "Lâm Việt giao đủ đơn trước, yêu cầu La Phong tự kiểm dấu quầy rồi dùng sổ tín dụng tách bạch khoản thu mua chiến lợi phẩm với khoản tiền đã trả trước; sau đó hắn chỉ cho La Phong quyền tự so giá giữa quầy và lời mời của Cao Nguyên.",
+      "beats": [
+        "La Phong kiểm ba dấu quầy Thanh Lô Phường, tự tay chia Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm cho ba thành viên đã góp tiền; lời hẹn giao hàng được trả ngay trước mặt các đội săn đang do dự.",
+        "Cao Nguyên đưa điều kiện chỉ được bán hàng cho chợ Tinh Hạch để đổi lấy giá thu mua cao trước mắt. La Phong đối chiếu với mười một tín dụng quầy đã ghi riêng và giá trị lô thịt, tinh hạch Hỏa đã được Lâm Việt bán ở Thanh Huyền, rồi tuyên bố Đội Tro Tàn không ký độc quyền.",
+        "Tô Vãn mang danh sách người thức tỉnh tới quầy, ký đơn sáu viên Tịnh Mạch Đan Nhất giai hạ phẩm cho Thành Vệ, trả trước sáu tinh hạch; suất giữ chỗ không cọc của Hứa An được nhập vào viên đầu tiên của đơn.",
+        "Chu Dã xuất hiện cùng đối giá tự kiếm được và xin giữ vị trí người mua đầu của lô Man Ngưu kế tiếp cho một người trong nhóm không dị năng; Lâm Việt ghi rõ đây là yêu cầu chờ nguồn hàng, không nhận tiền cho món chưa có trên kệ."
+      ],
+      "materialOutcome": "Ba bản bí tịch đã đến tay Đội Tro Tàn đúng hạn; Thành Vệ có đơn sáu viên Tịnh Mạch Đan đã khóa giá và trả trước sáu tinh hạch; Đội Tro Tàn công khai từ chối độc quyền của Cao Nguyên.",
+      "emotionalTarget": "Sướng vì chữ tín hóa thành phe: khách đã trả tiền nhận hàng thật, rồi tự dùng lợi ích nhìn thấy để đứng về phía quầy thay vì bị đầu nậu mua chuộc.",
+      "newNamedThing": "Sổ tín dụng thợ săn",
+      "prerequisiteIds": [
+        "c3_acq_ba_ban_man_nguu",
+        "cao_nguyen_chan_nguon_hang"
+      ],
+      "revealsFactIds": [],
+      "advancesMilestoneIds": [],
+      "valueContrastId": "so_tin_dung_minh_bach",
+      "valueExperience": "La Phong nhìn khoản tín dụng của đội được ghi tách khỏi tiền mua bí tịch, hiểu rằng sáu cân thịt và năm tinh hạch họ từng chỉ xem là chiến lợi phẩm cồng kềnh đã thật sự đổi thành hàng, linh thạch và quyền chọn của chính họ.",
+      "ledger": [
+        {
+          "eventId": "c4_transfer_ba_ban_man_nguu_tro_tan",
+          "kind": "transfer",
+          "assetId": "man_nguu_luyen_the_quyet",
+          "assetName": "Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm",
+          "quantity": 3,
+          "unit": "bản",
+          "fungible": false,
+          "sourceLotId": "c3_acq_ba_ban_man_nguu",
+          "fromOwnerId": "lam_viet",
+          "fromOwnerName": "Lâm Việt",
+          "toOwnerId": "doi_tro_tan",
+          "toOwnerName": "Ba thành viên Đội Tro Tàn có tên trên đơn",
+          "note": "Hoàn tất đơn đã trả trước ở chương 2 bằng đúng mười hai tinh hạch Nhất giai; không thu thêm và không đổi người nhận."
+        },
+        {
+          "eventId": "c4_acq_tinh_hach_dat_coc_thanh_ve",
+          "kind": "acquire",
+          "assetId": "tinh_hach_nhat_giai_hon_hop",
+          "assetName": "Tinh hạch Nhất giai hỗn hợp",
+          "quantity": 6,
+          "unit": "viên",
+          "fungible": true,
+          "sourceLotId": null,
+          "fromOwnerId": "to_van",
+          "fromOwnerName": "Tô Vãn đại diện Thành Vệ Đông Hà",
+          "toOwnerId": "lam_viet",
+          "toOwnerName": "Lâm Việt",
+          "note": "Tiền trả trước cho đơn sáu viên Tịnh Mạch Đan Nhất giai hạ phẩm, giá ba tinh hạch mỗi viên; còn mười hai tinh hạch thanh toán khi giao."
+        }
+      ],
+      "endHookKind": "opportunity"
+    },
+    {
+      "chapterNumber": 5,
+      "sceneMode": "public_showcase",
+      "openingBridge": "Ngay sau khi Đội Tro Tàn công khai chọn giao dịch minh bạch, Hứa An bước vào quầy với thẻ trinh sát và bốn tinh hạch Lôi hệ Nhất giai được xác nhận từ nhiệm vụ; người của Cao Nguyên đứng ngoài cửa chờ xem hắn sẽ bán chiến lợi phẩm cho ai.",
+      "protagonistMove": "Lâm Việt không để Hứa An bán tinh hạch vào tay đầu nậu: hắn dùng một linh thạch hạ phẩm nhập hợp lệ một bản Man Ngưu Luyện Thể Quyết, đặt ngay lên kệ và chốt giao dịch bằng đúng bốn tinh hạch Lôi hệ của Hứa An.",
+      "beats": [
+        "Hứa An đặt bốn tinh hạch Lôi hệ Nhất giai lên quầy, gọi đủ tên Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm và mua bản sách thay vì đổi chiến lợi phẩm lấy tiền mặt; Chu Dã tự tay mở trang đầu, xác nhận đây là con đường luyện thể khác với Lôi Quang.",
+        "Hứa An nói rõ trước Thành Vệ và các đội săn rằng Lôi hệ giúp hắn giữ mạng hôm nay, còn công pháp giúp hắn không phải chờ dị năng ban phát sức mạnh ngày mai. Người từng coi hắn là ca thức tỉnh thất bại chuyển sang hỏi giá, hỏi đợt sách kế tiếp và hỏi đội mình có thể đặt chung hay không.",
+        "Tô Vãn xác nhận Thành Vệ giữ đơn sáu viên Tịnh Mạch Đan, đồng thời yêu cầu được ưu tiên bàn đơn đội săn sau khi hàng được giao. Người của chợ Tinh Hạch chỉ có thể mang tin về rằng khách đang dùng tinh hạch để mua đường mạnh lên, không còn bán hết cho Cao Nguyên.",
+        "Lâm Việt niêm yết lại quầy: hàng có sẵn bán ngay, đơn tổ chức khóa giá theo đối giá trả trước; hắn để Cao Nguyên thấy rõ quầy không cần ai ban quyền định giá."
+      ],
+      "materialOutcome": "Hứa An sở hữu Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm; Lâm Việt nhận bốn tinh hạch Lôi hệ Nhất giai và Thành Vệ công khai giữ đơn sáu viên Tịnh Mạch Đan.",
+      "emotionalTarget": "Cú công nhận công khai: người đã được cứu dùng chính chiến lợi phẩm mình kiếm để mua tương lai lớn hơn, biến quầy thành lựa chọn không thể xem thường.",
+      "newNamedThing": "Ưu tiên đơn đội săn Thành Vệ",
+      "prerequisiteIds": [
+        "c2_acq_tinh_hach_loi_hua_an_chien_loi_pham",
+        "c4_transfer_ba_ban_man_nguu_tro_tan",
+        "c4_acq_tinh_hach_dat_coc_thanh_ve"
+      ],
+      "revealsFactIds": [],
+      "advancesMilestoneIds": [],
+      "valueContrastId": "loi_quang_va_luyen_the",
+      "valueExperience": "Hứa An cảm nhận bốn tinh hạch Lôi từng là bằng chứng mình sống sót rời khỏi tay, đổi thành cuốn sách có thể dẫn khí huyết đi qua từng thớ cơ; giá trị của chiến lợi phẩm không còn là một bữa ăn hay giá chợ, mà là một con đường tự chọn.",
+      "ledger": [
+        {
+          "eventId": "c5_transfer_linh_thach_nhap_man_nguu_hua_an",
+          "kind": "transfer",
+          "assetId": "linh_thach_ha_pham",
+          "assetName": "Linh thạch hạ phẩm",
+          "quantity": 1,
+          "unit": "viên",
+          "fungible": true,
+          "sourceLotId": "c3_acq_linh_thach_tu_han_duoc_su",
+          "fromOwnerId": "lam_viet",
+          "fromOwnerName": "Lâm Việt",
+          "toOwnerId": "quay_bi_tich_pho_thong",
+          "toOwnerName": "Quầy bí tịch phổ thông Thanh Lô Phường",
+          "note": "Lâm Việt mua một bản chép được phép bán để giao ngay cho Hứa An."
+        },
+        {
+          "eventId": "c5_acq_man_nguu_hua_an",
+          "kind": "acquire",
+          "assetId": "man_nguu_luyen_the_quyet",
+          "assetName": "Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm",
+          "quantity": 1,
+          "unit": "bản",
+          "fungible": false,
+          "sourceLotId": null,
+          "fromOwnerId": "quay_bi_tich_pho_thong",
+          "fromOwnerName": "Quầy bí tịch phổ thông Thanh Lô Phường",
+          "toOwnerId": "lam_viet",
+          "toOwnerName": "Lâm Việt",
+          "note": "Bản chép được phép bán, nhập để bán giao ngay cho Hứa An."
+        },
+        {
+          "eventId": "c5_transfer_man_nguu_hua_an",
+          "kind": "transfer",
+          "assetId": "man_nguu_luyen_the_quyet",
+          "assetName": "Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm",
+          "quantity": 1,
+          "unit": "bản",
+          "fungible": false,
+          "sourceLotId": "c5_acq_man_nguu_hua_an",
+          "fromOwnerId": "lam_viet",
+          "fromOwnerName": "Lâm Việt",
+          "toOwnerId": "hua_an",
+          "toOwnerName": "Hứa An",
+          "note": "Hứa An mua nâng cấp năng lực mới bằng bốn tinh hạch Lôi hệ Nhất giai tự kiếm."
+        },
+        {
+          "eventId": "c5_transfer_tinh_hach_loi_hua_an",
+          "kind": "transfer",
+          "assetId": "tinh_hach_loi_nhat_giai",
+          "assetName": "Tinh hạch Lôi hệ Nhất giai",
+          "quantity": 4,
+          "unit": "viên",
+          "fungible": true,
+          "sourceLotId": "c2_acq_tinh_hach_loi_hua_an_chien_loi_pham",
+          "fromOwnerId": "hua_an",
+          "fromOwnerName": "Hứa An",
+          "toOwnerId": "lam_viet",
+          "toOwnerName": "Lâm Việt",
+          "note": "Thanh toán đủ cho một bản Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm."
+        }
+      ],
+      "endHookKind": "threat"
+    }
+  ],
+  "editorialNotes": []
+}

@@ -78,11 +78,13 @@ const formatQuantity = (value: number): string =>
  * reader sees inside 【】 — the receipt is the reward.
  */
 export function renderLedgerLines(events: AssetEvent[]): string[] {
+  // The planner's note is bookkeeping ("paid in chapter 2", "credited to…"). It stays in
+  // the plan; the reader only ever sees who handed what to whom.
   return events.map(event => {
     const amount = `${formatQuantity(event.quantity)} ${event.unit} ${event.assetName}`;
-    if (event.kind === 'acquire') return `Nhập: ${event.toOwnerName} nhận ${amount}. ${event.note}`;
-    if (event.kind === 'transfer') return `Giao dịch: ${event.fromOwnerName ?? event.fromOwnerId} → ${event.toOwnerName}: ${amount}. ${event.note}`;
-    return `Tiêu hao: ${event.fromOwnerName ?? event.fromOwnerId} dùng ${amount}. ${event.note}`;
+    if (event.kind === 'acquire') return `Nhập kho: ${event.toOwnerName} nhận ${amount}`;
+    if (event.kind === 'transfer') return `Giao dịch: ${event.fromOwnerName ?? event.fromOwnerId} → ${event.toOwnerName}: ${amount}`;
+    return `Tiêu hao: ${event.fromOwnerName ?? event.fromOwnerId} dùng ${amount}`;
   });
 }
 

@@ -1,0 +1,144 @@
+{
+  "verdict": {
+    "continuity": [],
+    "scorecard": {
+      "opening": 4,
+      "anticipation": 4,
+      "payoff": 4,
+      "newness": 4,
+      "endHook": 4
+    },
+    "craft": {
+      "protagonistAgency": 3,
+      "sceneLife": 4,
+      "worldLogic": 4,
+      "dialogueNaturalness": 3,
+      "structuralFreshness": 3
+    },
+    "repetition": [
+      {
+        "quote": "【Chu Dã đã dựa vào Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm dẫn khí nhập thể, bước vào Luyện Khí tầng một.】",
+        "repeatsChapter": 2,
+        "note": "Chu Dã đã đột phá Luyện Khí tầng một ngay khi mua bí tịch ở chương 2. Lần này có thêm chức năng chứng minh công khai, nhưng vẫn lặp nhịp “Chu Dã biểu diễn cảnh giới → người ngoài gọi đúng cấp → hỏi lô sau”."
+      }
+    ],
+    "aiFlavor": [
+      {
+        "quote": "“Cho ta biết thứ gì là tiền trả trước.”\n\n“Thứ gì là chiến lợi phẩm.”\n\n“Và thứ gì vẫn thuộc về Đội Tro Tàn.”",
+        "kind": "parallel_triple"
+      },
+      {
+        "quote": "【Hứa An đã ổn định Lôi Quang, tiến vào Nhất giai trung kỳ. Lôi lực vận hành ổn định, đủ tư cách tiếp tục nhiệm vụ trinh sát.】",
+        "kind": "report_prose"
+      },
+      {
+        "quote": "“Ta bán hàng thật.”",
+        "kind": "theme_spoken"
+      },
+      {
+        "quote": "“Luyện Khí tầng một?”\n\n“Không có dị năng mà thật sự thành được Luyện Khí tầng một?”",
+        "kind": "crowd_chorus"
+      }
+    ],
+    "steering": [
+      "Ưu tiên trả lời lời hẹn còn nợ của Chu Dã: đặt anh cùng người không dị năng được anh bảo lãnh vào một cảnh săn hoặc đổi hàng, để họ tự kiếm đủ đối giá cho bản Man Ngưu lô mới thay vì chỉ xin giữ chỗ.",
+      "Cho Lâm Việt trở lại Thanh Lô Phường với đơn sáu viên Tịnh Mạch Đan của Thành Vệ làm áp lực vật chất; hắn phải tự chọn nguồn dược liệu, giá thuê lò hoặc người hợp tác để chứng minh con đường thi Nhất giai Luyện Đan Sư.",
+      "Để Hứa An thực hiện giá trị riêng của mình bằng bốn tinh hạch Lôi hệ đã tự kiếm: anh cần quyết định giữ chúng cho đồng đội hay đổi lấy Man Ngưu Luyện Thể Quyết theo mốc quay lại đã hẹn ở chương 5.",
+      "Khi lô Man Ngưu mới về, hãy cho người được Chu Dã bảo lãnh trực tiếp chạm, đọc và thử dẫn khí trước quầy; payoff là người đó gọi đúng phẩm cấp, trả giá bằng tài nguyên tự kiếm, còn các đội săn tranh suất bằng đơn hàng cụ thể.",
+      "Cho Cao Nguyên đổi sang một lợi ích thương mại sắc hơn như săn độc quyền nguồn hàng hoặc lôi kéo đội săn bằng giá; phản đòn của Lâm Việt nên là điều khoản thu mua hay nguồn cung tốt hơn, không phải xung đột bảo vệ cửa hàng."
+    ],
+    "reviewBinding": {
+      "chapterNumber": 4,
+      "title": "“Lô Man Ngưu Kế Tiếp, Để Tôi Đứng Đầu!”",
+      "excerpt": "La Phong dẫn ba người bước thẳng vào trong.\n\n“Lâm Việt.”\n\n“Đơn của Đội Tro Tàn, giao được chưa?”"
+    }
+  },
+  "digest": {
+    "chapterNumber": 4,
+    "title": "“Lô Man Ngưu Kế Tiếp, Để Tôi Đứng Đầu!”",
+    "summary": "Song Giới Thương Điếm hoàn tất đơn của Đội Tro Tàn, được Thành Vệ Đông Hà đặt đơn Tịnh Mạch Đan và chứng kiến Hứa An cùng Chu Dã xác lập hai con đường tu luyện khác nhau.",
+    "payoffKind": "duoc_cong_nhan",
+    "endedOn": "Chu Dã hỏi Lâm Việt có được đứng đầu lô Man Ngưu kế tiếp cho một người trong nhóm không có dị năng hay không.",
+    "newNamedThings": [
+      "Sổ tín dụng thợ săn",
+      "Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm",
+      "Tịnh Mạch Đan Nhất giai hạ phẩm"
+    ],
+    "narrativeEvidence": [],
+    "coreChanges": {
+      "storyDayDelta": 0,
+      "died": [],
+      "progressionChanges": [
+        {
+          "subjectId": "hua_an",
+          "systemId": "tien_hoa_mat_the",
+          "trackId": null,
+          "toRankId": "nhat_giai",
+          "toMinorStageId": "trung_ky",
+          "why": "Trạm Thành Vệ xác nhận Hứa An đã ổn định Lôi Quang và tiến vào Nhất giai trung kỳ."
+        },
+        {
+          "subjectId": "chu_da",
+          "systemId": "tu_tien",
+          "trackId": null,
+          "toRankId": "luyen_khi_1",
+          "toMinorStageId": null,
+          "why": "Chu Dã dựa vào Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm dẫn khí nhập thể và bước vào Luyện Khí tầng một."
+        }
+      ],
+      "assetEvents": [
+        {
+          "eventId": "c4_transfer_ba_ban_man_nguu_tro_tan",
+          "kind": "transfer",
+          "assetId": "man_nguu_luyen_the_quyet",
+          "assetName": "Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm",
+          "quantity": 3,
+          "unit": "bản",
+          "fungible": false,
+          "sourceLotId": "c3_acq_ba_ban_man_nguu",
+          "fromOwnerId": "lam_viet",
+          "fromOwnerName": "Lâm Việt",
+          "toOwnerId": "doi_tro_tan",
+          "toOwnerName": "Ba thành viên Đội Tro Tàn có tên trên đơn",
+          "note": "Hoàn tất đơn đã trả trước ở chương 2 bằng đúng mười hai tinh hạch Nhất giai; không thu thêm và không đổi người nhận."
+        },
+        {
+          "eventId": "c4_acq_tinh_hach_dat_coc_thanh_ve",
+          "kind": "acquire",
+          "assetId": "tinh_hach_nhat_giai_hon_hop",
+          "assetName": "Tinh hạch Nhất giai hỗn hợp",
+          "quantity": 6,
+          "unit": "viên",
+          "fungible": true,
+          "sourceLotId": null,
+          "fromOwnerId": "to_van",
+          "fromOwnerName": "Tô Vãn đại diện Thành Vệ Đông Hà",
+          "toOwnerId": "lam_viet",
+          "toOwnerName": "Lâm Việt",
+          "note": "Tiền trả trước cho đơn sáu viên Tịnh Mạch Đan Nhất giai hạ phẩm, giá ba tinh hạch mỗi viên; còn mười hai tinh hạch thanh toán khi giao."
+        }
+      ],
+      "goldenFingerRungChange": null,
+      "moved": [],
+      "worldFactsRevealed": [
+        {
+          "id": "thanh_ve_dong_ha",
+          "note": "Thành Vệ Đông Hà do Tô Vãn đại diện đã ký đơn tổ chức sáu viên Tịnh Mạch Đan Nhất giai hạ phẩm với Song Giới Thương Điếm."
+        }
+      ],
+      "newCast": [],
+      "hooksPlanted": [
+        {
+          "id": "lo_man_nguu_cho_nguoi_khong_di_nang",
+          "what": "Lô Man Ngưu kế tiếp có thể được ưu tiên cho một người trong nhóm không có dị năng theo đề nghị của Chu Dã.",
+          "dueByChapter": 5
+        }
+      ],
+      "hooksPaid": [],
+      "learnedFinger": []
+    }
+  },
+  "attempts": 1,
+  "costUsd": 0.071577,
+  "inputFingerprint": "bcd5f408439e73396d71de61794fb9c875c03c5ecde5fab89e11649f2d0ebc81"
+}

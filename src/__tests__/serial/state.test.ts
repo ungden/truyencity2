@@ -525,6 +525,15 @@ describe('sanitizing an extractor digest', () => {
     expect(next.symbolicCore.openHooks.map(hook => hook.id)).toContain('hook_moi');
   });
 
+  test('v3 evidence an extractor volunteers for a v2 story is dropped, not fatal', () => {
+    const volunteered = digest({
+      narrativeEvidence: [{ id: 'fact_cua_mo', chapterNumber: 8, quote: 'Cửa mở.', learnedByCharacterIds: [] }],
+    } as Partial<ChapterDigest>);
+    const { digest: clean, dropped } = sanitizeDigest({ premise, bible: baseBible(), digest: volunteered });
+    expect(clean.narrativeEvidence).toEqual([]);
+    expect(dropped.join(' ')).toMatch(/narrativeEvidence/);
+  });
+
   test('a valid digest passes through untouched', () => {
     const clean = digest();
     expect(sanitizeDigest({ premise, bible: baseBible(), digest: clean })).toEqual({ digest: clean, dropped: [] });

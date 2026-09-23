@@ -1,5 +1,5 @@
 import type { ProviderUsage, StoryModelProvider } from '@/services/story-factory/provider';
-import type { ChapterDigest, ChapterDraft, CyclePlan, JudgeVerdict, OpeningAudit, SceneMode } from '@/services/serial/contracts';
+import { metaLeakFindings, type ChapterDigest, type ChapterDraft, type CyclePlan, type JudgeVerdict, type OpeningAudit, type SceneMode } from '@/services/serial/contracts';
 import { DEFAULT_SERIAL_ROUTES } from '@/services/serial/routes';
 import {
   auditFourChapterOpening, cyclePull, cycleReadyToClose, foldVolume, LOW_PULL_THRESHOLD, lowPullStreak,
@@ -644,8 +644,8 @@ describe('code-owned ledger and reader-facing gates', () => {
   test('the writer copies numbers rendered by code from the planned ledger', () => {
     const writerBrief = buildWriterBrief({ premise, bible: baseBible(), cycle: ledgerCycle(), chapterNumber: 8, previousChapter: null });
     expect(writerBrief.bangSoLieu).toEqual([
-      'Nhập: Lâm Việt nhận 3 lá Hộ Thân Phù. Mua ở quầy phù Thanh Lô.',
-      'Giao dịch: Lâm Việt → Bảy Thạch: 1 lá Hộ Thân Phù. Bảy Thạch trả ba tinh hạch Nhất giai.',
+      'Nhập kho: Lâm Việt nhận 3 lá Hộ Thân Phù',
+      'Giao dịch: Lâm Việt → Bảy Thạch: 1 lá Hộ Thân Phù',
     ]);
     expect(WRITER_SYSTEM_PROMPT).toMatch(/bangSoLieu/);
   });
@@ -727,6 +727,20 @@ describe('code-owned ledger and reader-facing gates', () => {
       ['c8_nhap_phu', null],
       ['c8_ban_phu', 'c8_nhap_phu'],
     ]);
+  });
+
+  test('brief vocabulary in the prose is caught in code and sent to the one repair', async () => {
+    const leaked = draft({ content: `${'x'.repeat(900)}\n\nĐây là Sổ tín dụng thợ săn.\n\nMột thứ mới có tên.` });
+    const provider = stubProvider({
+      writer: [leaked, draft()],
+      judge: [cleanVerdict(), cleanVerdict()],
+      extractor: [goodDigest],
+    });
+    const result = await writeOneChapter(chapterInput(provider));
+    expect(result.status).toBe('committed');
+    expect(provider.calls).toEqual(['writer', 'judge', 'writer', 'judge', 'extractor']);
+    expect(metaLeakFindings('Hoàn tất đơn đã trả trước ở chương 2.')).toHaveLength(1);
+    expect(metaLeakFindings('Chương mới của đời hắn bắt đầu.')).toHaveLength(0);
   });
 
   test('two low-pull cycles in a row are a pattern; one is steering', () => {

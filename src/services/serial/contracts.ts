@@ -694,7 +694,22 @@ export const HARD_CONTINUITY_KINDS = [
   'dead_returns', 'progression_regressed', 'location_impossible', 'timeline',
   'knows_too_much', 'contradicts_bible', 'golden_finger_scope', 'progression_contradiction',
 ] as const;
-export const SOFT_CONTINUITY_KINDS = ['transaction_contradiction', 'resource_provenance'] as const;
+export const SOFT_CONTINUITY_KINDS = ['transaction_contradiction', 'resource_provenance', 'meta_leak'] as const;
+
+/**
+ * Words that only exist in the brief. A reader who meets "một thứ mới có tên" or "ở
+ * chương 2" inside the story has been shown the machinery; the pilot of 2026-09-23 did
+ * exactly that. Detected in code and repaired like any other slip.
+ */
+const META_LEAK = /thứ mới có tên|bangSoLieu|hinhDangChuong|openingBridge|protagonistMove|materialOutcome|beat ?sheet|(?:^|\s)(?:ở|từ|trong|tại) chương \d+/iu;
+
+export function metaLeakFindings(prose: string): Array<{ kind: 'meta_leak'; quote: string; explain: string }> {
+  return prose.split(/\r?\n/).filter(line => META_LEAK.test(line)).slice(0, 5).map(line => ({
+    kind: 'meta_leak' as const,
+    quote: line.trim().slice(0, 400),
+    explain: 'Câu này nhắc tới cách viết (luật, số chương, trường dữ liệu) thay vì chuyện trong truyện; viết lại thành diễn biến hoặc xoá.',
+  }));
+}
 
 export const JudgeVerdictSchema = z.object({
   continuity: z.array(z.object({

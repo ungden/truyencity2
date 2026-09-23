@@ -1,0 +1,245 @@
+{
+  "verdict": {
+    "continuity": [],
+    "scorecard": {
+      "opening": 4,
+      "anticipation": 4,
+      "payoff": 4,
+      "newness": 4,
+      "endHook": 4
+    },
+    "craft": {
+      "protagonistAgency": 4,
+      "sceneLife": 3,
+      "worldLogic": 5,
+      "dialogueNaturalness": 3,
+      "structuralFreshness": 3
+    },
+    "repetition": [
+      {
+        "quote": "【Giao dịch: Lâm Việt → Hàn Dược Sư: 6 cân Thịt Thiết Giáp Ngưu Nhất giai. Hàn Dược Sư mua trọn với giá bốn linh thạch hạ phẩm mỗi cân.】",
+        "repeatsChapter": 2,
+        "note": "Lại dùng khung giao dịch dạng sổ cái đã xuất hiện ở chương 2; hữu ích để chốt số liệu, nhưng nhiều khung liên tiếp làm nửa sau chương gần với biên bản giao dịch."
+      },
+      {
+        "quote": "Người trong trạm lập tức đổi sắc mặt.",
+        "repeatsChapter": 2,
+        "note": "Thủ pháp người xung quanh đổi thái độ ngay sau khi nhân vật được đo đúng cấp lặp nhịp đột phá và phản ứng công khai của chương trước."
+      }
+    ],
+    "aiFlavor": [
+      {
+        "quote": "【Nhập: Lâm Việt nhận 24 viên Linh thạch hạ phẩm. Tiền bán sáu cân Thịt Thiết Giáp Ngưu.】",
+        "kind": "report_prose"
+      },
+      {
+        "quote": "【Giao dịch: Lâm Việt → Hỏa Văn Lô: 5 viên Tinh hạch Hỏa hệ Nhất giai. Hỏa Văn Lô mua với giá bốn linh thạch hạ phẩm mỗi viên.】",
+        "kind": "report_prose"
+      },
+      {
+        "quote": "Người trong trạm lập tức đổi sắc mặt.",
+        "kind": "crowd_chorus"
+      },
+      {
+        "quote": "Mấy chủ tửu lâu gần đó nghe thấy chữ “Nhất giai” liền vây tới.",
+        "kind": "crowd_chorus"
+      }
+    ],
+    "steering": [
+      "Mở chương sau bằng việc Đội Tro Tàn tới quầy nhận đủ ba bản Man Ngưu Luyện Thể Quyết đã trả trước; cho La Phong kiểm dấu quầy, tự chia sách cho người đã liều mạng mang hàng về, để lời hẹn giao đúng hạn được trả bằng một cảnh trao hàng cụ thể.",
+      "Cho Chu Dã xuất hiện cùng đối giá tự kiếm được và mua bản Man Ngưu Luyện Thể Quyết đã hẹn từ chương 3; việc hắn chọn mua cho ai hoặc giữ cho mình phải tạo một quan hệ lợi ích mới tại quầy.",
+      "Đặt Cao Nguyên trước một đội săn đang cân nhắc bán hàng: hắn cần giữ độc quyền bằng mức thu mua và điều kiện riêng, còn Lâm Việt dùng sổ tín dụng minh bạch cùng giá trị đã bán ở Thanh Huyền để khiến đội săn chủ động so giá và chọn bên.",
+      "Sau khi nhận bí tịch, cho một thành viên Đội Tro Tàn thử công pháp hoặc dùng thành quả từ nó kiếm được chuyến hàng mới, rồi mang một đơn tài nguyên có phẩm cấp rõ ràng về quầy để vòng khách hàng thật sự tăng vốn.",
+      "Giữ xung đột của Cao Nguyên ở giá, nguồn hàng và sự trung thành của đội săn ngoài cửa hàng; payoff nên là một đội công khai đặt lô hàng kế tiếp thay vì va chạm bạo lực tại quầy."
+    ],
+    "reviewBinding": {
+      "chapterNumber": 3,
+      "title": "“Nhất giai sơ kỳ Lôi hệ, ai còn dám gọi hắn phế?”",
+      "excerpt": "Hàn Dược Sư cắn một miếng.\n\nÔng ta nhắm mắt.\n\nKhí huyết từ đầu lưỡi chạy thẳng xuống đầu ngón tay.\n\nThạch trụ đo khí huyết bên sạp bỗng sáng lên một nấc rõ ràng."
+    }
+  },
+  "digest": {
+    "chapterNumber": 3,
+    "title": "“Nhất giai sơ kỳ Lôi hệ, ai còn dám gọi hắn phế?”",
+    "summary": "Hứa An được xác nhận đạt Nhất giai sơ kỳ Lôi hệ và trở thành trinh sát chính thức, trong khi Lâm Việt hoàn tất đơn của Đội Tro Tàn nhưng bị Cao Nguyên đe dọa chặn nguồn hàng.",
+    "payoffKind": "duoc_cong_nhan",
+    "endedOn": "Cao Nguyên tuyên bố từ ngày mai sẽ khiến các đội săn không dám mang hàng tới quầy của Lâm Việt.",
+    "newNamedThings": [
+      "doi_tro_tan",
+      "doi_trinh_sat_chinh_thuc",
+      "thiet_giap_nguu",
+      "hoa_van_lo",
+      "man_nguu_luyen_the_quyet",
+      "quay_bi_tich_pho_thong"
+    ],
+    "narrativeEvidence": [],
+    "coreChanges": {
+      "storyDayDelta": 0,
+      "died": [],
+      "progressionChanges": [
+        {
+          "subjectId": "hua_an",
+          "systemId": "tien_hoa_mat_the",
+          "trackId": null,
+          "toRankId": "nhat_giai",
+          "toMinorStageId": "so_ky",
+          "why": "Thạch trụ kiểm định xác nhận Hứa An đạt Nhất giai sơ kỳ Lôi hệ, và thông báo trực tiếp ghi hắn đủ tư cách giữ vị trí trinh sát chính thức."
+        }
+      ],
+      "assetEvents": [
+        {
+          "eventId": "c3_acq_thit_thiet_giap_nguu",
+          "kind": "acquire",
+          "assetId": "thit_thiet_giap_nguu",
+          "assetName": "Thịt Thiết Giáp Ngưu Nhất giai",
+          "quantity": 6,
+          "unit": "cân",
+          "fungible": true,
+          "sourceLotId": null,
+          "fromOwnerId": "doi_tro_tan",
+          "fromOwnerName": "Đội Tro Tàn",
+          "toOwnerId": "lam_viet",
+          "toOwnerName": "Lâm Việt",
+          "note": "Cửa hàng thu mua riêng, ghi có một tín dụng mỗi cân cho Đội Tro Tàn."
+        },
+        {
+          "eventId": "c3_acq_tinh_hach_hoa",
+          "kind": "acquire",
+          "assetId": "tinh_hach_hoa_nhat_giai",
+          "assetName": "Tinh hạch Hỏa hệ Nhất giai",
+          "quantity": 5,
+          "unit": "viên",
+          "fungible": true,
+          "sourceLotId": null,
+          "fromOwnerId": "doi_tro_tan",
+          "fromOwnerName": "Đội Tro Tàn",
+          "toOwnerId": "lam_viet",
+          "toOwnerName": "Lâm Việt",
+          "note": "Cửa hàng thu mua riêng, ghi có một tín dụng mỗi viên cho Đội Tro Tàn."
+        },
+        {
+          "eventId": "c3_transfer_thit_han_duoc_su",
+          "kind": "transfer",
+          "assetId": "thit_thiet_giap_nguu",
+          "assetName": "Thịt Thiết Giáp Ngưu Nhất giai",
+          "quantity": 6,
+          "unit": "cân",
+          "fungible": true,
+          "sourceLotId": "c3_acq_thit_thiet_giap_nguu",
+          "fromOwnerId": "lam_viet",
+          "fromOwnerName": "Lâm Việt",
+          "toOwnerId": "han_duoc_su",
+          "toOwnerName": "Hàn Dược Sư",
+          "note": "Hàn Dược Sư mua trọn với giá bốn linh thạch hạ phẩm mỗi cân."
+        },
+        {
+          "eventId": "c3_acq_linh_thach_tu_han_duoc_su",
+          "kind": "acquire",
+          "assetId": "linh_thach_ha_pham",
+          "assetName": "Linh thạch hạ phẩm",
+          "quantity": 24,
+          "unit": "viên",
+          "fungible": true,
+          "sourceLotId": null,
+          "fromOwnerId": "han_duoc_su",
+          "fromOwnerName": "Hàn Dược Sư",
+          "toOwnerId": "lam_viet",
+          "toOwnerName": "Lâm Việt",
+          "note": "Tiền bán sáu cân Thịt Thiết Giáp Ngưu."
+        },
+        {
+          "eventId": "c3_transfer_tinh_hach_hoa_hoa_van_lo",
+          "kind": "transfer",
+          "assetId": "tinh_hach_hoa_nhat_giai",
+          "assetName": "Tinh hạch Hỏa hệ Nhất giai",
+          "quantity": 5,
+          "unit": "viên",
+          "fungible": true,
+          "sourceLotId": "c3_acq_tinh_hach_hoa",
+          "fromOwnerId": "lam_viet",
+          "fromOwnerName": "Lâm Việt",
+          "toOwnerId": "hoa_van_lo",
+          "toOwnerName": "Hỏa Văn Lô",
+          "note": "Hỏa Văn Lô mua với giá bốn linh thạch hạ phẩm mỗi viên."
+        },
+        {
+          "eventId": "c3_acq_linh_thach_tu_hoa_van_lo",
+          "kind": "acquire",
+          "assetId": "linh_thach_ha_pham",
+          "assetName": "Linh thạch hạ phẩm",
+          "quantity": 20,
+          "unit": "viên",
+          "fungible": true,
+          "sourceLotId": null,
+          "fromOwnerId": "hoa_van_lo",
+          "fromOwnerName": "Hỏa Văn Lô",
+          "toOwnerId": "lam_viet",
+          "toOwnerName": "Lâm Việt",
+          "note": "Tiền bán năm tinh hạch Hỏa hệ Nhất giai."
+        },
+        {
+          "eventId": "c3_transfer_linh_thach_nhap_bi_tich",
+          "kind": "transfer",
+          "assetId": "linh_thach_ha_pham",
+          "assetName": "Linh thạch hạ phẩm",
+          "quantity": 3,
+          "unit": "viên",
+          "fungible": true,
+          "sourceLotId": "c3_acq_linh_thach_tu_han_duoc_su",
+          "fromOwnerId": "lam_viet",
+          "fromOwnerName": "Lâm Việt",
+          "toOwnerId": "quay_bi_tich_pho_thong",
+          "toOwnerName": "Quầy bí tịch phổ thông Thanh Lô Phường",
+          "note": "Thanh toán ba bản chép được phép bán, một linh thạch mỗi bản."
+        },
+        {
+          "eventId": "c3_acq_ba_ban_man_nguu",
+          "kind": "acquire",
+          "assetId": "man_nguu_luyen_the_quyet",
+          "assetName": "Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm",
+          "quantity": 3,
+          "unit": "bản",
+          "fungible": false,
+          "sourceLotId": null,
+          "fromOwnerId": "quay_bi_tich_pho_thong",
+          "fromOwnerName": "Quầy bí tịch phổ thông Thanh Lô Phường",
+          "toOwnerId": "lam_viet",
+          "toOwnerName": "Lâm Việt",
+          "note": "Ba bản dành để hoàn tất đơn đã trả trước của Đội Tro Tàn."
+        }
+      ],
+      "goldenFingerRungChange": null,
+      "moved": [
+        {
+          "characterId": "lam_viet",
+          "toLocationId": "kho_lam_viet"
+        },
+        {
+          "characterId": "lam_viet",
+          "toLocationId": "thanh_lo_phuong"
+        }
+      ],
+      "worldFactsRevealed": [
+        {
+          "id": "thanh_huyen_gioi",
+          "note": "Lâm Việt đi qua cửa sau Song Giới Thương Điếm và xuất hiện trong kho nhỏ ở Thanh Huyền Giới, sau đó mang nguyên liệu tới Thanh Lô Phường."
+        }
+      ],
+      "newCast": [],
+      "hooksPlanted": [
+        {
+          "id": "cao_nguyen_chan_nguon_hang",
+          "what": "Cao Nguyên tuyên bố sẽ khiến các đội săn không dám mang hàng tới quầy của Lâm Việt từ ngày mai.",
+          "dueByChapter": 4
+        }
+      ],
+      "hooksPaid": [
+        "cao_nguyen_chat_van"
+      ],
+      "learnedFinger": []
+    }
+  },
+  "attempts": 1,
+  "costUsd": 0.0659,
+  "inputFingerprint": "78c0ee844718886c688826fc4d2d4da84a4740453913aad6ff84b6a77deaa7e5"
+}

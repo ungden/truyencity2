@@ -1,0 +1,11 @@
+{
+  "chapters": 4,
+  "totalUsd": 0.586,
+  "perChapterUsd": 0.147,
+  "reading": {
+    "chapters": 4,
+    "average": 3.95,
+    "weakest": "structuralFreshness"
+  },
+  "narrativeReview": null
+}

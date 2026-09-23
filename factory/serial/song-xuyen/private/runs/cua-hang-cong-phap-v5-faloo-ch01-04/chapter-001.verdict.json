@@ -1,0 +1,194 @@
+{
+  "verdict": {
+    "continuity": [],
+    "scorecard": {
+      "opening": 5,
+      "anticipation": 5,
+      "payoff": 5,
+      "newness": 4,
+      "endHook": 4
+    },
+    "craft": {
+      "protagonistAgency": 4,
+      "sceneLife": 5,
+      "worldLogic": 4,
+      "dialogueNaturalness": 4,
+      "structuralFreshness": 4
+    },
+    "repetition": [],
+    "aiFlavor": [
+      {
+        "quote": "“Còn thuốc không?”\n“Ba tinh hạch một viên đúng không, tôi có tinh hạch Phong hệ!”\n“Đừng chen, tôi đổi tinh hạch Thổ hệ!”\n“Chủ quầy, nhận đặt trước chứ?”",
+        "kind": "crowd_chorus"
+      }
+    ],
+    "steering": [
+      "Đưa Hứa An vào nhiệm vụ trinh sát ở chương 2: hắn cần chứng minh viên đan không chỉ cứu được thức tỉnh mà còn cho hắn năng lực săn mục tiêu tiến hóa, và phải tự mang về bốn tinh hạch Lôi hệ Nhất giai làm chiến lợi phẩm.",
+      "Cho Cao Nguyên đứng trước quầy với mục tiêu giành quyền chi phối nguồn tinh hạch của phố, nhưng để Lâm Việt chủ động chốt chính sách thu mua hoặc điều kiện bán hàng; xung đột phải diễn ra bằng giá, nguồn hàng và quyền lợi khách, không phải uy hiếp quầy.",
+      "Cho một người cụ thể trải nghiệm món kế tiếp dành cho người chưa thức tỉnh mà Chu Dã đã hỏi, rồi từ hiệu quả trực tiếp mới dẫn tới hỏi giá hoặc tranh suất.",
+      "Khi Thành Vệ mang danh sách tới, để Tô Vãn phải chọn giữa mua theo giá niêm yết và bảo đảm nhu cầu đội săn; payoff nên là một đơn hàng hoặc nguồn tài nguyên cụ thể chảy vào vốn của Lâm Việt."
+    ],
+    "reviewBinding": {
+      "chapterNumber": 1,
+      "title": "“Ai Cho Phép Các Người Mua Qua Quầy Ta?”",
+      "excerpt": "Ngày mở quầy, Lâm Việt đặt sáu bình sứ lên kệ gỗ.\n\nTrên mỗi bình chỉ có một tấm thẻ trắng."
+    }
+  },
+  "digest": {
+    "chapterNumber": 1,
+    "title": "“Ai Cho Phép Các Người Mua Qua Quầy Ta?”",
+    "summary": "Lâm Việt bán sạch sáu viên Tịnh Mạch Đan, giúp Hứa An ổn định Lôi lực và khiến Thành Vệ Đông Hà đặt ưu tiên mua hàng, nhưng Cao Nguyên bất ngờ đến chất vấn Song Giới Thương Điếm.",
+    "payoffKind": "duoc_cong_nhan",
+    "endedOn": "Cao Nguyên gõ ngón tay lên mặt quầy và hỏi: “Ai cho phép các người mua qua quầy ta?”",
+    "newNamedThings": [
+      "tinh_mach_dan_nhat_giai_ha_pham — Tịnh Mạch Đan Nhất giai hạ phẩm",
+      "bia_thu_luc_tram_thanh_ve — Bia thử lực Trạm Thành Vệ",
+      "loi_quang — Lôi Quang",
+      "tinh_hach_loi_he_nhat_giai — Tinh hạch Lôi hệ Nhất giai",
+      "tinh_hach_nhat_giai_hon_hop — Tinh hạch Nhất giai hỗn hợp",
+      "doi_san — đội săn"
+    ],
+    "narrativeEvidence": [],
+    "coreChanges": {
+      "storyDayDelta": 0,
+      "died": [],
+      "progressionChanges": [
+        {
+          "subjectId": "hua_an",
+          "systemId": "tien_hoa_mat_the",
+          "trackId": null,
+          "toRankId": "nhat_giai",
+          "toMinorStageId": "so_ky",
+          "why": "Sau khi dùng Tịnh Mạch Đan, Hứa An được xác nhận đã ổn định Lôi lực ở Nhất giai sơ kỳ."
+        }
+      ],
+      "assetEvents": [
+        {
+          "eventId": "c1_acq_tinh_mach_dan",
+          "kind": "acquire",
+          "assetId": "tinh_mach_dan",
+          "assetName": "Tịnh Mạch Đan Nhất giai hạ phẩm",
+          "quantity": 6,
+          "unit": "viên",
+          "fungible": true,
+          "sourceLotId": null,
+          "fromOwnerId": "quay_bach_duoc",
+          "fromOwnerName": "Quầy thanh lý Bách Dược tại Thanh Lô Phường",
+          "toOwnerId": "lam_viet",
+          "toOwnerName": "Lâm Việt",
+          "note": "Lâm Việt mua trọn lô bằng hai linh thạch hạ phẩm cuối cùng, có phiếu hàng."
+        },
+        {
+          "eventId": "c1_transfer_tinh_mach_hua_an",
+          "kind": "transfer",
+          "assetId": "tinh_mach_dan",
+          "assetName": "Tịnh Mạch Đan Nhất giai hạ phẩm",
+          "quantity": 1,
+          "unit": "viên",
+          "fungible": true,
+          "sourceLotId": "c1_acq_tinh_mach_dan",
+          "fromOwnerId": "lam_viet",
+          "fromOwnerName": "Lâm Việt",
+          "toOwnerId": "hua_an",
+          "toOwnerName": "Hứa An",
+          "note": "Bán theo giá niêm yết ba tinh hạch Lôi hệ Nhất giai."
+        },
+        {
+          "eventId": "c1_acq_tinh_hach_loi_hua_an",
+          "kind": "acquire",
+          "assetId": "tinh_hach_loi_nhat_giai",
+          "assetName": "Tinh hạch Lôi hệ Nhất giai",
+          "quantity": 3,
+          "unit": "viên",
+          "fungible": true,
+          "sourceLotId": null,
+          "fromOwnerId": "hua_an",
+          "fromOwnerName": "Hứa An",
+          "toOwnerId": "lam_viet",
+          "toOwnerName": "Lâm Việt",
+          "note": "Khoản thanh toán đủ cho một viên Tịnh Mạch Đan."
+        },
+        {
+          "eventId": "c1_consume_tinh_mach_hua_an",
+          "kind": "consume",
+          "assetId": "tinh_mach_dan",
+          "assetName": "Tịnh Mạch Đan Nhất giai hạ phẩm",
+          "quantity": 1,
+          "unit": "viên",
+          "fungible": true,
+          "sourceLotId": "c1_transfer_tinh_mach_hua_an",
+          "fromOwnerId": "hua_an",
+          "fromOwnerName": "Hứa An",
+          "toOwnerId": null,
+          "toOwnerName": null,
+          "note": "Hứa An dùng ngay trước quầy để ổn định quá trình thức tỉnh."
+        },
+        {
+          "eventId": "c1_transfer_tinh_mach_thanh_ve",
+          "kind": "transfer",
+          "assetId": "tinh_mach_dan",
+          "assetName": "Tịnh Mạch Đan Nhất giai hạ phẩm",
+          "quantity": 5,
+          "unit": "viên",
+          "fungible": true,
+          "sourceLotId": "c1_acq_tinh_mach_dan",
+          "fromOwnerId": "lam_viet",
+          "fromOwnerName": "Lâm Việt",
+          "toOwnerId": "to_van",
+          "toOwnerName": "Tô Vãn đại diện Thành Vệ Đông Hà",
+          "note": "Thành Vệ mua năm viên còn lại, ba tinh hạch Nhất giai hỗn hợp mỗi viên."
+        },
+        {
+          "eventId": "c1_acq_tinh_hach_hon_hop_thanh_ve",
+          "kind": "acquire",
+          "assetId": "tinh_hach_nhat_giai_hon_hop",
+          "assetName": "Tinh hạch Nhất giai hỗn hợp",
+          "quantity": 15,
+          "unit": "viên",
+          "fungible": true,
+          "sourceLotId": null,
+          "fromOwnerId": "to_van",
+          "fromOwnerName": "Tô Vãn đại diện Thành Vệ Đông Hà",
+          "toOwnerId": "lam_viet",
+          "toOwnerName": "Lâm Việt",
+          "note": "Khoản thanh toán đủ cho năm viên Tịnh Mạch Đan."
+        }
+      ],
+      "goldenFingerRungChange": null,
+      "moved": [],
+      "worldFactsRevealed": [
+        {
+          "id": "tram_dong_ha",
+          "note": "Trạm Thành Vệ Đông Hà có Bia thử lực dùng để kiểm định năng lực thức tỉnh; Hứa An đã phá vỡ bia này sau khi ổn định Lôi lực."
+        },
+        {
+          "id": "thanh_ve_dong_ha",
+          "note": "Thành Vệ Đông Hà cần Tịnh Mạch Đan để ổn định quá trình thức tỉnh và tuyên bố sẽ ưu tiên đơn của Song Giới Thương Điếm nếu chất lượng được duy trì."
+        }
+      ],
+      "newCast": [],
+      "hooksPlanted": [
+        {
+          "id": "thanh_ve_mang_danh_sach",
+          "what": "Ngày mai Thành Vệ Đông Hà sẽ đưa danh sách người thức tỉnh tới Song Giới Thương Điếm.",
+          "dueByChapter": 2
+        },
+        {
+          "id": "hua_an_mua_lo_sau",
+          "what": "Hứa An sẽ mang đủ đối giá để giành suất đầu ở lô Tịnh Mạch Đan sau cho đồng đội.",
+          "dueByChapter": 2
+        },
+        {
+          "id": "cao_nguyen_chat_van",
+          "what": "Cao Nguyên đang chất vấn việc khách mua hàng qua quầy của Song Giới Thương Điếm.",
+          "dueByChapter": 2
+        }
+      ],
+      "hooksPaid": [],
+      "learnedFinger": []
+    }
+  },
+  "attempts": 2,
+  "costUsd": 0.004446,
+  "inputFingerprint": "2d2f0ad91babb1cd0d93ceb03b51404bdf0d51007c0037becbc55e4ed0cb462e"
+}

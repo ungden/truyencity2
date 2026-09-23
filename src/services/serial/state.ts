@@ -364,9 +364,18 @@ export function sanitizeDigest(input: { premise: Premise; bible: Bible; digest: 
     return true;
   });
 
+  // Lived-causality evidence only exists for retired v3 stories; for any other premise
+  // it is an extractor filling an optional field, not a claim about the story.
+  let narrativeEvidence = digest.narrativeEvidence;
+  if (premise.schemaVersion !== 3 && narrativeEvidence.length > 0) {
+    dropped.push(`narrativeEvidence: ${narrativeEvidence.length} mục chỉ dùng cho premise v3`);
+    narrativeEvidence = [];
+  }
+
   return {
     digest: {
       ...digest,
+      narrativeEvidence,
       newNamedThings,
       coreChanges: {
         ...changes, newCast, died, progressionChanges, goldenFingerRungChange,

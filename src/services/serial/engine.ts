@@ -3,7 +3,7 @@ import { mergeProviderUsage, type ProviderUsage, type StoryModelProvider } from 
 import { StoryFactoryError } from '@/services/story-factory/contracts';
 import { groundEvidenceSpan } from '@/services/story-factory/validation';
 import {
-  BibleSchema, ChapterDigestSchema, CyclePlanSchema, HARD_CONTINUITY_KINDS, pullAverage, RollingCyclePlanSchema, scorecardAverage,
+  BibleSchema, ChapterDigestSchema, CyclePlanSchema, HARD_CONTINUITY_KINDS, metaLeakFindings, pullAverage, RollingCyclePlanSchema, scorecardAverage,
   type Bible, type ChapterDigest, type ChapterDraft, type CyclePlan, type JudgeVerdict,
   OpeningAuditSchema, type OpeningAudit, type Premise, type SerialRoutes,
 } from './contracts';
@@ -254,7 +254,9 @@ export async function writeOneChapter(input: {
       chapter: { chapterNumber, title: draft.title, content: draft.content },
     });
     usages.push(result.usage);
-    return result.value;
+    const leaks = metaLeakFindings(draft.content)
+      .filter(leak => !result.value.continuity.some(item => item.quote === leak.quote));
+    return leaks.length ? { ...result.value, continuity: [...result.value.continuity, ...leaks].slice(0, 10) } : result.value;
   };
 
   const resumeCandidate = input.resumeArtifact?.chapter.chapterNumber === chapterNumber
