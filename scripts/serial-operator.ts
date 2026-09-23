@@ -42,6 +42,16 @@ const slugify = (title: string): string =>
     .replace(/đ/gi, 'd').toLowerCase()
     .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 80);
 
+/**
+ * A write that silently matched no row is how `quota` once printed "ok" while the job was
+ * running and nothing changed. Every operator update states how many rows it must touch.
+ */
+function expectRows(result: { data: unknown[] | null; error: unknown }, expected: number, what: string): void {
+  if (result.error) throw result.error;
+  const touched = result.data?.length ?? 0;
+  if (touched !== expected) throw new Error(`${what}: expected to update ${expected} row(s), updated ${touched}. Nothing was changed; check the job state and retry.`);
+}
+
 async function status(): Promise<void> {
   const { data, error } = await db.from('serial_jobs')
     .select('id,status,stage,current_chapter,chapters_today,daily_target,consecutive_replans,last_error,novel_id,serial_novel_id,novels(title,hidden)')
@@ -193,15 +203,16 @@ async function repairOpening(): Promise<void> {
     onRepaired: async (revised, numbers) => {
       for (const chapter of revised.filter(item => numbers.includes(item.chapterNumber))) {
         const saved = await db.from('chapters').update({ title: chapter.title, content: chapter.content, updated_at: new Date().toISOString() })
-          .eq('novel_id', job.data.novel_id).eq('chapter_number', chapter.chapterNumber).eq('publication_state', 'draft');
-        if (saved.error) throw saved.error;
+          .eq('novel_id', job.data.novel_id).eq('chapter_number', chapter.chapterNumber).eq('publication_state', 'draft')
+          .select('id');
+        expectRows(saved, 1, `repair-opening chapter ${chapter.chapterNumber}`);
       }
     },
   });
   const noted = await db.from('serial_jobs').update({
     last_error: repaired.audit.passed ? null : `Sau sửa cục bộ vẫn còn: ${repaired.audit.findings.map(item => `Ch.${item.chapterNumber} ${item.kind}`).join(' | ')}`,
-  }).eq('id', jobId);
-  if (noted.error) throw noted.error;
+  }).eq('id', jobId).select('id');
+  expectRows(noted, 1, 'repair-opening note');
   const costUsd = repaired.usages.reduce((sum, usage) => sum + usage.costUsd, 0);
   console.log(JSON.stringify({ repaired: repaired.repaired, rounds: repaired.rounds.length, passed: repaired.audit.passed, findings: repaired.audit.findings, costUsd }, null, 2));
 }
@@ -245,8 +256,8 @@ async function setStatus(next: 'ready' | 'paused', label: string): Promise<void>
     assertSerialLaunchable(PremiseSchema.parse(novel.data.premise));
     console.log(JSON.stringify({ dryRun: !apply, command: label, gate: approval.gate, jobId }, null, 2));
     if (!apply) return;
-    const approved = await db.from('serial_novels').update(approval.patch).eq('id', job.data.serial_novel_id);
-    if (approved.error) throw approved.error;
+    const approved = await db.from('serial_novels').update(approval.patch).eq('id', job.data.serial_novel_id).select('id');
+    expectRows(approved, 1, 'approve');
   } else {
     if (label === 'pause' && ['awaiting_approval', 'opening_review'].includes(job.data.status)) {
       throw new Error('pause cannot replace a premise or opening review gate.');
@@ -254,8 +265,8 @@ async function setStatus(next: 'ready' | 'paused', label: string): Promise<void>
     console.log(JSON.stringify({ dryRun: !apply, command: label, jobId }, null, 2));
     if (!apply) return;
   }
-  const { error } = await db.from('serial_jobs').update(patch).eq('id', jobId);
-  if (error) throw error;
+  const changed = await db.from('serial_jobs').update(patch).eq('id', jobId).eq('status', job.data.status).select('id');
+  expectRows(changed, 1, label);
   console.log(`${label}: ok`);
 }
 
@@ -304,12 +315,12 @@ async function reroute(): Promise<void> {
     route_version: DEFAULT_SERIAL_ROUTES.routeVersion,
     prompt_version: SERIAL_PROMPT_VERSION,
     updated_at: new Date().toISOString(),
-  }).eq('id', job.data.serial_novel_id);
-  if (updated.error) throw updated.error;
+  }).eq('id', job.data.serial_novel_id).select('id');
+  expectRows(updated, 1, 'reroute routes');
   const cleared = await db.from('serial_jobs').update({
     last_error: null, retry_count: 0, next_run_at: new Date().toISOString(), updated_at: new Date().toISOString(),
-  }).eq('id', jobId);
-  if (cleared.error) throw cleared.error;
+  }).eq('id', jobId).select('id');
+  expectRows(cleared, 1, 'reroute job');
   console.log('reroute: ok');
 }
 
@@ -322,10 +333,10 @@ async function setDailyTarget(): Promise<void> {
   }
   console.log(JSON.stringify({ dryRun: !apply, command: 'quota', jobId, dailyTarget }, null, 2));
   if (!apply) return;
-  const { error } = await db.from('serial_jobs').update({
+  const changed = await db.from('serial_jobs').update({
     daily_target: dailyTarget, next_run_at: new Date().toISOString(), updated_at: new Date().toISOString(),
-  }).eq('id', jobId).neq('status', 'running');
-  if (error) throw error;
+  }).eq('id', jobId).neq('status', 'running').select('id');
+  expectRows(changed, 1, 'quota (a running job cannot be changed; retry when its stage ends)');
   console.log('quota: ok');
 }
 

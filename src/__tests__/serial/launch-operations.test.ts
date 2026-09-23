@@ -94,3 +94,13 @@ describe('serial launch operations', () => {
     expect(adminPage).toMatch(/Công khai truyện/);
   });
 });
+
+describe('operator writes cannot report success without changing anything', () => {
+  test('every update in serial-operator asserts how many rows it touched', () => {
+    const source = readFileSync('scripts/serial-operator.ts', 'utf8');
+    const updates = source.match(/\.update\(/g)?.length ?? 0;
+    const checks = source.match(/expectRows\((?!result)/g)?.length ?? 0;
+    expect(updates).toBeGreaterThan(0);
+    expect(checks).toBe(updates);
+  });
+});
