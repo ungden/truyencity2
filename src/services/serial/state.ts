@@ -304,6 +304,9 @@ export function sanitizeDigest(input: { premise: Premise; bible: Bible; digest: 
     const previous = progressions.get(key);
     if (previous) {
       const previousRank = system.ranks.findIndex(rank => rank.id === previous.rankId);
+      if (previous.rankId === change.toRankId && (previous.minorStageId ?? null) === (change.toMinorStageId ?? null)) {
+        return drop(`${label}: đã đạt từ trước, chương chỉ công bố lại`);
+      }
       if (nextRank < previousRank || nextRank > previousRank + 1) return drop(`${label}: không phải bước kế tiếp`);
       if (nextRank === previousRank && system.minorStages.length > 0) {
         const previousMinor = previous.minorStageId ? system.minorStages.findIndex(stage => stage.id === previous.minorStageId) : -1;

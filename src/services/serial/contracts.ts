@@ -694,7 +694,7 @@ export const HARD_CONTINUITY_KINDS = [
   'dead_returns', 'progression_regressed', 'location_impossible', 'timeline',
   'knows_too_much', 'contradicts_bible', 'golden_finger_scope', 'progression_contradiction',
 ] as const;
-export const SOFT_CONTINUITY_KINDS = ['transaction_contradiction', 'resource_provenance', 'meta_leak'] as const;
+export const SOFT_CONTINUITY_KINDS = ['transaction_contradiction', 'resource_provenance', 'meta_leak', 'process_prose'] as const;
 
 /**
  * Words that only exist in the brief. A reader who meets "một thứ mới có tên" or "ở
@@ -702,6 +702,46 @@ export const SOFT_CONTINUITY_KINDS = ['transaction_contradiction', 'resource_pro
  * exactly that. Detected in code and repaired like any other slip.
  */
 const META_LEAK = /thứ mới có tên|bangSoLieu|hinhDangChuong|openingBridge|protagonistMove|materialOutcome|beat ?sheet|(?:^|\s)(?:ở|từ|trong|tại) chương \d+/iu;
+
+/**
+ * Bookkeeping and inspection vocabulary. The failure every engine here has slid into is
+ * a chapter spent on ledgers, samples and verification: the two September pilots rose
+ * from ~8 to 20–27 of these per thousand words by chapter ten, and the first chapter-four
+ * on the fixed engine was already at 15. Measured in code, so no judge has to be asked
+ * whether caution is interesting.
+ */
+const PROCESS_WORDS = [
+  'kiểm', 'mẫu', 'ghi', 'sổ', 'xác nhận', 'đối chứng', 'giới hạn', 'không hứa', 'quyết toán',
+  'tín dụng', 'ghi có', 'số dư', 'khoản', 'phiếu', 'chứng từ', 'thủ tục',
+];
+export const PROCESS_DENSITY_LIMIT = 14;
+
+const countProcessWords = (text: string): number => {
+  const lower = text.toLowerCase();
+  return PROCESS_WORDS.reduce((sum, word) => sum + lower.split(word).length - 1, 0);
+};
+
+/** Bookkeeping words per thousand words of prose. */
+export function processDensity(prose: string): number {
+  const words = prose.trim().split(/\s+/).filter(Boolean).length;
+  return words === 0 ? 0 : Number((countProcessWords(prose) * 1_000 / words).toFixed(1));
+}
+
+export function processProseFindings(prose: string): Array<{ kind: 'process_prose'; quote: string; explain: string }> {
+  const words = prose.trim().split(/\s+/).filter(Boolean).length;
+  const density = processDensity(prose);
+  if (words < 600 || density <= PROCESS_DENSITY_LIMIT) return [];
+  return prose.split(/\r?\n/).map(line => line.trim()).filter(line => line.length >= 12)
+    .map(line => ({ line, hits: countProcessWords(line) }))
+    .filter(item => item.hits >= 2)
+    .sort((a, b) => b.hits - a.hits)
+    .slice(0, 3)
+    .map(item => ({
+      kind: 'process_prose' as const,
+      quote: item.line.slice(0, 400),
+      explain: `Chương dành ${density} từ sổ sách/kiểm định trên 1.000 từ (ngưỡng ${PROCESS_DENSITY_LIMIT}). Rút đoạn này thành một câu hoặc thay bằng hành động, phản ứng và kết quả nhìn thấy.`,
+    }));
+}
 
 export function metaLeakFindings(prose: string): Array<{ kind: 'meta_leak'; quote: string; explain: string }> {
   return prose.split(/\r?\n/).filter(line => META_LEAK.test(line)).slice(0, 5).map(line => ({
@@ -855,4 +895,33 @@ export function assertSerialLaunchable(premise: Premise): void {
   if (premise.schemaVersion !== 2) {
     throw new Error('Serial chỉ khởi chạy premise văn phạm Faloo (schemaVersion 2). Premise v3 lived-causality đã ngừng dùng từ 2026-09-23.');
   }
+  const problems = premiseLint(premise);
+  if (problems.length) throw new Error(`Premise chưa đạt văn phạm Faloo: ${problems.join(' | ')}`);
+}
+
+/**
+ * The premise is copied into every chapter's brief, so whatever it dwells on the prose
+ * dwells on. The first fixed-engine pilot spent a scene of chapter four on a "hunter
+ * credit ledger" because the approved opening ledger was written as accounting (credits,
+ * balances, "no credit arises", "paid in chapter two"). A hook that postpones the title's
+ * promise ("before selling techniques he must understand…") produced ten chapters of
+ * postponement. Both are rejected before approval.
+ */
+const BOOKKEEPING = /tín dụng|ghi có|số dư|quyết toán|phát sinh|khấu trừ|người thanh toán|nghĩa vụ|(?:^|\s)chương (?:một|hai|ba|bốn|\d+)/iu;
+const POSTPONED_PROMISE = /trước khi (?:bán|mở|kiếm|lên cấp|thành)|rồi mới (?:bán|mở|hình thành)|từng bước[^.]{0,40}rồi mới/iu;
+
+export function premiseLint(premise: Premise): string[] {
+  const problems: string[] = [];
+  for (const entry of premise.worldKernel.openingLedger) {
+    const text = `${entry.quantity} ${entry.consideration} ${entry.resultingStatus}`;
+    if (BOOKKEEPING.test(text)) problems.push(`openingLedger ${entry.id} viết như sổ kế toán hoặc nhắc số chương`);
+    if (entry.consideration.length + entry.resultingStatus.length > 240) problems.push(`openingLedger ${entry.id} dài quá 240 ký tự`);
+  }
+  for (const [field, value] of [['hook', premise.hook], ['readerFantasy', premise.readerFantasy]] as const) {
+    if (POSTPONED_PROMISE.test(value)) problems.push(`${field} trì hoãn lời hứa thay vì hứa nó`);
+  }
+  if (premise.goldenFinger.evolution.length < 6 || premise.goldenFinger.evolution.length > 8) {
+    problems.push('kim thủ chỉ cần 6–8 nấc có tên');
+  }
+  return problems;
 }

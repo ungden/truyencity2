@@ -18,12 +18,12 @@ import { geminiProvider } from '@/services/story-factory/provider';
 import type { ProviderUsage } from '@/services/story-factory/provider';
 import {
   BibleSchema, ChapterDigestSchema, CyclePlanSchema, JudgeVerdictSchema, PremiseSchema,
-  type Bible, type ChapterDigest, type CyclePlan, type JudgeVerdict, assertSerialLaunchable,
+  type Bible, type ChapterDigest, type CyclePlan, type JudgeVerdict, assertSerialLaunchable, processDensity,
 } from '@/services/serial/contracts';
 import { DEFAULT_SERIAL_ROUTES } from '@/services/serial/routes';
 import { applyDigest, seedBible } from '@/services/serial/state';
 import {
-  planNextCycle, readingHealth, SerialCheckpointError, writeOneChapter,
+  auditFourChapterOpening, planNextCycle, readingHealth, SerialCheckpointError, writeOneChapter,
   serialChapterInputFingerprint,
   type ChapterOutcome, type SerialDraftCheckpoint,
 } from '@/services/serial/engine';
@@ -411,6 +411,17 @@ async function main(): Promise<void> {
       });
     }
   }
+  // The same editor's read production runs at chapter four. A pilot that skips it has
+  // not tested the gate a real launch has to pass.
+  let openingAudit: Awaited<ReturnType<typeof auditFourChapterOpening>>['audit'] | null = null;
+  if (writtenChapters.length >= 4) {
+    const audited = await auditFourChapterOpening({
+      provider, routes: DEFAULT_SERIAL_ROUTES, premise, chapters: writtenChapters.slice(0, 4),
+    });
+    usages.push(...audited.usages);
+    openingAudit = audited.audit;
+    writeJson(join(outDir, 'opening-audit.json'), audited.audit);
+  }
   const spend = priorSpend + usages.reduce((sum, usage) => sum + usage.costUsd, 0);
   const reviewGate = narrativeReview ? narrativeReviewGate(narrativeReview.review) : null;
   const report = {
@@ -418,6 +429,9 @@ async function main(): Promise<void> {
     totalUsd: Number(spend.toFixed(3)),
     perChapterUsd: verdicts.length ? Number((spend / verdicts.length).toFixed(3)) : 0,
     reading: readingHealth(verdicts),
+    // Bookkeeping words per 1,000; above PROCESS_DENSITY_LIMIT a chapter is drifting into ledger prose.
+    processDensity: writtenChapters.map(chapter => processDensity(chapter.content)),
+    openingAudit: openingAudit ? { passed: openingAudit.passed, findings: openingAudit.findings.map(item => `Ch.${item.chapterNumber} ${item.kind}`) } : null,
     narrativeReview: reviewGate ? {
       mayPublish: reviewGate.mayPublish,
       upstreamFindings: reviewGate.upstreamFindings.length,

@@ -33,6 +33,11 @@ Người dùng duyệt "sửa hết". Đã làm, có test (447/447 xanh, typeche
 | C. Đảo cổng | Lỗi số liệu sống sót sau một lần sửa → vẫn commit; chỉ lỗ hổng logic mới replan. `sanitizeDigest` gạt id sai của Extractor thay vì từ chối chương. Opening audit chấm như biên tập nhận sách (kim thủ chỉ muộn nhất ch2, kết chương có móc, lời hứa tiêu đề trả trước ch3, bảng 【】 kiểm bằng code). Hai chu kỳ liền điểm kéo đọc < 2,5 → giữ riêng tư một lần chờ người đọc. | `contracts.ts` `HARD_CONTINUITY_KINDS`, `state.ts` `sanitizeDigest`, `prompts.ts`, `runtime.ts` `holdLowPullCycle` |
 | Premise / nhịp | Playbook `2026-09-23.1`: kim thủ chỉ muộn nhất cuối ch2, kết chương "hé lộ rồi cắt", luật mới `title_promise_pays_early`. | `playbook.json` |
 
+Chống tái phát (sau pilot 4 chương): khoá chính sách bằng test (`policy-lock.test.ts`),
+trần 43 mã từ chối, lint premise (sổ mở đầu không viết như kế toán, hook không trì hoãn lời
+hứa), đo văn sổ sách bằng code (> 14 từ/1.000 → sửa một lần), bắt từ ngữ lộ chỉ dẫn, không
+công bố lại cấp đã đạt, và `serial:run` chạy opening audit như production.
+
 Chưa làm (cần quyết định hoặc tốn tiền): schema v2 vẫn đòi đúng hai thế giới nên chưa viết
 được lane 全民领主/御兽 thuần; chưa chạy pilot trả phí nào với engine đã sửa. Mô-đun
 `src/services/narrative/foundation.ts` dùng chung với Story Factory (đã dừng) giữ nguyên.

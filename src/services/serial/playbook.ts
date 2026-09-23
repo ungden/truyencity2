@@ -37,6 +37,28 @@ const CraftRuleSchema = z.object({
   supersedes: z.string().trim().optional(),
 }).strict();
 
+/**
+ * Directions that forbid the payoffs the genre is read for. Each one was written as a
+ * reasonable-sounding fix — "don't add transactions just to look like progress", "don't
+ * penalise a chapter for lacking a payoff" — and each time the engine obeyed it into
+ * chapters where nothing happened (2026-08 factory, 2026-09-21 lived-causality). A
+ * playbook containing one is rejected at load, whether it comes from this file or a
+ * database row later. Fix a weak chapter at premise or plan, never by forbidding events.
+ * See docs/WRITING_SYSTEM_AUDIT_2026-09-23.md.
+ */
+export const ANTI_PAYOFF_PATTERNS: RegExp[] = [
+  /không (?:tự )?thêm (?:khách hàng|giao dịch|cấp bậc|đám đông|tên mới)/iu,
+  /không (?:phạt|trừ điểm)[^.\n]{0,60}(?:thiếu|chưa có) (?:giao dịch|tăng cấp|tên mới|payoff|phần thưởng|nhân chứng|hook)/iu,
+  /không đòi[^.\n]{0,40}(?:kiếm tiền|cấp bậc|tên mới|người chứng kiến|payoff)/iu,
+  /không khóa số chương phải (?:bán hàng|lên cấp)/iu,
+  /chưa phải lúc ép payoff/iu,
+  /(?:được phép|có thể) (?:là trọng tâm|có trọng lượng) dù chưa (?:kiếm tiền|lên cấp)/iu,
+];
+
+export function antiPayoffViolations(text: string): string[] {
+  return ANTI_PAYOFF_PATTERNS.filter(pattern => pattern.test(text)).map(pattern => pattern.source);
+}
+
 export const PlaybookSchema = z.object({
   version: z.string().trim().min(3),
   note: z.string().trim().optional(),
@@ -49,7 +71,16 @@ export const PlaybookSchema = z.object({
   genreCanon: z.record(z.unknown()).optional(),
   payoffKinds: z.array(PayoffKindSchema).min(5),
   rules: z.array(CraftRuleSchema).min(1),
-}).strict();
+}).strict().superRefine((book, ctx) => {
+  book.rules.forEach((rule, index) => {
+    const violations = antiPayoffViolations(rule.text);
+    if (violations.length) ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['rules', index, 'text'],
+      message: `Rule ${rule.id} forbids a payoff (${violations.join(', ')}). Fix weak chapters at premise or plan instead.`,
+    });
+  });
+});
 
 export type Playbook = z.infer<typeof PlaybookSchema>;
 export type CraftRule = z.infer<typeof CraftRuleSchema>;

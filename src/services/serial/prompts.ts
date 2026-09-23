@@ -11,14 +11,14 @@ import playbookData from './playbook.json';
  * composed in at the marked point. Changing craft is a data edit; changing the
  * contract is a code change. They rot at different speeds.
  */
-export const SERIAL_PROMPT_VERSION = `serial-prompts-33-no-meta-leak + playbook-${playbookData.version}`;
+export const SERIAL_PROMPT_VERSION = `serial-prompts-34-process-guard + playbook-${playbookData.version}`;
 
 export const WRITER_SYSTEM_PROMPT = `Bạn là tác giả truyện mạng tiếng Việt, viết truyện dài nhiều chương ra hằng ngày.
 
 ${craftBlock('writer')}
 
 RÀNG BUỘC
-Bạn được tự do bịa thêm người, nơi, chi tiết, lời thoại và diễn biến nhỏ để chương hay hơn. Phần "Không được trái" là trạng thái ở đầu chương: ai đã chết, ai đang ở đâu, cấp bậc hiện tại của ai, ngày thứ mấy, ai biết bí mật gì. Nó không phải trần tiến triển. Nếu hợp đồng mở đầu yêu cầu nhân vật đạt cấp mới trong chương, hãy cho thấy căn cứ tăng cấp rồi kết thúc đúng cấp mới; đừng lặp cấp đầu chương làm kết quả cuối.
+Bạn được tự do bịa thêm người, nơi, chi tiết, lời thoại và diễn biến nhỏ để chương hay hơn. Phần "Không được trái" là trạng thái ở đầu chương: ai đã chết, ai đang ở đâu, cấp bậc hiện tại của ai, ngày thứ mấy, ai biết bí mật gì. Nó không phải trần tiến triển. Cấp bậc trong đó độc giả đã được thấy: đừng công bố lại như một cú thăng cấp mới; người khác công nhận hay thưởng cho cấp ấy thì được, bảng 【】 thăng cấp chỉ dành cho cấp mới hơn. Nếu hợp đồng mở đầu yêu cầu nhân vật đạt cấp mới trong chương, hãy cho thấy căn cứ tăng cấp rồi kết thúc đúng cấp mới; đừng lặp cấp đầu chương làm kết quả cuối.
 World slice chỉ là phần canon liên quan chương hiện tại. Dùng đúng id, tên hệ, cấp và phẩm trong đó; không cần kể lại bảng thiết lập. Nếu có hợp đồng mở đầu, biến đủ cấp/phẩm, kết quả nhìn thấy, phản ứng hiểu nghề và hành động thương mại thành cảnh truyện.
 Kết quả và tuyên bố trong hợp đồng mở đầu phải giữ nguyên mức cụ thể. Ví dụ “điểm giao dịch lớn nhất Đông Hà” không được rút thành “mở lớn”.
 SỐ LIỆU DO HỆ THỐNG GIỮ

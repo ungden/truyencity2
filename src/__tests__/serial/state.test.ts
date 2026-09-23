@@ -534,6 +534,18 @@ describe('sanitizing an extractor digest', () => {
     expect(dropped.join(' ')).toMatch(/narrativeEvidence/);
   });
 
+  test('a rank the subject already holds is not recorded as a new breakthrough', () => {
+    const bible = baseBible();
+    const held = bible.symbolicCore.progressions.find(state => state.subjectId === 'lam_viet' && state.systemId === 'tu_tien')!;
+    const repeated = digest({ coreChanges: { progressionChanges: [{
+      subjectId: 'lam_viet', systemId: 'tu_tien', trackId: held.trackId, toRankId: held.rankId,
+      toMinorStageId: held.minorStageId, why: 'Trạm kiểm định công nhận lại.',
+    }] } });
+    const { digest: clean, dropped } = sanitizeDigest({ premise, bible, digest: repeated });
+    expect(clean.coreChanges.progressionChanges).toEqual([]);
+    expect(dropped.join(' ')).toMatch(/đã đạt từ trước/);
+  });
+
   test('a valid digest passes through untouched', () => {
     const clean = digest();
     expect(sanitizeDigest({ premise, bible: baseBible(), digest: clean })).toEqual({ digest: clean, dropped: [] });

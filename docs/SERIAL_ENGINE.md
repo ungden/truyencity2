@@ -68,6 +68,27 @@ The opening audit (chapter 4) is an acquiring editor's read: golden finger paid 
 of chapter 2, chapters 1–3 end on a reveal or a want, the title's promise paid by chapter 3,
 and — checked in code — at least one 【】 panel in a system lane.
 
+### Anti-regression locks
+
+The same failure — chapters in which nothing happens — killed four engines, each time
+through a reasonable-sounding fix. `src/__tests__/serial/policy-lock.test.ts` makes the
+next one fail CI:
+
+| Lock | What it stops |
+|---|---|
+| `ANTI_PAYOFF_PATTERNS` (playbook load + prompt test) | A rule forbidding transactions, ranks, new names, crowds or payoffs |
+| Soft/hard continuity kinds, auditor schema | Arithmetic or provenance becoming a reason to discard a chapter |
+| `RULE_BUDGET` (43) | Adding a rejection rule without removing one |
+| `premiseLint` in `assertSerialLaunchable` | An opening ledger written as accounting, a hook that postpones the promise, fewer than 6 rungs |
+| `processProseFindings` (code, per chapter) | Bookkeeping/inspection prose above 14 words per 1,000 — sent to the one repair |
+| `metaLeakFindings` (code, per chapter) | Brief vocabulary ("thứ mới có tên", "ở chương 2") in the story |
+
+`serial:run` runs the chapter-four opening audit and reports `processDensity` per chapter,
+so a pilot tests the same gates as a launch.
+
+When a chapter reads badly, fix the premise or the plan. Never forbid an event, never gate
+on arithmetic, never add a rule because one chapter failed.
+
 Paid chapter work is checkpointed by completed layer. If Judge, revision, Extractor,
 semantic evidence verification or literary review fails after prose exists, the run stores
 the draft and the last completed artifacts in `draft_artifact`. The next tick resumes at

@@ -35,6 +35,11 @@ add validators or rules to it.
 retired; only schema v2 premises launch, numbers are owned by the planned ledger, and
 arithmetic never discards a chapter. `SERIAL_ENGINE_ENABLED` is unset.
 
+**When Serial writes a weak chapter, fix the premise or the plan — never forbid an event,
+never gate on arithmetic, never add a rejection rule for one failure.** That fix is how all
+four engines here died. `src/__tests__/serial/policy-lock.test.ts` enforces it; do not
+loosen it to make a change pass.
+
 ## The writing system (incumbent)
 
 One service, one cron, one queue: `src/services/story-factory/` → `/api/cron/story-factory`.
@@ -113,7 +118,7 @@ and a silent production stall.
 
 ```bash
 npm run typecheck
-npm test                 # 447
+npm test                 # 462
 npm run security:secrets
 ```
 
