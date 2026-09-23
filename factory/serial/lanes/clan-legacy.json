@@ -3,9 +3,9 @@
   "lane": "gia_toc_tu_tien",
   "archetype": "clan_legacy",
   "title": "Tu Tiên Gia Tộc: Đa Tử Đa Phúc, Mỗi Thiên Tài Nhập Phả Đổi Một Linh Mạch",
-  "hook": "Gia chủ Lục Hàn chỉ cần cưới đúng người, nhận đúng đệ tử và nuôi lớn hậu bối: mỗi thiên tài nhập gia phả đều mở phần thưởng, từ Trúc Cơ đan đến linh mạch của cả gia tộc.",
+  "hook": "Gia chủ Lục Hàn chỉ cần cưới đúng người, nhận đúng đệ tử và nuôi lớn hậu bối: mỗi thiên tài nhập gia phả đổi về một đạo linh mạch, và đứa con nuôi đầu tiên đã kéo một đạo tiểu linh mạch mới chảy vào tổ trạch ngay trước mặt chủ nợ.",
   "blurb": "Lục Hàn muốn giữ lại đúng một thứ: tiểu linh mạch tổ truyền của Lục gia, thứ sẽ bị Tạ gia thu hồi sau ba mươi ngày nếu hắn không nộp đủ ba trăm linh thạch hạ phẩm. Một gia chủ Luyện Khí tầng sáu, kho rỗng, tộc nhân tản mác, hắn vốn chỉ đủ sức bán nốt tổ trạch để đổi đường sống. Nhưng bảng 【Hậu Duệ Hưng Tộc】 thức tỉnh khi hắn nhận cô bé mang dị linh căn làm con nuôi: tư chất được xếp hạng, gia phả được ghi nhận, và một viên Trúc Cơ đan thật sự rơi vào tay hắn. Lục Hàn không vội nuốt đan một mình. Hắn dùng phần thưởng đoạt lại linh điền, kết liên hôn với gia tộc đang cần chỗ dựa, thu nhận những hạt giống bị tông môn bỏ quên. Mỗi lần một đứa trẻ ra đời hay một đệ tử nhập môn, Lục gia lại có thêm một lá bài lật bàn. Nhưng linh mạch không chỉ có Tạ gia nhìn chằm chằm: phường thị muốn nuốt đất, tông môn muốn lấy người, còn đại hội gia tộc sẽ quyết định ai được tồn tại ở Vân Lĩnh.",
-  "readerFantasy": "Nhìn một gia chủ nghèo biến tư chất của con cháu và đệ tử thành phần thưởng thấy ngay được: đan dược, công pháp, pháp khí, linh điền rồi lãnh địa; mỗi chiến thắng đều thành vốn để cả Lục gia leo cao hơn.",
+  "readerFantasy": "Nhìn một gia chủ nghèo biến tư chất của con cháu và đệ tử thành phần thưởng thấy ngay được: đứa con nuôi đầu tiên đổi về một đạo linh mạch, rồi đan dược, công pháp, pháp khí, linh điền và lãnh địa; mỗi chiến thắng đều thành vốn để cả Lục gia leo cao hơn.",
   "presentation": {
     "coverPath": "/covers/serial-lanes/clan-legacy.webp",
     "tagline": "Sinh con, thu đồ, mở thưởng, dựng lại tiên tộc",
@@ -902,10 +902,10 @@
     "openingContract": [
       {
         "chapterNumber": 1,
-        "proves": "Lục Hàn nhận Lục Tiểu Mãn làm con nuôi ngay trước mặt chủ nợ, hệ thống giám định cô bé là Băng linh căn và phát Trúc Cơ đan.",
-        "namedLevelOrGrade": "Băng linh căn, Trúc Cơ đan Nhị phẩm",
-        "visibleResult": "Lục Hàn có vật đủ giá trị đổi lấy thời hạn chuộc mạch, còn Tiểu Mãn được ghi tên vào gia phả.",
-        "witnessReaction": "Tộc lão đổi thái độ, Tạ gia lập tức nghi ngờ Lục gia giấu truyền thừa.",
+        "proves": "Lục Hàn nhận Lục Tiểu Mãn làm con nuôi ngay trước mặt chủ nợ, hệ thống giám định cô bé là Băng linh căn Thượng phẩm, thưởng một đạo tiểu linh mạch mới và một viên Trúc Cơ đan.",
+        "namedLevelOrGrade": "Băng linh căn Thượng phẩm, tiểu linh mạch, Trúc Cơ đan Nhị phẩm",
+        "visibleResult": "Tiểu Mãn được ghi tên vào gia phả, một đạo tiểu linh mạch mới trồi lên sau từ đường và linh khí tổ trạch dâng lên trước mặt chủ nợ; Lục Hàn còn có Trúc Cơ đan đủ giá đổi thời hạn chuộc tiểu linh mạch cũ.",
+        "witnessReaction": "Tộc lão đổi thái độ, Tạ gia lập tức nghi ngờ Lục gia giấu truyền thừa và bắt đầu nhòm ngó mạch mới.",
         "commercialAction": "Lục Hàn mang Trúc Cơ đan đến phường thị để định giá nhưng không bán đứt."
       },
       {

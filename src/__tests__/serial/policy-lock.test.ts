@@ -46,11 +46,15 @@ describe('policy lock: payoffs are never forbidden', () => {
     expect(PlaybookSchema.safeParse(poisoned).success).toBe(false);
   });
 
+  test('the title promise is set in the premise, where the first four chapters are decided', () => {
+    expect(activeRules('premise').map(rule => rule.id)).toContain('title_promise_in_contract');
+  });
+
   test('the measured Faloo rules stay active', () => {
     const active = new Set([...activeRules('writer'), ...activeRules('planner'), ...activeRules('premise')].map(rule => rule.id));
     for (const id of [
       'open_on_desire', 'end_on_expectation', 'one_named_thing', 'chapter_title_is_a_line',
-      'activate_in_chapter_one', 'title_promise_pays_early', 'cycle_fulfills_desire',
+      'activate_in_chapter_one', 'title_promise_pays_early', 'title_promise_in_contract', 'cycle_fulfills_desire',
     ]) expect(active.has(id)).toBe(true);
   });
 });

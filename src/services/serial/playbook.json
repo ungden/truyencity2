@@ -1,5 +1,5 @@
 {
-  "version": "2026-09-24.2",
+  "version": "2026-09-24.3",
   "note": "Craft that dates. Code owns contracts; this file owns taste. Edit here, not in prompts.ts.",
   "payoffKinds": [
     {
@@ -235,6 +235,14 @@
       "observedAt": "2026-09-23",
       "evidence": "docs/WRITING_SYSTEM_AUDIT_2026-09-23.md §4.4 — 5/6 truyện gốc top kích hoạt trong ch1 (12–98%), 969757 lộ cuối ch2",
       "text": "Kim thủ chỉ cho độc giả một kết quả nhìn thấy trong chương một, muộn nhất là cuối chương hai; chương nào chưa trả thì kết bằng khoảnh khắc nó sắp lộ diện. Nó tiến hoá qua sáu đến tám nấc có tên, mỗi nấc đổi cách dùng chứ không chỉ đổi con số."
+    },
+    {
+      "id": "title_promise_in_contract",
+      "role": "premise",
+      "status": "active",
+      "observedAt": "2026-09-24",
+      "evidence": "Opening audit 2026-09-24, Tu Tiên Gia Tộc: tiêu đề hứa 'mỗi thiên tài nhập phả đổi một linh mạch', hợp đồng bốn chương chỉ trả đan, gia hạn nợ và linh điền; mở đầu bị viết lại toàn bộ.",
+      "text": "HỢP ĐỒNG MỞ ĐẦU TRẢ LỜI HỨA CỦA TIÊU ĐỀ\nThứ vế sau dấu hai chấm của tiêu đề hứa phải là visibleResult của một chương trong ba chương đầu, gọi đúng tên như tiêu đề (tiêu đề hứa linh mạch thì chương đó có linh mạch, hứa thẻ đỏ thì có dấu hiệu thẻ đỏ). Hook và readerFantasy nói lời hứa ấy như điều đã bắt đầu, không xếp nó ở cuối một chuỗi phần thưởng."
     },
     {
       "id": "cycle_fulfills_desire",
