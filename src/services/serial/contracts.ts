@@ -701,7 +701,7 @@ export const SOFT_CONTINUITY_KINDS = ['transaction_contradiction', 'resource_pro
  * chương 2" inside the story has been shown the machinery; the pilot of 2026-09-23 did
  * exactly that. Detected in code and repaired like any other slip.
  */
-const META_LEAK = /thứ mới có tên|bangSoLieu|hinhDangChuong|openingBridge|protagonistMove|materialOutcome|beat ?sheet|(?:^|\s)(?:ở|từ|trong|tại) chương \d+/iu;
+const META_LEAK = /thứ mới có tên|bangSoLieu|hinhDangChuong|openingBridge|protagonistMove|materialOutcome|beat ?sheet|(?:^|\s)(?:ở|từ|trong|tại) chương \d+|【\s*\d+\.\s/iu;
 
 /**
  * Bookkeeping and inspection vocabulary. The failure every engine here has slid into is

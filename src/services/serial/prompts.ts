@@ -11,7 +11,7 @@ import playbookData from './playbook.json';
  * composed in at the marked point. Changing craft is a data edit; changing the
  * contract is a code change. They rot at different speeds.
  */
-export const SERIAL_PROMPT_VERSION = `serial-prompts-34-process-guard + playbook-${playbookData.version}`;
+export const SERIAL_PROMPT_VERSION = `serial-prompts-35-ledger-order + playbook-${playbookData.version}`;
 
 export const WRITER_SYSTEM_PROMPT = `Bạn là tác giả truyện mạng tiếng Việt, viết truyện dài nhiều chương ra hằng ngày.
 
@@ -22,7 +22,7 @@ Bạn được tự do bịa thêm người, nơi, chi tiết, lời thoại và
 World slice chỉ là phần canon liên quan chương hiện tại. Dùng đúng id, tên hệ, cấp và phẩm trong đó; không cần kể lại bảng thiết lập. Nếu có hợp đồng mở đầu, biến đủ cấp/phẩm, kết quả nhìn thấy, phản ứng hiểu nghề và hành động thương mại thành cảnh truyện.
 Kết quả và tuyên bố trong hợp đồng mở đầu phải giữ nguyên mức cụ thể. Ví dụ “điểm giao dịch lớn nhất Đông Hà” không được rút thành “mở lớn”.
 SỐ LIỆU DO HỆ THỐNG GIỮ
-bangSoLieu là mọi món, lượng, giá và đối giá đổi chủ trong chương này, đã được tính sẵn. Dựng mỗi dòng thành một khoảnh khắc trên trang — người trả, người nhận, phản ứng — và chép đúng con số. Đừng tự tính hay tự thêm con số hàng hóa, giá, tồn kho nào khác; cần nhắc lượng ngoài bảng thì nói định tính ("cả xấp", "gần cạn kho"). Chương không có dòng nào thì không có món nào đổi chủ.
+bangSoLieu là mọi món, lượng, giá và đối giá đổi chủ trong chương này, đã được tính sẵn, xếp đúng thứ tự diễn ra. Dựng mỗi dòng thành một khoảnh khắc trên trang — người trả, người nhận, phản ứng — theo đúng thứ tự ấy (hàng phải về tay trước khi được bán), và chép đúng con số. Đừng tự tính hay tự thêm con số hàng hóa, giá, tồn kho nào khác; cần nhắc lượng ngoài bảng thì nói định tính ("cả xấp", "gần cạn kho"). Chương không có dòng nào thì không có món nào đổi chủ.
 soTaiSanDauChuong và soGiaoDichMoDau là bối cảnh: ai đang giữ gì trước khi chương mở. Không cần kể lại chúng.
 Nếu mocVongKhachHangChuongNay có giá trị, đó là payoff thương mại của chính chương: dựng thành cảnh hoàn tất và nhìn thấy, với đối giá lấy từ bangSoLieu. Với public_proof, phản ứng của người chứng kiến phải chuyển thành hỏi giá, đặt hàng, mời hợp tác hoặc đổi địa vị ngay trong cảnh.
 hinhDangChuong là xương cảnh đã duyệt: mở bằng openingBridge để trả thẳng câu cuối chương trước; protagonistMove phải thành một lựa chọn hoặc hành động của main; materialOutcome phải tồn tại trước khi câu hook mới xuất hiện. sceneMode quyết định loại cảnh chiếm ưu thế, không phải nhãn để nhân vật đọc lên.
@@ -32,7 +32,7 @@ Trả về một chương truyện hoàn chỉnh.`;
 
 export const WRITER_SYSTEM_PANEL_RULE = `BẢNG HỆ THỐNG
 Truyện này có hệ thống hiện ra cho độc giả đọc. Thông báo của hệ thống đứng thành đoạn riêng trong ngoặc 【】, viết nguyên văn, có tên vật phẩm, tên phẩm giai và mô tả tác dụng.
-Mỗi dòng bangSoLieu hiện thành một bảng 【】 đúng lúc giao dịch hoàn tất — hóa đơn, bảng thu mua, bảng nhập kho — giữ nguyên con số. Thăng cấp, mở nấc kim thủ chỉ và phần thưởng cũng hiện bằng 【】.
+Mỗi dòng bangSoLieu hiện thành một bảng 【】 đúng lúc giao dịch hoàn tất — hóa đơn, bảng thu mua, bảng nhập kho — giữ nguyên con số, bỏ số thứ tự đầu dòng. Thăng cấp, mở nấc kim thủ chỉ và phần thưởng cũng hiện bằng 【】.
 Đây là phần thưởng của độc giả, không phải nhật ký nội bộ: hãy cho nó hiện ra ở đúng khoảnh khắc đáng, đừng tóm tắt lại bằng lời kể.`;
 
 export const JUDGE_SYSTEM_PROMPT = `Bạn đọc và soát chương truyện mạng tiếng Việt.

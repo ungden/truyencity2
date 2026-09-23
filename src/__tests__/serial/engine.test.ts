@@ -644,8 +644,8 @@ describe('code-owned ledger and reader-facing gates', () => {
   test('the writer copies numbers rendered by code from the planned ledger', () => {
     const writerBrief = buildWriterBrief({ premise, bible: baseBible(), cycle: ledgerCycle(), chapterNumber: 8, previousChapter: null });
     expect(writerBrief.bangSoLieu).toEqual([
-      'Nhập kho: Lâm Việt nhận 3 lá Hộ Thân Phù',
-      'Giao dịch: Lâm Việt → Bảy Thạch: 1 lá Hộ Thân Phù',
+      '1. Nhập kho: Lâm Việt nhận 3 lá Hộ Thân Phù',
+      '2. Giao dịch: Lâm Việt → Bảy Thạch: 1 lá Hộ Thân Phù',
     ]);
     expect(WRITER_SYSTEM_PROMPT).toMatch(/bangSoLieu/);
   });
@@ -741,6 +741,7 @@ describe('code-owned ledger and reader-facing gates', () => {
     expect(provider.calls).toEqual(['writer', 'judge', 'writer', 'judge', 'extractor']);
     expect(metaLeakFindings('Hoàn tất đơn đã trả trước ở chương 2.')).toHaveLength(1);
     expect(metaLeakFindings('Chương mới của đời hắn bắt đầu.')).toHaveLength(0);
+    expect(metaLeakFindings('【1. Giao dịch: Lâm Việt → Bảy Thạch: 1 lá Hộ Thân Phù】')).toHaveLength(1);
   });
 
   test('two low-pull cycles in a row are a pattern; one is steering', () => {

@@ -80,11 +80,12 @@ const formatQuantity = (value: number): string =>
 export function renderLedgerLines(events: AssetEvent[]): string[] {
   // The planner's note is bookkeeping ("paid in chapter 2", "credited to…"). It stays in
   // the plan; the reader only ever sees who handed what to whom.
-  return events.map(event => {
+  return events.map((event, index) => {
+    const step = `${index + 1}. `;
     const amount = `${formatQuantity(event.quantity)} ${event.unit} ${event.assetName}`;
-    if (event.kind === 'acquire') return `Nhập kho: ${event.toOwnerName} nhận ${amount}`;
-    if (event.kind === 'transfer') return `Giao dịch: ${event.fromOwnerName ?? event.fromOwnerId} → ${event.toOwnerName}: ${amount}`;
-    return `Tiêu hao: ${event.fromOwnerName ?? event.fromOwnerId} dùng ${amount}`;
+    if (event.kind === 'acquire') return `${step}Nhập kho: ${event.toOwnerName} nhận ${amount}`;
+    if (event.kind === 'transfer') return `${step}Giao dịch: ${event.fromOwnerName ?? event.fromOwnerId} → ${event.toOwnerName}: ${amount}`;
+    return `${step}Tiêu hao: ${event.fromOwnerName ?? event.fromOwnerId} dùng ${amount}`;
   });
 }
 
