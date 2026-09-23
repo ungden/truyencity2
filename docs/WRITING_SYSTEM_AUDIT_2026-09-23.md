@@ -34,7 +34,7 @@ Người dùng duyệt "sửa hết". Đã làm, có test (447/447 xanh, typeche
 | Premise / nhịp | Playbook `2026-09-23.1`: kim thủ chỉ muộn nhất cuối ch2, kết chương "hé lộ rồi cắt", luật mới `title_promise_pays_early`. | `playbook.json` |
 
 Chống tái phát (sau pilot 4 chương): khoá chính sách bằng test (`policy-lock.test.ts`),
-trần 43 mã từ chối, lint premise (sổ mở đầu không viết như kế toán, hook không trì hoãn lời
+trần mã từ chối (57 khi đếm đúng cả lời gọi xuống dòng), lint premise (sổ mở đầu không viết như kế toán, hook không trì hoãn lời
 hứa), đo văn sổ sách bằng code (> 14 từ/1.000 → sửa một lần), bắt từ ngữ lộ chỉ dẫn, không
 công bố lại cấp đã đạt, và `serial:run` chạy opening audit như production.
 

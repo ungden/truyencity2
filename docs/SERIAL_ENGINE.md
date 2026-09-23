@@ -85,7 +85,7 @@ next one fail CI:
 |---|---|
 | `ANTI_PAYOFF_PATTERNS` (playbook load + prompt test) | A rule forbidding transactions, ranks, new names, crowds or payoffs |
 | Soft/hard continuity kinds, auditor schema | Arithmetic or provenance becoming a reason to discard a chapter |
-| `RULE_BUDGET` (43) | Adding a rejection rule without removing one |
+| `RULE_BUDGET` (57, counted across line breaks) | Adding a rejection rule without removing one |
 | `premiseLint` in `assertSerialLaunchable` | An opening ledger written as accounting, a hook that postpones the promise, fewer than 6 rungs |
 | `processProseFindings` (code, per chapter) | Bookkeeping/inspection prose above 14 words per 1,000 — sent to the one repair |
 | `metaLeakFindings` (code, per chapter) | Brief vocabulary ("thứ mới có tên", "ở chương 2") in the story |

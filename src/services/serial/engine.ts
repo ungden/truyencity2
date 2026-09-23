@@ -731,24 +731,9 @@ export async function planNextCycle(input: {
         `New cycle must start at chapter ${input.startChapter}, got ${candidate.startChapter}.`,
       );
     }
-    if (input.activeCycle && input.premise.schemaVersion !== 3) {
-      const recentModes = new Set(input.activeCycle.beatSheets
-        .filter(sheet => sheet.chapterNumber < input.startChapter && sheet.chapterNumber >= input.startChapter - 3)
-        .map(sheet => sheet.sceneMode));
-      // The rolling merge keeps the approved loop, not the planner's temporary
-      // replacement fields. Validate exemptions against that same durable promise.
-      const scheduledChapters = new Set(input.activeCycle.customerLoop
-        ? Object.values(input.activeCycle.customerLoop.schedule)
-        : []);
-      const repeated = candidate.beatSheets.find(sheet =>
-        recentModes.has(sheet.sceneMode) && !scheduledChapters.has(sheet.chapterNumber));
-      if (repeated) {
-        throw new SerialStateError(
-          'recent_scene_mode_repeat',
-          `Chapter ${repeated.chapterNumber} repeats recent scene mode ${repeated.sceneMode} outside a scheduled customer milestone.`,
-        );
-      }
-    }
+    // Scene-mode variety is taste, asked for in the planner prompt. It used to reject rolling
+    // plans outright; a planner that missed it twice paused a whole story (card-profession,
+    // 2026-09-24). Taste steers; it never stops a story.
     if (!input.activeCycle) {
       assertPayoffRotation(input.previousCycle, candidate);
       assertCycleAssetCoherence(input.bible, candidate, input.startChapter);

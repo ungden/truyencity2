@@ -390,7 +390,7 @@ describe('cycle lifecycle', () => {
     expect(result.usages).toHaveLength(2);
   });
 
-  test('a rolling planner changes recent scene modes outside locked customer milestones', async () => {
+  test('a repeated scene mode is taste: the first rolling plan is kept, not rejected', async () => {
     const makeBeat = (chapterNumber: number, sceneMode: 'transaction' | 'hunt' | 'public_showcase' | 'investigation' | 'crafting') => ({
       chapterNumber,
       sceneMode,
@@ -425,8 +425,8 @@ describe('cycle lifecycle', () => {
       previousCycle: null, activeCycle: active,
       cycleNumber: 2, volumeNumber: 1, startChapter: 14, fixedEndChapter: 18, recentVerdicts: [],
     });
-    expect(result.cycle.beatSheets.map(sheet => sheet.sceneMode)).toEqual(['transaction', 'investigation', 'crafting']);
-    expect(result.usages).toHaveLength(2);
+    expect(result.cycle.beatSheets.map(sheet => sheet.sceneMode)).toEqual(['transaction', 'hunt', 'investigation']);
+    expect(result.usages).toHaveLength(1);
   });
 
   test('a final rolling window plans only the exact remaining chapter', async () => {

@@ -77,16 +77,17 @@ describe('policy lock: arithmetic never discards a chapter', () => {
 });
 
 describe('policy lock: the rule count only goes down', () => {
-  // 43 on 2026-09-23. Adding a rejection rule means removing one: every engine here
-  // died by accumulating them. Lower this number when you delete rules.
-  const RULE_BUDGET = 43;
+  // 57 on 2026-09-24, counted across line breaks (the first version of this test only
+  // matched single-line calls and reported 43). Adding a rejection rule means removing
+  // one: every engine here died by accumulating them. Lower this number when you delete.
+  const RULE_BUDGET = 57;
 
   test(`the serial engine has at most ${RULE_BUDGET} distinct rejection codes`, () => {
     const dir = 'src/services/serial';
     const codes = new Set<string>();
     for (const file of readdirSync(dir).filter(name => name.endsWith('.ts'))) {
       const source = readFileSync(join(dir, file), 'utf8');
-      for (const match of source.matchAll(/(?:fail|SerialStateError)\('([a-z_]+)'/g)) codes.add(match[1]);
+      for (const match of source.matchAll(/(?:fail|SerialStateError)\(\s*'([a-z_]+)'/g)) codes.add(match[1]);
     }
     expect(codes.size).toBeLessThanOrEqual(RULE_BUDGET);
   });
