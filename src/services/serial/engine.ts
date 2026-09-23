@@ -234,6 +234,60 @@ export async function auditFourChapterOpening(input: {
   return { audit, narrativeReview: narrative?.review ?? null, usages, costUsd: totalCost(usages) };
 }
 
+/**
+ * Opening findings that mean the opening is built wrong — the golden finger pays late,
+ * the title's promise is unpaid, the system never shows. Those replan the cycle.
+ * Everything else (a timeline slip, an ending without a hook) is a passage an editor
+ * would send back for a local fix; discarding four chapters for one sentence is the
+ * waste this engine exists to avoid.
+ */
+export const STRUCTURAL_OPENING_KINDS = new Set<string>([
+  'golden_finger_late', 'title_promise_unpaid', 'system_panel_missing', 'opening_contract', 'unapproved_cost',
+]);
+
+export function splitOpeningFindings(audit: OpeningAudit): {
+  structural: OpeningAudit['findings'];
+  local: OpeningAudit['findings'];
+} {
+  return {
+    structural: audit.findings.filter(finding => STRUCTURAL_OPENING_KINDS.has(finding.kind)),
+    local: audit.findings.filter(finding => !STRUCTURAL_OPENING_KINDS.has(finding.kind)),
+  };
+}
+
+/** One targeted revision per chapter an editor flagged, leaving every other chapter as it was. */
+export async function repairOpeningChapters(input: {
+  provider: StoryModelProvider;
+  routes: SerialRoutes;
+  premise: Premise;
+  chapters: Array<{ chapterNumber: number; title: string; content: string }>;
+  findings: OpeningAudit['findings'];
+  deadline?: number;
+}): Promise<{ chapters: Array<{ chapterNumber: number; title: string; content: string }>; repaired: number[]; usages: ProviderUsage[] }> {
+  const usages: ProviderUsage[] = [];
+  const repaired: number[] = [];
+  const chapters = [...input.chapters];
+  for (const chapterNumber of [...new Set(input.findings.map(finding => finding.chapterNumber))].sort((a, b) => a - b)) {
+    const index = chapters.findIndex(chapter => chapter.chapterNumber === chapterNumber);
+    if (index < 0) continue;
+    assertTimeFor(CHAPTER_TIMEOUT_MS, input.deadline, usages);
+    const neighbours = chapters.filter(chapter => Math.abs(chapter.chapterNumber - chapterNumber) === 1)
+      .map(chapter => ({ chuongSo: chapter.chapterNumber, tieuDe: chapter.title, doanDau: chapter.content.slice(0, 600), doanCuoi: chapter.content.slice(-600) }));
+    const result = await reviseChapter({
+      provider: input.provider, routes: input.routes, premise: input.premise,
+      writerBrief: { chuongSo: chapterNumber, suaCucBoTheoBienTapMoDau: true, chuongLienKe: neighbours },
+      rejected: { title: chapters[index].title, content: chapters[index].content },
+      findings: input.findings.filter(finding => finding.chapterNumber === chapterNumber).map(finding => ({
+        kind: finding.kind, quote: finding.quote, explain: `${finding.explain} Hướng sửa: ${finding.repair}`,
+      })),
+    });
+    usages.push(result.usage);
+    chapters[index] = { chapterNumber, title: result.value.title, content: result.value.content };
+    repaired.push(chapterNumber);
+  }
+  return { chapters, repaired, usages };
+}
+
 export async function writeOneChapter(input: {
   provider: StoryModelProvider;
   routes: SerialRoutes;

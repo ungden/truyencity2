@@ -64,6 +64,13 @@ transactions survived.
 | Low reader-pull score on one chapter or cycle | Steering for the next plan, never a block |
 | Two consecutive cycles averaging below 2.5 on the five pull dimensions | Cycle held private and job paused once; `resume` publishes it |
 
+Opening findings split in two. **Structural** (golden finger late, title promise unpaid,
+no 【】 in a system lane, an opening-contract result missing, an unapproved cost) replan the
+cycle. **Local** (a timeline slip, an ending without a hook) commit chapter four into the
+human opening review with the editor's notes in `last_error`;
+`serial:operator repair-opening --job-id=… --apply` revises only the flagged chapters and
+audits again. `serial:run` does the same automatically.
+
 The opening audit (chapter 4) is an acquiring editor's read: golden finger paid by the end
 of chapter 2, chapters 1–3 end on a reveal or a want, the title's promise paid by chapter 3,
 and — checked in code — at least one 【】 panel in a system lane.

@@ -11,7 +11,8 @@ import {
 import { SERIAL_PROMPT_VERSION } from './prompts';
 import {
   assertTimeFor, auditFourChapterOpening, cyclePull, foldVolume, lowPullStreak, LOW_PULL_THRESHOLD, planNextCycle,
-  SerialCheckpointError, SerialDeadlineError, writeOneChapter, type ChapterOutcome, type SerialDraftCheckpoint,
+  SerialCheckpointError, SerialDeadlineError, splitOpeningFindings, writeOneChapter,
+  type ChapterOutcome, type SerialDraftCheckpoint,
 } from './engine';
 import { CHAPTER_TIMEOUT_MS, SUPPORT_TIMEOUT_MS } from './agents';
 import { SerialStateError } from './state';
@@ -506,6 +507,7 @@ async function stageWrite(
 
   let commitUsages = outcome.usages;
   let commitCostUsd = outcome.costUsd;
+  let localOpeningNotes: string | null = null;
   if (chapterNumber === 4) {
     const { data: earlier, error: earlierError } = await db.from('chapters')
       .select('chapter_number,title,content')
@@ -622,7 +624,14 @@ async function stageWrite(
       };
     }
 
-    if (!audited.audit.passed) {
+    const openingSplit = splitOpeningFindings(audited.audit);
+    if (!audited.audit.passed && openingSplit.structural.length === 0) {
+      // Local findings: the chapter-four commit already stops at the human opening review.
+      // The reviewer gets the editor's notes and `serial:operator repair-opening` instead
+      // of four discarded chapters.
+      localOpeningNotes = openingSplit.local.map(finding =>
+        `Ch.${finding.chapterNumber} ${finding.kind}: ${finding.explain} Hướng sửa: ${finding.repair}`).join(' | ');
+    } else if (!audited.audit.passed) {
       const literary = blockingProseFindings.map(finding =>
         `Ch.${finding.chapterNumber ?? '?'} ${finding.kind}: ${finding.explanation} Repair: ${finding.direction}`
       );
@@ -659,6 +668,12 @@ async function stageWrite(
   });
   if (error) throw error;
   const needsOpeningReview = Boolean((commit as { needsOpeningReview?: boolean } | null)?.needsOpeningReview);
+  if (localOpeningNotes) {
+    const noted = await db.from('serial_jobs')
+      .update({ last_error: `Biên tập mở đầu đề nghị sửa cục bộ: ${localOpeningNotes}`.slice(0, 2_000) })
+      .eq('id', job.id);
+    if (noted.error) throw noted.error;
+  }
 
   return {
     status: 'completed', jobId: job.id, stage: 'write', chapterNumber,

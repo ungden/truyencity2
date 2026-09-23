@@ -104,7 +104,8 @@ export async function reviseChapter(input: {
   premise: Premise;
   writerBrief: unknown;
   rejected: ChapterDraft;
-  findings: JudgeVerdict['continuity'];
+  /** Judge continuity, code-detected slips or opening-audit findings: a quote and why. */
+  findings: Array<{ kind: string; quote: string | null; explain: string }>;
 }): Promise<AgentResult<ChapterDraft>> {
   const base = serialSystemPrompt('writer', input.premise);
   const system = `${input.premise.voiceSheet.showsSystemPanel ? `${base}\n\n${WRITER_SYSTEM_PANEL_RULE}` : base}

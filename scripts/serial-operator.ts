@@ -16,7 +16,9 @@
 import dotenv from 'dotenv';
 import { readFileSync } from 'node:fs';
 import { createClient } from '@supabase/supabase-js';
-import { assertSerialLaunchable, PremiseSchema } from '@/services/serial/contracts';
+import { assertSerialLaunchable, OpeningAuditSchema, PremiseSchema, SerialRoutesSchema } from '@/services/serial/contracts';
+import { auditFourChapterOpening, repairOpeningChapters, splitOpeningFindings } from '@/services/serial/engine';
+import { geminiProvider } from '@/services/story-factory/provider';
 import { DEFAULT_SERIAL_ROUTES } from '@/services/serial/routes';
 import { SERIAL_PROMPT_VERSION } from '@/services/serial/prompts';
 import { seedBible } from '@/services/serial/state';
@@ -156,6 +158,51 @@ async function read(): Promise<void> {
   console.log(data.content);
 }
 
+/**
+ * Local opening findings (a timeline slip, an ending without a hook) stop at the human
+ * opening review instead of discarding four chapters. This applies the editor's notes:
+ * one targeted revision per flagged chapter, then the audit again. Dry run by default.
+ */
+async function repairOpening(): Promise<void> {
+  const jobId = value('job-id');
+  if (!jobId) throw new Error('repair-opening requires --job-id');
+  const job = await db.from('serial_jobs').select('novel_id,serial_novel_id,status,current_chapter').eq('id', jobId).single();
+  if (job.error) throw job.error;
+  if (job.data.status !== 'opening_review' || job.data.current_chapter !== 4) {
+    throw new Error('repair-opening requires a job waiting at the chapter-four opening review.');
+  }
+  const novel = await db.from('serial_novels').select('premise,routes').eq('id', job.data.serial_novel_id).single();
+  if (novel.error) throw novel.error;
+  const premise = PremiseSchema.parse(novel.data.premise);
+  const routes = SerialRoutesSchema.parse(novel.data.routes);
+  const rows = await db.from('chapters').select('chapter_number,title,content')
+    .eq('novel_id', job.data.novel_id).eq('publication_state', 'draft')
+    .gte('chapter_number', 1).lte('chapter_number', 4).order('chapter_number');
+  if (rows.error) throw rows.error;
+  const chapters = (rows.data ?? []).map(row => ({ chapterNumber: row.chapter_number as number, title: row.title as string, content: row.content as string }));
+  const run = await db.from('serial_runs').select('opening_audit').eq('serial_novel_id', job.data.serial_novel_id)
+    .eq('kind', 'chapter').eq('chapter_number', 4).not('opening_audit', 'is', null)
+    .order('started_at', { ascending: false }).limit(1).maybeSingle();
+  if (run.error) throw run.error;
+  const audit = OpeningAuditSchema.parse(run.data?.opening_audit ?? { passed: true, summary: 'Không có audit.', findings: [] });
+  const { local } = splitOpeningFindings(audit);
+  console.log(JSON.stringify({ dryRun: !apply, chapters: chapters.map(item => item.chapterNumber), local }, null, 2));
+  if (!apply || local.length === 0) return;
+  const repaired = await repairOpeningChapters({ provider: geminiProvider, routes, premise, chapters, findings: local });
+  for (const chapter of repaired.chapters.filter(item => repaired.repaired.includes(item.chapterNumber))) {
+    const saved = await db.from('chapters').update({ title: chapter.title, content: chapter.content, updated_at: new Date().toISOString() })
+      .eq('novel_id', job.data.novel_id).eq('chapter_number', chapter.chapterNumber).eq('publication_state', 'draft');
+    if (saved.error) throw saved.error;
+  }
+  const again = await auditFourChapterOpening({ provider: geminiProvider, routes, premise, chapters: repaired.chapters });
+  const noted = await db.from('serial_jobs').update({
+    last_error: again.audit.passed ? null : `Sau sửa cục bộ vẫn còn: ${again.audit.findings.map(item => `Ch.${item.chapterNumber} ${item.kind}`).join(' | ')}`,
+  }).eq('id', jobId);
+  if (noted.error) throw noted.error;
+  const costUsd = [...repaired.usages, ...again.usages].reduce((sum, usage) => sum + usage.costUsd, 0);
+  console.log(JSON.stringify({ repaired: repaired.repaired, passed: again.audit.passed, findings: again.audit.findings, costUsd }, null, 2));
+}
+
 async function setStatus(next: 'ready' | 'paused', label: string): Promise<void> {
   const jobId = value('job-id');
   if (!jobId) throw new Error(`${label} requires --job-id`);
@@ -284,6 +331,7 @@ async function main(): Promise<void> {
     case 'status': return status();
     case 'seed': return seed();
     case 'read': return read();
+    case 'repair-opening': return repairOpening();
     case 'approve': return setStatus('ready', 'approve');
     case 'restart-opening': return launchAction('restart-opening');
     case 'release': return launchAction('release');
@@ -293,7 +341,7 @@ async function main(): Promise<void> {
     case 'pause': return setStatus('paused', 'pause');
     case 'resume': return setStatus('ready', 'resume');
     default:
-      console.error('Commands: status | seed | read | approve | restart-opening | release | reroute | quota | tick | pause | resume');
+      console.error('Commands: status | seed | read | repair-opening | approve | restart-opening | release | reroute | quota | tick | pause | resume');
       process.exit(1);
   }
 }

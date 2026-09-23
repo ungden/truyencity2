@@ -31,6 +31,9 @@ describe('chapter-four human review gate', () => {
     expect(commitAt).toBeGreaterThan(auditAt);
     expect(runtime).toMatch(/Opening audit failed/);
     expect(runtime).toMatch(/rpc\('replan_serial_cycle'/);
+    // Only structural findings replan; local ones go to the human review with notes.
+    expect(runtime).toMatch(/openingSplit\.structural\.length === 0/);
+    expect(operator).toMatch(/repair-opening/);
   });
 
   test('chapter four enters opening review in the same transaction that commits it', () => {

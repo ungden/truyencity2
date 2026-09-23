@@ -1,0 +1,13 @@
+{
+  "passed": false,
+  "summary": "Chương bốn đã có đơn tổ chức và mục tiêu nghề nghiệp, đủ lực kéo sang chương năm. Tuy nhiên, trình tự Đội Tro Tàn nhận bí tịch rồi đi săn tự mâu thuẫn giữa chương hai và ba.",
+  "findings": [
+    {
+      "kind": "timeline",
+      "chapterNumber": 3,
+      "quote": "“Thiết Giáp Ngưu.”\n\nThanh niên cầm dao phay kéo khóa túi ra, mùi máu nóng lập tức tràn khắp cửa hàng.",
+      "explain": "Cuối chương hai, Chu Dã chốt rõ: “Đưa ba bản về đây trước. Sau đó… Đội Tro Tàn đi săn Thiết Giáp Ngưu.” Nhưng mở chương ba, Đội Tro Tàn đã mang chiến lợi phẩm Thiết Giáp Ngưu đến bán, còn bí tịch mãi chương bốn mới được giao.",
+      "repair": "Hoặc cho Lâm Việt giao ba bản ngay đầu chương ba rồi mới chuyển cảnh săn; hoặc sửa câu chốt chương hai thành mục tiêu đi săn sau khi đơn được xác nhận/nhận hàng trong ngày, không khẳng định phải nhận bí tịch trước."
+    }
+  ]
+}

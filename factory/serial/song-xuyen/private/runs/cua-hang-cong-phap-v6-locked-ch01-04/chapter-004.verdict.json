@@ -1,0 +1,136 @@
+{
+  "verdict": {
+    "continuity": [],
+    "scorecard": {
+      "opening": 4,
+      "anticipation": 4,
+      "payoff": 4,
+      "newness": 3,
+      "endHook": 4
+    },
+    "craft": {
+      "protagonistAgency": 4,
+      "sceneLife": 3,
+      "worldLogic": 4,
+      "dialogueNaturalness": 3,
+      "structuralFreshness": 3
+    },
+    "repetition": [
+      {
+        "quote": "Một đội trưởng vốn gọi hắn là tiểu tử ban nãy bỗng đổi giọng.",
+        "repeatsChapter": 3,
+        "note": "Tiếp tục thủ pháp Thành Vệ/người ngoài đổi thái độ công khai sau khi hàng hóa được chứng minh; chương 3 cũng đã trả nhịp được Thành Vệ công nhận."
+      },
+      {
+        "quote": "Một trinh sát đứng ngoài cửa hít mạnh.",
+        "repeatsChapter": 1,
+        "note": "Lại dùng người đứng ngoài quầy kinh ngạc để xác nhận giá trị hàng hóa, gần với nhịp Thành Vệ xác nhận hiệu quả Tịnh Mạch Đan ở chương 1."
+      }
+    ],
+    "aiFlavor": [
+      {
+        "quote": "Đây không phải lời quảng cáo.\n\nĐây là người sống sót mang kết quả về đổi lấy hàng.",
+        "kind": "parallel_triple"
+      },
+      {
+        "quote": "Một người là Nhất giai trung kỳ.\n\nMột người là Luyện Khí tầng một.\n\nHai con đường khác nhau, giờ đều đang dẫn về cùng một quầy hàng.",
+        "kind": "theme_spoken"
+      },
+      {
+        "quote": "【Đơn Thành Vệ số Một: Tô Vãn đại diện Thành Vệ Đông Hà đặt 6 viên Tịnh Mạch Đan Nhất giai hạ phẩm, giá 3 tinh hạch Nhất giai mỗi viên.",
+        "kind": "report_prose"
+      },
+      {
+        "quote": "“Thành Vệ bao hết à?”\n\n“Đội tuần tra thì cần, đội săn chúng tôi cũng cần!”\n\n“Lâm chủ quầy, cho chúng tôi quyền ưu tiên!”",
+        "kind": "crowd_chorus"
+      }
+    ],
+    "steering": [
+      "Đưa Lâm Việt tới kỳ thi Nhất giai Luyện Đan Sư ở Thanh Huyền ngay sau khi kéo cửa sau; cho Lữ Trưởng Lão hoặc giám khảo đặt điều kiện thực dụng khiến hắn phải dùng kinh nghiệm xử lý tinh hạch từ Đông Hà, thay vì chỉ đọc kết quả thi.",
+      "Cho Lâm Việt tự mua hoặc chọn dược liệu, thuê lò và luyện thành mẻ Tịnh Mạch Đan đầu tiên bằng nguồn vốn đã tích lũy; trả payoff bằng tư cách Nhất giai Luyện Đan Sư cùng năng lực thực tế hoàn thành đơn sáu viên.",
+      "Khi giao lô sáu viên tại Đông Hà, để Hứa An nhận suất đầu và dùng đan trước một trinh sát đang mất ổn định, rồi cho Tô Vãn chốt cách phân phối của Thành Vệ bằng đối giá cụ thể.",
+      "Để Đội Tro Tàn mang về da, thịt hoặc tinh hạch từ cuộc săn mới và trực tiếp mặc cả theo bảng thu mua, biến lời hứa không bán cho Cao Nguyên thành một vòng hàng hóa lớn hơn."
+    ],
+    "reviewBinding": {
+      "chapterNumber": 4,
+      "title": "“Tôi sẽ làm điểm giao dịch lớn nhất Đông Hà!”",
+      "excerpt": "Lâm Việt mở cửa quầy, lấy ba bản bí tịch từ túi trữ vật ra rồi đặt thẳng lên mặt bàn."
+    }
+  },
+  "digest": {
+    "chapterNumber": 4,
+    "title": "“Tôi sẽ làm điểm giao dịch lớn nhất Đông Hà!”",
+    "summary": "Lâm Việt hoàn tất giao dịch với Đội Tro Tàn, nhận đơn lớn từ Thành Vệ Đông Hà và biến quầy hàng thành điểm cung ứng được nhiều đội săn chú ý.",
+    "payoffKind": "duoc_cong_nhan",
+    "endedOn": "Lâm Việt dự định ở Thanh Huyền Giới thi Nhất giai Luyện Đan Sư.",
+    "newNamedThings": [
+      "doi_tro_tan",
+      "man_nguu_luyen_the_quyet_nhat_giai_trung_pham",
+      "thiet_giap_nguu",
+      "tinh_mach_dan_nhat_giai_ha_pham",
+      "bia_thu_luc_dong_ha",
+      "don_thanh_ve_so_mot"
+    ],
+    "narrativeEvidence": [],
+    "coreChanges": {
+      "storyDayDelta": 0,
+      "died": [],
+      "progressionChanges": [],
+      "assetEvents": [
+        {
+          "eventId": "c4_01_giao_don_tro_tan",
+          "kind": "transfer",
+          "assetId": "man_nguu_luyen_the_quyet",
+          "assetName": "Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm",
+          "quantity": 3,
+          "unit": "bản",
+          "fungible": false,
+          "sourceLotId": "c3_08_nhap_ba_man_nguu_quyet",
+          "fromOwnerId": "lam_viet",
+          "fromOwnerName": "Lâm Việt",
+          "toOwnerId": "doi_tro_tan",
+          "toOwnerName": "Ba thành viên Đội Tro Tàn",
+          "note": "Giao đủ ba bản công pháp của đơn đã trả trước; không thu thêm."
+        },
+        {
+          "eventId": "c4_02_thu_dat_truoc_don_thanh_ve",
+          "kind": "acquire",
+          "assetId": "tinh_hach_nhat_giai_hon_hop",
+          "assetName": "Tinh hạch Nhất giai hỗn hợp",
+          "quantity": 6,
+          "unit": "viên",
+          "fungible": true,
+          "sourceLotId": null,
+          "fromOwnerId": "to_van",
+          "fromOwnerName": "Tô Vãn đại diện Thành Vệ Đông Hà",
+          "toOwnerId": "lam_viet",
+          "toOwnerName": "Lâm Việt",
+          "note": "Tô Vãn đặt đơn sáu viên Tịnh Mạch Đan Nhất giai hạ phẩm, trả trước sáu tinh hạch; mười hai tinh hạch còn lại thanh toán khi nhận hàng. Suất đầu dành cho Hứa An."
+        }
+      ],
+      "goldenFingerRungChange": null,
+      "moved": [],
+      "worldFactsRevealed": [
+        {
+          "id": "thanh_ve_dong_ha",
+          "note": "Thành Vệ Đông Hà được xác nhận là nguồn vật tư ưu tiên của Song Giới Thương Điếm và đã đặt lô sáu viên Tịnh Mạch Đan Nhất giai hạ phẩm."
+        }
+      ],
+      "newCast": [],
+      "hooksPlanted": [
+        {
+          "id": "lam_viet_thi_luyen_dan_su",
+          "what": "Lâm Việt sẽ ở Thanh Huyền Giới thi Nhất giai Luyện Đan Sư.",
+          "dueByChapter": 5
+        }
+      ],
+      "hooksPaid": [
+        "hua_an_dang_ky_lo_sau"
+      ],
+      "learnedFinger": []
+    }
+  },
+  "attempts": 1,
+  "costUsd": 0.027232,
+  "inputFingerprint": "258eb60f02a2a33df85a4a2abd8578bacfba2e7580ea07a6f0d244fe0679c3d2"
+}

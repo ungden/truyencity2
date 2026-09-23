@@ -3,7 +3,7 @@ import { metaLeakFindings, type ChapterDigest, type ChapterDraft, type CyclePlan
 import { DEFAULT_SERIAL_ROUTES } from '@/services/serial/routes';
 import {
   auditFourChapterOpening, cyclePull, cycleReadyToClose, foldVolume, LOW_PULL_THRESHOLD, lowPullStreak,
-  planNextCycle, readingHealth, SerialCheckpointError, SerialDeadlineError, writeOneChapter,
+  planNextCycle, readingHealth, repairOpeningChapters, SerialCheckpointError, SerialDeadlineError, splitOpeningFindings, writeOneChapter,
   type SerialDraftCheckpoint,
 } from '@/services/serial/engine';
 import { normalizeChapterDraft, reviewBindingMismatch } from '@/services/serial/agents';
@@ -845,5 +845,33 @@ describe('judge review binding', () => {
     expect(reviewBindingMismatch({ chapterNumber: 4, title: chapter.title, excerpt }, chapter)).toMatch(/excerpt not found/);
     expect(reviewBindingMismatch({ chapterNumber: 4, title: 'Một tên khác', excerpt: chapter.content.slice(0, 60) }, chapter)).toMatch(/title/);
     expect(reviewBindingMismatch({ chapterNumber: 3, title: chapter.title, excerpt: chapter.content.slice(0, 60) }, chapter)).toMatch(/chapterNumber/);
+  });
+});
+
+describe('opening findings: local ones are fixed in place, structural ones replan', () => {
+  const opening = Array.from({ length: 4 }, (_, index) => ({
+    chapterNumber: index + 1, title: `Chương thử ${index + 1}`, content: `Nội dung chương ${index + 1}. `.repeat(40),
+  }));
+  const timeline = {
+    kind: 'timeline' as const, chapterNumber: 3, quote: 'Nội dung chương 3.',
+    explain: 'Đội săn mang chiến lợi phẩm về trước khi nhận bí tịch đã hẹn.', repair: 'Giao bí tịch đầu chương ba.',
+  };
+
+  test('a timeline slip is local; a late golden finger is structural', () => {
+    const { structural, local } = splitOpeningFindings({
+      passed: false, summary: 's',
+      findings: [timeline, { ...timeline, kind: 'golden_finger_late', chapterNumber: 2 }],
+    });
+    expect(local.map(finding => finding.kind)).toEqual(['timeline']);
+    expect(structural.map(finding => finding.kind)).toEqual(['golden_finger_late']);
+  });
+
+  test('only the flagged chapter is revised, with the editor note in hand', async () => {
+    const provider = stubProvider({ writer: [draft({ title: 'Chương thử 3', content: 'Bản đã sửa. '.repeat(80) })] });
+    const result = await repairOpeningChapters({ provider, routes: DEFAULT_SERIAL_ROUTES, premise, chapters: opening, findings: [timeline] });
+    expect(provider.calls).toEqual(['writer']);
+    expect(result.repaired).toEqual([3]);
+    expect(result.chapters[2].content).toMatch(/Bản đã sửa/);
+    expect(result.chapters.filter(chapter => chapter.chapterNumber !== 3)).toEqual(opening.filter(chapter => chapter.chapterNumber !== 3));
   });
 });
