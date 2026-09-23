@@ -33,7 +33,13 @@ add validators or rules to it.
 (20 chapters, premise v3 "lived-causality") read as inspection logs, not 爽文 — see
 [docs/WRITING_SYSTEM_AUDIT_2026-09-23.md](docs/WRITING_SYSTEM_AUDIT_2026-09-23.md). v3 is
 retired; only schema v2 premises launch, numbers are owned by the planned ledger, and
-arithmetic never discards a chapter. `SERIAL_ENGINE_ENABLED` is unset.
+arithmetic never discards a chapter. `SERIAL_ENGINE_ENABLED=true` in production since
+2026-09-24; the first story on it is *Song Xuyên Mạt Thế: Cửa Hàng Của Ta Bán Công Pháp Tu
+Tiên* (slug `cua-hang-cua-ta-ban-cong-phap-tu-tien`).
+
+Vercel has two projects building this repo. **`truyencity2` is production** (owns
+`www.truyencity.com`, holds the secrets). `truyencity` is the one this checkout is
+`vercel link`ed to; it has no environment variables. Change env vars on `truyencity2`.
 
 **When Serial writes a weak chapter, fix the premise or the plan — never forbid an event,
 never gate on arithmetic, never add a rejection rule for one failure.** That fix is how all

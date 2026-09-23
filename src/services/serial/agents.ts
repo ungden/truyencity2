@@ -1,6 +1,6 @@
 import type { StoryModelProvider, ProviderUsage } from '@/services/story-factory/provider';
 import {
-  ChapterDigestSchema, ChapterDraftSchema, CyclePlanShapeSchema, JudgeProviderVerdictSchema, OpeningAuditProviderSchema, PremiseSchema,
+  ChapterDigestSchema, ChapterDraftSchema, LegacyChapterDigestSchema, CyclePlanShapeSchema, JudgeProviderVerdictSchema, OpeningAuditProviderSchema, PremiseSchema,
   type ChapterDigest, type ChapterDraft, type CyclePlan, type JudgeVerdict, type OpeningAudit, type Premise,
   type SerialRoutes,
 } from './contracts';
@@ -176,11 +176,13 @@ export async function extractDigest(input: {
   premise: Premise;
   extractorBrief: unknown;
 }): Promise<AgentResult<ChapterDigest>> {
+  // Lived-causality evidence exists only for retired v3 stories. Offering the field to a
+  // v2 extractor bought tokens that sanitizeDigest then threw away on every chapter.
   const result = await input.provider.json({
     model: input.routes.extractor,
     system: serialSystemPrompt('extractor', input.premise),
     prompt: brief(input.extractorBrief),
-    schema: ChapterDigestSchema,
+    schema: input.premise.schemaVersion === 3 ? ChapterDigestSchema : LegacyChapterDigestSchema,
     temperature: 0,
     timeoutMs: SUPPORT_TIMEOUT_MS,
   });

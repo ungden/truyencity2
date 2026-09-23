@@ -708,6 +708,9 @@ export const ChapterDigestSchema = z.object({
   }).strict(),
 }).strict();
 export type ChapterDigest = z.infer<typeof ChapterDigestSchema>;
+/** What a v2 extractor is asked for: the digest without lived-causality evidence. */
+export const LegacyChapterDigestSchema = ChapterDigestSchema.omit({ narrativeEvidence: true })
+  .transform(digest => ({ ...digest, narrativeEvidence: [] as ChapterDigest['narrativeEvidence'] }));
 
 // ---------------------------------------------------------------- Verdict
 
