@@ -3,7 +3,7 @@ import { metaLeakFindings, type ChapterDigest, type ChapterDraft, type CyclePlan
 import { DEFAULT_SERIAL_ROUTES } from '@/services/serial/routes';
 import {
   auditFourChapterOpening, cyclePull, cycleReadyToClose, foldVolume, LOW_PULL_THRESHOLD, lowPullStreak,
-  planNextCycle, readingHealth, repairOpeningChapters, SerialCheckpointError, SerialDeadlineError, splitOpeningFindings, writeOneChapter,
+  planNextCycle, readingHealth, repairOpeningChapters, repairOpeningUntilClean, SerialCheckpointError, SerialDeadlineError, splitOpeningFindings, writeOneChapter,
   type SerialDraftCheckpoint,
 } from '@/services/serial/engine';
 import { normalizeChapterDraft, reviewBindingMismatch } from '@/services/serial/agents';
@@ -885,5 +885,44 @@ describe('opening findings: local ones are fixed in place, structural ones repla
     expect(result.repaired).toEqual([3]);
     expect(result.chapters[2].content).toMatch(/Bản đã sửa/);
     expect(result.chapters.filter(chapter => chapter.chapterNumber !== 3)).toEqual(opening.filter(chapter => chapter.chapterNumber !== 3));
+  });
+});
+
+describe('opening repair follows a fix that moved the problem next door', () => {
+  const opening = Array.from({ length: 4 }, (_, index) => ({
+    chapterNumber: index + 1, title: `Chương thử ${index + 1}`,
+    content: `Nội dung chương ${index + 1}. `.repeat(40) + '\n\n【Giao dịch hoàn tất】',
+  }));
+  const finding = (chapterNumber: number) => ({
+    kind: 'timeline' as const, chapterNumber, quote: `Nội dung chương ${chapterNumber}.`,
+    explain: 'Trình tự giao hàng mâu thuẫn.', repair: 'Chỉ giữ một lần giao.',
+  });
+
+  test('a second round repairs the neighbour, then stops', async () => {
+    const fixed = (n: number) => draft({ title: `Chương thử ${n}`, content: `Bản sửa ${n}. `.repeat(80) + '\n\n【Giao dịch hoàn tất】' });
+    const provider = stubProvider({
+      writer: [fixed(3), fixed(4)],
+      auditor: [
+        { passed: false, summary: 'Chương 4 giao lại.', findings: [finding(4)] },
+        { passed: true, summary: 'Sạch.', findings: [] },
+      ],
+    });
+    const result = await repairOpeningUntilClean({
+      provider, routes: DEFAULT_SERIAL_ROUTES, premise, chapters: opening,
+      audit: { passed: false, summary: 'Chương 3 sai trình tự.', findings: [finding(3)] },
+    });
+    expect(provider.calls).toEqual(['writer', 'auditor', 'writer', 'auditor']);
+    expect(result.audit.passed).toBe(true);
+    expect(result.repaired).toEqual([3, 4]);
+  });
+
+  test('structural findings are never patched', async () => {
+    const provider = stubProvider({});
+    const result = await repairOpeningUntilClean({
+      provider, routes: DEFAULT_SERIAL_ROUTES, premise, chapters: opening,
+      audit: { passed: false, summary: 's', findings: [{ ...finding(2), kind: 'title_promise_unpaid' }] },
+    });
+    expect(provider.calls).toEqual([]);
+    expect(result.rounds).toEqual([]);
   });
 });

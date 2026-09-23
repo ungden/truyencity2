@@ -23,8 +23,8 @@ import {
 import { DEFAULT_SERIAL_ROUTES } from '@/services/serial/routes';
 import { applyDigest, seedBible } from '@/services/serial/state';
 import {
-  auditFourChapterOpening, planNextCycle, readingHealth, repairOpeningChapters, SerialCheckpointError,
-  splitOpeningFindings, writeOneChapter,
+  auditFourChapterOpening, planNextCycle, readingHealth, repairOpeningUntilClean, SerialCheckpointError,
+  writeOneChapter,
   serialChapterInputFingerprint,
   type ChapterOutcome, type SerialDraftCheckpoint,
 } from '@/services/serial/engine';
@@ -422,26 +422,22 @@ async function main(): Promise<void> {
     usages.push(...audited.usages);
     openingAudit = audited.audit;
     writeJson(join(outDir, 'opening-audit.json'), audited.audit);
-    const { structural, local } = splitOpeningFindings(audited.audit);
     // Same path a reviewer takes with `serial:operator repair-opening`: local notes are
-    // fixed in place once, then audited again. Structural findings would replan.
-    if (!audited.audit.passed && structural.length === 0 && local.length > 0) {
-      const repaired = await repairOpeningChapters({
-        provider, routes: DEFAULT_SERIAL_ROUTES, premise, chapters: writtenChapters.slice(0, 4), findings: local,
-      });
+    // fixed in place (at most two rounds), then audited again. Structural findings replan.
+    const repaired = await repairOpeningUntilClean({
+      provider, routes: DEFAULT_SERIAL_ROUTES, premise, chapters: writtenChapters.slice(0, 4), audit: audited.audit,
+    });
+    if (repaired.rounds.length) {
       usages.push(...repaired.usages);
       for (const chapter of repaired.chapters.filter(item => repaired.repaired.includes(item.chapterNumber))) {
         const file = join(outDir, `chapter-${String(chapter.chapterNumber).padStart(3, '0')}.md`);
-        if (existsSync(file)) renameSync(file, file.replace(/\.md$/, '.pre-repair.md'));
+        const original = file.replace(/\.md$/, '.pre-repair.md');
+        if (existsSync(file) && !existsSync(original)) renameSync(file, original);
         atomicWrite(file, `# ${chapter.title}\n\n${chapter.content}\n`);
         writtenChapters[chapter.chapterNumber - 1] = chapter;
       }
-      const again = await auditFourChapterOpening({
-        provider, routes: DEFAULT_SERIAL_ROUTES, premise, chapters: writtenChapters.slice(0, 4),
-      });
-      usages.push(...again.usages);
-      openingAudit = again.audit;
-      writeJson(join(outDir, 'opening-audit.json'), { before: audited.audit, repaired: repaired.repaired, after: again.audit });
+      openingAudit = repaired.audit;
+      writeJson(join(outDir, 'opening-audit.json'), { before: audited.audit, rounds: repaired.rounds, after: repaired.audit });
     }
   }
   const spend = priorSpend + usages.reduce((sum, usage) => sum + usage.costUsd, 0);

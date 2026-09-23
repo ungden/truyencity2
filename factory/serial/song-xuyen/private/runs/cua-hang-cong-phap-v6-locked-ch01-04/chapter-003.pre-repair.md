@@ -1,34 +1,6 @@
 # “Bốn linh thạch một cân, lô này tôi lấy sạch!”
 
-Lâm Việt đặt ba bản bí tịch lên quầy.
-
-“Đội Tro Tàn, đơn đã trả trước.”
-
-Cô gái tóc ngắn chộp lấy bản đầu tiên, ngón tay lướt qua bìa da xám.
-
-“Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm.”
-
-Thanh niên cầm dao phay cải tạo ôm bản thứ hai vào ngực.
-
-“Lần này ta cắt khe khớp.”
-
-Người cầm khiên nhận bản cuối, cười khàn.
-
-“Ta ghim đầu nó xuống.”
-
-Chu Dã đứng cạnh cửa, chỉ gõ ngón tay lên quyền ấn trên Bia Thử Lực Đông Hà.
-
-“Đừng ham giáp dày.”
-
-“Luyện được lực từ chân lên eo rồi hẵng ra ngoài thành.”
-
-Cô gái tóc ngắn gật đầu.
-
-“Đội Tro Tàn đi săn Thiết Giáp Ngưu.”
-
-...
-
-Khi họ trở lại, túi da nặng trịch bị quẳng lên quầy.
+Cô gái tóc ngắn quẳng túi da nặng trịch lên quầy.
 
 “Thiết Giáp Ngưu.”
 
@@ -108,13 +80,19 @@ Thanh niên gầy nắm chặt số tinh hạch vừa đổi được, cười �
 
 Người cầm khiên quay lại nhìn Chu Dã.
 
-Chu Dã hất cằm về phía ba bản bí tịch họ đang ôm.
+“Ba bản bí tịch…”
 
-“Về luyện cho chắc.”
+“Đã có hàng.” Lâm Việt đáp.
 
-“Lần sau gặp nó, đừng để ta phải đấm vào cổ nó nữa.”
+Cả ba cùng quay phắt về phía hắn.
 
-Cả ba cùng gật đầu.
+Lâm Việt không giải thích thêm.
+
+“Trước khi trời tối, quay lại nhận.”
+
+Cô gái tóc ngắn siết cán cung gấp.
+
+“Được.”
 
 Đội Tro Tàn rời đi rất nhanh.
 
@@ -130,7 +108,9 @@ Mùi máu nóng bị gió lạnh của kho nhỏ ở Thanh Huyền Giới cuốn
 
 Hắn không dừng lại, thay áo ngoài rồi mang thùng hàng xuống Thanh Lô Phường.
 
-Muốn để Đội Tro Tàn tiếp tục săn được hàng, trước hết phải biến đống chiến lợi phẩm này thành linh thạch.
+Muốn trả đơn của Đội Tro Tàn, hắn phải lấy được bí tịch.
+
+Muốn lấy bí tịch, trước hết phải biến đống chiến lợi phẩm này thành linh thạch.
 
 Cái vòng này mà chạy trơn tru.
 
@@ -336,6 +316,26 @@ Lâm Việt không quay đầu.
 
 “Giữ giá được thì sẽ có.”
 
+Ở quầy bí tịch phổ thông, ông chủ vừa thấy hắn đã hừ một tiếng.
+
+“Lại mua Man Ngưu Luyện Thể Quyết?”
+
+“Lấy bản chép được phép bán.”
+
+“Ngươi mua món này làm gì mà liên tục thế?”
+
+“Có người chờ.”
+
+Ông chủ nhún vai, lấy ba bản bí tịch có dấu quầy đặt lên mặt bàn.
+
+Lâm Việt kiểm dấu, kiểm giấy, rồi mới cất vào túi trữ vật.
+
+【Nhập kho: Lâm Việt nhận 3 bản Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm】
+
+Ba bản bí tịch nằm gọn trong túi.
+
+Đơn của Đội Tro Tàn cuối cùng đã có hàng thật.
+
 Lâm Việt trở về Đông Hà khi trời đã ngả tối.
 
 Trước trạm Thành Vệ, một vòng người đang chen kín.
@@ -414,7 +414,7 @@ Cô gái tóc ngắn nhìn hắn, rồi nhìn cánh cửa cửa hàng.
 
 Chu Dã đập nắm tay vào lòng bàn tay.
 
-“Vậy luyện cho chắc.”
+“Vậy nhận bí tịch.”
 
 “Lần này…”
 

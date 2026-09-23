@@ -17,7 +17,7 @@ import dotenv from 'dotenv';
 import { readFileSync } from 'node:fs';
 import { createClient } from '@supabase/supabase-js';
 import { assertSerialLaunchable, OpeningAuditSchema, PremiseSchema, SerialRoutesSchema } from '@/services/serial/contracts';
-import { auditFourChapterOpening, repairOpeningChapters, splitOpeningFindings } from '@/services/serial/engine';
+import { repairOpeningUntilClean, splitOpeningFindings } from '@/services/serial/engine';
 import { geminiProvider } from '@/services/story-factory/provider';
 import { DEFAULT_SERIAL_ROUTES } from '@/services/serial/routes';
 import { SERIAL_PROMPT_VERSION } from '@/services/serial/prompts';
@@ -188,19 +188,18 @@ async function repairOpening(): Promise<void> {
   const { local } = splitOpeningFindings(audit);
   console.log(JSON.stringify({ dryRun: !apply, chapters: chapters.map(item => item.chapterNumber), local }, null, 2));
   if (!apply || local.length === 0) return;
-  const repaired = await repairOpeningChapters({ provider: geminiProvider, routes, premise, chapters, findings: local });
+  const repaired = await repairOpeningUntilClean({ provider: geminiProvider, routes, premise, chapters, audit });
   for (const chapter of repaired.chapters.filter(item => repaired.repaired.includes(item.chapterNumber))) {
     const saved = await db.from('chapters').update({ title: chapter.title, content: chapter.content, updated_at: new Date().toISOString() })
       .eq('novel_id', job.data.novel_id).eq('chapter_number', chapter.chapterNumber).eq('publication_state', 'draft');
     if (saved.error) throw saved.error;
   }
-  const again = await auditFourChapterOpening({ provider: geminiProvider, routes, premise, chapters: repaired.chapters });
   const noted = await db.from('serial_jobs').update({
-    last_error: again.audit.passed ? null : `Sau sửa cục bộ vẫn còn: ${again.audit.findings.map(item => `Ch.${item.chapterNumber} ${item.kind}`).join(' | ')}`,
+    last_error: repaired.audit.passed ? null : `Sau sửa cục bộ vẫn còn: ${repaired.audit.findings.map(item => `Ch.${item.chapterNumber} ${item.kind}`).join(' | ')}`,
   }).eq('id', jobId);
   if (noted.error) throw noted.error;
-  const costUsd = [...repaired.usages, ...again.usages].reduce((sum, usage) => sum + usage.costUsd, 0);
-  console.log(JSON.stringify({ repaired: repaired.repaired, passed: again.audit.passed, findings: again.audit.findings, costUsd }, null, 2));
+  const costUsd = repaired.usages.reduce((sum, usage) => sum + usage.costUsd, 0);
+  console.log(JSON.stringify({ repaired: repaired.repaired, rounds: repaired.rounds.length, passed: repaired.audit.passed, findings: repaired.audit.findings, costUsd }, null, 2));
 }
 
 async function setStatus(next: 'ready' | 'paused', label: string): Promise<void> {

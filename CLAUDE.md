@@ -118,7 +118,7 @@ and a silent production stall.
 
 ```bash
 npm run typecheck
-npm test                 # 471
+npm test                 # 474
 npm run security:secrets
 ```
 

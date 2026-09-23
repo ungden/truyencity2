@@ -288,6 +288,45 @@ export async function repairOpeningChapters(input: {
   return { chapters, repaired, usages };
 }
 
+/**
+ * Repair local opening findings, audit again, and repeat once if the fix moved the
+ * problem next door (a delivery moved into chapter three now happens twice). Bounded:
+ * what survives two rounds, or anything structural, is left for the reader and replan.
+ */
+export async function repairOpeningUntilClean(input: {
+  provider: StoryModelProvider;
+  routes: SerialRoutes;
+  premise: Premise;
+  chapters: Array<{ chapterNumber: number; title: string; content: string }>;
+  audit: OpeningAudit;
+  maxRounds?: number;
+  deadline?: number;
+}): Promise<{
+  chapters: Array<{ chapterNumber: number; title: string; content: string }>;
+  audit: OpeningAudit;
+  repaired: number[];
+  rounds: Array<{ repaired: number[]; findings: OpeningAudit['findings'] }>;
+  usages: ProviderUsage[];
+}> {
+  let chapters = input.chapters;
+  let audit = input.audit;
+  const usages: ProviderUsage[] = [];
+  const rounds: Array<{ repaired: number[]; findings: OpeningAudit['findings'] }> = [];
+  for (let round = 0; round < (input.maxRounds ?? 2); round += 1) {
+    const { structural, local } = splitOpeningFindings(audit);
+    if (audit.passed || structural.length > 0 || local.length === 0) break;
+    const repaired = await repairOpeningChapters({ ...input, chapters, findings: local });
+    usages.push(...repaired.usages);
+    chapters = repaired.chapters;
+    rounds.push({ repaired: repaired.repaired, findings: local });
+    assertTimeFor(SUPPORT_TIMEOUT_MS, input.deadline, usages);
+    const again = await auditFourChapterOpening({ provider: input.provider, routes: input.routes, premise: input.premise, chapters });
+    usages.push(...again.usages);
+    audit = again.audit;
+  }
+  return { chapters, audit, repaired: [...new Set(rounds.flatMap(item => item.repaired))].sort(), rounds, usages };
+}
+
 export async function writeOneChapter(input: {
   provider: StoryModelProvider;
   routes: SerialRoutes;
