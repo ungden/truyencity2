@@ -478,6 +478,7 @@ export function buildCyclePlannerBrief(input: {
   startChapter: number;
   fixedEndChapter?: number;
   steering: string[];
+  previousChapter?: string | null;
 }) {
   const { premise, bible } = input;
   const used: PayoffKind[] = recentPayoffKinds(bible);
@@ -497,6 +498,9 @@ export function buildCyclePlannerBrief(input: {
     quyenSo: input.volumeNumber,
     chuongBatDau: input.startChapter,
     chuongKetThucCoDinh: input.fixedEndChapter ?? null,
+    // What the last written chapter ended on. A replan that could not see it planned a
+    // deposit right after the protagonist said he takes no money up front.
+    doanCuoiChuongTruoc: previousTail(input.previousChapter ?? null, 300),
     // The premise's promise for the chapters being planned, surfaced rather than left
     // inside worldKernel: a planner that could not see it turned "the clan takes the
     // field back" into "the field is sealed pending a ruling".

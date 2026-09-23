@@ -242,10 +242,15 @@ async function stagePlanCycle(
     return parsed.success ? [parsed.data] : [];
   });
 
+  const { data: lastChapter, error: lastChapterError } = await db.from('chapters')
+    .select('content').eq('novel_id', job.novel_id).eq('chapter_number', job.current_chapter).maybeSingle();
+  if (lastChapterError) throw lastChapterError;
+
   let planned: Awaited<ReturnType<typeof planNextCycle>>;
   try {
     planned = await planNextCycle({
       provider, routes, premise, bible,
+      previousChapter: (lastChapter as { content?: string } | null)?.content ?? null,
       previousCycle: previous?.success ? previous.data : null,
       activeCycle: active?.success ? active.data : null,
       cycleNumber: extending

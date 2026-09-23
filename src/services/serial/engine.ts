@@ -661,6 +661,8 @@ export async function planNextCycle(input: {
   /** A validation error from the previous tick's plan, fixed on this first attempt. */
   correction?: string | null;
   deadline?: number;
+  /** The last written chapter, so the first planned chapter continues what it ended on. */
+  previousChapter?: string | null;
 }): Promise<{ cycle: CyclePlan; usages: ProviderUsage[]; costUsd: number }> {
   assertBibleCoherence(input.premise, input.bible);
   const usages: ProviderUsage[] = [];
@@ -674,6 +676,7 @@ export async function planNextCycle(input: {
     startChapter: input.startChapter,
     fixedEndChapter: input.fixedEndChapter,
     steering: [...new Set([...(input.editorialNotes ?? []), ...collectSteering(input.recentVerdicts)])].slice(0, 8),
+    previousChapter: input.previousChapter ?? null,
   });
 
   const rolling = Boolean(input.activeCycle);

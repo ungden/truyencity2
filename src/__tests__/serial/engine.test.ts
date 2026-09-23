@@ -598,6 +598,21 @@ describe('context selection', () => {
     }
   });
 
+  test('a replan continues what the last chapter ended on, and a change of mind is shown, not flagged', () => {
+    const ending = 'Lục Hàn dặn Phàn Mộc: “Ai hỏi lô sau thì ghi tên, không nhận tiền trước.”';
+    const brief = buildCyclePlannerBrief({
+      premise, bible: baseBible(), previousCycle: null, activeCycle: cycle({ cycleNumber: 1, startChapter: 1, plannedEndChapter: 5 }),
+      cycleNumber: 1, volumeNumber: 1, startChapter: 4, fixedEndChapter: 5, steering: [], previousChapter: `Mở đầu. ${ending}`,
+    });
+    expect(brief.doanCuoiChuongTruoc).toContain(ending);
+    for (const archetype of archetypeIds()) {
+      const prompts = promptsFor(archetype);
+      expect(prompts.planner).toMatch(/beat ghi luôn lý do đổi ý hiện trên trang/);
+      expect(prompts.writer).toMatch(/cho thấy lý do đổi ý ngay trên trang/);
+      expect(prompts.judge).toMatch(/Nhân vật đổi ý với lý do hiện trên trang không phải lỗi/);
+    }
+  });
+
   test('chapter roles receive only the relevant active and recently consumed asset lots', () => {
     const bible = baseBible();
     bible.symbolicCore.activeAssetLots = [{
