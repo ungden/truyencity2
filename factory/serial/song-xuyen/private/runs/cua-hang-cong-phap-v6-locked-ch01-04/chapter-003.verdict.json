@@ -1,0 +1,213 @@
+{
+  "verdict": {
+    "continuity": [],
+    "scorecard": {
+      "opening": 4,
+      "anticipation": 4,
+      "payoff": 5,
+      "newness": 5,
+      "endHook": 3
+    },
+    "craft": {
+      "protagonistAgency": 5,
+      "sceneLife": 4,
+      "worldLogic": 5,
+      "dialogueNaturalness": 4,
+      "structuralFreshness": 4
+    },
+    "repetition": [
+      {
+        "quote": "Trước trạm Thành Vệ, một vòng người đang chen kín.",
+        "repeatsChapter": 1,
+        "note": "Lại dùng mô thức chứng minh công dụng trước công chúng rồi để Thành Vệ xác nhận. Lần này có thêm Chu Dã và bia đá nên vẫn là payoff hợp lệ, nhưng chương sau nên chuyển phản ứng ấy thành đơn hàng cụ thể thay vì thêm một màn vây xem."
+      }
+    ],
+    "aiFlavor": [
+      {
+        "quote": "“Thiết Giáp Ngưu?”\n\n“Loại hung thú da như giáp sắt ấy?”\n\n“Thanh Lô Phường mấy tháng rồi chưa thấy hàng thật!”",
+        "kind": "crowd_chorus"
+      },
+      {
+        "quote": "Cái vòng này mà chạy trơn tru.\n\nSong Giới Thương Điếm mới thật sự sống.",
+        "kind": "empty_lyricism"
+      },
+      {
+        "quote": "【Giao dịch: Lâm Việt → Hàn Dược Sư: 6 cân Thịt Thiết Giáp Ngưu Nhất giai】",
+        "kind": "report_prose"
+      }
+    ],
+    "steering": [
+      "Mở chương 4 bằng việc Lâm Việt giao tận tay ba bản Man Ngưu Luyện Thể Quyết cho Đội Tro Tàn, xác nhận đơn trả trước đã khép và cho từng người chọn ngay một mục tiêu săn phù hợp với công pháp mới.",
+      "Cho cô gái tóc ngắn dẫn đội thử công pháp trong một chuyến săn ngắn; một người phải dùng thân pháp hoặc cách phối hợp mới để biến việc từng phải chạy thành một cú hạ thú có chiến lợi phẩm rõ ràng.",
+      "Đưa Tô Vãn vào cửa hàng với mục tiêu giữ quân trinh sát, để cô đặt đơn tổ chức sáu viên Tịnh Mạch Đan, trả trước đúng sáu tinh hạch và công khai dành suất đầu cho Hứa An.",
+      "Để Cao Nguyên phản ứng bằng lợi ích bị mất: hắn phải tung giá mua hoặc điều kiện ở Chợ Tinh Hạch nhằm giữ nguồn hàng, còn Lâm Việt đáp lại bằng bảng thu mua và khách tự chọn giao dịch, không biến cửa hàng thành cảnh chống cướp.",
+      "Trả payoff bằng một lô hàng hoặc đơn săn mới mà Đội Tro Tàn mang về sau khi mạnh lên, khiến Hàn Dược Sư hay Hỏa Văn Lô phải tranh một quyền mua dài hạn có giá và số lượng cụ thể."
+    ],
+    "reviewBinding": {
+      "chapterNumber": 3,
+      "title": "“Bốn linh thạch một cân, lô này tôi lấy sạch!”",
+      "excerpt": "Hàn Dược Sư lấy túi linh thạch đặt lên bàn, động tác nhanh đến mức như sợ Lâm Việt đổi ý."
+    }
+  },
+  "digest": {
+    "chapterNumber": 3,
+    "title": "“Bốn linh thạch một cân, lô này tôi lấy sạch!”",
+    "summary": "Lâm Việt hoàn tất giao dịch với Đội Tro Tàn, bán toàn bộ chiến lợi phẩm để mua bí tịch, đồng thời khiến Song Giới Thương Điếm và hàng hóa của mình được Thành Vệ công nhận.",
+    "payoffKind": "duoc_cong_nhan",
+    "endedOn": "Đội Tro Tàn chuẩn bị nhận bí tịch và tiếp tục săn Thiết Giáp Ngưu, không còn bán chiến lợi phẩm cho Cao Nguyên.",
+    "newNamedThings": [
+      "doi_tro_tan: Đội Tro Tàn",
+      "hoa_van_lo: Hỏa Văn Lô",
+      "phuc_van_lau: Phúc Vân Lâu",
+      "van_huong_cac: Vạn Hương Các",
+      "thiet_giap_ngu: Thiết Giáp Ngưu",
+      "man_nguu_luyen_the_quyet: Man Ngưu Luyện Thể Quyết"
+    ],
+    "narrativeEvidence": [],
+    "coreChanges": {
+      "storyDayDelta": 0,
+      "died": [],
+      "progressionChanges": [],
+      "assetEvents": [
+        {
+          "eventId": "c3_01_tra_tinh_hach_thu_mua_tro_tan",
+          "kind": "consume",
+          "assetId": "tinh_hach_nhat_giai_hon_hop",
+          "assetName": "Tinh hạch Nhất giai hỗn hợp",
+          "quantity": 11,
+          "unit": "viên",
+          "fungible": true,
+          "sourceLotId": "c1_05_thu_tinh_hach_thanh_ve",
+          "fromOwnerId": "lam_viet",
+          "fromOwnerName": "Lâm Việt",
+          "toOwnerId": null,
+          "toOwnerName": null,
+          "note": "Lâm Việt dùng mười một tinh hạch Nhất giai hỗn hợp trả Đội Tro Tàn theo giá một viên mỗi cân thịt và một viên mỗi tinh hạch Hỏa."
+        },
+        {
+          "eventId": "c3_02_nhap_thit_thiet_giap_nguu",
+          "kind": "acquire",
+          "assetId": "thit_thiet_giap_nguu",
+          "assetName": "Thịt Thiết Giáp Ngưu Nhất giai",
+          "quantity": 6,
+          "unit": "cân",
+          "fungible": true,
+          "sourceLotId": null,
+          "fromOwnerId": "doi_tro_tan",
+          "fromOwnerName": "Đội Tro Tàn",
+          "toOwnerId": "lam_viet",
+          "toOwnerName": "Lâm Việt",
+          "note": "Đội Tro Tàn bán sáu cân thịt từ chuyến săn Thiết Giáp Ngưu."
+        },
+        {
+          "eventId": "c3_03_nhap_tinh_hach_hoa",
+          "kind": "acquire",
+          "assetId": "tinh_hach_hoa_nhat_giai",
+          "assetName": "Tinh hạch Hỏa hệ Nhất giai",
+          "quantity": 5,
+          "unit": "viên",
+          "fungible": true,
+          "sourceLotId": null,
+          "fromOwnerId": "doi_tro_tan",
+          "fromOwnerName": "Đội Tro Tàn",
+          "toOwnerId": "lam_viet",
+          "toOwnerName": "Lâm Việt",
+          "note": "Đội Tro Tàn bán năm viên tinh hạch Hỏa từ chuyến săn Thiết Giáp Ngưu."
+        },
+        {
+          "eventId": "c3_04_ban_thit_cho_han_duoc_su",
+          "kind": "transfer",
+          "assetId": "thit_thiet_giap_nguu",
+          "assetName": "Thịt Thiết Giáp Ngưu Nhất giai",
+          "quantity": 6,
+          "unit": "cân",
+          "fungible": true,
+          "sourceLotId": "c3_02_nhap_thit_thiet_giap_nguu",
+          "fromOwnerId": "lam_viet",
+          "fromOwnerName": "Lâm Việt",
+          "toOwnerId": "han_duoc_su",
+          "toOwnerName": "Hàn Dược Sư",
+          "note": "Hàn Dược Sư mua trọn sáu cân thịt với giá bốn linh thạch hạ phẩm mỗi cân."
+        },
+        {
+          "eventId": "c3_05_thu_linh_thach_tu_han_duoc_su",
+          "kind": "acquire",
+          "assetId": "linh_thach_ha_pham",
+          "assetName": "Linh thạch hạ phẩm",
+          "quantity": 24,
+          "unit": "viên",
+          "fungible": true,
+          "sourceLotId": null,
+          "fromOwnerId": "han_duoc_su",
+          "fromOwnerName": "Hàn Dược Sư",
+          "toOwnerId": "lam_viet",
+          "toOwnerName": "Lâm Việt",
+          "note": "Hàn Dược Sư trả hai mươi bốn linh thạch hạ phẩm cho sáu cân thịt."
+        },
+        {
+          "eventId": "c3_06_ban_tinh_hach_hoa_cho_hoa_van_lo",
+          "kind": "transfer",
+          "assetId": "tinh_hach_hoa_nhat_giai",
+          "assetName": "Tinh hạch Hỏa hệ Nhất giai",
+          "quantity": 5,
+          "unit": "viên",
+          "fungible": true,
+          "sourceLotId": "c3_03_nhap_tinh_hach_hoa",
+          "fromOwnerId": "lam_viet",
+          "fromOwnerName": "Lâm Việt",
+          "toOwnerId": "hoa_van_lo",
+          "toOwnerName": "Hỏa Văn Lô",
+          "note": "Hỏa Văn Lô mua năm viên tinh hạch Hỏa với giá bốn linh thạch hạ phẩm mỗi viên."
+        },
+        {
+          "eventId": "c3_07_thu_linh_thach_tu_hoa_van_lo",
+          "kind": "acquire",
+          "assetId": "linh_thach_ha_pham",
+          "assetName": "Linh thạch hạ phẩm",
+          "quantity": 20,
+          "unit": "viên",
+          "fungible": true,
+          "sourceLotId": null,
+          "fromOwnerId": "hoa_van_lo",
+          "fromOwnerName": "Hỏa Văn Lô",
+          "toOwnerId": "lam_viet",
+          "toOwnerName": "Lâm Việt",
+          "note": "Hỏa Văn Lô trả hai mươi linh thạch hạ phẩm cho năm viên tinh hạch Hỏa."
+        },
+        {
+          "eventId": "c3_08_nhap_ba_man_nguu_quyet",
+          "kind": "acquire",
+          "assetId": "man_nguu_luyen_the_quyet",
+          "assetName": "Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm",
+          "quantity": 3,
+          "unit": "bản",
+          "fungible": false,
+          "sourceLotId": null,
+          "fromOwnerId": "quay_bi_tich_pho_thong",
+          "fromOwnerName": "Quầy bí tịch phổ thông Thanh Lô Phường",
+          "toOwnerId": "lam_viet",
+          "toOwnerName": "Lâm Việt",
+          "note": "Lâm Việt dùng ba linh thạch hạ phẩm từ lô nguyên liệu để mua ba bản chép được phép bán, đủ giao đơn Đội Tro Tàn."
+        }
+      ],
+      "goldenFingerRungChange": null,
+      "moved": [],
+      "worldFactsRevealed": [
+        {
+          "id": "thanh_huyen_gioi",
+          "note": "Lâm Việt có một kho nhỏ tại Thanh Huyền Giới, nơi hắn chuyển hàng trước khi mang đi giao dịch."
+        }
+      ],
+      "newCast": [],
+      "hooksPlanted": [],
+      "hooksPaid": [
+        "doi_tro_tan_nhan_ba_ban_cong_phap",
+        "doi_tro_tan_di_san_thiet_giap_ngu"
+      ],
+      "learnedFinger": []
+    }
+  },
+  "attempts": 1,
+  "costUsd": 0.071061,
+  "inputFingerprint": "a1dca915bc30c00ce8e6dab42f5fd6fd40d2e0b9ddea4321e4ef9ff567484149"
+}

@@ -1,0 +1,163 @@
+{
+  "verdict": {
+    "continuity": [],
+    "scorecard": {
+      "opening": 5,
+      "anticipation": 4,
+      "payoff": 5,
+      "newness": 4,
+      "endHook": 4
+    },
+    "craft": {
+      "protagonistAgency": 4,
+      "sceneLife": 5,
+      "worldLogic": 4,
+      "dialogueNaturalness": 4,
+      "structuralFreshness": 3
+    },
+    "repetition": [],
+    "aiFlavor": [
+      {
+        "quote": "“Ổn định mạch năng lượng, khóa dị năng vào cơ thể, không phải thuốc kích thích!”",
+        "kind": "parallel_triple"
+      },
+      {
+        "quote": "ánh mắt sáng đến đáng sợ.",
+        "kind": "generic_adjective"
+      },
+      {
+        "quote": "“Còn bao nhiêu viên?”\n\n“Ba tinh hạch một viên thật à?”\n\n“Bán cho đội săn chúng tôi trước",
+        "kind": "crowd_chorus"
+      }
+    ],
+    "steering": [
+      "Đưa Tô Vãn dẫn đội trinh sát ra một chuyến tuần tra có người thức tỉnh sắp mất kiểm soát; cô cần chứng minh năm viên vừa mua thật sự giữ được quân số khi nhiệm vụ xảy ra biến cố.",
+      "Cho Hứa An chủ động dùng Lôi Quang đã ổn định để hoàn thành một việc đội trinh sát trước đó không thể làm, thay vì chỉ lặp lại cảnh thử sức tại quầy.",
+      "Trả payoff vật chất ở cuối chuyến đi: đội Thành Vệ mang về một lô tinh hạch hoặc tài nguyên hung thú đủ cụ thể để biến công dụng của Tịnh Mạch Đan thành vốn mua hàng tiếp theo.",
+      "Giữ xung đột ở bên ngoài cửa hàng, đặt lợi ích của Tô Vãn là bảo toàn quân tuần tra đối diện với nhu cầu tranh tài nguyên của đội săn; khi trở lại quầy, để họ tranh bằng giá, suất hàng hoặc điều kiện đơn.",
+      "Dành chương kế tiếp để hoàn tất bước Thành Vệ dùng đan giữ ổn định người thức tỉnh; sau đó chương 3 mới cho Hứa An và Chu Dã trở lại Trạm Thành Vệ làm chứng minh công khai như lịch đã hẹn."
+    ],
+    "reviewBinding": {
+      "chapterNumber": 1,
+      "title": "“Lô sau, tôi phải đứng tên đầu!”",
+      "excerpt": "Lâm Việt kiểm tra số tinh hạch trong túi da, sau đó đẩy năm hộp gỗ nhỏ về phía Tô Vãn."
+    }
+  },
+  "digest": {
+    "chapterNumber": 1,
+    "title": "“Lô sau, tôi phải đứng tên đầu!”",
+    "summary": "Lâm Việt bán Tịnh Mạch Đan giúp Hứa An ổn định lôi điện, được Thành Vệ Đông Hà xác nhận hiệu quả và khiến Hứa An giành suất đầu tiên cho lô hàng sau.",
+    "payoffKind": "duoc_cong_nhan",
+    "endedOn": "“Lô sau, tôi phải đứng tên đầu!”",
+    "newNamedThings": [
+      "Tịnh Mạch Đan Nhất giai hạ phẩm (tinh_mach_dan_nhat_giai_ha_pham)",
+      "Bia Thử Lực Đông Hà (bia_thu_luc_dong_ha)",
+      "đội trinh sát (doi_trinh_sat)",
+      "đội săn (doi_san)"
+    ],
+    "narrativeEvidence": [],
+    "coreChanges": {
+      "storyDayDelta": 0,
+      "died": [],
+      "progressionChanges": [],
+      "assetEvents": [
+        {
+          "eventId": "c1_01_nhap_tinh_mach_dan",
+          "kind": "acquire",
+          "assetId": "tinh_mach_dan",
+          "assetName": "Tịnh Mạch Đan Nhất giai hạ phẩm",
+          "quantity": 6,
+          "unit": "viên",
+          "fungible": true,
+          "sourceLotId": null,
+          "fromOwnerId": "bach_duoc_thanh_ly",
+          "fromOwnerName": "Quầy thanh lý Bách Dược tại Thanh Lô Phường",
+          "toOwnerId": "lam_viet",
+          "toOwnerName": "Lâm Việt",
+          "note": "Lâm Việt dùng hai linh thạch hạ phẩm cuối cùng mua trọn lô có phiếu hàng trước khi mở cửa."
+        },
+        {
+          "eventId": "c1_02_ban_hua_an_tinh_mach_dan",
+          "kind": "transfer",
+          "assetId": "tinh_mach_dan",
+          "assetName": "Tịnh Mạch Đan Nhất giai hạ phẩm",
+          "quantity": 1,
+          "unit": "viên",
+          "fungible": true,
+          "sourceLotId": "c1_01_nhap_tinh_mach_dan",
+          "fromOwnerId": "lam_viet",
+          "fromOwnerName": "Lâm Việt",
+          "toOwnerId": "hua_an",
+          "toOwnerName": "Hứa An",
+          "note": "Hứa An mua một viên theo giá niêm yết."
+        },
+        {
+          "eventId": "c1_03_thu_tinh_hach_hua_an",
+          "kind": "acquire",
+          "assetId": "tinh_hach_loi_nhat_giai",
+          "assetName": "Tinh hạch Lôi hệ Nhất giai",
+          "quantity": 3,
+          "unit": "viên",
+          "fungible": true,
+          "sourceLotId": null,
+          "fromOwnerId": "hua_an",
+          "fromOwnerName": "Hứa An",
+          "toOwnerId": "lam_viet",
+          "toOwnerName": "Lâm Việt",
+          "note": "Hứa An trả đúng ba tinh hạch Lôi hệ Nhất giai cho viên đan."
+        },
+        {
+          "eventId": "c1_04_ban_thanh_ve_tinh_mach_dan",
+          "kind": "transfer",
+          "assetId": "tinh_mach_dan",
+          "assetName": "Tịnh Mạch Đan Nhất giai hạ phẩm",
+          "quantity": 5,
+          "unit": "viên",
+          "fungible": true,
+          "sourceLotId": "c1_01_nhap_tinh_mach_dan",
+          "fromOwnerId": "lam_viet",
+          "fromOwnerName": "Lâm Việt",
+          "toOwnerId": "to_van",
+          "toOwnerName": "Tô Vãn đại diện Thành Vệ Đông Hà",
+          "note": "Tô Vãn mua năm viên còn lại cho Thành Vệ Đông Hà."
+        },
+        {
+          "eventId": "c1_05_thu_tinh_hach_thanh_ve",
+          "kind": "acquire",
+          "assetId": "tinh_hach_nhat_giai_hon_hop",
+          "assetName": "Tinh hạch Nhất giai hỗn hợp",
+          "quantity": 15,
+          "unit": "viên",
+          "fungible": true,
+          "sourceLotId": null,
+          "fromOwnerId": "to_van",
+          "fromOwnerName": "Tô Vãn đại diện Thành Vệ Đông Hà",
+          "toOwnerId": "lam_viet",
+          "toOwnerName": "Lâm Việt",
+          "note": "Tô Vãn trả đúng mười lăm tinh hạch Nhất giai hỗn hợp, ba viên cho mỗi viên đan."
+        }
+      ],
+      "goldenFingerRungChange": null,
+      "moved": [],
+      "worldFactsRevealed": [
+        {
+          "id": "thanh_ve_dong_ha",
+          "note": "Thành Vệ Đông Hà công khai xác nhận Tịnh Mạch Đan Nhất giai hạ phẩm có thể ổn định thức tỉnh giả đang bạo loạn và ưu tiên dùng lô thuốc cho đội trinh sát."
+        }
+      ],
+      "newCast": [],
+      "hooksPlanted": [
+        {
+          "id": "hua_an_dang_ky_lo_sau",
+          "what": "Hứa An đã được Lâm Việt ghi tên đứng đầu danh sách chờ suất trong lô Tịnh Mạch Đan tiếp theo.",
+          "dueByChapter": 2
+        }
+      ],
+      "hooksPaid": [],
+      "learnedFinger": []
+    }
+  },
+  "attempts": 1,
+  "costUsd": 0.042498,
+  "inputFingerprint": "56b97cd758f950eb45cdfb44f6438ea22663328b6e55d15100ebbbaa634b5dad"
+}

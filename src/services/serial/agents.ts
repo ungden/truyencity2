@@ -8,6 +8,7 @@ import {
   PREMISE_SYSTEM_PROMPT, WRITER_SYSTEM_PANEL_RULE,
 } from './prompts';
 import { StoryFactoryError } from '@/services/story-factory/contracts';
+import { groundEvidenceSpan } from '@/services/story-factory/validation';
 import { serialSystemPrompt } from './foundation';
 
 /**
@@ -35,6 +36,28 @@ const comparableTitle = (value: string): string => value
   .replace(/^#{1,6}\s*/, '')
   .replace(/^chương\s+\d+\s*:\s*/u, '')
   .replace(/[“”"'‘’`*_#:\s]/gu, '');
+
+/**
+ * Did the judge read this draft? Title and chapter must match, and the excerpt must be a
+ * real passage — exact, or a run of at least twelve words (or 70% of a short excerpt) once
+ * quotes, dashes and spacing are ignored. Models re-type curly quotes and em-dashes; a
+ * reviewer who reproduced the passage word for word has read it.
+ */
+export function reviewBindingMismatch(
+  binding: { chapterNumber: number; title: string; excerpt: string } | undefined,
+  chapter: { chapterNumber: number; title: string; content: string },
+): string | null {
+  if (!binding) return 'missing reviewBinding';
+  if (binding.chapterNumber !== chapter.chapterNumber) return `chapterNumber ${binding.chapterNumber} ≠ ${chapter.chapterNumber}`;
+  if (comparableTitle(binding.title) !== comparableTitle(chapter.title)) return `title "${binding.title}" ≠ "${chapter.title}"`;
+  if (chapter.content.includes(binding.excerpt)) return null;
+  const words = (value: string) => value.match(/[\p{L}\p{N}]+/gu) ?? [];
+  const excerptWords = words(binding.excerpt).length;
+  const matched = words(groundEvidenceSpan(chapter.content, binding.excerpt) ?? '').length;
+  return matched >= Math.min(12, Math.ceil(excerptWords * 0.7)) && matched >= 6
+    ? null
+    : `excerpt not found (${matched}/${excerptWords} words): ${binding.excerpt.slice(0, 120)}`;
+}
 
 /** Remove a model-emitted Markdown heading that merely repeats the structured title. */
 export function normalizeChapterDraft(draft: ChapterDraft): ChapterDraft {
@@ -133,17 +156,13 @@ export async function judgeChapter(input: {
     temperature: 0.2,
     timeoutMs: SUPPORT_TIMEOUT_MS,
   });
-  const binding = result.value.reviewBinding;
   const deniedInput = (result.value.steering ?? []).some(line =>
     /(?:không|chưa) (?:có|được (?:cấp|cung cấp|gửi)) (?:truyện|văn bản|nội dung|phần văn|bản thảo)/iu.test(line));
-  if (!binding
-      || binding.chapterNumber !== input.chapter.chapterNumber
-      || comparableTitle(binding.title) !== comparableTitle(input.chapter.title)
-      || !input.chapter.content.includes(binding.excerpt)
-      || deniedInput) {
+  const mismatch = deniedInput ? 'steering says no text was supplied' : reviewBindingMismatch(result.value.reviewBinding, input.chapter);
+  if (mismatch) {
     throw new StoryFactoryError(
       'infra_blocked',
-      'Judge response is not grounded in the supplied chapter.',
+      `Judge response is not grounded in the supplied chapter: ${mismatch}`,
       { usage: result.usage },
     );
   }

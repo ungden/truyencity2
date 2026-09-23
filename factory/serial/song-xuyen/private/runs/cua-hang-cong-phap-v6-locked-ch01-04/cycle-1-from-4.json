@@ -1,0 +1,167 @@
+{
+  "schemaVersion": 1,
+  "cycleNumber": 1,
+  "volumeNumber": 1,
+  "startChapter": 1,
+  "plannedEndChapter": 5,
+  "pressure": "Lâm Việt phải chứng minh ngay Song Giới Thương Điếm bán được đan dược và công pháp thật: dùng lô Tịnh Mạch Đan mở khách tổ chức ở Đông Hà, rồi biến chiến lợi phẩm của khách thành vốn linh thạch để giao đơn công pháp đã nhận và hướng tới kỳ thi Nhất giai Luyện Đan Sư.",
+  "escalation": [
+    "Hứa An uống Tịnh Mạch Đan Nhất giai hạ phẩm trước quầy, ổn định thức tỉnh Lôi hệ và đập vỡ bia thử trước đám đông; toàn bộ lô đan lập tức được Tô Vãn mua cho Thành Vệ Đông Hà.",
+    "Chu Dã mua Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm, vận hành chu thiên đầu tiên và để lại quyền ấn trên bia đo lực, mở ra nhu cầu công pháp cho người không có dị năng.",
+    "Đội Tro Tàn dùng niềm tin từ công pháp để đi săn Thiết Giáp Ngưu, bán thịt cùng tinh hạch Hỏa cho Lâm Việt; hàng mạt thế được Hàn Dược Sư và Hỏa Văn Lô tranh mua tại Thanh Lô Phường.",
+    "Lâm Việt dùng linh thạch thu được nhập đủ ba bản công pháp giao Đội Tro Tàn; Hứa An và Chu Dã trở lại cùng Thành Vệ, khiến Tô Vãn ký đơn Tịnh Mạch Đan quy mô đội và xác nhận cửa hàng đã có khách tổ chức.",
+    "Đơn tổ chức tạo cho Lâm Việt vốn lẫn uy tín để thuê lò, thi Nhất giai Luyện Đan Sư; đồng thời Cao Nguyên thấy nguồn tinh hạch của mình bị rút khỏi Chợ Tinh Hạch."
+  ],
+  "climax": {
+    "payoffKind": "duoc_cong_nhan",
+    "performedBy": "ally",
+    "attribution": "public",
+    "result": "Tại quầy Song Giới Thương Điếm, Hứa An với Lôi Quang đã ổn định và Chu Dã đã bước vào Luyện Khí tầng một cùng xuất hiện trước Thành Vệ. Tô Vãn công khai xác nhận hiệu quả của hai con đường hàng hóa, ký đơn sáu viên Tịnh Mạch Đan cho đội, trong đó giữ suất đầu cho Hứa An. Lâm Việt giao đủ ba bản Man Ngưu Luyện Thể Quyết đã đặt trước cho Đội Tro Tàn, biến cửa hàng từ quầy bán lẻ thành nguồn hàng mà đội săn và Thành Vệ đều phải xếp lịch mua.",
+    "witnesses": [
+      "Tô Vãn và Thành Vệ Đông Hà",
+      "Hứa An",
+      "Chu Dã",
+      "Đội Tro Tàn",
+      "Người sống sót tại Phố Thương Điếm Đông Hà"
+    ]
+  },
+  "aftermath": "Lâm Việt giữ được linh thạch từ lô nguyên liệu để chuẩn bị thuê lò và mua dược liệu ở Thanh Lô Phường. Thành Vệ trở thành khách tổ chức đầu tiên nhưng cửa hàng vẫn ở nấc Kệ bán lẻ; mọi đơn sau phải do Lâm Việt tự gom hàng, định giá và giao đúng hạn.",
+  "nextHook": "Cao Nguyên nhận ra các đội săn đang bán chiến lợi phẩm thẳng cho quầy của Lâm Việt thay vì qua Chợ Tinh Hạch. Hắn không thể làm gì trong cửa hàng, nên bắt đầu dùng quyền chia bãi săn bên ngoài để ép đội săn chọn phe.",
+  "customerLoop": {
+    "customerId": "to_van",
+    "entryNeed": "Thành Vệ Đông Hà cần Tịnh Mạch Đan ổn định người thức tỉnh để đội trinh sát không mất quân giữa nhiệm vụ.",
+    "purchaseAssetId": "tinh_mach_dan",
+    "purchaseMode": "first_acquisition",
+    "purchaseTerms": {
+      "quantity": 5,
+      "unit": "viên",
+      "consideration": "Tô Vãn đại diện Thành Vệ Đông Hà trả đúng mười lăm tinh hạch Nhất giai hỗn hợp, ba tinh hạch cho mỗi viên Tịnh Mạch Đan Nhất giai hạ phẩm."
+    },
+    "purchase": "Tô Vãn mua trọn năm viên còn lại sau khi Hứa An chứng minh tác dụng trước quầy.",
+    "useToEarn": "Thành Vệ dùng lô đan để giữ ổn định những người thức tỉnh trong đội trinh sát, nhờ đó duy trì được nhân lực cho các chuyến tuần tra và săn bắt.",
+    "publicProof": "Hứa An cùng Chu Dã trở lại trước Thành Vệ với Lôi Quang đã ổn định và quyền ấn Luyện Khí tầng một; Tô Vãn công khai xác nhận hàng của cửa hàng đã tạo ra chiến lực dùng được.",
+    "returnUpgradeAssetId": "tinh_mach_dan",
+    "returnUpgradeMode": "organization_scale",
+    "returnUpgradeTerms": {
+      "quantity": 6,
+      "unit": "viên",
+      "consideration": "Tô Vãn đặt đơn sáu viên Tịnh Mạch Đan Nhất giai hạ phẩm theo giá ba tinh hạch Nhất giai mỗi viên, trả trước sáu tinh hạch; mười hai tinh hạch còn lại thanh toán khi nhận hàng. Suất đầu trong đơn dành cho Hứa An."
+    },
+    "returnUpgrade": "Tô Vãn quay lại với tư cách khách tổ chức, nâng từ mua cứu gấp cho một nhóm nhỏ thành đơn sáu viên dành cho đội Thành Vệ.",
+    "schedule": {
+      "purchaseChapter": 1,
+      "useToEarnChapter": 2,
+      "publicProofChapter": 3,
+      "returnUpgradeChapter": 4
+    }
+  },
+  "beatSheets": [
+    {
+      "chapterNumber": 4,
+      "sceneMode": "organization",
+      "openingBridge": "Ngay sau khi Đội Tro Tàn tuyên bố không còn bán chiến lợi phẩm cho Cao Nguyên, Lâm Việt mở cửa quầy và đặt ba bản Man Ngưu Luyện Thể Quyết đã nhập sẵn lên mặt bàn: đơn trả trước phải được giao trước mọi cuộc nói chuyện mới.",
+      "protagonistMove": "Lâm Việt tự đối chiếu đơn đã trả trước, giao đủ ba bản công pháp cho Đội Tro Tàn, rồi lấy báo cáo tuần tra của Thành Vệ làm căn cứ niêm yết đơn Tịnh Mạch Đan sáu viên thay vì nhận lời mặc cả mơ hồ.",
+      "beats": [
+        "Cô gái tóc ngắn, thanh niên gầy cầm dao phay cải tạo và người cầm khiên lần lượt nhận bản Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm; mỗi người chạm tay vào trang chép có dấu quầy rồi tự chọn cách phối hợp để săn Thiết Giáp Ngưu.",
+        "Tô Vãn dẫn Hứa An và Chu Dã đến quầy, xác nhận những người đã dùng Tịnh Mạch Đan trong tuần tra giữ được dị năng ổn định; Hứa An đòi rõ suất đầu lô sau, trả dứt lời hứa từng được ghi tên cho cậu.",
+        "Hứa An để Lôi Quang chạy ổn định qua lòng bàn tay, Chu Dã để lại quyền ấn mới trên Bia Thử Lực Đông Hà; người ngoài gọi đúng Nhất giai trung kỳ và Luyện Khí tầng một, buộc Thành Vệ phải nhìn nhận cả hai con đường.",
+        "Tô Vãn ký đơn tổ chức sáu viên Tịnh Mạch Đan, trả trước sáu tinh hạch và ghi Hứa An ở suất đầu; đám đông đổi cách gọi Lâm Việt từ chủ quầy thành người nắm nguồn hàng cho Thành Vệ."
+      ],
+      "materialOutcome": "Đội Tro Tàn sở hữu đủ ba bản công pháp đã thanh toán; Thành Vệ Đông Hà có đơn tổ chức sáu viên Tịnh Mạch Đan cùng khoản đặt trước sáu tinh hạch, suất đầu được khóa cho Hứa An.",
+      "emotionalTarget": "Sự thỏa mãn dứt khoát khi mọi lời hẹn giao hàng, giữ suất và hiệu quả thực chiến đều được trả ngay trên quầy, biến người mua lẻ thành khách tổ chức.",
+      "newNamedThing": "Đơn Thành Vệ số Một",
+      "prerequisiteIds": [],
+      "revealsFactIds": [],
+      "advancesMilestoneIds": [],
+      "valueContrastId": null,
+      "valueExperience": null,
+      "ledger": [
+        {
+          "eventId": "c4_01_giao_don_tro_tan",
+          "kind": "transfer",
+          "assetId": "man_nguu_luyen_the_quyet",
+          "assetName": "Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm",
+          "quantity": 3,
+          "unit": "bản",
+          "fungible": false,
+          "sourceLotId": "c3_08_nhap_ba_man_nguu_quyet",
+          "fromOwnerId": "lam_viet",
+          "fromOwnerName": "Lâm Việt",
+          "toOwnerId": "doi_tro_tan",
+          "toOwnerName": "Ba thành viên Đội Tro Tàn",
+          "note": "Giao đủ ba bản công pháp của đơn đã trả trước; không thu thêm."
+        },
+        {
+          "eventId": "c4_02_thu_dat_truoc_don_thanh_ve",
+          "kind": "acquire",
+          "assetId": "tinh_hach_nhat_giai_hon_hop",
+          "assetName": "Tinh hạch Nhất giai hỗn hợp",
+          "quantity": 6,
+          "unit": "viên",
+          "fungible": true,
+          "sourceLotId": null,
+          "fromOwnerId": "to_van",
+          "fromOwnerName": "Tô Vãn đại diện Thành Vệ Đông Hà",
+          "toOwnerId": "lam_viet",
+          "toOwnerName": "Lâm Việt",
+          "note": "Tô Vãn đặt đơn sáu viên Tịnh Mạch Đan Nhất giai hạ phẩm, trả trước sáu tinh hạch; mười hai tinh hạch còn lại thanh toán khi nhận hàng. Suất đầu dành cho Hứa An."
+        }
+      ],
+      "endHookKind": "declaration"
+    },
+    {
+      "chapterNumber": 5,
+      "sceneMode": "hunt",
+      "openingBridge": "Đơn Thành Vệ số Một vừa treo lên bảng, cô gái tóc ngắn gấp bản công pháp vào ngực và tuyên bố Đội Tro Tàn sẽ dùng chính chuyến săn đầu tiên sau khi nhận hàng để trả lời xem bỏ Chợ Tinh Hạch có đáng giá hay không.",
+      "protagonistMove": "Lâm Việt không đi săn thay khách; hắn chọn công khai bảng thu mua theo giai tại quầy, xác nhận Đội Tro Tàn được tự do bán chiến lợi phẩm cho ai trả giá rõ ràng, rồi để họ mang công pháp ra ngoài chứng minh giá trị.",
+      "beats": [
+        "Ở Bãi săn Thiết Giáp Ngưu, người cầm khiên giữ chân một con hung thú non, thanh niên gầy dùng khí huyết theo Man Ngưu Luyện Thể Quyết ép lưỡi dao vào khe giáp, còn cô gái tóc ngắn bắn mũi tên kết thúc thay vì phải tháo chạy như những chuyến trước.",
+        "Đội mang thịt và tinh hạch thu được về Phố Thương Điếm; trước người qua đường, họ gọi đúng chiến lợi phẩm Nhất giai và nói thẳng công pháp mua tại quầy đã cho họ đội hình có thể săn được.",
+        "Cao Nguyên xuất hiện ở đầu phố, đưa giá thu mua cao hơn và nhắc đến quyền chia bãi săn; các thành viên Đội Tro Tàn không bị ép trong cửa hàng, chỉ đáp rằng họ sẽ so giá công khai trước bảng thu mua của Lâm Việt.",
+        "Tô Vãn chứng kiến chiến lợi phẩm cùng đội hình trở về, xác nhận đơn thuốc và ba bản công pháp đã tạo ra lực lượng dùng được; sự công nhận của Thành Vệ khiến những đội săn khác bắt đầu hỏi tên lô hàng kế tiếp."
+      ],
+      "materialOutcome": "Đội Tro Tàn có một lô chiến lợi phẩm Thiết Giáp Ngưu Nhất giai mới do chính họ săn được; đơn sáu viên của Thành Vệ được công khai củng cố bằng kết quả săn thật.",
+      "emotionalTarget": "Cú sướng khi khách từng bị đầu nậu định giá thấp tự mang chiến lợi phẩm về, được quyền chọn người mua và khiến người từng nắm giá phải xuống nước tranh khách.",
+      "newNamedThing": "Bãi săn Thiết Giáp Ngưu",
+      "prerequisiteIds": [],
+      "revealsFactIds": [],
+      "advancesMilestoneIds": [],
+      "valueContrastId": null,
+      "valueExperience": null,
+      "ledger": [
+        {
+          "eventId": "c5_01_thu_hoach_thit_thiet_giap_nguu_tro_tan",
+          "kind": "acquire",
+          "assetId": "thit_thiet_giap_nguu",
+          "assetName": "Thịt Thiết Giáp Ngưu Nhất giai",
+          "quantity": 4,
+          "unit": "cân",
+          "fungible": true,
+          "sourceLotId": null,
+          "fromOwnerId": "bai_san_thiet_giap_nguu",
+          "fromOwnerName": "Thiết Giáp Ngưu Nhất giai bị Đội Tro Tàn săn hạ",
+          "toOwnerId": "doi_tro_tan",
+          "toOwnerName": "Đội Tro Tàn",
+          "note": "Chiến lợi phẩm từ chuyến săn đầu tiên sau khi đội nhận đủ Man Ngưu Luyện Thể Quyết."
+        },
+        {
+          "eventId": "c5_02_thu_hoach_tinh_hach_hoa_tro_tan",
+          "kind": "acquire",
+          "assetId": "tinh_hach_hoa_nhat_giai",
+          "assetName": "Tinh hạch Hỏa hệ Nhất giai",
+          "quantity": 1,
+          "unit": "viên",
+          "fungible": true,
+          "sourceLotId": null,
+          "fromOwnerId": "bai_san_thiet_giap_nguu",
+          "fromOwnerName": "Thiết Giáp Ngưu Nhất giai bị Đội Tro Tàn săn hạ",
+          "toOwnerId": "doi_tro_tan",
+          "toOwnerName": "Đội Tro Tàn",
+          "note": "Tinh hạch lấy từ cùng con Thiết Giáp Ngưu Nhất giai; Đội Tro Tàn giữ hàng để công khai so giá thu mua."
+        }
+      ],
+      "endHookKind": "threat"
+    }
+  ],
+  "editorialNotes": []
+}

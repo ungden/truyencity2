@@ -1,0 +1,193 @@
+{
+  "verdict": {
+    "continuity": [],
+    "scorecard": {
+      "opening": 5,
+      "anticipation": 4,
+      "payoff": 5,
+      "newness": 5,
+      "endHook": 4
+    },
+    "craft": {
+      "protagonistAgency": 4,
+      "sceneLife": 4,
+      "worldLogic": 4,
+      "dialogueNaturalness": 3,
+      "structuralFreshness": 2
+    },
+    "repetition": [
+      {
+        "quote": "“Bia thử lực còn nửa dưới.” Lâm Việt chỉ ra ngoài cửa. “Muốn chứng minh thì ra đó.”",
+        "repeatsChapter": 1,
+        "note": "Tiếp tục nhịp chương trước: hàng mới được chứng minh công khai ngay trước quầy, rồi đám đông chuyển sang tranh mua. Hiệu quả sướng vẫn tốt, nhưng khung trả thưởng đã lặp."
+      },
+      {
+        "quote": "“Bí tịch kia còn không?”\n\n“Bốn tinh hạch một bản đúng không?”\n\n“Lâm chủ quầy, tôi mua!”",
+        "repeatsChapter": 1,
+        "note": "Lại dùng chuỗi hô giá tập thể sau màn chứng minh, gần với phản ứng tranh mua Tịnh Mạch Đan ở chương trước."
+      }
+    ],
+    "aiFlavor": [
+      {
+        "quote": "Không có lôi quang.\n\nKhông có lửa.\n\nKhông có băng sương.",
+        "kind": "parallel_triple"
+      },
+      {
+        "quote": "“Bí tịch kia còn không?”\n\n“Bốn tinh hạch một bản đúng không?”\n\n“Lâm chủ quầy, tôi mua!”\n\n“Tránh ra, đội tôi có người chưa thức tỉnh!”",
+        "kind": "crowd_chorus"
+      },
+      {
+        "quote": "【Chu Dã đột phá Luyện Khí tầng một: khí huyết hấp thu linh khí, mở ra con đường tu luyện cho người không có dị năng.】",
+        "kind": "report_prose"
+      }
+    ],
+    "steering": [
+      "Ưu tiên trả lời lời hẹn còn nợ: đặt Hứa An và Tô Vãn tại trạm Thành Vệ, cho Hứa An đòi rõ suất đầu trong lô Tịnh Mạch Đan kế tiếp, còn Tô Vãn cần giữ quân trinh sát không bạo loạn trước một chuyến tuần tra cụ thể.",
+      "Hoàn tất mốc use-to-earn của Thành Vệ: để một người thức tỉnh dùng viên Tịnh Mạch Đan đã mua trong tình huống tuần tra hoặc săn bắt thật, nhờ ổn định dị năng mà giữ được đội hình hay thu về tài nguyên cụ thể.",
+      "Cho Lâm Việt tự chọn và mang lô đan tới giao dịch theo nhu cầu vừa lộ ra; payoff phải là Thành Vệ xác nhận hiệu quả bằng chiến lực hoặc chiến lợi phẩm, tạo vốn và lý do vật chất cho đơn tổ chức sáu viên sau này.",
+      "Với Đội Tro Tàn, hãy để họ nhận đủ ba bản đã đặt, mỗi người thử công pháp theo khác biệt nghề săn của mình, rồi dùng kết quả đó quyết định có thực sự đánh Thiết Giáp Ngưu thay vì chỉ hô khẩu hiệu.",
+      "Đổi cách công khai giá trị ở chương tới: ưu tiên một cảnh nhiệm vụ có hậu quả, thương lượng suất hàng và chiến lợi phẩm, thay vì lại dùng bia thử lực cùng đám đông hô giá."
+    ],
+    "reviewBinding": {
+      "chapterNumber": 2,
+      "title": "“Người không dị năng cũng mua được đường mạnh lên!”",
+      "excerpt": "Chu Dã chặn ngay trước bảng giá, bàn tay to bè đập lên mặt quầy."
+    }
+  },
+  "digest": {
+    "chapterNumber": 2,
+    "title": "“Người không dị năng cũng mua được đường mạnh lên!”",
+    "summary": "Chu Dã mua Man Ngưu Luyện Thể Quyết, đột phá Luyện Khí tầng một và cùng Đội Tro Tàn chuẩn bị săn Thiết Giáp Ngưu.",
+    "payoffKind": "dot_pha",
+    "endedOn": "“Đội Tro Tàn đi săn Thiết Giáp Ngưu.”",
+    "newNamedThings": [
+      "Man Ngưu Luyện Thể Quyết",
+      "Bia Thử Lực Đông Hà",
+      "Đội Tro Tàn",
+      "Thiết Giáp Ngưu"
+    ],
+    "narrativeEvidence": [],
+    "coreChanges": {
+      "storyDayDelta": 0,
+      "died": [],
+      "progressionChanges": [
+        {
+          "subjectId": "chu_da",
+          "systemId": "tu_tien",
+          "trackId": null,
+          "toRankId": "luyen_khi_1",
+          "toMinorStageId": null,
+          "why": "Chu Dã được xác nhận trực tiếp đã đột phá Luyện Khí tầng một sau khi tu luyện Man Ngưu Luyện Thể Quyết."
+        }
+      ],
+      "assetEvents": [
+        {
+          "eventId": "c2_01_nhap_man_nguu_quyet",
+          "kind": "acquire",
+          "assetId": "man_nguu_luyen_the_quyet",
+          "assetName": "Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm",
+          "quantity": 1,
+          "unit": "bản",
+          "fungible": false,
+          "sourceLotId": null,
+          "fromOwnerId": "quay_bi_tich_pho_thong",
+          "fromOwnerName": "Quầy bí tịch phổ thông Thanh Lô Phường",
+          "toOwnerId": "lam_viet",
+          "toOwnerName": "Lâm Việt",
+          "note": "Lâm Việt dùng một linh thạch hạ phẩm mua bản chép phổ thông có dấu quầy."
+        },
+        {
+          "eventId": "c2_02_ban_chu_da_man_nguu_quyet",
+          "kind": "transfer",
+          "assetId": "man_nguu_luyen_the_quyet",
+          "assetName": "Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm",
+          "quantity": 1,
+          "unit": "bản",
+          "fungible": false,
+          "sourceLotId": "c2_01_nhap_man_nguu_quyet",
+          "fromOwnerId": "lam_viet",
+          "fromOwnerName": "Lâm Việt",
+          "toOwnerId": "chu_da",
+          "toOwnerName": "Chu Dã",
+          "note": "Chu Dã nhận bản giao ngay sau khi trả đủ giá niêm yết."
+        },
+        {
+          "eventId": "c2_03_thu_tinh_hach_chu_da",
+          "kind": "acquire",
+          "assetId": "tinh_hach_nhat_giai_hon_hop",
+          "assetName": "Tinh hạch Nhất giai hỗn hợp",
+          "quantity": 4,
+          "unit": "viên",
+          "fungible": true,
+          "sourceLotId": null,
+          "fromOwnerId": "chu_da",
+          "fromOwnerName": "Chu Dã",
+          "toOwnerId": "lam_viet",
+          "toOwnerName": "Lâm Việt",
+          "note": "Chu Dã trả đúng bốn tinh hạch Nhất giai của chính mình."
+        },
+        {
+          "eventId": "c2_04_thu_tinh_hach_dat_truoc_tro_tan",
+          "kind": "acquire",
+          "assetId": "tinh_hach_nhat_giai_hon_hop",
+          "assetName": "Tinh hạch Nhất giai hỗn hợp",
+          "quantity": 12,
+          "unit": "viên",
+          "fungible": true,
+          "sourceLotId": null,
+          "fromOwnerId": "doi_tro_tan",
+          "fromOwnerName": "Đội Tro Tàn",
+          "toOwnerId": "lam_viet",
+          "toOwnerName": "Lâm Việt",
+          "note": "Ba thành viên Đội Tro Tàn góp đủ mười hai tinh hạch Nhất giai, trả trước bốn viên cho mỗi bản trong đơn ba bản."
+        }
+      ],
+      "goldenFingerRungChange": null,
+      "moved": [],
+      "worldFactsRevealed": [],
+      "newCast": [
+        {
+          "id": "co_gai_toc_ngan",
+          "name": "cô gái tóc ngắn",
+          "sheet": "Cô gái tóc ngắn đeo cung gấp sau lưng, là người đi đầu và đại diện cho Đội Tro Tàn.",
+          "role": "người đi đầu của Đội Tro Tàn",
+          "locationId": "pho_dong_ha",
+          "startingProgressions": []
+        },
+        {
+          "id": "thanh_nien_gay_cam_dao_phay",
+          "name": "thanh niên gầy cầm dao phay cải tạo",
+          "sheet": "Thanh niên gầy cầm dao phay cải tạo, đi cùng Đội Tro Tàn.",
+          "role": "thành viên Đội Tro Tàn",
+          "locationId": "pho_dong_ha",
+          "startingProgressions": []
+        },
+        {
+          "id": "nguoi_cam_khien",
+          "name": "người cầm khiên",
+          "sheet": "Người lớn tuổi hơn, vai đeo khiên sắt đầy vết móng vuốt, đi cùng Đội Tro Tàn.",
+          "role": "thành viên Đội Tro Tàn",
+          "locationId": "pho_dong_ha",
+          "startingProgressions": []
+        }
+      ],
+      "hooksPlanted": [
+        {
+          "id": "doi_tro_tan_nhan_ba_ban_cong_phap",
+          "what": "Đội Tro Tàn đã trả đủ tinh hạch để giữ suất ba bản Man Ngưu Luyện Thể Quyết và chờ Lâm Việt gọi khi có hàng.",
+          "dueByChapter": 3
+        },
+        {
+          "id": "doi_tro_tan_di_san_thiet_giap_ngu",
+          "what": "Đội Tro Tàn dự định đi săn Thiết Giáp Ngưu sau khi nhận đủ ba bản Man Ngưu Luyện Thể Quyết.",
+          "dueByChapter": 3
+        }
+      ],
+      "hooksPaid": [],
+      "learnedFinger": []
+    }
+  },
+  "attempts": 1,
+  "costUsd": 0.058269,
+  "inputFingerprint": "e8a32adb9b2829683faec63adfdc3c77952e0613cfe6c427665d9be697960e19"
+}

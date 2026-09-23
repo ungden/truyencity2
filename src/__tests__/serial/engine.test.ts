@@ -6,7 +6,7 @@ import {
   planNextCycle, readingHealth, SerialCheckpointError, SerialDeadlineError, writeOneChapter,
   type SerialDraftCheckpoint,
 } from '@/services/serial/engine';
-import { normalizeChapterDraft } from '@/services/serial/agents';
+import { normalizeChapterDraft, reviewBindingMismatch } from '@/services/serial/agents';
 import { assetLedgerSlice, buildCyclePlannerBrief, buildExtractorBrief, buildJudgeBrief, buildWriterBrief, collectSteering, refreshStyleMemory, relevantCast } from '@/services/serial/context';
 import { seedBible } from '@/services/serial/state';
 import { premise, baseBible, cycle } from './fixtures';
@@ -825,5 +825,25 @@ describe('never start a paid call without time to finish it', () => {
     expect(result.cycle.plannedEndChapter).toBe(12);
     expect(result.cycle.customerLoop?.schedule).toEqual({ purchaseChapter: 8, useToEarnChapter: 9, publicProofChapter: 10, returnUpgradeChapter: 11 });
     expect(result.cycle.beatSheets[0].valueContrastId).toBeNull();
+  });
+});
+
+describe('judge review binding', () => {
+  const chapter = {
+    chapterNumber: 4,
+    title: '“Tôi sẽ làm điểm giao dịch lớn nhất Đông Hà!”',
+    content: 'Tô Vãn đặt bút ký. “Thành Vệ không cần lời quảng cáo — ta cần hàng đúng phẩm, đúng hẹn,” nàng nói, rồi nhìn Lâm Việt thật lâu trước khi quay đi.',
+  };
+
+  test('a re-typed passage with straight quotes and spacing still proves the draft was read', () => {
+    const excerpt = '"Thành Vệ không cần lời quảng cáo - ta cần hàng đúng phẩm, đúng hẹn," nàng nói, rồi nhìn Lâm Việt';
+    expect(reviewBindingMismatch({ chapterNumber: 4, title: 'Tôi sẽ làm điểm giao dịch lớn nhất Đông Hà!', excerpt }, chapter)).toBeNull();
+  });
+
+  test('an invented passage, a wrong title or a wrong chapter does not', () => {
+    const excerpt = 'Lâm Việt mở kho ở Thanh Lô Phường và đếm lại toàn bộ đan dược còn trên kệ gỗ.';
+    expect(reviewBindingMismatch({ chapterNumber: 4, title: chapter.title, excerpt }, chapter)).toMatch(/excerpt not found/);
+    expect(reviewBindingMismatch({ chapterNumber: 4, title: 'Một tên khác', excerpt: chapter.content.slice(0, 60) }, chapter)).toMatch(/title/);
+    expect(reviewBindingMismatch({ chapterNumber: 3, title: chapter.title, excerpt: chapter.content.slice(0, 60) }, chapter)).toMatch(/chapterNumber/);
   });
 });

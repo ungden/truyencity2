@@ -8,7 +8,7 @@ import {
   OpeningAuditSchema, type OpeningAudit, type Premise, type SerialRoutes,
 } from './contracts';
 import {
-  auditOpening, CHAPTER_TIMEOUT_MS, extractDigest, judgeChapter, planCycle, PLANNER_TIMEOUT_MS, reviseChapter,
+  auditOpening, CHAPTER_TIMEOUT_MS, reviewBindingMismatch, extractDigest, judgeChapter, planCycle, PLANNER_TIMEOUT_MS, reviseChapter,
   SUPPORT_TIMEOUT_MS, writeChapter,
 } from './agents';
 import {
@@ -153,13 +153,7 @@ export function serialChapterInputFingerprint(input: {
 }
 
 function verdictMatchesChapter(verdict: JudgeVerdict | undefined, chapter: ChapterDraft, chapterNumber: number): boolean {
-  const binding = verdict?.reviewBinding;
-  if (!binding) return false;
-  const comparable = (value: string): string => value.normalize('NFKC').toLowerCase()
-    .replace(/^#{1,6}\s*/, '').replace(/^chương\s+\d+\s*:\s*/u, '').replace(/[“”"'‘’`*_#:\s]/gu, '');
-  return binding.chapterNumber === chapterNumber
-    && comparable(binding.title) === comparable(chapter.title)
-    && chapter.content.includes(binding.excerpt);
+  return reviewBindingMismatch(verdict?.reviewBinding, { chapterNumber, title: chapter.title, content: chapter.content }) === null;
 }
 
 export async function auditFourChapterOpening(input: {

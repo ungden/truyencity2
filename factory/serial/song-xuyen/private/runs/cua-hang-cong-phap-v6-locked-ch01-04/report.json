@@ -1,0 +1,17 @@
+{
+  "chapters": 3,
+  "totalUsd": 0.401,
+  "perChapterUsd": 0.134,
+  "reading": {
+    "chapters": 3,
+    "average": 4.17,
+    "weakest": "structuralFreshness"
+  },
+  "processDensity": [
+    3.9,
+    3.6,
+    2.4
+  ],
+  "openingAudit": null,
+  "narrativeReview": null
+}
