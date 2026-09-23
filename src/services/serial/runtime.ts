@@ -469,9 +469,12 @@ async function stageWrite(
       error: outcome.reason, finished_at: new Date().toISOString(),
     }).eq('id', runId);
     if (savedFailure.error) throw savedFailure.error;
+    // Replan from this chapter: the ones before it passed their judge (and, in cycle 1,
+    // a person's opening review). Rewinding the whole cycle threw those away.
     const { data, error } = await db.rpc('replan_serial_cycle', {
       p_job_id: job.id, p_lease_token: job.lease_token,
       p_cycle_id: job.current_cycle_id, p_reason: outcome.reason,
+      p_from_chapter: chapterNumber,
     });
     if (error) throw error;
     return {

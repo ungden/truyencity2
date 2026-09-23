@@ -28,12 +28,12 @@
   "goldenFinger": {
     "name": "Nhãn Đồ Tiến Hóa",
     "rule": "Trần Kính nhìn thấy một bảng 【】 trên sủng thú đã tiếp xúc trực tiếp. Bảng chỉ hiện một nhánh tiến hóa ẩn gần nhất, điều kiện kích hoạt, vật liệu chủ đạo và một nguy cơ thất bại. Hắn không thể cưỡng ép tiến hóa, không thể sao chép vật liệu, và chỉ mở được nhánh tiếp theo sau khi sinh mệnh đã thật sự hoàn thành lần biến đổi trước.",
-    "scope": "Áp dụng cho sủng thú, trứng thú và dấu vết sinh mệnh trong bí cảnh. Ban đầu chỉ đọc được thú cấp Phàm; các nấc sau mới mở suy diễn, đối chiếu và can thiệp có giới hạn.",
+    "scope": "Áp dụng cho sủng thú, trứng thú và dấu vết sinh mệnh trong bí cảnh. Sủng thú đã khế ước với Trần Kính luôn đọc được, dù đã lên cấp nào; với thú lạ, ban đầu chỉ đọc được cấp Phàm, các nấc sau mới mở suy diễn, đối chiếu và can thiệp có giới hạn.",
     "evolution": [
       {
         "id": "eye_spark",
         "name": "Tinh Nhãn",
-        "changesUse": "Thấy tên loài, phẩm cấp và một điều kiện tiến hóa ẩn của sủng thú cấp Phàm."
+        "changesUse": "Thấy tên loài, phẩm cấp và một điều kiện tiến hóa ẩn của sủng thú đã khế ước (mọi phẩm cấp) và của thú lạ cấp Phàm."
       },
       {
         "id": "eye_trace",

@@ -351,6 +351,44 @@ describe('serial runtime', () => {
     expect(parked?.value).toMatchObject({ status: 'paused' });
   });
 
+  test('a chapter that fails twice replans from itself, never erasing the chapters before it', async () => {
+    const prose = 'Lâm Việt kiểm từng kiện hàng, ghi lại dấu niêm phong rồi khép sổ. '.repeat(20);
+    const provider = {
+      async text() { throw new Error('unused'); },
+      async json<T>(input: { system: string; model: string }) {
+        const value = input.system.startsWith('Bạn đọc và soát')
+          ? {
+              reviewBinding: { chapterNumber: 8, title: 'Ca kiểm hàng', excerpt: prose.slice(0, 40) },
+              continuity: [{
+                kind: 'golden_finger_scope', quote: prose.slice(0, 40),
+                explain: 'Bảng đọc vượt nấc đã duyệt.', repair: 'Giữ bảng trong nấc hiện tại.',
+              }],
+              scorecard: { opening: 4, anticipation: 4, payoff: 3, newness: 3, endHook: 3 },
+              craft: { protagonistAgency: 4, sceneLife: 4, worldLogic: 4, dialogueNaturalness: 4, structuralFreshness: 3 },
+              repetition: [], aiFlavor: [], steering: [],
+            }
+          : { title: 'Ca kiểm hàng', content: prose };
+        return {
+          value: value as T,
+          usage: { model: input.model, inputTokens: 1, outputTokens: 1, costUsd: 0.01, finishReason: 'STOP' },
+        };
+      },
+    } as StoryModelProvider;
+    const { db, rpcCalls } = fakeDb({
+      rows: {
+        serial_novels: novelRow(),
+        serial_cycles: { id: 'cy1', plan: cycle(), start_chapter: 8, end_chapter: 16 },
+        serial_runs: { id: 'run1' },
+        chapters: null,
+      },
+      rpc: { claim_serial_job: job({ current_chapter: 7 }) },
+    });
+    const result = await runSerialTick({ db, provider });
+    expect(result.detail).toMatch(/Replanned cycle/);
+    const replan = rpcCalls.find(call => call.fn === 'replan_serial_cycle');
+    expect(replan?.args).toMatchObject({ p_cycle_id: 'cy1', p_from_chapter: 8 });
+  });
+
   test('the next tick consumes an extractor checkpoint instead of calling Writer and Judge again', async () => {
     const verdict = {
       continuity: [],

@@ -32,6 +32,15 @@ describe('serial launch operations', () => {
     expect(body).not.toMatch(/current_cycle_id = NULL/);
   });
 
+  test('a replan from a failed chapter keeps the drafts before it and the Bible they built', () => {
+    const keep = readFileSync('supabase/migrations/20260924070000_serial_replan_keeps_passed_chapters.sql', 'utf8');
+    expect(keep).toMatch(/p_from_chapter integer DEFAULT NULL/);
+    expect(keep).toMatch(/v_bible_chapter = p_from_chapter - 1/);
+    expect(keep).toMatch(/chapter_number BETWEEN v_from AND v_cycle\.end_chapter/);
+    expect(keep).toMatch(/IF v_from = v_cycle\.start_chapter THEN\s+UPDATE public\.serial_novels SET bible = v_cycle\.checkpoint_bible/);
+    expect(keep).toMatch(/current_chapter = v_from - 1/);
+  });
+
   test('automatic replans refund only same-day draft chapters from quota', () => {
     expect(quotaRefundMigration).toMatch(/timezone\('Asia\/Ho_Chi_Minh', created_at\)::date = v_local_date/);
     expect(quotaRefundMigration).toMatch(/greatest\(0, v_job\.chapters_today - v_refund\)/);

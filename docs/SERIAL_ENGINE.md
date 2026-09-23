@@ -214,7 +214,7 @@ Nothing parks waiting for a repair.
 | Provider error or timeout | Lease released, retried in 5 minutes on the same route |
 | Judge cites a contradiction | One targeted repair against the quoted passages |
 | It survives the repair | One clean rewrite with the findings in front of it |
-| It survives that too | `replan_serial_cycle`: drafts deleted, Bible restored to the cycle checkpoint, plan again |
+| It survives that too | `replan_serial_cycle` from that chapter: its drafts and later ones are deleted, the chapters before it (which passed their judge, and in cycle 1 the opening review) stay with the Bible they built, and the rest of the cycle is planned again. Only a failed opening audit rewinds the whole cycle to its checkpoint. Until 2026-09-24 every replan rewound the whole cycle, which cost the beast-taming launch its approved opening |
 | A cycle replans twice | Job `paused` — the one place a person is needed, and the job is to **read**, not to repair |
 | Lease expires mid-stage | `reconcile_serial_jobs` returns it with exponential backoff |
 
