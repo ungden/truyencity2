@@ -77,12 +77,24 @@ const formatQuantity = (value: number): string =>
  * them; it never computes them. In a lane with a system panel these lines are what the
  * reader sees inside 【】 — the receipt is the reward.
  */
+/**
+ * "1 phiếu Phiếu Khảo Hạch", "1 thẻ Thẻ Tên": when the name already opens with its unit,
+ * the unit is dropped, or every panel stutters. Compared without case or diacritic folding
+ * beyond lower-casing: Vietnamese units are single words.
+ */
+function measureWord(unit: string, assetName: string): string {
+  const word = unit.trim();
+  if (!word) return '';
+  const first = assetName.trim().split(/\s+/)[0] ?? '';
+  return first.toLocaleLowerCase('vi') === word.toLocaleLowerCase('vi') ? '' : `${word} `;
+}
+
 export function renderLedgerLines(events: AssetEvent[]): string[] {
   // The planner's note is bookkeeping ("paid in chapter 2", "credited to…"). It stays in
   // the plan; the reader only ever sees who handed what to whom.
   return events.map((event, index) => {
     const step = `${index + 1}. `;
-    const amount = `${formatQuantity(event.quantity)} ${event.unit} ${event.assetName}`;
+    const amount = `${formatQuantity(event.quantity)} ${measureWord(event.unit, event.assetName)}${event.assetName}`;
     if (event.kind === 'acquire') return `${step}Nhập kho: ${event.toOwnerName} nhận ${amount}`;
     if (event.kind === 'transfer') return `${step}Giao dịch: ${event.fromOwnerName ?? event.fromOwnerId} → ${event.toOwnerName}: ${amount}`;
     return `${step}Tiêu hao: ${event.fromOwnerName ?? event.fromOwnerId} dùng ${amount}`;

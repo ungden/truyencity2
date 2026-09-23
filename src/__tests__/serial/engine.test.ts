@@ -674,6 +674,15 @@ describe('code-owned ledger and reader-facing gates', () => {
     expect(lines.background).toEqual(['1. Giao dịch: Bảy Thạch → Tô Vãn: 1 viên Tinh hạch Nhất giai']);
   });
 
+  test('a unit the item name already starts with is not printed twice', () => {
+    const ticket = {
+      ...ledger[0], eventId: 'c3_phieu', assetId: 'phieu_khao_hach', assetName: 'Phiếu Khảo Hạch Chính Thức', quantity: 1, unit: 'phiếu',
+    };
+    const [line] = splitLedgerLines([ticket], ticket.toOwnerId ?? undefined).panel;
+    expect(line).toMatch(/nhận 1 Phiếu Khảo Hạch Chính Thức$/);
+    expect(splitLedgerLines([{ ...ticket, unit: 'tấm' }], ticket.toOwnerId ?? undefined).panel[0]).toMatch(/1 tấm Phiếu Khảo Hạch/);
+  });
+
   test('the committed ledger is the plan, whatever the extractor thought changed hands', async () => {
     const extractorGuess = {
       ...goodDigest,
