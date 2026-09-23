@@ -62,6 +62,12 @@ describe('policy lock: arithmetic never discards a chapter', () => {
     expect(HARD_CONTINUITY_KINDS.length).toBeLessThanOrEqual(8);
   });
 
+  test('a panel describing what a pet, card or item can do is not a golden-finger overreach', () => {
+    for (const archetype of archetypeIds()) {
+      expect(promptsFor(archetype).judge).toMatch(/là thông tin thế giới, không phải kim thủ chỉ có thêm tác dụng/);
+    }
+  });
+
   test('the opening auditor cannot return inventory findings', () => {
     const kinds = OpeningAuditProviderSchema.safeParse({
       passed: false, summary: 's',
