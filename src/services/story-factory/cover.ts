@@ -116,16 +116,12 @@ export async function renderCoverTypography(title: string): Promise<Buffer> {
   return overlay;
 }
 
-export async function generateFactoryCover(input: {
-  db: SupabaseClient;
-  novelId: string;
+/** Backdrop + gradient + title typography, as a validated 2:3 WebP buffer. Nothing is uploaded. */
+export async function renderFactoryCover(input: {
   title: string;
   backgroundPrompt: string;
   usageContext?: GeminiUsageContext;
-}): Promise<{
-  coverUrl: string; path: string; sha256: string; width: number; height: number;
-  model: string; costUsd: number;
-}> {
+}): Promise<{ buffer: Buffer; model: string; costUsd: number }> {
   const background = await generateCoverBackdrop({
     prompt: input.backgroundPrompt,
     usageContext: input.usageContext,
@@ -144,6 +140,22 @@ export async function generateFactoryCover(input: {
   if (metadata.width !== WIDTH || metadata.height !== HEIGHT || metadata.format !== 'webp') {
     throw new StoryFactoryError('infra_blocked', 'Deterministic cover renderer violated the 2:3 WebP contract.');
   }
+  return { buffer: rendered, model: background.model, costUsd: background.costUsd };
+}
+
+export async function generateFactoryCover(input: {
+  db: SupabaseClient;
+  novelId: string;
+  title: string;
+  backgroundPrompt: string;
+  usageContext?: GeminiUsageContext;
+}): Promise<{
+  coverUrl: string; path: string; sha256: string; width: number; height: number;
+  model: string; costUsd: number;
+}> {
+  const cover = await renderFactoryCover(input);
+  const rendered = cover.buffer;
+  const background = { model: cover.model, costUsd: cover.costUsd };
   const path = `factory/${input.novelId}.webp`;
   const upload = await input.db.storage.from('covers').upload(path, rendered, {
     contentType: 'image/webp',

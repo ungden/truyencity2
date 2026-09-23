@@ -1,6 +1,6 @@
 import type { StoryModelProvider, ProviderUsage } from '@/services/story-factory/provider';
 import {
-  ChapterDigestSchema, ChapterDraftSchema, LegacyChapterDigestSchema, CyclePlanShapeSchema, JudgeProviderVerdictSchema, OpeningAuditProviderSchema, PremiseSchema,
+  ChapterDigestSchema, ChapterDraftSchema, LegacyChapterDigestSchema, CyclePlanShapeSchema, JudgeProviderVerdictSchema, OpeningAuditProviderSchema, ProposedPremiseSchema,
   type ChapterDigest, type ChapterDraft, type CyclePlan, type JudgeVerdict, type OpeningAudit, type Premise,
   type SerialRoutes,
 } from './contracts';
@@ -25,6 +25,11 @@ export const SUPPORT_TIMEOUT_MS = 120_000;
  * under the 300s function ceiling that a chapter tick does not have.
  */
 export const PLANNER_TIMEOUT_MS = 200_000;
+/**
+ * A premise package is the largest output in the engine (a full World Kernel, ~30KB of
+ * JSON). It is only ever drafted offline by `serial:propose`, never inside a cron tick.
+ */
+export const PREMISE_TIMEOUT_MS = 480_000;
 
 const brief = (value: unknown): string => JSON.stringify(value, null, 1);
 
@@ -226,15 +231,21 @@ export async function proposePremise(input: {
   routes: SerialRoutes;
   lane: string;
   archetype?: string;
+  /** Editorial direction for this lane: what to build. */
+  direction?: string[];
+  /** Existing premises or books the new one must not resemble. */
   avoid: string[];
 }): Promise<AgentResult<Premise>> {
   const result = await input.provider.json({
     model: input.routes.premise,
     system: promptsFor(input.archetype).premise,
-    prompt: brief({ lane: input.lane, archetype: input.archetype ?? null, khongDuocTrungVoi: input.avoid }),
-    schema: PremiseSchema,
+    prompt: brief({
+      lane: input.lane, archetype: input.archetype ?? null,
+      chiDaoBienTap: input.direction ?? [], khongDuocTrungVoi: input.avoid,
+    }),
+    schema: ProposedPremiseSchema,
     temperature: 1,
-    timeoutMs: SUPPORT_TIMEOUT_MS,
+    timeoutMs: PREMISE_TIMEOUT_MS,
   });
   return { value: result.value, usage: result.usage };
 }

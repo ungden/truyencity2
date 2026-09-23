@@ -1,0 +1,751 @@
+{
+  "schemaVersion": 2,
+  "lane": "quy_tac_quai_dam",
+  "archetype": "rule_horror",
+  "title": "Quy Tắc Quái Đàm: Ta Nhìn Thấy Điều Luật Sai, Mở Đường Sống Cho Cả Tòa Nhà",
+  "hook": "Một shipper cần đủ năm triệu tiền cọc để sang phòng trọ đã nhìn thấy dòng chữ sai trong nội quy chung cư quái đàm, rồi đổi nó lấy Chuông Trực Đêm và suất sống sót đầu tiên.",
+  "blurb": "Lâm Khải chỉ muốn kiếm đủ năm triệu tiền cọc trước ngày chủ trọ khóa cửa. Ban ngày, anh là shipper bị khách bom đơn cũng phải cười trừ; nhưng ngay chuyến giao hàng cuối cùng, cả tòa chung cư biến thành phó bản quái đàm và mọi người bị ép tuân theo một tờ nội quy có điều dẫn thẳng tới cái chết. Nhãn của Lâm Khải là kẻ giao hàng nghèo, độ chênh của anh là đôi mắt có thể nhìn thấy những câu luật đang “lệch nhịp” với thực tại. Anh không biết trước đáp án, chỉ thấy chỗ nào quy tắc đang nói dối, rồi phải dùng mạng sống để kiểm chứng. Khi người khác xếp hàng vào thang máy theo điều cấm sai, Lâm Khải gõ đúng ba tiếng cửa, cứu được một người và nhận Chuông Trực Đêm. Bảng 【Xếp Hạng Thông Quan】 gọi tên anh là Kẻ Quan Sát cấp Tàn Dư. Nhưng phần thưởng ấy cũng khiến Cục Tuần Dạ, những gia tộc giữ lối vào phó bản và kẻ sống sót muốn cướp công đều biết: một shipper tầm thường đã chạm vào thứ họ độc chiếm bấy lâu.",
+  "readerFantasy": "Nhìn ra luật giả trước người khác, dùng vật phẩm quỷ dị đúng lúc để sống sót, leo từng cấp thông quan rõ ràng, rồi biến thành tích thành quyền chọn phó bản, đội ngũ và chỗ đứng tại Vân Cảng.",
+  "presentation": {
+    "coverPath": "/covers/serial-lanes/rule-horror.webp",
+    "tagline": "Nhìn lỗi quy tắc, lấy phần thưởng sống sót.",
+    "shortDescription": "Một shipper nghèo nhìn thấy lỗi trong nội quy phó bản. Mỗi lần chỉ ra luật giả và phá chốt đúng lúc, anh nhận cấp bậc, vật phẩm quỷ dị và một kẻ muốn chiêu mộ hoặc giết mình.",
+    "tags": [
+      "quái đàm",
+      "quy tắc",
+      "sinh tồn",
+      "phó bản",
+      "hiện đại",
+      "thông quan",
+      "hệ thống"
+    ],
+    "sellingPoints": [
+      "Chương một nhìn thấy luật giả, chương hai có Chuông Trực Đêm và bảng xếp hạng.",
+      "Mỗi phó bản có luật đúng luật sai, chi tiết đời thường lệch nhịp và cú phá giải riêng.",
+      "Cấp bậc thông quan, vật phẩm quỷ dị và phản ứng tranh giành đều được gọi tên rõ ràng.",
+      "Từ giữ tiền trọ đến giành quyền quyết định lối vào các phó bản cấp thành phố."
+    ]
+  },
+  "goldenFinger": {
+    "name": "Mắt Bắt Lỗi",
+    "rule": "Khi Lâm Khải đọc quy tắc, biển chỉ dẫn, lời nhắc hoặc mệnh lệnh thuộc phó bản, những câu mâu thuẫn với “ý chí vận hành” của phó bản sẽ hiện một vệt chữ xám như bị gạch khỏi trang giấy. Mắt Bắt Lỗi chỉ chỉ ra điểm đáng ngờ, không cho đáp án; anh phải quan sát hậu quả, tìm điều kiện ẩn và tự chịu nguy hiểm khi thử. Nếu cố tình dùng một lỗi đã biết để hại người vô tội ngoài điều kiện phá giải, vệt chữ biến mất đến hết phó bản.",
+    "scope": "Chỉ có hiệu lực trong vùng quái đàm đã mở hoặc lên vật phẩm quỷ dị có liên hệ trực tiếp với phó bản. Không đọc được suy nghĩ, tương lai, mật mã đời thường hay quy tắc do con người bịa ra ngoài vùng quái đàm.",
+    "evolution": [
+      {
+        "id": "vet_xam",
+        "name": "Vệt Xám",
+        "changesUse": "Nhìn thấy một điều luật có khả năng sai trong tờ quy tắc đầu tiên của phó bản."
+      },
+      {
+        "id": "doi_chieu",
+        "name": "Đối Chiếu",
+        "changesUse": "So sánh vệt xám với cảnh vật hiện tại để xác định mâu thuẫn đang nằm ở người, vật hay thời điểm."
+      },
+      {
+        "id": "hoi_am",
+        "name": "Hồi Âm",
+        "changesUse": "Nghe được một mẩu hậu quả ngắn khi người khác sắp thực hiện luật giả, giúp cứu hoặc dẫn đối thủ vào lựa chọn."
+      },
+      {
+        "id": "dau_moc",
+        "name": "Đầu Mốc",
+        "changesUse": "Đánh dấu tối đa một vật thể có liên quan đến luật thật để lần theo đường phá giải."
+      },
+      {
+        "id": "doi_luat",
+        "name": "Đổi Luật",
+        "changesUse": "Dùng vật phẩm quỷ dị làm giá để tạm thay một câu luật giả bằng điều kiện tương đương trong vài phút."
+      },
+      {
+        "id": "truy_nguyen",
+        "name": "Truy Nguyên",
+        "changesUse": "Từ một luật giả đã bị phá, nhìn thấy hành vi tạo ra luật thật của chủ phó bản."
+      },
+      {
+        "id": "phan_quyen",
+        "name": "Phán Quyền",
+        "changesUse": "Trong cú chốt, chọn giữa hai diễn giải luật thật và ép phó bản công nhận một diễn giải nếu có đủ nhân chứng cùng vật chứng."
+      }
+    ]
+  },
+  "conflictLadder": {
+    "survival": "Lâm Khải phải sống qua các phó bản đang nuốt người giao hàng, cư dân và học sinh, đồng thời kiếm đủ năm triệu tiền cọc trước khi bị đuổi khỏi phòng trọ.",
+    "rules": "Anh phải phân biệt luật thật với luật giả khi Cục Tuần Dạ, gia tộc và những kẻ sống sót đều che giấu hoặc bóp méo thông tin để giữ phần thưởng.",
+    "ideology": "Lâm Khải chống lại quan điểm rằng người yếu chỉ đáng làm mồi dò luật; anh xây đội bằng trao đổi minh bạch, trong khi kẻ khác tin mạng người là tài nguyên tiêu hao.",
+    "self": "Khi đã có quyền chọn phó bản và người theo, Lâm Khải phải quyết định mình trở thành nhà môi giới bán cơ hội sống sót, hay người phá độc quyền lối vào dù phải gánh trách nhiệm cho những người được cứu."
+  },
+  "hiddenThread": "Mỗi phó bản bị phá đều để lại một mảnh “nội quy gốc” liên quan đến Hành Lang Mười Ba, nơi được cho là nguồn của lần quái đàm giáng lâm đầu tiên. Cục Tuần Dạ không thật sự muốn đóng các phó bản: họ cần người thông quan để thu thập mảnh gốc, mở một phó bản cấp thành phố và tái lập quyền kiểm soát Vân Cảng. Mắt Bắt Lỗi không phải quà tặng ngẫu nhiên; nó từng thuộc về người viết ra điều luật đầu tiên chống lại Hành Lang.",
+  "payoffStance": "front",
+  "oppositionEngine": "Cục Tuần Dạ giữ giấy phép vào vùng phong tỏa, hồ sơ phó bản và kho vật phẩm; họ mất độc quyền khi Lâm Khải tự tìm luật thật và kéo được người sống sót về phe mình, nên sẽ chiêu mộ, giám sát rồi gài anh vào phó bản không có đường lui. Nhà họ Tạ giữ quyền phân phối suất vào các phó bản thấp cấp và mất nguồn lợi lẫn uy tín khi bảng xếp hạng gọi tên một shipper, nên Tạ Minh Quân sẽ mua chuộc nhân chứng, thách đấu quyền dẫn đội và cướp chiến lợi phẩm bằng hợp đồng. Những người sống sót cấp thấp cần Lâm Khải, nhưng cũng có người muốn bán bí mật của anh để đổi vé an toàn. Mỗi lần anh thắng, anh giành thêm quyền tiếp cận thông tin, vật phẩm hoặc người theo; đồng thời chạm tới một tầng lợi ích lớn hơn đang bị giữ chặt.",
+  "castSeed": [
+    {
+      "id": "lam_khai",
+      "name": "Lâm Khải",
+      "role": "protagonist",
+      "agenda": "Kiếm đủ năm triệu tiền cọc để sang phòng trọ trước hạn, sau đó dùng quyền thông quan để không còn phải giao mạng mình cho bất kỳ ai định giá.",
+      "antagonistClass": null,
+      "startLocationId": "phong_tro_17",
+      "startingProgressions": [
+        {
+          "systemId": "nguoi_tham_gia",
+          "trackId": "quan_sat",
+          "rankId": "tan_du",
+          "minorStageId": "so_ky"
+        }
+      ],
+      "milestones": [
+        {
+          "name": "Đổi Chuông Trực Đêm",
+          "progressionTarget": {
+            "systemId": "nguoi_tham_gia",
+            "trackId": "quan_sat",
+            "rankId": "tan_du",
+            "minorStageId": "trung_ky"
+          },
+          "socialResult": "Được những người sống sót ở chung cư gọi là người dẫn đường thay vì shipper xui xẻo."
+        },
+        {
+          "name": "Lập Nhóm Giao Ca",
+          "progressionTarget": {
+            "systemId": "nguoi_tham_gia",
+            "trackId": "quan_sat",
+            "rankId": "thu_luat",
+            "minorStageId": "so_ky"
+          },
+          "socialResult": "Có đội ba người đầu tiên và buộc Cục Tuần Dạ phải cấp quyền quan sát."
+        },
+        {
+          "name": "Cướp Quyền Chọn Cửa",
+          "progressionTarget": {
+            "systemId": "nguoi_tham_gia",
+            "trackId": "quan_sat",
+            "rankId": "pha_luat",
+            "minorStageId": "hau_ky"
+          },
+          "socialResult": "Phá quyền phân phối của nhà họ Tạ tại một khu phong tỏa."
+        },
+        {
+          "name": "Phán Quyền Hành Lang",
+          "progressionTarget": {
+            "systemId": "nguoi_tham_gia",
+            "trackId": "quan_sat",
+            "rankId": "chu_luat",
+            "minorStageId": "dai_vien_man"
+          },
+          "socialResult": "Trở thành người có quyền quyết định diễn giải luật gốc trước toàn Vân Cảng."
+        }
+      ]
+    },
+    {
+      "id": "doan_nhi",
+      "name": "Đoàn Nhi",
+      "role": "ally",
+      "agenda": "Tìm em trai mất tích trong phó bản Trường Học Tan Ca và trả món nợ ân tình cho người đã cứu mình.",
+      "antagonistClass": null,
+      "startLocationId": "chung_cu_minh_dang",
+      "startingProgressions": [
+        {
+          "systemId": "nguoi_tham_gia",
+          "trackId": "sinh_ton",
+          "rankId": "tan_du",
+          "minorStageId": "so_ky"
+        }
+      ],
+      "milestones": [
+        {
+          "name": "Giữ Được Phòng 604",
+          "progressionTarget": {
+            "systemId": "nguoi_tham_gia",
+            "trackId": "sinh_ton",
+            "rankId": "tan_du",
+            "minorStageId": "hau_ky"
+          },
+          "socialResult": "Từ nhân chứng hoảng loạn thành người được cư dân tin cậy."
+        },
+        {
+          "name": "Tìm Thấy Danh Sách Tan Ca",
+          "progressionTarget": {
+            "systemId": "nguoi_tham_gia",
+            "trackId": "sinh_ton",
+            "rankId": "thu_luat",
+            "minorStageId": "trung_ky"
+          },
+          "socialResult": "Có quyền yêu cầu Cục Tuần Dạ mở hồ sơ người mất tích."
+        },
+        {
+          "name": "Trở Thành Người Giữ Ca",
+          "progressionTarget": {
+            "systemId": "nguoi_tham_gia",
+            "trackId": "sinh_ton",
+            "rankId": "pha_luat",
+            "minorStageId": "so_ky"
+          },
+          "socialResult": "Được nhóm Giao Ca giao quyền bảo vệ người mới."
+        }
+      ]
+    },
+    {
+      "id": "ta_minh_quan",
+      "name": "Tạ Minh Quân",
+      "role": "antagonist",
+      "agenda": "Giữ quyền phân phối suất vào phó bản của nhà họ Tạ và chứng minh xuất thân bình dân không xứng đứng đầu bảng.",
+      "antagonistClass": "doi_thu_gia_toc",
+      "startLocationId": "van_phong_ta_gia",
+      "startingProgressions": [
+        {
+          "systemId": "nguoi_tham_gia",
+          "trackId": "quan_sat",
+          "rankId": "thu_luat",
+          "minorStageId": "so_ky"
+        },
+        {
+          "systemId": "gia_toc_nguoi_giu_cua",
+          "trackId": "uy_quyen",
+          "rankId": "thieu_chu",
+          "minorStageId": null
+        }
+      ],
+      "milestones": [
+        {
+          "name": "Mua Chuộc Nhân Chứng",
+          "progressionTarget": {
+            "systemId": "gia_toc_nguoi_giu_cua",
+            "trackId": "uy_quyen",
+            "rankId": "thieu_chu",
+            "minorStageId": null
+          },
+          "socialResult": "Biến một nhóm cư dân thành người cung cấp lời khai cho nhà họ Tạ."
+        },
+        {
+          "name": "Thách Đấu Quyền Dẫn Đội",
+          "progressionTarget": {
+            "systemId": "nguoi_tham_gia",
+            "trackId": "quan_sat",
+            "rankId": "pha_luat",
+            "minorStageId": "trung_ky"
+          },
+          "socialResult": "Buộc Lâm Khải phải đấu công khai để giữ người theo."
+        },
+        {
+          "name": "Mất Ghế Thiếu Chủ",
+          "progressionTarget": {
+            "systemId": "gia_toc_nguoi_giu_cua",
+            "trackId": "uy_quyen",
+            "rankId": "khach_khanh",
+            "minorStageId": null
+          },
+          "socialResult": "Chuyển từ đối thủ kiêu ngạo thành kẻ sẵn sàng phá luật để lấy lại vị trí."
+        }
+      ]
+    },
+    {
+      "id": "vuong_tu_han",
+      "name": "Vương Tử Hàn",
+      "role": "antagonist",
+      "agenda": "Hoàn thành chỉ tiêu thu hồi vật phẩm cho Cục Tuần Dạ để đổi lấy quyền tiếp cận hồ sơ về người chị đã chết trong quái đàm.",
+      "antagonistClass": "quan_chuc_cuc_tuan_da",
+      "startLocationId": "tram_tuan_da_so_bay",
+      "startingProgressions": [
+        {
+          "systemId": "nguoi_tham_gia",
+          "trackId": "sinh_ton",
+          "rankId": "pha_luat",
+          "minorStageId": "so_ky"
+        },
+        {
+          "systemId": "cuc_tuan_da",
+          "trackId": "chuc_vu",
+          "rankId": "giam_sat",
+          "minorStageId": null
+        }
+      ],
+      "milestones": [
+        {
+          "name": "Thu Hồi Chuông Trực Đêm",
+          "progressionTarget": {
+            "systemId": "cuc_tuan_da",
+            "trackId": "chuc_vu",
+            "rankId": "giam_sat",
+            "minorStageId": null
+          },
+          "socialResult": "Được cấp trên hứa cấp hồ sơ mật nếu tước được vật phẩm của Lâm Khải."
+        },
+        {
+          "name": "Mở Hồ Sơ Hành Lang",
+          "progressionTarget": {
+            "systemId": "cuc_tuan_da",
+            "trackId": "chuc_vu",
+            "rankId": "doi_truong",
+            "minorStageId": null
+          },
+          "socialResult": "Biết Cục Tuần Dạ che giấu nguồn gốc quái đàm và bắt đầu dao động."
+        },
+        {
+          "name": "Phản Lệnh Phong Tỏa",
+          "progressionTarget": {
+            "systemId": "nguoi_tham_gia",
+            "trackId": "sinh_ton",
+            "rankId": "phan_luat",
+            "minorStageId": "trung_ky"
+          },
+          "socialResult": "Trở thành đồng minh nguy hiểm vì vẫn giữ mạng lưới Cục Tuần Dạ."
+        }
+      ]
+    },
+    {
+      "id": "ngo_bao_tram",
+      "name": "Ngô Bảo Trâm",
+      "role": "authority",
+      "agenda": "Giữ khu chung cư ổn định, giảm số người chết và đổi thành tích lấy quyền tự chủ cho đội tuần tra của mình.",
+      "antagonistClass": "nguoi_nam_quyen",
+      "startLocationId": "tram_tuan_da_so_bay",
+      "startingProgressions": [
+        {
+          "systemId": "nguoi_tham_gia",
+          "trackId": "quan_sat",
+          "rankId": "pha_luat",
+          "minorStageId": "trung_ky"
+        },
+        {
+          "systemId": "cuc_tuan_da",
+          "trackId": "chuc_vu",
+          "rankId": "doi_truong",
+          "minorStageId": null
+        }
+      ],
+      "milestones": [
+        {
+          "name": "Cấp Vé Quan Sát",
+          "progressionTarget": {
+            "systemId": "cuc_tuan_da",
+            "trackId": "chuc_vu",
+            "rankId": "doi_truong",
+            "minorStageId": null
+          },
+          "socialResult": "Công khai bảo lãnh Lâm Khải, đổi lại quyền giám sát anh."
+        },
+        {
+          "name": "Đổi Đội Lấy Dân",
+          "progressionTarget": {
+            "systemId": "nguoi_tham_gia",
+            "trackId": "quan_sat",
+            "rankId": "phan_luat",
+            "minorStageId": "so_ky"
+          },
+          "socialResult": "Mất niềm tin cấp trên vì từ chối bỏ lại người mới."
+        },
+        {
+          "name": "Tự Lập Trạm Bảy",
+          "progressionTarget": {
+            "systemId": "cuc_tuan_da",
+            "trackId": "chuc_vu",
+            "rankId": "tram_chu",
+            "minorStageId": null
+          },
+          "socialResult": "Có một trạm độc lập làm hậu phương cho nhóm Giao Ca."
+        }
+      ]
+    },
+    {
+      "id": "phan_duc_loc",
+      "name": "Phan Đức Lộc",
+      "role": "family",
+      "agenda": "Trả khoản nợ cũ bằng cách ép Lâm Khải giao vật phẩm, nếu không sẽ bán địa chỉ người thân của anh cho nhà họ Tạ.",
+      "antagonistClass": "nguoi_than_no_no",
+      "startLocationId": "cho_dem_van_cang",
+      "startingProgressions": [
+        {
+          "systemId": "nguoi_tham_gia",
+          "trackId": "sinh_ton",
+          "rankId": "nguoi_ngoai",
+          "minorStageId": "so_ky"
+        }
+      ],
+      "milestones": [
+        {
+          "name": "Bán Tin Chung Cư",
+          "progressionTarget": {
+            "systemId": "nguoi_tham_gia",
+            "trackId": "sinh_ton",
+            "rankId": "tan_du",
+            "minorStageId": "so_ky"
+          },
+          "socialResult": "Trở thành kẻ môi giới tin tức bị cả khu trọ dè chừng."
+        },
+        {
+          "name": "Bị Kéo Vào Ca Đêm",
+          "progressionTarget": {
+            "systemId": "nguoi_tham_gia",
+            "trackId": "sinh_ton",
+            "rankId": "tan_du",
+            "minorStageId": "hau_ky"
+          },
+          "socialResult": "Hiểu mạng người không thể trả bằng tiền và buộc phải chọn phe."
+        },
+        {
+          "name": "Cắt Đứt Khoản Nợ",
+          "progressionTarget": {
+            "systemId": "nguoi_tham_gia",
+            "trackId": "sinh_ton",
+            "rankId": "thu_luat",
+            "minorStageId": "so_ky"
+          },
+          "socialResult": "Trở thành người liên lạc chợ đêm cho nhóm Giao Ca."
+        }
+      ]
+    }
+  ],
+  "worldKernel": {
+    "worlds": [
+      {
+        "id": "van_cang",
+        "name": "Vân Cảng",
+        "civilizationState": "Một thành phố cảng hiện đại hư cấu với ứng dụng giao hàng, chung cư cũ, trường học, bệnh viện và chợ đêm như đời thường. Sau các đợt quái đàm giáng lâm, những vùng bị phong tỏa được Cục Tuần Dạ quản lý kín; giới giàu mua suất vào phó bản cấp thấp để lấy vật phẩm, còn dân thường thường chỉ biết mình bị chọn khi điện thoại nhận nội quy.",
+        "locations": [
+          {
+            "id": "phong_tro_17",
+            "name": "Phòng Trọ 17",
+            "note": "Phòng trọ tầng bốn nơi Lâm Khải bị chủ nhà thúc tiền cọc; điểm xuất phát của mục tiêu năm triệu."
+          },
+          {
+            "id": "chung_cu_minh_dang",
+            "name": "Chung Cư Minh Đăng",
+            "note": "Phó bản mở màn. Đèn hành lang luôn sáng, thang máy luôn dừng ở tầng không tồn tại và bảng nội quy có một câu sai."
+          },
+          {
+            "id": "tram_tuan_da_so_bay",
+            "name": "Trạm Tuần Dạ Số Bảy",
+            "note": "Trạm phong tỏa phụ trách khu phía bắc Vân Cảng, nơi lưu hồ sơ và vật phẩm bị thu hồi."
+          },
+          {
+            "id": "van_phong_ta_gia",
+            "name": "Văn Phòng Nhà Họ Tạ",
+            "note": "Tòa nhà tiếp khách dùng để bán suất quan sát và ký hợp đồng phân phối lối vào phó bản."
+          },
+          {
+            "id": "cho_dem_van_cang",
+            "name": "Chợ Đêm Vân Cảng",
+            "note": "Nơi tin tức về người mất tích, vật phẩm lậu và địa chỉ phó bản đổi tay trong các quầy hàng bình thường."
+          }
+        ],
+        "factions": [
+          {
+            "id": "cuc_tuan_da",
+            "name": "Cục Tuần Dạ",
+            "agenda": "Phong tỏa quái đàm, thu hồi vật phẩm, kiểm soát người thông quan và bí mật thu thập nội quy gốc để mở Hành Lang Mười Ba."
+          },
+          {
+            "id": "gia_toc_nguoi_giu_cua",
+            "name": "Nhà Họ Tạ",
+            "agenda": "Độc quyền bán suất vào phó bản, thu lợi từ người mới và duy trì danh tiếng gia tộc qua bảng xếp hạng."
+          },
+          {
+            "id": "nhom_giao_ca",
+            "name": "Nhóm Giao Ca",
+            "agenda": "Nhóm do Lâm Khải hình thành nhằm chia sẻ luật thật, bảo vệ người mới và giành quyền chọn phó bản khỏi các thế lực lớn."
+          }
+        ]
+      }
+    ],
+    "progressionSystems": [
+      {
+        "id": "nguoi_tham_gia",
+        "name": "Cấp Bậc Người Thông Quan",
+        "kind": "realm",
+        "subjectType": "character",
+        "tracks": [
+          {
+            "id": "quan_sat",
+            "name": "Quan Sát",
+            "note": "Đọc tình huống, suy luận luật thật và dẫn nhịp phá giải."
+          },
+          {
+            "id": "sinh_ton",
+            "name": "Sinh Tồn",
+            "note": "Chịu áp lực phó bản, bảo toàn bản thân và cứu người theo điều kiện."
+          }
+        ],
+        "ranks": [
+          {
+            "id": "nguoi_ngoai",
+            "name": "Người Ngoài",
+            "note": "Chưa có quyền chủ động vào phó bản."
+          },
+          {
+            "id": "tan_du",
+            "name": "Tàn Dư",
+            "note": "Người vừa sống sót, có thể giữ một vật phẩm quỷ dị cấp thấp."
+          },
+          {
+            "id": "thu_luat",
+            "name": "Thử Luật",
+            "note": "Có thể nhận diện điều kiện phụ và dẫn một nhóm nhỏ."
+          },
+          {
+            "id": "pha_luat",
+            "name": "Phá Luật",
+            "note": "Có thể phá cú chốt của phó bản trung cấp."
+          },
+          {
+            "id": "phan_luat",
+            "name": "Phán Luật",
+            "note": "Có quyền tranh diễn giải luật thật trong phó bản lớn."
+          },
+          {
+            "id": "chu_luat",
+            "name": "Chủ Luật",
+            "note": "Đỉnh cấp đã biết; có thể đối diện Hành Lang Mười Ba."
+          }
+        ],
+        "minorStages": [
+          {
+            "id": "so_ky",
+            "name": "Sơ Kỳ",
+            "note": "Vừa ổn định năng lực."
+          },
+          {
+            "id": "trung_ky",
+            "name": "Trung Kỳ",
+            "note": "Có một cách dùng đáng tin cậy."
+          },
+          {
+            "id": "hau_ky",
+            "name": "Hậu Kỳ",
+            "note": "Có thể xử lý biến cố đột ngột."
+          },
+          {
+            "id": "dai_vien_man",
+            "name": "Đại Viên Mãn",
+            "note": "Đủ điều kiện thăng bậc."
+          }
+        ]
+      },
+      {
+        "id": "cuc_tuan_da",
+        "name": "Chức Vụ Cục Tuần Dạ",
+        "kind": "organization",
+        "subjectType": "character",
+        "tracks": [
+          {
+            "id": "chuc_vu",
+            "name": "Chức Vụ",
+            "note": "Quyền hạn hành chính đối với vùng phong tỏa."
+          }
+        ],
+        "ranks": [
+          {
+            "id": "quan_sat_vien",
+            "name": "Quan Sát Viên",
+            "note": "Ghi nhận sự kiện."
+          },
+          {
+            "id": "giam_sat",
+            "name": "Giám Sát",
+            "note": "Giám sát một đội thông quan."
+          },
+          {
+            "id": "doi_truong",
+            "name": "Đội Trưởng",
+            "note": "Chỉ huy xử lý một vùng."
+          },
+          {
+            "id": "tram_chu",
+            "name": "Trạm Chủ",
+            "note": "Kiểm soát một trạm phong tỏa."
+          }
+        ],
+        "minorStages": []
+      },
+      {
+        "id": "gia_toc_nguoi_giu_cua",
+        "name": "Thứ Bậc Nhà Họ Tạ",
+        "kind": "organization",
+        "subjectType": "character",
+        "tracks": [
+          {
+            "id": "uy_quyen",
+            "name": "Ủy Quyền",
+            "note": "Quyền chia suất vào phó bản và điều động người nhà."
+          }
+        ],
+        "ranks": [
+          {
+            "id": "khach_khanh",
+            "name": "Khách Khanh",
+            "note": "Người ngoài làm việc cho nhà họ Tạ."
+          },
+          {
+            "id": "thieu_chu",
+            "name": "Thiếu Chủ",
+            "note": "Người kế thừa quyền phân phối."
+          },
+          {
+            "id": "gia_chu",
+            "name": "Gia Chủ",
+            "note": "Người giữ toàn bộ lối vào của gia tộc."
+          }
+        ],
+        "minorStages": []
+      }
+    ],
+    "progressionSubjects": [],
+    "gradeSystems": [
+      {
+        "id": "pham_cap_vat_pham",
+        "name": "Phẩm Cấp Vật Phẩm Quỷ Dị",
+        "categories": [
+          "vật phẩm quỷ dị",
+          "chìa khóa phó bản",
+          "mảnh nội quy"
+        ],
+        "tiers": [
+          {
+            "id": "tan_pham",
+            "name": "Tàn Phẩm",
+            "note": "Công dụng đơn lẻ, có tác dụng phụ rõ ràng."
+          },
+          {
+            "id": "linh_pham",
+            "name": "Linh Phẩm",
+            "note": "Có thể tương tác với một điều luật."
+          },
+          {
+            "id": "hung_pham",
+            "name": "Hung Phẩm",
+            "note": "Có thể đổi cục diện phó bản trung cấp."
+          },
+          {
+            "id": "chu_pham",
+            "name": "Chủ Phẩm",
+            "note": "Liên quan trực tiếp đến luật gốc."
+          }
+        ],
+        "qualities": [
+          {
+            "id": "on_dinh",
+            "name": "Ổn Định",
+            "note": "Dễ dùng, ít phản phệ."
+          },
+          {
+            "id": "bat_on",
+            "name": "Bất Ổn",
+            "note": "Mạnh hơn nhưng dễ kéo theo điều kiện xấu."
+          },
+          {
+            "id": "thuc_tinh",
+            "name": "Thức Tỉnh",
+            "note": "Có phản ứng với chủ nhân và luật thật."
+          }
+        ],
+        "note": "Phẩm cấp đánh giá quyền năng; phẩm chất đánh giá độ ổn định và mức phản phệ."
+      },
+      {
+        "id": "do_kho_pho_ban",
+        "name": "Độ Khó Phó Bản",
+        "categories": [
+          "Phó bản quái đàm"
+        ],
+        "tiers": [
+          {
+            "id": "do_kho_1",
+            "name": "Lam",
+            "note": null
+          },
+          {
+            "id": "do_kho_2",
+            "name": "Cam",
+            "note": null
+          },
+          {
+            "id": "do_kho_3",
+            "name": "Đỏ",
+            "note": null
+          },
+          {
+            "id": "do_kho_4",
+            "name": "Đen",
+            "note": null
+          },
+          {
+            "id": "do_kho_5",
+            "name": "Trắng Tuyệt",
+            "note": null
+          }
+        ],
+        "qualities": [],
+        "note": "Độ khó phó bản quyết định số điều luật sai, số người chơi và phẩm vật phẩm quỷ dị được thưởng."
+      }
+    ],
+    "equivalences": [
+      {
+        "leftSystemId": "nguoi_tham_gia",
+        "leftRankId": "tan_du",
+        "rightSystemId": "cuc_tuan_da",
+        "rightRankId": "quan_sat_vien",
+        "note": "Người đạt Tàn Dư thường được Cục Tuần Dạ ghi nhận như Quan Sát Viên dự bị, nhưng không tự động có quyền hạn."
+      },
+      {
+        "leftSystemId": "nguoi_tham_gia",
+        "leftRankId": "pha_luat",
+        "rightSystemId": "cuc_tuan_da",
+        "rightRankId": "doi_truong",
+        "note": "Người đạt Phá Luật có giá trị chiến thuật tương đương Đội Trưởng trong một phó bản, nhưng quyền hành ngoài phó bản vẫn khác nhau."
+      }
+    ],
+    "economyLoops": [],
+    "launchProducts": [],
+    "openingContract": [
+      {
+        "chapterNumber": 1,
+        "proves": "Lâm Khải nhìn thấy câu “sau mười giờ phải dùng thang máy” có vệt xám, từ chối bước vào thang máy và tìm được người gõ cửa ba tiếng còn sống.",
+        "namedLevelOrGrade": "Người Ngoài Sơ Kỳ",
+        "visibleResult": "Anh giữ mạng, lấy được bảng nội quy có một góc bị cháy và biết Mắt Bắt Lỗi là thật.",
+        "witnessReaction": "Đoàn Nhi đổi thái độ từ coi anh là shipper gây rối sang bám theo xin chỉ dẫn.",
+        "commercialAction": null
+      },
+      {
+        "chapterNumber": 2,
+        "proves": "Lâm Khải dùng mâu thuẫn giữa tiếng chuông và số tầng để xác định giờ trực thật, phá lệnh dụ người vào tầng không tồn tại.",
+        "namedLevelOrGrade": "Tàn Dư Sơ Kỳ",
+        "visibleResult": "Bảng 【Xếp Hạng Thông Quan】 trao Chuông Trực Đêm phẩm Tàn Phẩm, phẩm chất Ổn Định.",
+        "witnessReaction": "Vương Tử Hàn lập tức đề nghị thu hồi vật phẩm, còn Tạ Minh Quân hỏi giá mua đứt.",
+        "commercialAction": null
+      },
+      {
+        "chapterNumber": 3,
+        "proves": "Chuông Trực Đêm rung trước khi luật giả được đọc, cho Lâm Khải thử ứng dụng đầu tiên là chặn Đoàn Nhi mở cửa phòng 604.",
+        "namedLevelOrGrade": "Tàn Dư Trung Kỳ",
+        "visibleResult": "Cả nhóm sống qua lần kiểm tra cư dân, Lâm Khải lấy được thẻ tên người trực thật.",
+        "witnessReaction": "Ngô Bảo Trâm đưa lời mời ghi danh vào Cục Tuần Dạ, đồng thời cảnh cáo không được giấu vật phẩm.",
+        "commercialAction": null
+      },
+      {
+        "chapterNumber": 4,
+        "proves": "Lâm Khải dùng thẻ tên và tiếng chuông gọi đúng người trực, buộc chủ phó bản hủy câu luật sai rồi mở cửa thoát.",
+        "namedLevelOrGrade": "Tàn Dư Hậu Kỳ",
+        "visibleResult": "Chung Cư Minh Đăng được thông quan, Lâm Khải đứng đầu bảng và nhận quyền chọn một phó bản cấp thấp.",
+        "witnessReaction": "Tạ Minh Quân công khai thách đấu quyền dẫn đội, còn cư dân sống sót tranh nhau xin gia nhập nhóm của Lâm Khải.",
+        "commercialAction": null
+      }
+    ],
+    "openingLedger": []
+  },
+  "arena": "Vân Cảng hiện đại bị quái đàm cắt thành các phó bản đời thường: chung cư, trường học, bệnh viện, chợ đêm và ga tàu. Bên ngoài là cuộc tranh quyền vào vùng phong tỏa; bên trong là cuộc đấu trí với luật đúng sai.",
+  "novelty": "Main không nhận đáp án hay dự báo toàn năng: Mắt Bắt Lỗi chỉ khoanh câu mâu thuẫn. Mỗi bước mạnh lên là mở một cách dùng mới để quan sát, đánh dấu, đổi điều kiện hoặc phán diễn giải luật.",
+  "endingDirection": "Ở hồi cuối, Lâm Khải đạt Chủ Luật Đại Viên Mãn, dẫn Nhóm Giao Ca tiến vào Hành Lang Mười Ba. Anh phát hiện Cục Tuần Dạ muốn dùng luật gốc biến cả Vân Cảng thành một phó bản ổn định để dễ cai trị. Lâm Khải không chọn phá hủy thành phố hay nhận ghế cai quản; anh dùng Phán Quyền buộc Hành Lang công nhận luật mới: bất cứ ai bước vào quái đàm đều được biết điều kiện thật để có cơ hội sống. Cái giá là Mắt Bắt Lỗi hòa vào nội quy công khai, còn anh mất lợi thế độc nhất nhưng giữ được thành phố không còn bị độc quyền sinh tử.",
+  "voiceSheet": {
+    "pov": "third_limited",
+    "register": "Nhịp nhanh, câu gọn, tập trung vào chi tiết đời thường sai một ly: thang máy dừng tầng lạ, loa phát tên người chưa đến, cửa phòng gõ ngược từ bên trong. Lâm Khải nói ít, thực dụng, hay chốt lựa chọn bằng giá phải trả; không than thân dài dòng.",
+    "chapterTitleRule": "Tiêu đề chương nêu thẳng nơi chốn, luật nguy hiểm hoặc phần thưởng: “Nội Quy Tầng Mười Ba”, “Chuông Trực Đêm Rung Lần Một”, “Tàn Dư Hậu Kỳ”.",
+    "showsSystemPanel": true,
+    "reactionRule": "Mỗi khi Lâm Khải gọi đúng cấp bậc như Tàn Dư, Thử Luật, Phá Luật hoặc phẩm vật như Tàn Phẩm, Linh Phẩm, người chứng kiến phải chuyển thành hành động lợi ích cụ thể: Cục Tuần Dạ ra lệnh chiêu mộ hay thu hồi, nhà họ Tạ nâng giá mua hoặc thách đấu, người sống sót xin vào đội hay đổi lời khai. Sự kinh ngạc không đứng yên quá một cảnh.",
+    "taboos": [
+      "Không dùng máu me làm nguồn sợ chính.",
+      "Không cho quy tắc tự thay đổi vô cớ sau khi đã có lời giải.",
+      "Không để kim thủ cho đáp án hoàn chỉnh.",
+      "Không dùng địa danh, quốc gia, thương hiệu hay nhân vật có thật.",
+      "Không giải quyết đối thủ chỉ bằng hiểu lầm kéo dài.",
+      "Không để nhân vật phụ chỉ tồn tại để khen main."
+    ]
+  }
+}

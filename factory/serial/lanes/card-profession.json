@@ -1,0 +1,842 @@
+{
+  "schemaVersion": 2,
+  "lane": "toan_dan_chuc_nghiep",
+  "archetype": "card_profession",
+  "title": "Toàn Dân Chuyển Chức: Nghề Phụ Luyện Thẻ Của Ta Ra Thẻ Đỏ, Đoạt Cả Hầm Ngục",
+  "hook": "Mười tám tuổi thức tỉnh nghề phụ Luyện Thẻ, Lâm Kha luyện ra thẻ Lục ngay tại lễ đường; mỗi màu thẻ mới còn biến thành thực lực của chính cậu, từ chuộc quầy sửa thẻ đến đoạt hầm ngục.",
+  "blurb": "Lâm Kha chỉ muốn kiếm đủ năm triệu phiếu Minh để chuộc lại quầy sửa thẻ của cha trước ngày sang tên. Nhưng trong lễ thức tỉnh, nghề Luyện Thẻ bị cả lớp cười là nghề phụ lại cho cậu một bảng chưa từng tồn tại: gom nguyên liệu, luyện thẻ, dung hợp thẻ, mở phẩm màu Trắng đến Đỏ. Quan trọng hơn, mỗi lần cậu làm ra một màu mới, thực lực bản thân cũng đổi theo. Ba viên Sỏi Tro Nham bị vứt bên sân lễ biến thành Khiên Tro phẩm Lục, chặn đứng cú va đập của học viên tinh anh và khiến kiểm định viên phải gọi đúng phẩm màu trước toàn trường. Từ một người giao lõi quái ở khu trọ, Lâm Kha sẽ dùng thẻ thắng kiểm định, cướp suất hầm ngục, dựng đội săn và bước vào giải liên viện. Nhưng Phan gia đang giữ nguồn mực, nhà Đoàn cần quyền khai thác, còn tầng sâu Hầm Mưa Đen chỉ chờ người gom đủ sáu màu thẻ để mở ra.",
+  "readerFantasy": "Thấy Lâm Kha biến phế liệu thành thẻ phẩm cao, gọi đúng cấp để ép đối thủ đổi thái độ, rồi lấy chiến thắng và phần thưởng làm vốn leo từ khu trọ lên quyền khai thác hầm ngục.",
+  "presentation": {
+    "coverPath": "/covers/serial-lanes/card-profession.webp",
+    "tagline": "Luyện một thẻ, đổi một màu, mạnh một bậc.",
+    "shortDescription": "Nghề phụ Luyện Thẻ bị coi thường? Lâm Kha luyện thẻ Lục ngay ngày thức tỉnh, mỗi phẩm màu mới đều tăng thực lực của hắn, từ kiểm định học viện đến hầm ngục và giải liên viện.",
+    "tags": [
+      "Toàn dân chức nghiệp",
+      "Luyện thẻ",
+      "Học viện",
+      "Hầm ngục",
+      "Thăng cấp",
+      "Đấu trường"
+    ],
+    "sellingPoints": [
+      "Chương một có thẻ Lục thật, chặn đòn thật và cả lớp chứng kiến.",
+      "Phẩm màu thẻ là phần thưởng nhìn thấy được, đồng thời mở kỹ năng mới cho nhân vật chính.",
+      "Mỗi thắng lợi đổi thành quyền vào hầm ngục, đội săn, chỉ tiêu bí cảnh hoặc vị thế công khai.",
+      "Đối thủ tranh nguyên liệu, chỉ tiêu và quyền khai thác bằng hành động cụ thể."
+    ]
+  },
+  "goldenFinger": {
+    "name": "Bảng Luyện Thẻ Vạn Tượng",
+    "rule": "Lâm Kha có thể đưa nguyên liệu, lõi quái hoặc thẻ hợp lệ vào bảng để nhận công thức, luyện thẻ và dung hợp theo cấu trúc nhìn thấy. Lần đầu hoàn thành mỗi phẩm màu Trắng, Lục, Lam, Tím, Kim, Đỏ, cậu nhận một Thẻ Chủ cùng màu nâng thực lực cá nhân. Bảng không tạo miễn phí nguyên liệu, không bảo đảm thành công khi thiếu điều kiện và không thể luyện vật vượt quá nguyên liệu đã có.",
+    "scope": "Áp dụng cho vật liệu, quái vật và thẻ thuộc hệ thống chức nghiệp của Liên bang Minh Lưu; Lâm Kha phải tự thu thập, chiến đấu, kiểm chứng và trả giá cho mọi lần luyện.",
+    "evolution": [
+      {
+        "id": "stage_so_luyen",
+        "name": "Sơ Luyện",
+        "changesUse": "Nhận diện nguyên liệu cơ bản và luyện thẻ Trắng theo công thức đơn."
+      },
+      {
+        "id": "stage_chiet_tach",
+        "name": "Chiết Tách",
+        "changesUse": "Phân giải thẻ hỏng, lấy lại một phần vật liệu và thấy lỗi cấu trúc."
+      },
+      {
+        "id": "stage_dung_hop",
+        "name": "Dung Hợp",
+        "changesUse": "Ghép hai thẻ tương thích để tạo hiệu ứng lai phẩm Lục hoặc Lam."
+      },
+      {
+        "id": "stage_khac_an",
+        "name": "Khắc Ấn",
+        "changesUse": "Khắc một kỹ năng từ thẻ vào Thẻ Chủ để Lâm Kha dùng không cần gọi thẻ."
+      },
+      {
+        "id": "stage_lien_ket",
+        "name": "Liên Kết",
+        "changesUse": "Tạo bộ thẻ phối hợp cho đồng đội, biến đội hình thành lợi thế chiến thuật."
+      },
+      {
+        "id": "stage_phan_tich",
+        "name": "Phản Tích",
+        "changesUse": "Đọc dư âm của quái vật bị hạ để truy ra vật liệu then chốt và đường bí cảnh."
+      },
+      {
+        "id": "stage_vuc_lo",
+        "name": "Vực Lò",
+        "changesUse": "Luyện thẻ Tím trở lên trong môi trường hầm ngục, đổi địa hình và luật giao chiến."
+      },
+      {
+        "id": "stage_the_mon",
+        "name": "Thẻ Môn",
+        "changesUse": "Dùng đủ sáu màu để mở cửa thẻ cổ, lựa chọn tạo thẻ quy tắc hoặc phá thẻ quy tắc đối thủ."
+      }
+    ]
+  },
+  "conflictLadder": {
+    "survival": "Giữ mạng trong hầm ngục, kiếm tiền chuộc quầy và không để đội săn bị bỏ rơi giữa dị biến.",
+    "rules": "Giành chứng nhận, chỉ tiêu hầm ngục và quyền sở hữu công thức trước khi gia tộc dùng quy tắc bóp chết người nghèo.",
+    "ideology": "Lâm Kha chống việc biến thẻ mạnh thành tài sản cha truyền con nối, còn các thế lực tin tài nguyên phải thuộc về kẻ đủ tiền giữ nó.",
+    "self": "Khi đã có thể tạo thẻ Đỏ và điều khiển lợi ích cả Vân Cảng, Lâm Kha chọn dựng luật chia cơ hội hay tự trở thành người độc quyền mới."
+  },
+  "hiddenThread": "Bảng Luyện Thẻ không phải phần thưởng vô chủ mà là chìa khóa đóng mở một Thẻ Môn từng phong ấn nguồn dị biến của Hầm Mưa Đen. Sáu phẩm màu không chỉ là thang sức mạnh: mỗi màu là một mảnh quyền hạn. Tạ Mặc muốn người mở cửa để cứu thành, Phan gia muốn biến cửa thành độc quyền nguyên liệu, còn Lâm Kha dần hiểu việc mở cửa sai cách sẽ khiến mọi chức nghiệp bị thẻ hóa thành tài sản có thể tước đoạt.",
+  "payoffStance": "front",
+  "oppositionEngine": "Phan gia giữ mực thẻ, kho vật liệu và người trong Tháp Giám Định; họ mất độc quyền ngay khi Lâm Kha chứng minh phế liệu cũng có thể luyện thẻ phẩm cao. Nhà Đoàn giữ đội săn cùng quyền khai thác và sẽ mất vị trí nếu đội của Lâm Kha vượt họ. Tạ Mặc giữ chỉ tiêu bí cảnh, cần Lâm Kha nhưng sẵn sàng dùng quy định để thử lòng cậu. Họ có thể khóa hàng, mua chuộc đồng đội, dựng cuộc kiểm định, thách đấu công khai hoặc chiếm cổng hầm ngục. Mỗi lần Lâm Kha phá một vòng kiểm soát, cậu không chỉ thắng trận mà có thêm khách hàng, đồng đội, giấy phép hoặc quyền nói trong luật chơi.",
+  "castSeed": [
+    {
+      "id": "lam_kha",
+      "name": "Lâm Kha",
+      "role": "protagonist",
+      "agenda": "Chuộc quầy sửa thẻ, rồi xây một đội săn không bị ai cắt cổ bằng nguyên liệu.",
+      "antagonistClass": null,
+      "startLocationId": "le_duong_thuc_tinh",
+      "startingProgressions": [
+        {
+          "systemId": "canh_gioi_chuc_nghiep",
+          "trackId": "luyen_the",
+          "rankId": "tan_chuc",
+          "minorStageId": "nhap_mon"
+        },
+        {
+          "systemId": "pham_the_chu",
+          "trackId": null,
+          "rankId": "bach_the",
+          "minorStageId": null
+        }
+      ],
+      "milestones": [
+        {
+          "name": "Luyện Khiên Tro phẩm Lục trước toàn trường",
+          "progressionTarget": {
+            "systemId": "pham_the_chu",
+            "trackId": null,
+            "rankId": "luc_the",
+            "minorStageId": null
+          },
+          "socialResult": "Thoát danh nghề phụ vô dụng và bị Tháp Giám Định gọi tên."
+        },
+        {
+          "name": "Chuộc lại quầy sửa thẻ của cha",
+          "progressionTarget": {
+            "systemId": "canh_gioi_chuc_nghiep",
+            "trackId": "luyen_the",
+            "rankId": "the_su",
+            "minorStageId": "thuc_chien"
+          },
+          "socialResult": "Có nơi luyện thẻ hợp pháp và nguồn khách đầu tiên."
+        },
+        {
+          "name": "Lập đội săn Mực Tro",
+          "progressionTarget": {
+            "systemId": "to_chuc_doi_san",
+            "trackId": null,
+            "rankId": "doi_truong",
+            "minorStageId": null
+          },
+          "socialResult": "Không còn phải xin suất hầm ngục từ Phan gia."
+        },
+        {
+          "name": "Đoạt chức vô địch liên viện",
+          "progressionTarget": {
+            "systemId": "canh_gioi_chuc_nghiep",
+            "trackId": "luyen_the",
+            "rankId": "the_dai_su",
+            "minorStageId": "tinh_anh"
+          },
+          "socialResult": "Nhận chìa khóa Bí Cảnh Thẻ Cổ."
+        },
+        {
+          "name": "Mở Thẻ Môn Hầm Mưa Đen",
+          "progressionTarget": {
+            "systemId": "canh_gioi_chuc_nghiep",
+            "trackId": "luyen_the",
+            "rankId": "the_vuong",
+            "minorStageId": "dinh_phong"
+          },
+          "socialResult": "Có quyền quyết định luật phân phối thẻ mới của Vân Cảng."
+        }
+      ]
+    },
+    {
+      "id": "doan_tuyet",
+      "name": "Đoàn Tuyết",
+      "role": "rival",
+      "agenda": "Giành quyền khai thác Hầm Mưa Đen bằng thành tích của chính mình.",
+      "antagonistClass": "gia_toc_thu_san",
+      "startLocationId": "san_kiem_dinh",
+      "startingProgressions": [
+        {
+          "systemId": "canh_gioi_chuc_nghiep",
+          "trackId": "kiem_the",
+          "rankId": "the_su",
+          "minorStageId": "thuc_chien"
+        }
+      ],
+      "milestones": [
+        {
+          "name": "Thắng vòng tuyển đội săn",
+          "progressionTarget": {
+            "systemId": "canh_gioi_chuc_nghiep",
+            "trackId": "kiem_the",
+            "rankId": "the_su",
+            "minorStageId": "tinh_anh"
+          },
+          "socialResult": "Có quyền tự chọn ba thành viên."
+        },
+        {
+          "name": "Ký giao kèo đồng đội với Lâm Kha",
+          "progressionTarget": null,
+          "socialResult": "Tách khỏi quyền điều khiển trực tiếp của gia tộc."
+        },
+        {
+          "name": "Chém mở tầng ba Hầm Mưa Đen",
+          "progressionTarget": {
+            "systemId": "canh_gioi_chuc_nghiep",
+            "trackId": "kiem_the",
+            "rankId": "the_dai_su",
+            "minorStageId": "thuc_chien"
+          },
+          "socialResult": "Được công nhận là đội trưởng khai hoang."
+        }
+      ]
+    },
+    {
+      "id": "phan_duy",
+      "name": "Phan Duy",
+      "role": "antagonist",
+      "agenda": "Giữ độc quyền mực thẻ và chứng minh dân khu trọ không thể chen vào tầng tinh anh.",
+      "antagonistClass": "gia_toc_thuong_nghiep",
+      "startLocationId": "hoc_vien_the_van_cang",
+      "startingProgressions": [
+        {
+          "systemId": "canh_gioi_chuc_nghiep",
+          "trackId": "thao_tung",
+          "rankId": "the_su",
+          "minorStageId": "nhap_mon"
+        }
+      ],
+      "milestones": [
+        {
+          "name": "Khóa nguồn mực của Lâm Kha",
+          "progressionTarget": null,
+          "socialResult": "Ép Lâm Kha rời lớp tinh anh."
+        },
+        {
+          "name": "Mua suất đội tuyển học viện",
+          "progressionTarget": {
+            "systemId": "to_chuc_doi_san",
+            "trackId": null,
+            "rankId": "doi_pho",
+            "minorStageId": null
+          },
+          "socialResult": "Có quyền chọn bản đồ luyện tập."
+        },
+        {
+          "name": "Cướp công thức dung hợp Lam phẩm",
+          "progressionTarget": {
+            "systemId": "canh_gioi_chuc_nghiep",
+            "trackId": "thao_tung",
+            "rankId": "the_dai_su",
+            "minorStageId": "tinh_anh"
+          },
+          "socialResult": "Trở thành đối tác bắt buộc của các xưởng thẻ."
+        }
+      ]
+    },
+    {
+      "id": "tong_nghiem",
+      "name": "Tống Nghiêm",
+      "role": "ally",
+      "agenda": "Kiếm phí điều trị cho mẹ và trở thành Khiên Thủ không bỏ lại ai.",
+      "antagonistClass": null,
+      "startLocationId": "khu_tro_tay",
+      "startingProgressions": [
+        {
+          "systemId": "canh_gioi_chuc_nghiep",
+          "trackId": "khien_the",
+          "rankId": "tan_chuc",
+          "minorStageId": "nhap_mon"
+        }
+      ],
+      "milestones": [
+        {
+          "name": "Chặn đợt thú tro đầu tiên",
+          "progressionTarget": {
+            "systemId": "canh_gioi_chuc_nghiep",
+            "trackId": "khien_the",
+            "rankId": "the_su",
+            "minorStageId": "thuc_chien"
+          },
+          "socialResult": "Được Lâm Kha mời vào đội."
+        },
+        {
+          "name": "Nhận Khiên Tro Lam phẩm",
+          "progressionTarget": {
+            "systemId": "canh_gioi_chuc_nghiep",
+            "trackId": "khien_the",
+            "rankId": "the_su",
+            "minorStageId": "tinh_anh"
+          },
+          "socialResult": "Không còn bị gọi là bao cát thuê."
+        },
+        {
+          "name": "Giữ cổng tầng sâu một mình",
+          "progressionTarget": {
+            "systemId": "canh_gioi_chuc_nghiep",
+            "trackId": "khien_the",
+            "rankId": "the_dai_su",
+            "minorStageId": "thuc_chien"
+          },
+          "socialResult": "Mẹ được chuyển khỏi trạm cứu hộ nguy hiểm."
+        }
+      ]
+    },
+    {
+      "id": "bang_khiem",
+      "name": "Bàng Khiêm",
+      "role": "antagonist",
+      "agenda": "Lấy báo cáo lớn để vào bộ phận công thức của Tháp Giám Định.",
+      "antagonistClass": "quan_lieu_kiem_dinh",
+      "startLocationId": "thap_giam_dinh",
+      "startingProgressions": [
+        {
+          "systemId": "to_chuc_kiem_dinh",
+          "trackId": null,
+          "rankId": "tap_su",
+          "minorStageId": null
+        }
+      ],
+      "milestones": [
+        {
+          "name": "Xác nhận thẻ Lục đầu tiên",
+          "progressionTarget": {
+            "systemId": "to_chuc_kiem_dinh",
+            "trackId": null,
+            "rankId": "kiem_dinh_vien",
+            "minorStageId": null
+          },
+          "socialResult": "Có tên trong biên bản lịch sử của học viện."
+        },
+        {
+          "name": "Bị lộ nhận hối lộ Phan gia",
+          "progressionTarget": null,
+          "socialResult": "Mất chỗ dựa và phải chọn đứng về sự thật."
+        },
+        {
+          "name": "Công bố chuẩn thẻ Tím",
+          "progressionTarget": {
+            "systemId": "to_chuc_kiem_dinh",
+            "trackId": null,
+            "rankId": "chu_quan",
+            "minorStageId": null
+          },
+          "socialResult": "Giành quyền chống lại can thiệp của gia tộc."
+        }
+      ]
+    },
+    {
+      "id": "ta_mac",
+      "name": "Tạ Mặc",
+      "role": "authority",
+      "agenda": "Tìm người mở tầng sâu trước khi Hầm Mưa Đen vượt ngưỡng dị biến.",
+      "antagonistClass": "lien_minh_ham_nguc",
+      "startLocationId": "thap_giam_dinh",
+      "startingProgressions": [
+        {
+          "systemId": "canh_gioi_chuc_nghiep",
+          "trackId": "tham_dinh",
+          "rankId": "the_dai_su",
+          "minorStageId": "tinh_anh"
+        },
+        {
+          "systemId": "to_chuc_kiem_dinh",
+          "trackId": null,
+          "rankId": "thap_chu",
+          "minorStageId": null
+        }
+      ],
+      "milestones": [
+        {
+          "name": "Thử lòng Lâm Kha bằng kiểm định kín",
+          "progressionTarget": null,
+          "socialResult": "Xác định Lâm Kha không thể bị mua rẻ."
+        },
+        {
+          "name": "Giao chìa khóa Bí Cảnh Thẻ Cổ",
+          "progressionTarget": null,
+          "socialResult": "Buộc ba học viện cùng công nhận đội Mực Tro."
+        },
+        {
+          "name": "Mở hồ sơ Thẻ Môn",
+          "progressionTarget": {
+            "systemId": "canh_gioi_chuc_nghiep",
+            "trackId": "tham_dinh",
+            "rankId": "the_vuong",
+            "minorStageId": "dinh_phong"
+          },
+          "socialResult": "Trao quyền quyết định khai hoang cho thế hệ trẻ."
+        }
+      ]
+    }
+  ],
+  "worldKernel": {
+    "worlds": [
+      {
+        "id": "lien_bang_minh_luu",
+        "name": "Liên bang Minh Lưu",
+        "civilizationState": "Một liên bang hiện đại nơi cổng hầm ngục và chức nghiệp là nền kinh tế cốt lõi. Người đủ mười tám tuổi thức tỉnh nghề, dùng thẻ để chiến đấu, làm việc và nhận quyền vào khu tài nguyên.",
+        "locations": [
+          {
+            "id": "le_duong_thuc_tinh",
+            "name": "Lễ Đường Thức Tỉnh Vân Cảng",
+            "note": "Nơi thanh niên khu tây nhận chức nghiệp, cũng là nơi Lâm Kha gọi thẻ Lục đầu tiên."
+          },
+          {
+            "id": "hoc_vien_the_van_cang",
+            "name": "Học viện Thẻ Vân Cảng",
+            "note": "Học viện đào tạo người dùng thẻ, có sân kiểm định và đội tuyển liên viện."
+          },
+          {
+            "id": "thap_giam_dinh",
+            "name": "Tháp Giám Định Vân Cảng",
+            "note": "Cơ quan công bố phẩm màu, chứng nhận công thức và phân xử tranh chấp thẻ."
+          },
+          {
+            "id": "ham_mua_den",
+            "name": "Hầm Mưa Đen",
+            "note": "Cổng hầm ngục nhiều tầng dưới vành đai cảng, có dị biến liên quan Thẻ Môn."
+          },
+          {
+            "id": "dau_truong_lien_vien",
+            "name": "Đấu Trường Liên Viện",
+            "note": "Sân giải đấu tranh chỉ tiêu bí cảnh và quyền khai thác cho các học viện."
+          },
+          {
+            "id": "khu_tro_tay",
+            "name": "Khu Trọ Tây",
+            "note": "Khu dân lao động, nơi Lâm Kha sống và quầy sửa thẻ của cha sắp bị sang nhượng."
+          },
+          {
+            "id": "san_kiem_dinh",
+            "name": "Sân Kiểm Định Vân Cảng",
+            "note": "Sân thi đấu và kiểm định công khai của học viện, nơi thẻ mới được đo phẩm trước đám đông."
+          }
+        ],
+        "factions": [
+          {
+            "id": "phan_gia",
+            "name": "Phan gia",
+            "agenda": "Kiểm soát mực thẻ, kho vật liệu và các hợp đồng cung ứng cho học viện."
+          },
+          {
+            "id": "doan_doi_san",
+            "name": "Đội săn nhà Đoàn",
+            "agenda": "Giữ quyền khai thác Hầm Mưa Đen cho gia tộc bằng thành tích chiến đấu."
+          },
+          {
+            "id": "thap_giam_dinh_van_cang",
+            "name": "Tháp Giám Định Vân Cảng",
+            "agenda": "Duy trì chuẩn phẩm màu và dùng chứng nhận để kiểm soát công thức mới."
+          },
+          {
+            "id": "lien_minh_ham_nguc",
+            "name": "Liên minh Hầm Ngục",
+            "agenda": "Ngăn dị biến tràn ra thành và phân chia quyền khai thác theo thành tích."
+          },
+          {
+            "id": "doi_muc_tro",
+            "name": "Đội Mực Tro",
+            "agenda": "Đội do Lâm Kha lập, dùng luyện thẻ và chiến đấu để giành quyền tự chủ."
+          }
+        ]
+      }
+    ],
+    "progressionSystems": [
+      {
+        "id": "canh_gioi_chuc_nghiep",
+        "name": "Cảnh Giới Chức Nghiệp",
+        "kind": "realm",
+        "subjectType": "character",
+        "tracks": [
+          {
+            "id": "luyen_the",
+            "name": "Luyện Thẻ",
+            "note": "Luyện, dung hợp và khắc ấn thẻ."
+          },
+          {
+            "id": "kiem_the",
+            "name": "Kiếm Thẻ",
+            "note": "Dùng thẻ kiếm làm lối đánh chủ lực."
+          },
+          {
+            "id": "khien_the",
+            "name": "Khiên Thẻ",
+            "note": "Dùng thẻ khiên để phòng thủ và bảo hộ."
+          },
+          {
+            "id": "thao_tung",
+            "name": "Thao Túng",
+            "note": "Dùng thẻ phụ trợ để kiểm soát chiến trường và lợi ích."
+          },
+          {
+            "id": "tham_dinh",
+            "name": "Thẩm Định",
+            "note": "Đánh giá cấu trúc thẻ và nguy cơ hầm ngục."
+          }
+        ],
+        "ranks": [
+          {
+            "id": "tan_chuc",
+            "name": "Tân Chức",
+            "note": "Vừa thức tỉnh, chỉ dùng được thẻ cơ bản."
+          },
+          {
+            "id": "the_do",
+            "name": "Thẻ Đồ",
+            "note": "Có thể duy trì một bộ thẻ sơ cấp."
+          },
+          {
+            "id": "the_su",
+            "name": "Thẻ Sư",
+            "note": "Có năng lực chiến đấu hoặc chế tạo thực chiến."
+          },
+          {
+            "id": "the_dai_su",
+            "name": "Thẻ Đại Sư",
+            "note": "Tạo ảnh hưởng trong một học viện hay khu hầm ngục."
+          },
+          {
+            "id": "the_linh",
+            "name": "Thẻ Linh",
+            "note": "Điều động thẻ theo ý niệm và dẫn đội khai hoang."
+          },
+          {
+            "id": "the_vuong",
+            "name": "Thẻ Vương",
+            "note": "Chạm đến luật thẻ của một vùng dị biến."
+          },
+          {
+            "id": "the_hoang",
+            "name": "Thẻ Hoàng",
+            "note": "Đỉnh cao công khai của Liên bang, có thể phong ấn hoặc mở Thẻ Môn."
+          }
+        ],
+        "minorStages": [
+          {
+            "id": "nhap_mon",
+            "name": "Nhập Môn",
+            "note": "Vừa nắm cách gọi thẻ."
+          },
+          {
+            "id": "thuc_chien",
+            "name": "Thực Chiến",
+            "note": "Đã qua một trận có nguy cơ thật."
+          },
+          {
+            "id": "tinh_anh",
+            "name": "Tinh Anh",
+            "note": "Có thành tích được tổ chức công nhận."
+          },
+          {
+            "id": "dinh_phong",
+            "name": "Đỉnh Phong",
+            "note": "Đứng ở cực hạn của một cảnh giới."
+          }
+        ]
+      },
+      {
+        "id": "to_chuc_doi_san",
+        "name": "Cấp Bậc Đội Săn",
+        "kind": "organization",
+        "subjectType": "faction",
+        "tracks": [],
+        "ranks": [
+          {
+            "id": "to_nho",
+            "name": "Tổ Nhỏ",
+            "note": "Nhóm tạm thời dưới năm người."
+          },
+          {
+            "id": "doi_pho",
+            "name": "Đội Phó",
+            "note": "Có quyền chỉ huy một tổ trong đội săn."
+          },
+          {
+            "id": "doi_truong",
+            "name": "Đội Trưởng",
+            "note": "Có giấy phép dẫn đội vào hầm ngục."
+          },
+          {
+            "id": "doan_truong",
+            "name": "Đoàn Trưởng",
+            "note": "Điều động nhiều đội và nhận quyền khai thác lớn."
+          }
+        ],
+        "minorStages": []
+      },
+      {
+        "id": "to_chuc_kiem_dinh",
+        "name": "Cấp Bậc Kiểm Định",
+        "kind": "organization",
+        "subjectType": "character",
+        "tracks": [],
+        "ranks": [
+          {
+            "id": "tap_su",
+            "name": "Tập Sự",
+            "note": "Chỉ được ghi chép dưới giám sát."
+          },
+          {
+            "id": "kiem_dinh_vien",
+            "name": "Kiểm Định Viên",
+            "note": "Được ký kết quả thẻ phổ thông."
+          },
+          {
+            "id": "chu_quan",
+            "name": "Chủ Quản",
+            "note": "Có quyền xét chuẩn công thức khu vực."
+          },
+          {
+            "id": "thap_chu",
+            "name": "Tháp Chủ",
+            "note": "Quyết định chứng nhận và điều tra tranh chấp lớn."
+          }
+        ],
+        "minorStages": []
+      },
+      {
+        "id": "pham_the_chu",
+        "name": "Phẩm Thẻ Chủ",
+        "kind": "ability",
+        "subjectType": "character",
+        "tracks": [],
+        "ranks": [
+          {
+            "id": "bach_the",
+            "name": "Thẻ Chủ Trắng",
+            "note": null
+          },
+          {
+            "id": "luc_the",
+            "name": "Thẻ Chủ Lục",
+            "note": null
+          },
+          {
+            "id": "lam_the",
+            "name": "Thẻ Chủ Lam",
+            "note": null
+          },
+          {
+            "id": "tim_the",
+            "name": "Thẻ Chủ Tím",
+            "note": null
+          },
+          {
+            "id": "kim_the",
+            "name": "Thẻ Chủ Kim",
+            "note": null
+          },
+          {
+            "id": "do_the",
+            "name": "Thẻ Chủ Đỏ",
+            "note": null
+          }
+        ],
+        "minorStages": []
+      }
+    ],
+    "progressionSubjects": [
+      {
+        "id": "doi_muc_tro_subject",
+        "name": "Đội Mực Tro",
+        "kind": "faction",
+        "startLocationId": "khu_tro_tay",
+        "startingProgressions": [
+          {
+            "systemId": "to_chuc_doi_san",
+            "trackId": null,
+            "rankId": "to_nho",
+            "minorStageId": null
+          }
+        ]
+      }
+    ],
+    "gradeSystems": [
+      {
+        "id": "thuong_hieu_the",
+        "name": "Phẩm Màu Thẻ",
+        "categories": [
+          "Thẻ kỹ năng",
+          "Thẻ triệu hồi",
+          "Thẻ trang bị",
+          "Thẻ địa hình",
+          "Thẻ chủ"
+        ],
+        "tiers": [
+          {
+            "id": "bach_the",
+            "name": "Trắng",
+            "note": "Thẻ cơ bản, cấu trúc một tác dụng."
+          },
+          {
+            "id": "luc_the",
+            "name": "Lục",
+            "note": "Thẻ hoàn chỉnh, có hiệu ứng ổn định."
+          },
+          {
+            "id": "lam_the",
+            "name": "Lam",
+            "note": "Thẻ có biến thể chiến thuật và điều kiện kích hoạt."
+          },
+          {
+            "id": "tim_the",
+            "name": "Tím",
+            "note": "Thẻ tạo thay đổi rõ ràng cho đội hình hoặc địa hình."
+          },
+          {
+            "id": "kim_the",
+            "name": "Kim",
+            "note": "Thẻ hiếm có thể tác động quy tắc cục bộ."
+          },
+          {
+            "id": "do_the",
+            "name": "Đỏ",
+            "note": "Thẻ đỉnh cấp liên quan Thẻ Môn và dị biến."
+          }
+        ],
+        "qualities": [],
+        "note": "Phẩm màu là chuẩn công khai của thẻ và là mốc bảng Luyện Thẻ trả Thẻ Chủ cho Lâm Kha."
+      },
+      {
+        "id": "pham_loi_quai",
+        "name": "Phẩm Lõi Quái",
+        "categories": [
+          "Lõi quái hầm ngục",
+          "Lõi quái hoang dã"
+        ],
+        "tiers": [
+          {
+            "id": "loi_ha",
+            "name": "Hạ phẩm",
+            "note": null
+          },
+          {
+            "id": "loi_trung",
+            "name": "Trung phẩm",
+            "note": null
+          },
+          {
+            "id": "loi_thuong",
+            "name": "Thượng phẩm",
+            "note": null
+          },
+          {
+            "id": "loi_cuc",
+            "name": "Cực phẩm",
+            "note": null
+          }
+        ],
+        "qualities": [],
+        "note": "Phẩm lõi quyết định phẩm màu tối đa của thẻ luyện ra."
+      }
+    ],
+    "equivalences": [
+      {
+        "leftSystemId": "canh_gioi_chuc_nghiep",
+        "leftRankId": "tan_chuc",
+        "rightSystemId": "pham_the_chu",
+        "rightRankId": "bach_the",
+        "note": "Tân Chức thường chỉ ổn định được thẻ Trắng."
+      },
+      {
+        "leftSystemId": "canh_gioi_chuc_nghiep",
+        "leftRankId": "the_do",
+        "rightSystemId": "pham_the_chu",
+        "rightRankId": "luc_the",
+        "note": "Thẻ Đồ có thể dùng thẻ Lục trong thực chiến cơ bản."
+      },
+      {
+        "leftSystemId": "canh_gioi_chuc_nghiep",
+        "leftRankId": "the_su",
+        "rightSystemId": "pham_the_chu",
+        "rightRankId": "lam_the",
+        "note": "Thẻ Sư thường sở hữu hoặc luyện được thẻ Lam."
+      },
+      {
+        "leftSystemId": "canh_gioi_chuc_nghiep",
+        "leftRankId": "the_dai_su",
+        "rightSystemId": "pham_the_chu",
+        "rightRankId": "tim_the",
+        "note": "Thẻ Đại Sư mới đủ tư cách kiểm soát thẻ Tím ổn định."
+      },
+      {
+        "leftSystemId": "canh_gioi_chuc_nghiep",
+        "leftRankId": "the_linh",
+        "rightSystemId": "pham_the_chu",
+        "rightRankId": "kim_the",
+        "note": "Thẻ Linh có thể vận dụng thẻ Kim trong khai hoang lớn."
+      },
+      {
+        "leftSystemId": "canh_gioi_chuc_nghiep",
+        "leftRankId": "the_vuong",
+        "rightSystemId": "pham_the_chu",
+        "rightRankId": "do_the",
+        "note": "Thẻ Vương có tư cách chạm đến thẻ Đỏ và Thẻ Môn."
+      }
+    ],
+    "economyLoops": [],
+    "launchProducts": [],
+    "openingContract": [
+      {
+        "chapterNumber": 1,
+        "proves": "Nghề Luyện Thẻ của Lâm Kha có bảng riêng và luyện được thẻ thật từ vật liệu phế.",
+        "namedLevelOrGrade": "Tân Chức, thẻ Khiên Tro phẩm Lục",
+        "visibleResult": "Khiên Tro chặn cú húc của thú mô phỏng, mặt khiên hiện vân lục trước lễ đường.",
+        "witnessReaction": "Cả lớp im lặng, Bàng Khiêm yêu cầu mang thẻ đến Tháp Giám Định còn Phan Duy đổi giọng muốn mua.",
+        "commercialAction": null
+      },
+      {
+        "chapterNumber": 2,
+        "proves": "Thẻ Lục đầu tiên trả Thẻ Chủ, khiến Lâm Kha mạnh hơn người luyện thẻ bình thường.",
+        "namedLevelOrGrade": "Tân Chức Nhập Môn, Thẻ Chủ Lục",
+        "visibleResult": "Lâm Kha tự nâng được khối đá kiểm tra mà trước đó phải cần hai người khuân.",
+        "witnessReaction": "Đoàn Tuyết đề nghị một trận thử thẻ, Tống Nghiêm công khai đứng về phía Lâm Kha.",
+        "commercialAction": null
+      },
+      {
+        "chapterNumber": 3,
+        "proves": "Lâm Kha có thể dùng thẻ Lục để vượt kiểm định thay vì chỉ tạo ra vật trưng bày.",
+        "namedLevelOrGrade": "Thẻ Đồ Nhập Môn, Khiên Tro phẩm Lục",
+        "visibleResult": "Cậu giữ lá chắn qua ba đợt va đập và bảo vệ được Tống Nghiêm trong sân kiểm định.",
+        "witnessReaction": "Bàng Khiêm buộc phải cấp chứng nhận tạm thời, Phan Duy tuyên bố thách đấu.",
+        "commercialAction": null
+      },
+      {
+        "chapterNumber": 4,
+        "proves": "Dung hợp vật liệu phế có thể tạo lối đánh mới, mở cơ hội vào hầm ngục.",
+        "namedLevelOrGrade": "Thẻ Đồ Thực Chiến, Bước Tro phẩm Lục",
+        "visibleResult": "Lâm Kha né được đòn kiếm của Đoàn Tuyết rồi chạm chuông thắng trong giới hạn thời gian.",
+        "witnessReaction": "Tạ Mặc gửi lời mời kiểm định kín, Phan gia bắt đầu thu gom Sỏi Tro Nham.",
+        "commercialAction": null
+      }
+    ],
+    "openingLedger": []
+  },
+  "arena": "Học viện thức tỉnh, Tháp Giám Định, Hầm Mưa Đen và giải đấu liên viện là bốn đấu trường quen thuộc, liên tục đổi phần thưởng từ thẻ, chỉ tiêu đến quyền khai thác.",
+  "novelty": "Luyện thẻ không chỉ tạo trang bị: mỗi phẩm màu Lâm Kha mở lần đầu đều kết thành Thẻ Chủ, biến tiến bộ nghề phụ thành thực lực chiến đấu của chính hắn.",
+  "endingDirection": "Khoảng chương 800 đến 1.200, Lâm Kha hoàn thành bộ sáu màu, mở Thẻ Môn ở lõi Hầm Mưa Đen và phát hiện các gia tộc đã dùng chuẩn phẩm màu để khóa đường tiến của người nghèo. Cậu không xóa hệ thống thẻ bằng một trận thắng, mà dùng quyền Thẻ Hoàng lập chuẩn công thức công khai, phá độc quyền nguyên liệu và dựng liên minh đội săn có thể tự luyện, tự kiểm định, tự khai hoang. Trận cuối là lựa chọn giữa giữ Thẻ Môn cho riêng mình thành quyền lực tuyệt đối, hoặc mở đường nhưng chấp nhận thế giới sẽ xuất hiện thêm đối thủ ngang tầm.",
+  "voiceSheet": {
+    "pov": "third_limited",
+    "register": "Nhịp nhanh, câu gọn, ưu tiên công dụng thẻ, giá nguyên liệu, điều kiện thắng và phản ứng ngay tại hiện trường. Lâm Kha nói ít nhưng luôn chốt bằng giá, điều kiện hoặc câu hỏi lật lợi ích đối phương.",
+    "chapterTitleRule": "Tiêu đề chương nêu thẳng đấu trường, thẻ hoặc phần thưởng: ví dụ Kiểm Định: Khiên Tro Lục Phẩm, Cả Lớp Im Lặng.",
+    "showsSystemPanel": true,
+    "reactionRule": "Mỗi khi cấp cảnh giới hoặc phẩm màu được gọi đúng, phản ứng phải chuyển thành hành động có lợi ích: người chứng kiến tranh mua nguyên liệu, chiêu mộ vào đội, gửi thách đấu, sửa giá hợp đồng, rút thái độ khinh thường hoặc dùng quy tắc để ngăn cản. Không có kinh ngạc đứng yên chỉ để khen.",
+    "taboos": [
+      "Không trì hoãn thẻ Lục sau chương hai.",
+      "Không dùng nhân vật, quái vật hay địa danh từ tác phẩm có thật.",
+      "Không cho thắng lợi vô giá; mỗi phần thưởng phải dẫn đến nguyên liệu, quyền vào sân hoặc kẻ mất lợi.",
+      "Không dùng hiểu lầm kéo dài thay cho xung đột lợi ích.",
+      "Không để phẩm màu chỉ là con số mà không đổi cách dùng.",
+      "Không giải thích lại quy ước thức tỉnh nghề ở mỗi arc."
+    ]
+  }
+}

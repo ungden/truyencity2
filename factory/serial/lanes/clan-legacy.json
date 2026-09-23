@@ -1,0 +1,1000 @@
+{
+  "schemaVersion": 2,
+  "lane": "gia_toc_tu_tien",
+  "archetype": "clan_legacy",
+  "title": "Tu Tiên Gia Tộc: Đa Tử Đa Phúc, Mỗi Thiên Tài Nhập Phả Đổi Một Linh Mạch",
+  "hook": "Gia chủ Lục Hàn chỉ cần cưới đúng người, nhận đúng đệ tử và nuôi lớn hậu bối: mỗi thiên tài nhập gia phả đều mở phần thưởng, từ Trúc Cơ đan đến linh mạch của cả gia tộc.",
+  "blurb": "Lục Hàn muốn giữ lại đúng một thứ: tiểu linh mạch tổ truyền của Lục gia, thứ sẽ bị Tạ gia thu hồi sau ba mươi ngày nếu hắn không nộp đủ ba trăm linh thạch hạ phẩm. Một gia chủ Luyện Khí tầng sáu, kho rỗng, tộc nhân tản mác, hắn vốn chỉ đủ sức bán nốt tổ trạch để đổi đường sống. Nhưng bảng 【Hậu Duệ Hưng Tộc】 thức tỉnh khi hắn nhận cô bé mang dị linh căn làm con nuôi: tư chất được xếp hạng, gia phả được ghi nhận, và một viên Trúc Cơ đan thật sự rơi vào tay hắn. Lục Hàn không vội nuốt đan một mình. Hắn dùng phần thưởng đoạt lại linh điền, kết liên hôn với gia tộc đang cần chỗ dựa, thu nhận những hạt giống bị tông môn bỏ quên. Mỗi lần một đứa trẻ ra đời hay một đệ tử nhập môn, Lục gia lại có thêm một lá bài lật bàn. Nhưng linh mạch không chỉ có Tạ gia nhìn chằm chằm: phường thị muốn nuốt đất, tông môn muốn lấy người, còn đại hội gia tộc sẽ quyết định ai được tồn tại ở Vân Lĩnh.",
+  "readerFantasy": "Nhìn một gia chủ nghèo biến tư chất của con cháu và đệ tử thành phần thưởng thấy ngay được: đan dược, công pháp, pháp khí, linh điền rồi lãnh địa; mỗi chiến thắng đều thành vốn để cả Lục gia leo cao hơn.",
+  "presentation": {
+    "coverPath": "/covers/serial-lanes/clan-legacy.webp",
+    "tagline": "Sinh con, thu đồ, mở thưởng, dựng lại tiên tộc",
+    "shortDescription": "Gia chủ Luyện Khí sắp mất linh mạch tổ truyền thức tỉnh hệ thống hậu duệ. Mỗi thiên tài nhập gia phả đều đổi thành phần thưởng, giúp Lục gia giành linh điền, thắng đại hội và từng đời trỗi dậy.",
+    "tags": [
+      "gia tộc tu tiên",
+      "đa tử đa phúc",
+      "hệ thống",
+      "gia chủ",
+      "thu đồ",
+      "linh mạch",
+      "phường thị"
+    ],
+    "sellingPoints": [
+      "Chương đầu đã nhận con nuôi dị linh căn và nhận Trúc Cơ đan.",
+      "Mỗi hậu bối có tư chất, đường trưởng thành và phần thưởng riêng.",
+      "Đối thủ tranh tài nguyên bằng giá thuê, hôn ước, đại hội và chiến trường linh mạch.",
+      "Sức mạnh cá nhân luôn gắn với tài sản, nhân khẩu và cấp bậc gia tộc."
+    ]
+  },
+  "goldenFinger": {
+    "name": "Hậu Duệ Hưng Tộc",
+    "rule": "Khi Lục Hàn với tư cách gia chủ hoàn tất nghi thức ghi một người vào gia phả Lục gia hoặc sổ đệ tử Lục gia, bảng sẽ giám định linh căn, ngộ tính và khí vận của người đó. Người có tư chất càng cao, phần thưởng khai tộc càng lớn. Khi hậu bối đạt mốc tu vi, nghề nghiệp hoặc công trạng, gia chủ nhận thêm thưởng tương ứng. Người được ghi danh phải tự nguyện ở lại hoặc giữ quan hệ sư môn, dưỡng tử, hôn tộc hợp lệ; phản bội và cắt phả sẽ khóa một phần phúc báo. Phần thưởng chỉ dùng được để phát triển Lục gia, nhưng Lục Hàn được quyền quyết định phân phối.",
+    "scope": "Chỉ tác động lên gia phả, đệ tử và tài sản hợp pháp của Lục gia tại Vân Lĩnh giới; không tạo người, không sửa tư chất, không thay người khác tu luyện.",
+    "evolution": [
+      {
+        "id": "gia_pha_khai_mo",
+        "name": "Gia Phả Khai Mở",
+        "changesUse": "Giám định người đầu tiên được nhận và phát phần thưởng nhập phả một lần."
+      },
+      {
+        "id": "phuc_bao_dinh_cap",
+        "name": "Phúc Báo Định Cấp",
+        "changesUse": "Hiển thị rõ tư chất theo Hạ, Trung, Thượng, Địa, Thiên và dự báo loại thưởng."
+      },
+      {
+        "id": "su_mon_lien_hoan",
+        "name": "Sư Môn Liên Hoàn",
+        "changesUse": "Thu đệ tử, con nuôi và hậu duệ hôn tộc đều được tính vào chuỗi phúc báo."
+      },
+      {
+        "id": "moc_thanh_tuu",
+        "name": "Mốc Thành Tựu",
+        "changesUse": "Hậu bối đột phá, lập công hoặc học nghề sẽ kích hoạt thưởng mốc cho cả gia tộc."
+      },
+      {
+        "id": "gia_van_phan_luu",
+        "name": "Gia Vận Phân Lưu",
+        "changesUse": "Cho phép chọn một trong ba hướng thưởng: chiến lực, sản xuất hoặc lãnh địa."
+      },
+      {
+        "id": "to_dia_sac_phong",
+        "name": "Tổ Địa Sắc Phong",
+        "changesUse": "Có thể dùng gia vận tích lũy để thăng cấp linh điền, trận pháp và quyền sở hữu lãnh địa."
+      },
+      {
+        "id": "van_dai_dong_minh",
+        "name": "Vạn Đại Đồng Minh",
+        "changesUse": "Nhìn thấy độ tương hợp lợi ích của các liên hôn và sư môn, mở thưởng liên minh."
+      }
+    ]
+  },
+  "conflictLadder": {
+    "survival": "Giữ tiểu linh mạch và tổ trạch trước hạn ba mươi ngày, nuôi nổi năm tộc nhân còn lại.",
+    "rules": "Dùng khế đất, tỷ thí phường thị, luật đại hội gia tộc và danh ngạch tông môn để chống thế lực có quyền viết luật.",
+    "ideology": "Lục Hàn phản đối việc xem người có tư chất thấp là vật hy sinh; hắn xây gia tộc bằng cơ hội có điều kiện thay vì lấy thiên tài làm tài sản độc quyền.",
+    "self": "Khi đã có quyền lực, Lục Hàn phải chọn làm một gia chủ luôn đổi mọi quan hệ thành phúc báo hay dựng một Lục gia đủ mạnh để hậu bối được tự chọn con đường."
+  },
+  "hiddenThread": "Linh mạch tổ truyền của Lục gia không suy kiệt tự nhiên. Nó là một mắt trận cổ bị người đời trước cố ý khóa để che giấu quyền quản lý mạch nguồn Vân Lĩnh. Hệ thống không ban sức mạnh vô cớ: nó đang chọn một gia chủ có thể tập hợp đủ các nhánh huyết mạch, nghề nghiệp và đồng minh để mở lại mắt trận. Mỗi lãnh địa Lục Hàn giành được vừa là tài sản thật, vừa là một mảnh bản đồ dẫn đến kẻ đã khiến Lục gia sa sút.",
+  "payoffStance": "front",
+  "oppositionEngine": "Tạ gia đang giữ giấy thế chấp linh mạch và muốn nuốt tổ địa để mở rộng linh điền; nếu Lục Hàn thành công, họ mất nguồn dược liệu và uy danh gia tộc lớn. Chấp sự Nghiêm của Thanh Mộc tông giữ danh ngạch đệ tử cùng quyền khai thác dược cốc, nên muốn cướp thiên tài Lục gia bằng hợp đồng bất bình đẳng. Phường chủ Bùi giữ đường thương mại, thuế bến bãi và muốn Lục gia mãi nghèo để mua rẻ đất đai. Họ có thể ép nợ, phá liên hôn, mua chuộc tộc nhân, dựng tỷ thí và viện luật đại hội. Mỗi lần Lục Hàn thắng một điều khoản hoặc một trận chiến, hắn lấy lại một chỗ đứng cụ thể: linh điền, danh ngạch, quyền khai thác hay phiếu biểu quyết.",
+  "castSeed": [
+    {
+      "id": "luc_han",
+      "name": "Lục Hàn",
+      "role": "protagonist",
+      "agenda": "Gia chủ trẻ nhịn nhục đúng lúc nhưng luôn chốt giá bằng giấy trắng mực đen; mục tiêu trước mắt là trong ba mươi ngày kiếm đủ ba trăm linh thạch hạ phẩm để chuộc tiểu linh mạch.",
+      "antagonistClass": null,
+      "startLocationId": "luc_gia_to_trach",
+      "startingProgressions": [
+        {
+          "systemId": "tu_vi",
+          "trackId": null,
+          "rankId": "luyen_khi",
+          "minorStageId": "trung_ky"
+        },
+        {
+          "systemId": "gia_toc",
+          "trackId": "gia_chu",
+          "rankId": "tieu_toc",
+          "minorStageId": null
+        }
+      ],
+      "milestones": [
+        {
+          "name": "Chuộc lại tiểu linh mạch",
+          "progressionTarget": {
+            "systemId": "gia_toc",
+            "trackId": "gia_chu",
+            "rankId": "tieu_toc",
+            "minorStageId": null
+          },
+          "socialResult": "Giữ được tư cách gia chủ và ngăn Lục gia tan rã."
+        },
+        {
+          "name": "Trúc Cơ trước đại hội",
+          "progressionTarget": {
+            "systemId": "tu_vi",
+            "trackId": null,
+            "rankId": "truc_co",
+            "minorStageId": "so_ky"
+          },
+          "socialResult": "Có quyền ngồi vào bàn nghị sự Vân Lĩnh."
+        },
+        {
+          "name": "Lập Đan phòng Lục gia",
+          "progressionTarget": {
+            "systemId": "gia_toc",
+            "trackId": "san_xuat",
+            "rankId": "trung_toc",
+            "minorStageId": null
+          },
+          "socialResult": "Thoát cảnh phải mua đan dược giá ép từ phường thị."
+        },
+        {
+          "name": "Đoạt quyền mạch nguồn",
+          "progressionTarget": {
+            "systemId": "gia_toc",
+            "trackId": "gia_chu",
+            "rankId": "dai_toc",
+            "minorStageId": null
+          },
+          "socialResult": "Lục gia trở thành một trong các thế lực định luật Vân Lĩnh."
+        }
+      ]
+    },
+    {
+      "id": "luc_tieu_man",
+      "name": "Lục Tiểu Mãn",
+      "role": "family",
+      "agenda": "Cô bé mồ côi có băng linh căn muốn có một mái nhà thật sự và học kiếm để không bị bán lại cho bất cứ ai.",
+      "antagonistClass": null,
+      "startLocationId": "luc_gia_to_trach",
+      "startingProgressions": [
+        {
+          "systemId": "tu_vi",
+          "trackId": null,
+          "rankId": "phap_nhan",
+          "minorStageId": null
+        },
+        {
+          "systemId": "gia_toc",
+          "trackId": "hau_boi",
+          "rankId": "nhap_pha",
+          "minorStageId": null
+        }
+      ],
+      "milestones": [
+        {
+          "name": "Nhập phả Lục gia",
+          "progressionTarget": {
+            "systemId": "gia_toc",
+            "trackId": "hau_boi",
+            "rankId": "nhap_pha",
+            "minorStageId": null
+          },
+          "socialResult": "Từ hàng hóa trong khế bán thân trở thành con nuôi của gia chủ."
+        },
+        {
+          "name": "Dẫn khí thành công",
+          "progressionTarget": {
+            "systemId": "tu_vi",
+            "trackId": null,
+            "rankId": "luyen_khi",
+            "minorStageId": "so_ky"
+          },
+          "socialResult": "Khiến Thanh Mộc tông phải chủ động hỏi giá thu đồ."
+        },
+        {
+          "name": "Giành kiếm danh ngoại môn",
+          "progressionTarget": {
+            "systemId": "tu_vi",
+            "trackId": null,
+            "rankId": "luyen_khi",
+            "minorStageId": "hau_ky"
+          },
+          "socialResult": "Trở thành biểu tượng hậu bối của Lục gia."
+        }
+      ]
+    },
+    {
+      "id": "doan_nhu_y",
+      "name": "Đoàn Như Ý",
+      "role": "ally",
+      "agenda": "Nữ tu xuất thân Đoàn gia nhỏ muốn dùng liên hôn công bằng để cứu linh điền của nhà mình, không làm vật trao đổi cho Tạ gia.",
+      "antagonistClass": null,
+      "startLocationId": "van_linh_phuong_thi",
+      "startingProgressions": [
+        {
+          "systemId": "tu_vi",
+          "trackId": null,
+          "rankId": "luyen_khi",
+          "minorStageId": "hau_ky"
+        },
+        {
+          "systemId": "nghe_nghiep",
+          "trackId": "phu_su",
+          "rankId": "nhat_pham",
+          "minorStageId": null
+        }
+      ],
+      "milestones": [
+        {
+          "name": "Ký hôn minh song phương",
+          "progressionTarget": {
+            "systemId": "gia_toc",
+            "trackId": "lien_hon",
+            "rankId": "tieu_toc",
+            "minorStageId": null
+          },
+          "socialResult": "Đoàn gia và Lục gia cùng chống điều khoản thôn tính."
+        },
+        {
+          "name": "Vẽ thành Nhất phẩm Hàn Băng phù",
+          "progressionTarget": {
+            "systemId": "nghe_nghiep",
+            "trackId": "phu_su",
+            "rankId": "nhat_pham",
+            "minorStageId": null
+          },
+          "socialResult": "Lục gia có sản phẩm phòng thủ đầu tiên để bán và đổi vật tư."
+        },
+        {
+          "name": "Đột phá Trúc Cơ",
+          "progressionTarget": {
+            "systemId": "tu_vi",
+            "trackId": null,
+            "rankId": "truc_co",
+            "minorStageId": "so_ky"
+          },
+          "socialResult": "Liên minh hôn tộc không còn bị gọi là hai nhà yếu dựa hơi nhau."
+        }
+      ]
+    },
+    {
+      "id": "phan_moc",
+      "name": "Phàn Mộc",
+      "role": "ally",
+      "agenda": "Tán tu luyện đan thất bại nhiều lần muốn một đan phòng ổn định và quyền tự quyết công thức, đổi lại ông dạy trẻ Lục gia nhận biết linh dược.",
+      "antagonistClass": null,
+      "startLocationId": "van_linh_phuong_thi",
+      "startingProgressions": [
+        {
+          "systemId": "tu_vi",
+          "trackId": null,
+          "rankId": "luyen_khi",
+          "minorStageId": "dai_vien_man"
+        },
+        {
+          "systemId": "nghe_nghiep",
+          "trackId": "dan_su",
+          "rankId": "nhat_pham",
+          "minorStageId": null
+        }
+      ],
+      "milestones": [
+        {
+          "name": "Nhập chức khách khanh",
+          "progressionTarget": {
+            "systemId": "gia_toc",
+            "trackId": "san_xuat",
+            "rankId": "tieu_toc",
+            "minorStageId": null
+          },
+          "socialResult": "Lục gia có người kiểm định dược liệu và tự luyện Hồi Khí đan."
+        },
+        {
+          "name": "Luyện Nhị phẩm đan",
+          "progressionTarget": {
+            "systemId": "nghe_nghiep",
+            "trackId": "dan_su",
+            "rankId": "nhi_pham",
+            "minorStageId": null
+          },
+          "socialResult": "Các tiểu tộc bắt đầu đến Lục gia đặt đan."
+        },
+        {
+          "name": "Kết Trúc Cơ",
+          "progressionTarget": {
+            "systemId": "tu_vi",
+            "trackId": null,
+            "rankId": "truc_co",
+            "minorStageId": "trung_ky"
+          },
+          "socialResult": "Thoát thân phận tán tu bị phường thị tùy ý bắt chẹt."
+        }
+      ]
+    },
+    {
+      "id": "ta_kien_phong",
+      "name": "Tạ Kiến Phong",
+      "role": "antagonist",
+      "agenda": "Thiếu chủ Tạ gia muốn thu tiểu linh mạch Lục gia làm sính lễ và chứng minh mình đủ tư cách kế thừa chủ mạch.",
+      "antagonistClass": "thieu_chu_gia_toc_lon",
+      "startLocationId": "ta_gia_linh_dien",
+      "startingProgressions": [
+        {
+          "systemId": "tu_vi",
+          "trackId": null,
+          "rankId": "truc_co",
+          "minorStageId": "so_ky"
+        },
+        {
+          "systemId": "gia_toc",
+          "trackId": "gia_chu",
+          "rankId": "trung_toc",
+          "minorStageId": null
+        }
+      ],
+      "milestones": [
+        {
+          "name": "Thu hồi tổ địa Lục gia",
+          "progressionTarget": {
+            "systemId": "gia_toc",
+            "trackId": "gia_chu",
+            "rankId": "trung_toc",
+            "minorStageId": null
+          },
+          "socialResult": "Củng cố vị trí người thừa kế Tạ gia."
+        },
+        {
+          "name": "Đoạt dược cốc phía bắc",
+          "progressionTarget": {
+            "systemId": "gia_toc",
+            "trackId": "lanh_dia",
+            "rankId": "trung_toc",
+            "minorStageId": null
+          },
+          "socialResult": "Ép các tiểu tộc Vân Lĩnh nộp cống."
+        },
+        {
+          "name": "Tiến Kim Đan",
+          "progressionTarget": {
+            "systemId": "tu_vi",
+            "trackId": null,
+            "rankId": "kim_dan",
+            "minorStageId": "so_ky"
+          },
+          "socialResult": "Có tư cách thay cha lập thế lực riêng."
+        }
+      ]
+    },
+    {
+      "id": "nghiem_tu_lam",
+      "name": "Nghiêm Tử Lâm",
+      "role": "antagonist",
+      "agenda": "Chấp sự Thanh Mộc tông cần thiên tài và dược cốc để tích công lên trưởng lão, nên muốn biến Lục gia thành phụ thuộc tông môn.",
+      "antagonistClass": "chap_su_tong_mon",
+      "startLocationId": "thanh_moc_ngoai_vien",
+      "startingProgressions": [
+        {
+          "systemId": "tu_vi",
+          "trackId": null,
+          "rankId": "truc_co",
+          "minorStageId": "hau_ky"
+        },
+        {
+          "systemId": "to_chuc",
+          "trackId": "tang_ngoai_mon",
+          "rankId": "chap_su",
+          "minorStageId": null
+        }
+      ],
+      "milestones": [
+        {
+          "name": "Cướp danh ngạch Tiểu Mãn",
+          "progressionTarget": {
+            "systemId": "to_chuc",
+            "trackId": "tang_ngoai_mon",
+            "rankId": "chap_su",
+            "minorStageId": null
+          },
+          "socialResult": "Dùng thiên tài Lục gia đổi công trạng trong tông."
+        },
+        {
+          "name": "Nắm dược cốc Vân Lĩnh",
+          "progressionTarget": {
+            "systemId": "to_chuc",
+            "trackId": "tang_ngoai_mon",
+            "rankId": "truong_lao_du_bi",
+            "minorStageId": null
+          },
+          "socialResult": "Khống chế nguồn linh dược của các gia tộc quanh vùng."
+        },
+        {
+          "name": "Kết Kim Đan",
+          "progressionTarget": {
+            "systemId": "tu_vi",
+            "trackId": null,
+            "rankId": "kim_dan",
+            "minorStageId": "so_ky"
+          },
+          "socialResult": "Thoát cấp chấp sự để trực tiếp lập phe trong tông."
+        }
+      ]
+    }
+  ],
+  "worldKernel": {
+    "worlds": [
+      {
+        "id": "van_linh_gioi",
+        "name": "Vân Lĩnh giới",
+        "civilizationState": "Một vùng tu tiên lấy phường thị và tông môn làm trung tâm. Gia tộc nhỏ sống nhờ linh điền, linh khoáng và hôn minh; tông môn giữ phần lớn dược cốc, công pháp cùng danh ngạch Trúc Cơ. Vân Lĩnh đang bước vào kỳ phân mạch ba mươi năm một lần, đất có linh khí và quyền khai thác đều trở thành chiến trường.",
+        "locations": [
+          {
+            "id": "luc_gia_to_trach",
+            "name": "Lục gia tổ trạch",
+            "note": "Tổ trạch cũ bên tiểu linh mạch, còn năm tộc nhân và ba mẫu linh điền bị thế chấp."
+          },
+          {
+            "id": "van_linh_phuong_thi",
+            "name": "Vân Lĩnh phường thị",
+            "note": "Nơi bán đan dược, pháp khí, phù lục và ký khế ước; Bùi phường chủ kiểm soát quầy hàng cùng phí giao dịch."
+          },
+          {
+            "id": "ta_gia_linh_dien",
+            "name": "Tạ gia linh điền",
+            "note": "Cánh đồng linh dược trải rộng, nguồn thu chính và căn cơ quyền lực của Tạ gia."
+          },
+          {
+            "id": "thanh_moc_ngoai_vien",
+            "name": "Thanh Mộc ngoại viện",
+            "note": "Ngoại viện tông môn nhận đệ tử, kiểm tra linh căn và phân phối danh ngạch dược cốc."
+          },
+          {
+            "id": "bach_tuyet_doc",
+            "name": "Bạch Tuyết độc",
+            "note": "Khe núi lạnh có Băng Tâm thảo, nguy hiểm nhưng là địa điểm Lục gia có thể đổi vận bằng hái thuốc."
+          }
+        ],
+        "factions": [
+          {
+            "id": "luc_gia",
+            "name": "Lục gia",
+            "agenda": "Giữ tổ trạch, chuộc linh mạch và tập hợp hậu bối để từ tiểu tộc nợ nần trở lại thế gia có lãnh địa."
+          },
+          {
+            "id": "ta_gia",
+            "name": "Tạ gia",
+            "agenda": "Thôn tính linh mạch tiểu tộc, độc chiếm linh dược Vân Lĩnh và đưa Tạ Kiến Phong lên làm chủ mạch."
+          },
+          {
+            "id": "thanh_moc_tong",
+            "name": "Thanh Mộc tông",
+            "agenda": "Duy trì độc quyền công pháp, danh ngạch Trúc Cơ và dược cốc bằng cách hấp thu hoặc ràng buộc thiên tài địa phương."
+          },
+          {
+            "id": "van_linh_phuong",
+            "name": "Vân Lĩnh phường",
+            "agenda": "Tăng thuế giao dịch, kiểm soát giá vật tư và mua lại tài sản của các gia tộc sa sút."
+          },
+          {
+            "id": "doan_gia",
+            "name": "Đoàn gia",
+            "agenda": "Bảo toàn linh điền phía đông bằng một liên hôn có lợi thay vì bị ép gả cho Tạ gia."
+          }
+        ]
+      }
+    ],
+    "progressionSystems": [
+      {
+        "id": "tu_vi",
+        "name": "Tu vi tu tiên",
+        "kind": "realm",
+        "subjectType": "character",
+        "tracks": [],
+        "ranks": [
+          {
+            "id": "phap_nhan",
+            "name": "Phàm nhân",
+            "note": "Chưa dẫn linh khí."
+          },
+          {
+            "id": "luyen_khi",
+            "name": "Luyện Khí",
+            "note": "Dẫn khí vào thân, thọ khoảng một trăm năm."
+          },
+          {
+            "id": "truc_co",
+            "name": "Trúc Cơ",
+            "note": "Tính là tu sĩ, có thể ngự khí bay ngắn."
+          },
+          {
+            "id": "kim_dan",
+            "name": "Kim Đan",
+            "note": "Một phương nhân vật, thọ khoảng năm trăm năm."
+          },
+          {
+            "id": "nguyen_anh",
+            "name": "Nguyên Anh",
+            "note": "Trưởng lão tông môn, nguyên anh xuất khiếu."
+          },
+          {
+            "id": "hoa_than",
+            "name": "Hóa Thần",
+            "note": "Cường giả thống lĩnh đại vực."
+          },
+          {
+            "id": "luyen_hu",
+            "name": "Luyện Hư",
+            "note": "Chạm tới hư không và không gian."
+          },
+          {
+            "id": "hop_the",
+            "name": "Hợp Thể",
+            "note": "Dung hợp đạo pháp cùng thân thể."
+          },
+          {
+            "id": "dai_thua",
+            "name": "Đại Thừa",
+            "note": "Đỉnh cao trước thiên kiếp."
+          },
+          {
+            "id": "do_kiep",
+            "name": "Độ Kiếp",
+            "note": "Đối mặt thiên kiếp, trần sức mạnh tối hậu của bộ truyện."
+          }
+        ],
+        "minorStages": [
+          {
+            "id": "so_ky",
+            "name": "Sơ kỳ",
+            "note": "Giai đoạn mới vào cảnh giới."
+          },
+          {
+            "id": "trung_ky",
+            "name": "Trung kỳ",
+            "note": "Giai đoạn tích lũy ổn định."
+          },
+          {
+            "id": "hau_ky",
+            "name": "Hậu kỳ",
+            "note": "Giai đoạn chuẩn bị đột phá."
+          },
+          {
+            "id": "dai_vien_man",
+            "name": "Đại viên mãn",
+            "note": "Đỉnh của một cảnh giới."
+          }
+        ]
+      },
+      {
+        "id": "nghe_nghiep",
+        "name": "Bách nghệ tu tiên",
+        "kind": "profession",
+        "subjectType": "character",
+        "tracks": [
+          {
+            "id": "dan_su",
+            "name": "Đan sư",
+            "note": "Luyện đan dược."
+          },
+          {
+            "id": "phu_su",
+            "name": "Phù sư",
+            "note": "Chế phù lục."
+          },
+          {
+            "id": "tran_su",
+            "name": "Trận sư",
+            "note": "Bố trí trận pháp."
+          },
+          {
+            "id": "luyen_khi_su",
+            "name": "Luyện khí sư",
+            "note": "Chế pháp khí."
+          }
+        ],
+        "ranks": [
+          {
+            "id": "nhat_pham",
+            "name": "Nhất phẩm",
+            "note": "Phục vụ Luyện Khí."
+          },
+          {
+            "id": "nhi_pham",
+            "name": "Nhị phẩm",
+            "note": "Phục vụ Trúc Cơ."
+          },
+          {
+            "id": "tam_pham",
+            "name": "Tam phẩm",
+            "note": "Phục vụ Kim Đan."
+          },
+          {
+            "id": "tu_pham",
+            "name": "Tứ phẩm",
+            "note": "Phục vụ Nguyên Anh."
+          }
+        ],
+        "minorStages": []
+      },
+      {
+        "id": "gia_toc",
+        "name": "Gia tộc và lãnh địa",
+        "kind": "organization",
+        "subjectType": "faction",
+        "tracks": [
+          {
+            "id": "gia_chu",
+            "name": "Gia chủ",
+            "note": "Quyền điều hành và uy tín gia tộc."
+          },
+          {
+            "id": "hau_boi",
+            "name": "Hậu bối",
+            "note": "Thân phận trong gia phả."
+          },
+          {
+            "id": "lien_hon",
+            "name": "Liên hôn",
+            "note": "Cấp độ liên minh hôn tộc."
+          },
+          {
+            "id": "san_xuat",
+            "name": "Sản xuất",
+            "note": "Năng lực tự chủ đan, phù và linh thực."
+          },
+          {
+            "id": "lanh_dia",
+            "name": "Lãnh địa",
+            "note": "Quyền quản lý đất có linh khí."
+          }
+        ],
+        "ranks": [
+          {
+            "id": "nhap_pha",
+            "name": "Nhập phả",
+            "note": "Được gia phả bảo hộ."
+          },
+          {
+            "id": "tieu_toc",
+            "name": "Tiểu tộc",
+            "note": "Giữ được một tổ trạch hoặc tiểu linh mạch."
+          },
+          {
+            "id": "trung_toc",
+            "name": "Trung tộc",
+            "note": "Có Trúc Cơ, sản nghiệp và quyền dự đại hội."
+          },
+          {
+            "id": "dai_toc",
+            "name": "Đại tộc",
+            "note": "Có Kim Đan, nhiều lãnh địa và quyền định luật vùng."
+          },
+          {
+            "id": "the_gia",
+            "name": "Thế gia",
+            "note": "Truyền thừa nhiều đời, ảnh hưởng một đại vực."
+          }
+        ],
+        "minorStages": []
+      },
+      {
+        "id": "to_chuc",
+        "name": "Chức vị tông môn",
+        "kind": "organization",
+        "subjectType": "character",
+        "tracks": [
+          {
+            "id": "tang_ngoai_mon",
+            "name": "Ngoại môn",
+            "note": "Hệ chức vị dành cho người quản ngoại viện."
+          }
+        ],
+        "ranks": [
+          {
+            "id": "de_tu_ngoai_mon",
+            "name": "Đệ tử ngoại môn",
+            "note": "Tu học và làm nhiệm vụ."
+          },
+          {
+            "id": "chap_su",
+            "name": "Chấp sự",
+            "note": "Quản tài nguyên cùng danh ngạch."
+          },
+          {
+            "id": "truong_lao_du_bi",
+            "name": "Trưởng lão dự bị",
+            "note": "Có thể tranh ghế trưởng lão."
+          },
+          {
+            "id": "truong_lao",
+            "name": "Trưởng lão",
+            "note": "Nắm một mạch tông môn."
+          }
+        ],
+        "minorStages": []
+      }
+    ],
+    "progressionSubjects": [
+      {
+        "id": "luc_gia_san_nghiep",
+        "name": "Sản nghiệp Lục gia",
+        "kind": "asset",
+        "startLocationId": "luc_gia_to_trach",
+        "startingProgressions": [
+          {
+            "systemId": "gia_toc",
+            "trackId": "san_xuat",
+            "rankId": "tieu_toc",
+            "minorStageId": null
+          },
+          {
+            "systemId": "gia_toc",
+            "trackId": "lanh_dia",
+            "rankId": "tieu_toc",
+            "minorStageId": null
+          }
+        ]
+      }
+    ],
+    "gradeSystems": [
+      {
+        "id": "vat_pham_pham_giai",
+        "name": "Phẩm giai vật phẩm",
+        "categories": [
+          "đan dược",
+          "pháp khí",
+          "phù lục",
+          "trận pháp",
+          "công pháp",
+          "linh dược"
+        ],
+        "tiers": [
+          {
+            "id": "nhat_pham",
+            "name": "Nhất phẩm",
+            "note": "Thích hợp Luyện Khí."
+          },
+          {
+            "id": "nhi_pham",
+            "name": "Nhị phẩm",
+            "note": "Thích hợp Trúc Cơ."
+          },
+          {
+            "id": "tam_pham",
+            "name": "Tam phẩm",
+            "note": "Thích hợp Kim Đan."
+          },
+          {
+            "id": "tu_pham",
+            "name": "Tứ phẩm",
+            "note": "Thích hợp Nguyên Anh."
+          }
+        ],
+        "qualities": [
+          {
+            "id": "ha_dang",
+            "name": "Hạ đẳng",
+            "note": "Chất lượng cơ bản."
+          },
+          {
+            "id": "trung_dang",
+            "name": "Trung đẳng",
+            "note": "Chất lượng ổn định."
+          },
+          {
+            "id": "thuong_dang",
+            "name": "Thượng đẳng",
+            "note": "Chất lượng nổi bật."
+          },
+          {
+            "id": "cuc_pham",
+            "name": "Cực phẩm",
+            "note": "Gần hoàn mỹ trong cùng phẩm."
+          }
+        ],
+        "note": "Vật phẩm cùng phẩm vẫn khác giá theo chất lượng; phải gọi đúng phẩm và chất lượng khi giao dịch hoặc tỷ thí."
+      },
+      {
+        "id": "pham_linh_can",
+        "name": "Phẩm Tư Chất",
+        "categories": [
+          "Linh căn",
+          "Ngộ tính",
+          "Huyết mạch"
+        ],
+        "tiers": [
+          {
+            "id": "tu_chat_1",
+            "name": "Phàm căn",
+            "note": null
+          },
+          {
+            "id": "tu_chat_2",
+            "name": "Hoàng phẩm",
+            "note": null
+          },
+          {
+            "id": "tu_chat_3",
+            "name": "Huyền phẩm",
+            "note": null
+          },
+          {
+            "id": "tu_chat_4",
+            "name": "Địa phẩm",
+            "note": null
+          },
+          {
+            "id": "tu_chat_5",
+            "name": "Thiên phẩm",
+            "note": null
+          },
+          {
+            "id": "tu_chat_6",
+            "name": "Thánh phẩm",
+            "note": null
+          }
+        ],
+        "qualities": [],
+        "note": "Bảng hệ thống xếp tư chất người nhập gia phả theo phẩm này; phẩm càng cao phần thưởng khai tộc càng lớn."
+      }
+    ],
+    "equivalences": [
+      {
+        "leftSystemId": "nghe_nghiep",
+        "leftRankId": "nhat_pham",
+        "rightSystemId": "tu_vi",
+        "rightRankId": "luyen_khi",
+        "note": "Bách nghệ Nhất phẩm chủ yếu phục vụ tu sĩ Luyện Khí."
+      },
+      {
+        "leftSystemId": "nghe_nghiep",
+        "leftRankId": "nhi_pham",
+        "rightSystemId": "tu_vi",
+        "rightRankId": "truc_co",
+        "note": "Bách nghệ Nhị phẩm có thể tạo vật tư cho Trúc Cơ."
+      },
+      {
+        "leftSystemId": "gia_toc",
+        "leftRankId": "trung_toc",
+        "rightSystemId": "tu_vi",
+        "rightRankId": "truc_co",
+        "note": "Một Trung tộc bền vững tối thiểu cần Trúc Cơ trấn tộc."
+      },
+      {
+        "leftSystemId": "gia_toc",
+        "leftRankId": "dai_toc",
+        "rightSystemId": "tu_vi",
+        "rightRankId": "kim_dan",
+        "note": "Đại tộc cần Kim Đan để giữ nhiều lãnh địa."
+      }
+    ],
+    "economyLoops": [
+      {
+        "id": "hoi_khi_dan_loop",
+        "name": "Vòng Hồi Khí đan",
+        "fromWorldId": "van_linh_gioi",
+        "toWorldId": "van_linh_gioi",
+        "goods": [
+          "Bạch Linh thảo",
+          "Hồi Khí đan Nhất phẩm"
+        ],
+        "buyer": "Tán tu Luyện Khí và đội hái thuốc tại Vân Lĩnh phường thị",
+        "settlement": "Thanh toán bằng linh thạch hạ phẩm, trừ phí quầy hàng của Vân Lĩnh phường.",
+        "reinvestment": "Linh thạch dùng chuộc linh mạch, mua hạt giống linh dược, thuê hộ vệ và tích vốn mở Đan phòng Lục gia."
+      }
+    ],
+    "launchProducts": [
+      {
+        "id": "hoi_khi_dan_nhat_pham",
+        "name": "Hồi Khí đan Nhất phẩm",
+        "category": "đan dược",
+        "gradeSystemId": "vat_pham_pham_giai",
+        "tierId": "nhat_pham",
+        "qualityId": "trung_dang",
+        "effect": "Khôi phục linh khí cho Luyện Khí sau giao chiến hoặc hái thuốc, không thay thế tu luyện.",
+        "targetBuyer": "Tán tu và hộ vệ Luyện Khí",
+        "introducedChapter": 3
+      },
+      {
+        "id": "han_bang_phu_nhat_pham",
+        "name": "Hàn Băng phù Nhất phẩm",
+        "category": "phù lục",
+        "gradeSystemId": "vat_pham_pham_giai",
+        "tierId": "nhat_pham",
+        "qualityId": "trung_dang",
+        "effect": "Tạo một đợt hàn khí ngắn để làm chậm đối thủ Luyện Khí.",
+        "targetBuyer": "Đội hái thuốc và tiểu tộc thiếu hộ vệ",
+        "introducedChapter": 4
+      }
+    ],
+    "openingContract": [
+      {
+        "chapterNumber": 1,
+        "proves": "Lục Hàn nhận Lục Tiểu Mãn làm con nuôi ngay trước mặt chủ nợ, hệ thống giám định cô bé là Băng linh căn và phát Trúc Cơ đan.",
+        "namedLevelOrGrade": "Băng linh căn, Trúc Cơ đan Nhị phẩm",
+        "visibleResult": "Lục Hàn có vật đủ giá trị đổi lấy thời hạn chuộc mạch, còn Tiểu Mãn được ghi tên vào gia phả.",
+        "witnessReaction": "Tộc lão đổi thái độ, Tạ gia lập tức nghi ngờ Lục gia giấu truyền thừa.",
+        "commercialAction": "Lục Hàn mang Trúc Cơ đan đến phường thị để định giá nhưng không bán đứt."
+      },
+      {
+        "chapterNumber": 2,
+        "proves": "Lục Hàn dùng Trúc Cơ đan làm vật bảo chứng ký khế gia hạn và công khai từ chối điều khoản nuốt tổ trạch của Tạ gia.",
+        "namedLevelOrGrade": "Luyện Khí trung kỳ, Trúc Cơ đan Nhị phẩm",
+        "visibleResult": "Khoản nợ ba mươi ngày được kéo thành ba tháng, tiểu linh mạch chưa bị thu hồi.",
+        "witnessReaction": "Tạ Kiến Phong chuyển từ khinh thường sang thách Lục Hàn tỷ thí quyền khai thác linh điền.",
+        "commercialAction": "Ký khế thế chấp có thời hạn tại Vân Lĩnh phường."
+      },
+      {
+        "chapterNumber": 3,
+        "proves": "Phàn Mộc luyện thành lô Hồi Khí đan đầu tiên từ linh thảo Lục gia, Lục Hàn nhận ra hệ thống thưởng có thể biến hậu bối thành chuỗi sản xuất.",
+        "namedLevelOrGrade": "Hồi Khí đan Nhất phẩm trung đẳng",
+        "visibleResult": "Mười hai viên đan bán hết trong một buổi, Lục gia thu được bốn mươi linh thạch hạ phẩm.",
+        "witnessReaction": "Bùi phường chủ muốn ép Lục gia ký độc quyền quầy hàng, tán tu bắt đầu xếp hàng đặt đan.",
+        "commercialAction": "Bán lẻ mười hai viên Hồi Khí đan tại quầy thuê."
+      },
+      {
+        "chapterNumber": 4,
+        "proves": "Đoàn Như Ý vẽ Hàn Băng phù và cùng Lục Hàn thắng cuộc tranh linh điền bằng khế ước lẫn chiến lực.",
+        "namedLevelOrGrade": "Hàn Băng phù Nhất phẩm trung đẳng",
+        "visibleResult": "Lục gia lấy lại một mẫu linh điền Bạch Linh thảo và có liên hôn đồng minh đầu tiên.",
+        "witnessReaction": "Nghiêm Tử Lâm gửi lệnh gọi Tiểu Mãn vào Thanh Mộc ngoại viện, đồng thời Tạ gia nâng giá treo thưởng.",
+        "commercialAction": "Nhận đơn đặt trước hai mươi lá Hàn Băng phù từ đội hái thuốc."
+      }
+    ],
+    "openingLedger": [
+      {
+        "id": "ledger_01",
+        "chapterNumber": 1,
+        "kind": "reservation",
+        "asset": "Trúc Cơ đan Nhị phẩm",
+        "quantity": "1 viên",
+        "from": "Hậu Duệ Hưng Tộc",
+        "to": "Lục Hàn",
+        "consideration": "Phần thưởng do Lục Tiểu Mãn nhập phả với Băng linh căn.",
+        "resultingStatus": "Lục Hàn nắm vật bảo chứng, chưa được phép dùng cho mục đích ngoài phát triển Lục gia."
+      },
+      {
+        "id": "ledger_02",
+        "chapterNumber": 2,
+        "kind": "settlement",
+        "asset": "Thời hạn thế chấp tiểu linh mạch",
+        "quantity": "3 tháng",
+        "from": "Tạ gia",
+        "to": "Lục gia",
+        "consideration": "Trúc Cơ đan Nhị phẩm làm vật bảo chứng theo khế phường thị.",
+        "resultingStatus": "Tổ trạch và tiểu linh mạch tạm thời thuộc quyền vận hành Lục gia."
+      },
+      {
+        "id": "ledger_03",
+        "chapterNumber": 3,
+        "kind": "sale",
+        "asset": "Hồi Khí đan Nhất phẩm trung đẳng",
+        "quantity": "12 viên",
+        "from": "Lục gia",
+        "to": "Tán tu Vân Lĩnh",
+        "consideration": "40 linh thạch hạ phẩm sau phí quầy hàng.",
+        "resultingStatus": "Lục gia có dòng tiền đầu tiên để mua hạt giống linh dược."
+      },
+      {
+        "id": "ledger_04",
+        "chapterNumber": 4,
+        "kind": "order",
+        "asset": "Hàn Băng phù Nhất phẩm trung đẳng",
+        "quantity": "20 lá",
+        "from": "Đội hái thuốc Bạch Tuyết",
+        "to": "Lục gia",
+        "consideration": "Đặt cọc 10 linh thạch hạ phẩm, giao hàng sau bảy ngày.",
+        "resultingStatus": "Đoàn Như Ý có đơn phù đầu tiên, Lục gia giữ quan hệ khách hàng dài hạn."
+      }
+    ]
+  },
+  "arena": "Phường thị định giá tài nguyên, ngoại viện tông môn tranh thiên tài, chiến trường linh mạch đoạt đất, và đại hội gia tộc quyết định ai có quyền viết luật.",
+  "novelty": "Đa tử đa phúc không chỉ là sinh con nhận quà: con nuôi, đệ tử và liên hôn đều là lựa chọn chiến lược, còn phần thưởng buộc phải quay lại nuôi gia tộc.",
+  "endingDirection": "Sau khi tập hợp đủ các nhánh hậu bối và phá khóa mạch nguồn, Lục Hàn phát hiện quyền lực lớn nhất không phải độc chiếm linh khí mà là thiết lập quy tắc phân phối mới. Kết thúc hướng đến Lục gia trở thành thế gia giữ mạch nguồn Vân Lĩnh, đánh bại kẻ thao túng sự sa sút của các tiểu tộc, đồng thời Lục Hàn trao quyền lựa chọn đường tu cho thế hệ sau thay vì biến họ thành công cụ của hệ thống.",
+  "voiceSheet": {
+    "pov": "third_limited",
+    "register": "Nhịp nhanh, lời thoại thẳng, ưu tiên giá cả, cảnh giới, điều khoản và kết quả nhìn thấy. Lục Hàn nói ít nhưng luôn gọi đúng món nợ, đúng cấp bậc và đúng lợi ích; gia tộc có tình nhưng mọi lời hứa phải được chứng minh bằng hành động.",
+    "chapterTitleRule": "Tiêu đề chương luôn nêu một xung đột cụ thể và một kết quả hoặc phần thưởng, ví dụ: Chương 12: Băng linh căn nhập phả, nhận trận bàn Nhất phẩm.",
+    "showsSystemPanel": true,
+    "reactionRule": "Mỗi khi bảng gọi đúng linh căn, cảnh giới, phẩm giai hay cấp gia tộc, ít nhất một người chứng kiến phải chuyển sự kinh ngạc thành hành động lợi ích cụ thể: tranh mua, mời chào, ép ký khế, thách đấu, xin liên hôn, chiêu mộ hoặc đổi phe. Không được chỉ có lời khen suông; phản ứng phải tạo ra giao dịch, đối thủ hoặc cơ hội kế tiếp.",
+    "taboos": [
+      "Không có cảnh tình dục hay miêu tả thân mật trực diện.",
+      "Không dùng tên quốc gia, triều đại, thành phố hoặc nhân vật có thật.",
+      "Không cho phần thưởng giải quyết vô điều kiện mọi vấn đề.",
+      "Không bỏ qua giá linh thạch, khế ước và hậu quả khi gia tộc mở rộng.",
+      "Không để đối thủ ngu ngốc đứng nhìn khi Lục gia đoạt tài nguyên."
+    ]
+  }
+}

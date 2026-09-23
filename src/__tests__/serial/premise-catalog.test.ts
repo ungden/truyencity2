@@ -1,13 +1,18 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { PremiseSchema } from '@/services/serial/contracts';
 import { SERIAL_PREMISE_CATALOG } from '@/services/serial/catalog';
+import { archetypeOf } from '@/services/serial/playbook';
 
 describe('Song Xuyên production packages', () => {
   test('catalog and source directory contain exactly the two selected pilots', () => {
     expect(SERIAL_PREMISE_CATALOG.map(item => item.id)).toEqual([
       'cua-hang-cong-phap-tu-tien', 'rau-tuoi-doi-ai',
+      'card-profession', 'clan-legacy', 'beast-taming', 'rule-horror',
     ]);
-    expect(SERIAL_PREMISE_CATALOG.map(item => item.priority)).toEqual([1, 2]);
+    expect(SERIAL_PREMISE_CATALOG.map(item => item.priority)).toEqual([1, 2, 3, 4, 5, 6]);
+    expect(readdirSync('factory/serial/lanes').filter(file => file.endsWith('.json')).sort()).toEqual([
+      'beast-taming.json', 'card-profession.json', 'clan-legacy.json', 'rule-horror.json',
+    ]);
     expect(readdirSync('factory/serial/song-xuyen').filter(file => file.endsWith('.json'))).toEqual([
       '01-cua-hang-cong-phap-tu-tien.json', '02-rau-tuoi-doi-ai.json',
     ]);
@@ -18,9 +23,9 @@ describe('Song Xuyên production packages', () => {
       const source = PremiseSchema.parse(JSON.parse(readFileSync(item.sourcePath, 'utf8')));
       expect(item.premise).toEqual(source);
       expect(source.schemaVersion).toBe(2);
-      expect(source.presentation.coverPath).toMatch(/^\/covers\/serial-pilots\/.+\.webp$/);
+      expect(source.presentation.coverPath).toMatch(/^\/covers\/serial-(pilots|lanes)\/.+\.webp$/);
       expect(source.presentation.sellingPoints).toHaveLength(4);
-      expect(source.worldKernel.worlds).toHaveLength(2);
+      expect(source.worldKernel.worlds).toHaveLength(archetypeOf(source.archetype)!.worlds);
       expect(source.worldKernel.openingContract.map(contract => contract.chapterNumber)).toEqual([1, 2, 3, 4]);
     }
   });
@@ -38,7 +43,7 @@ describe('Song Xuyên production packages', () => {
         }
       }
       expect(premise.voiceSheet.reactionRule).toMatch(/gọi đúng|đúng tên/);
-      expect(premise.voiceSheet.reactionRule).toMatch(/đặt hàng|hợp đồng|tranh mua/);
+      if (archetypeOf(premise.archetype)!.commerce) expect(premise.voiceSheet.reactionRule).toMatch(/đặt hàng|hợp đồng|tranh mua/);
     }
   });
 
@@ -47,14 +52,14 @@ describe('Song Xuyên production packages', () => {
       for (const chapter of premise.worldKernel.openingContract) {
         expect(chapter.namedLevelOrGrade).not.toBeNull();
         expect(chapter.witnessReaction).not.toBeNull();
-        expect(chapter.commercialAction).not.toBeNull();
+        if (archetypeOf(premise.archetype)!.commerce) expect(chapter.commercialAction).not.toBeNull();
         expect(chapter.namedLevelOrGrade!.length).toBeGreaterThan(10);
         expect(chapter.visibleResult.length).toBeGreaterThan(20);
         expect(chapter.witnessReaction!.length).toBeGreaterThan(20);
-        expect(chapter.commercialAction!.length).toBeGreaterThan(20);
+        if (archetypeOf(premise.archetype)!.commerce) expect(chapter.commercialAction!.length).toBeGreaterThan(20);
       }
       expect(premise.blurb).not.toMatch(/thi triều|biến người[^.]{0,30}zombie/i);
-      expect(premise.blurb).toMatch(/bán|đổi|giao dịch/i);
+      if (archetypeOf(premise.archetype)!.commerce) expect(premise.blurb).toMatch(/bán|đổi|giao dịch/i);
     }
   });
 

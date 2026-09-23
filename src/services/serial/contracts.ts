@@ -134,7 +134,7 @@ const MilestoneSchema = z.object({
   socialResult: line,
 }).strict();
 
-export const PremiseSchema = z.object({
+const PremiseObjectSchema = z.object({
   schemaVersion: z.union([z.literal(2), z.literal(3)]),
   narrativeFoundation: NarrativeFoundationSchema.optional(),
   lane: z.enum(LANES),
@@ -296,7 +296,9 @@ export const PremiseSchema = z.object({
     reactionRule: para,
     taboos: z.array(line).max(12).default([]),
   }).strict(),
-}).strict().superRefine((premise, ctx) => {
+}).strict();
+
+function validatePremise(premise: z.infer<typeof PremiseObjectSchema>, ctx: z.RefinementCtx): void {
   const unique = (values: string[], path: (string | number)[]) => {
     if (new Set(values).size !== values.length) ctx.addIssue({ code: z.ZodIssueCode.custom, path, message: 'Ids must be unique.' });
   };
@@ -323,7 +325,7 @@ export const PremiseSchema = z.object({
   const antagonistClasses = new Set(premise.castSeed
     .filter(member => member.role === 'antagonist' && member.antagonistClass)
     .map(member => member.antagonistClass));
-  if (premise.schemaVersion === 2 && antagonistClasses.size < 2) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['castSeed'], message: 'Legacy premise needs antagonists from at least two classes.' });
+  if (premise.schemaVersion === 2 && antagonistClasses.size < 2) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['castSeed'], message: 'castSeed needs at least two characters with role antagonist and different antagonistClass values.' });
   const shape = archetypeOf(premise.archetype);
   if (!shape) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['archetype'], message: `Unknown archetype ${premise.archetype}.` });
@@ -331,15 +333,18 @@ export const PremiseSchema = z.object({
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['worldKernel', 'worlds'], message: `Archetype ${shape.id} needs exactly ${shape.worlds} world(s).` });
   }
   const commerce = shape?.commerce ?? true;
-  if (premise.schemaVersion === 2 && (premise.castSeed.length < 6
-    || premise.goldenFinger.evolution.length < 6
-    || premise.goldenFinger.evolution.length > 8
-    || premise.worldKernel.progressionSystems.length < 3
-    || premise.worldKernel.gradeSystems.length < 2
-    || (commerce && (premise.worldKernel.economyLoops.length < 2
-      || premise.worldKernel.launchProducts.length < 4
-      || premise.worldKernel.openingLedger.length < 4)))) {
-    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Premise v2 must meet its launch minimums (commerce archetypes also need economy loops, launch products and an opening ledger).' });
+  if (premise.schemaVersion === 2) {
+    // One issue per unmet minimum: a drafter has to know which count to fix.
+    const minimums: Array<[boolean, (string | number)[], string]> = [
+      [premise.castSeed.length < 6, ['castSeed'], 'castSeed needs at least 6 named characters.'],
+      [premise.goldenFinger.evolution.length < 6 || premise.goldenFinger.evolution.length > 8, ['goldenFinger', 'evolution'], 'goldenFinger.evolution needs 6-8 named rungs.'],
+      [premise.worldKernel.progressionSystems.length < 3, ['worldKernel', 'progressionSystems'], 'worldKernel.progressionSystems needs at least 3 systems.'],
+      [premise.worldKernel.gradeSystems.length < 2, ['worldKernel', 'gradeSystems'], 'worldKernel.gradeSystems needs at least 2 grade systems.'],
+      [commerce && premise.worldKernel.economyLoops.length < 2, ['worldKernel', 'economyLoops'], 'A commerce archetype needs at least 2 economy loops.'],
+      [commerce && premise.worldKernel.launchProducts.length < 4, ['worldKernel', 'launchProducts'], 'A commerce archetype needs at least 4 launch products.'],
+      [commerce && premise.worldKernel.openingLedger.length < 4, ['worldKernel', 'openingLedger'], 'A commerce archetype needs at least 4 opening ledger entries.'],
+    ];
+    for (const [unmet, path, message] of minimums) if (unmet) ctx.addIssue({ code: z.ZodIssueCode.custom, path, message });
   }
   const validateProgression = (state: z.infer<typeof ProgressionRefSchema>, path: (string | number)[]) => {
     const system = systems.get(state.systemId);
@@ -395,7 +400,41 @@ export const PremiseSchema = z.object({
       ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['narrativeFoundation'], message: error instanceof Error ? error.message : String(error) });
     }
   }
-});
+}
+
+export const PremiseSchema = PremiseObjectSchema.superRefine(validatePremise);
+
+const toStableId = (value: string): string => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+  .replace(/đ/gi, 'd').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 64);
+
+/**
+ * Stable ids are mechanical: a drafter that writes `Lam_Kha` or `lâm-kha` has not made a
+ * story mistake. Every id-valued field is rewritten the same way, so references stay
+ * consistent; nothing else in the package is touched.
+ */
+export function normalizePremiseIds<T>(value: T, key = ''): T {
+  const idKey = /^id$|Ids?$/.test(key);
+  if (typeof value === 'string') return (idKey ? toStableId(value) : value) as T;
+  if (Array.isArray(value)) return value.map(item => normalizePremiseIds(item, idKey ? key : '')) as T;
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, normalizePremiseIds(v, k)])) as T;
+  }
+  return value;
+}
+
+/**
+ * What a premise model is shown: schema v2 only. Offering the retired v3 foundation made the
+ * model fill it and fail validation on every draft (2026-09-24), the same way the extractor
+ * once filled lived-causality evidence nobody asked for.
+ */
+export const ProposedPremiseSchema = z.preprocess(
+  value => normalizePremiseIds(value),
+  PremiseObjectSchema.omit({ narrativeFoundation: true })
+    .extend({ schemaVersion: z.literal(2) })
+    .superRefine((premise, ctx) => validatePremise(premise, ctx)),
+);
+
+
 export type Premise = z.infer<typeof PremiseSchema>;
 
 // ------------------------------------------------------------------ Bible
@@ -992,6 +1031,9 @@ export function premiseLint(premise: Premise): string[] {
   }
   for (const [field, value] of [['hook', premise.hook], ['readerFantasy', premise.readerFantasy]] as const) {
     if (POSTPONED_PROMISE.test(value)) problems.push(`${field} trì hoãn lời hứa thay vì hứa nó`);
+  }
+  if (!premise.title.includes(':') || /^\s*(đấu trường|đấu truong|arena)\s*:/iu.test(premise.title)) {
+    problems.push('title phải có dạng "Thể loại: lợi thế + phần thưởng", không chép nhãn công thức');
   }
   if (premise.goldenFinger.evolution.length < 6 || premise.goldenFinger.evolution.length > 8) {
     problems.push('kim thủ chỉ cần 6–8 nấc có tên');

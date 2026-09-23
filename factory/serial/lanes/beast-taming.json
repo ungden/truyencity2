@@ -1,0 +1,817 @@
+{
+  "schemaVersion": 2,
+  "lane": "ngu_thu",
+  "archetype": "beast_taming",
+  "title": "Ngự Thú: Ta Nhìn Thấu Tiến Hóa Ẩn, Nuôi Sửu Khuyển Phế Vật Thành Vương Thú",
+  "hook": "Một kiểm định viên tập sự nghèo nhìn thấy đúng đường tiến hóa bị giấu của Sửu Khuyển phế vật. Mỗi lần nó đổi hình và kỹ năng trên bảng 【】, Trần Kính sẽ dùng trận đấu công khai để đổi lấy suất tài nguyên cao hơn.",
+  "blurb": "Trần Kính chỉ cần kiếm đủ 30.000 phiếu thú nguyên trước kỳ hạn một tháng để chuộc lại lồng thú của mẹ, nếu không con Sửu Khuyển bị xem là phế vật sẽ bị bán làm vật thử nghiệm. Thân phận của hắn chỉ là kiểm định viên tập sự chuyên dọn chuồng ở Trường Huấn Thú Hạ Thành, nhưng ngay chương đầu, hắn nhìn thấy bảng 【Đường tiến hóa ẩn: Sửu Khuyển → Khuyển Ảnh Nhai Cốt】 mà cả giáo quan lẫn máy kiểm định đều không có. Hắn không bán bí mật, cũng không van xin: hắn dẫn con chó xấu xí vào trận kiểm định công khai, dùng đúng một mẩu Tủy Thạch và một trận đánh cần thiết để ép nó lột xác. Cú thắng đầu tiên lấy lại tiền chuộc lồng, khiến những kẻ từng cười nhạo phải tranh nhau hỏi giá. Nhưng bản đồ tiến hóa sau đó chỉ về Bí cảnh Mẫu Sào, nơi các gia tộc, trường huấn thú và Liên Minh đều đang độc chiếm vật liệu có thể biến một con phế thú thành Vương Thú.",
+  "readerFantasy": "Nhìn main dùng con mắt thấy đường tiến hóa biến sủng thú phế vật thành chiến thú đổi hình từng nấc, thắng công khai để lấy danh tiếng, suất bí cảnh và quyền chọn tài nguyên trước kẻ mạnh.",
+  "presentation": {
+    "coverPath": "/covers/serial-lanes/beast-taming.webp",
+    "tagline": "Phế khuyển đổi hình, mỗi trận thắng một bậc tài nguyên.",
+    "shortDescription": "Trần Kính là kiểm định viên tập sự nghèo, nhưng thấy được đường tiến hóa ẩn của mọi sủng thú. Hắn sẽ nuôi Sửu Khuyển bị vứt bỏ thành Vương Thú, rồi dùng từng trận đấu trường để giành tài nguyên mà người khác đang độc chiếm.",
+    "tags": [
+      "Ngự thú",
+      "Tiến hóa",
+      "Đấu trường",
+      "Bí cảnh",
+      "Học viện",
+      "Sủng thú"
+    ],
+    "sellingPoints": [
+      "Sủng thú khởi đầu bị chê phế vật, mỗi lần tiến hóa đều đổi tên, ngoại hình và bộ kỹ năng hiển thị trong bảng 【】.",
+      "Mỗi phát hiện tiến hóa phải đổi bằng vật liệu, đối thủ hoặc địa hình cụ thể, nên thắng lợi luôn có cái giá rõ ràng.",
+      "Trận kiểm định, giải thành phố, giải khu vực và bí cảnh lần lượt mở khóa danh tiếng lẫn quyền tiếp cận tài nguyên.",
+      "Main là người quét chuồng mang nhãn kiểm định viên tập sự, nhưng nói chuyện bằng kết quả và dám công khai đặt cược vào phế thú."
+    ]
+  },
+  "goldenFinger": {
+    "name": "Nhãn Đồ Tiến Hóa",
+    "rule": "Trần Kính nhìn thấy một bảng 【】 trên sủng thú đã tiếp xúc trực tiếp. Bảng chỉ hiện một nhánh tiến hóa ẩn gần nhất, điều kiện kích hoạt, vật liệu chủ đạo và một nguy cơ thất bại. Hắn không thể cưỡng ép tiến hóa, không thể sao chép vật liệu, và chỉ mở được nhánh tiếp theo sau khi sinh mệnh đã thật sự hoàn thành lần biến đổi trước.",
+    "scope": "Áp dụng cho sủng thú, trứng thú và dấu vết sinh mệnh trong bí cảnh. Ban đầu chỉ đọc được thú cấp Phàm; các nấc sau mới mở suy diễn, đối chiếu và can thiệp có giới hạn.",
+    "evolution": [
+      {
+        "id": "eye_spark",
+        "name": "Tinh Nhãn",
+        "changesUse": "Thấy tên loài, phẩm cấp và một điều kiện tiến hóa ẩn của sủng thú cấp Phàm."
+      },
+      {
+        "id": "eye_trace",
+        "name": "Dấu Vết",
+        "changesUse": "Đọc được vật liệu thay thế và địa điểm hoặc đối thủ cần thiết để kích hoạt điều kiện."
+      },
+      {
+        "id": "eye_risk",
+        "name": "Cân Nguy",
+        "changesUse": "Hiện nguy cơ đột biến thất bại, giúp Trần Kính chọn thời điểm ngừng hoặc tiếp tục."
+      },
+      {
+        "id": "eye_resonance",
+        "name": "Cộng Minh",
+        "changesUse": "Khi sủng thú chiến đấu cạnh hắn, bảng dự báo một kỹ năng có thể thức tỉnh trong trận."
+      },
+      {
+        "id": "eye_branch",
+        "name": "Phân Chi",
+        "changesUse": "So sánh ba nhánh tiến hóa hợp lệ và chỉ ra cái giá chiến thuật của từng nhánh."
+      },
+      {
+        "id": "eye_contract",
+        "name": "Khế Ước",
+        "changesUse": "Nhìn ra điểm xung đột giữa ngự thú sư và sủng thú, cho phép sửa một điều khoản khế ước bằng thử thách tự nguyện."
+      },
+      {
+        "id": "eye_ancestry",
+        "name": "Tổ Đồ",
+        "changesUse": "Từ mảnh xương, lông hoặc hạch thú suy ra một đoạn huyết mạch cổ và bí cảnh liên quan."
+      }
+    ]
+  },
+  "conflictLadder": {
+    "survival": "Trần Kính phải chuộc lồng thú, giữ Sửu Khuyển khỏi bị Phòng Thí Nghiệm Hắc Tảo thu mua và sống qua những lần tiến hóa có tỷ lệ chết thật.",
+    "rules": "Các trường, gia tộc và Liên Minh dùng hạn ngạch kiểm định, quyền khai thác bí cảnh và quy tắc giải đấu để khóa vật liệu; hắn phải thắng trong luật trước khi có sức phá luật.",
+    "ideology": "Học viện xem tiến hóa là tài sản cần độc quyền, còn Trần Kính tin rằng đường đi của sủng thú thuộc về sự lựa chọn của cả người lẫn thú, không phải bảng giá của kẻ có quyền.",
+    "self": "Khi đã có danh tiếng và đội thú mạnh, Trần Kính phải chọn làm người bán bí mật cho thế lực lớn để sống yên, hay dựng một Đấu Trường Mở nơi phế thú và chủ nghèo cũng được chứng minh giá trị."
+  },
+  "hiddenThread": "Nhãn Đồ Tiến Hóa không phải năng lực vô chủ: nó là một mảnh giao diện còn sót lại từ Kỷ Nguyên Khai Phổ, khi các Vương Thú từng tự chọn huyết mạch thay vì bị con người phân hạng. Mọi nhánh ẩn mà Trần Kính mở đều đang đánh thức các Mẫu Ấn trong bí cảnh. Liên Minh Ngự Thú muốn thu hồi Mẫu Ấn để tái lập hệ thống kiểm soát giống loài; còn một số Vương Thú ngủ sâu muốn phá toàn bộ khế ước. Trần Kính sẽ phát hiện con đường của Sửu Khuyển không dẫn đến thú mạnh nhất, mà dẫn đến kẻ có quyền quyết định các đường tiến hóa còn lại.",
+  "payoffStance": "mixed",
+  "oppositionEngine": "Trường Huấn Thú Hạ Thành giữ quyền kiểm định và kho Tủy Thạch mà Trần Kính cần; giáo quan Tạ Hành mất uy tín nếu một nhân viên quét chuồng chứng minh máy của ông bỏ sót nhánh tiến hóa. Gia tộc Lục giữ giấy phép vào Bí cảnh Mẫu Sào và sẽ mất độc quyền vật liệu nếu phế thú của Trần Kính thắng giải. Phòng Thí Nghiệm Hắc Tảo cần mua Sửu Khuyển trước khi nó lột xác để giải phẫu huyết mạch. Họ có thể ép nợ, sửa điểm kiểm định, giăng đối thủ khắc chế, mua chuộc đồng đội hoặc chiếm điểm khai thác hợp pháp. Mỗi lần Trần Kính thắng một cửa, hắn không xóa đối thủ mà lấy được ghế dự bị, quyền đề cử, đồng minh hoặc giấy phép để bước vào bàn chơi lớn hơn.",
+  "castSeed": [
+    {
+      "id": "tran_kinh",
+      "name": "Trần Kính",
+      "role": "protagonist",
+      "agenda": "Chuộc lồng thú của mẹ bằng 30.000 phiếu thú nguyên, nuôi Sửu Khuyển thành chiến thú chính danh và giành quyền tự do chọn đường tiến hóa cho nó.",
+      "antagonistClass": null,
+      "startLocationId": "kennel_basement",
+      "startingProgressions": [
+        {
+          "systemId": "tamer_license",
+          "trackId": "inspection",
+          "rankId": "trainee",
+          "minorStageId": "initial"
+        },
+        {
+          "systemId": "beast_growth",
+          "trackId": "canine",
+          "rankId": "mortal",
+          "minorStageId": "cub"
+        }
+      ],
+      "milestones": [
+        {
+          "name": "Chuộc Lồng Số Bảy",
+          "progressionTarget": {
+            "systemId": "tamer_license",
+            "trackId": "inspection",
+            "rankId": "registered",
+            "minorStageId": "initial"
+          },
+          "socialResult": "Được giữ Sửu Khuyển dưới tên mình, không còn là người quét chuồng mượn thú thi đấu."
+        },
+        {
+          "name": "Thắng Giải Tân Nhân Hạ Thành",
+          "progressionTarget": {
+            "systemId": "tamer_license",
+            "trackId": "combat",
+            "rankId": "bronze",
+            "minorStageId": "steady"
+          },
+          "socialResult": "Có suất kho vật liệu và bị các đội tuyển thành phố mời gọi."
+        },
+        {
+          "name": "Mở Cửa Mẫu Sào",
+          "progressionTarget": {
+            "systemId": "tamer_license",
+            "trackId": "exploration",
+            "rankId": "silver",
+            "minorStageId": "steady"
+          },
+          "socialResult": "Nhận quyền dẫn đội tiến vào bí cảnh cấp khu vực."
+        },
+        {
+          "name": "Lập Đấu Trường Mở",
+          "progressionTarget": {
+            "systemId": "tamer_license",
+            "trackId": "combat",
+            "rankId": "gold",
+            "minorStageId": "peak"
+          },
+          "socialResult": "Có tiếng nói trong Liên Minh và che chở được ngự thú sư nghèo."
+        }
+      ]
+    },
+    {
+      "id": "su_khuyen",
+      "name": "Sửu Khuyển",
+      "role": "ally",
+      "agenda": "Nó ghét bị gọi là thịt nuôi, muốn cắn nát cái vòng định giá trên cổ và trở thành bạn chiến đấu mà Trần Kính phải ngẩng đầu gọi tên.",
+      "antagonistClass": null,
+      "startLocationId": "kennel_basement",
+      "startingProgressions": [
+        {
+          "systemId": "beast_growth",
+          "trackId": "canine",
+          "rankId": "mortal",
+          "minorStageId": "cub"
+        }
+      ],
+      "milestones": [
+        {
+          "name": "Nhai Xương Lột Xác",
+          "progressionTarget": {
+            "systemId": "beast_growth",
+            "trackId": "canine",
+            "rankId": "spirit",
+            "minorStageId": "awakened"
+          },
+          "socialResult": "Đổi tên thành Khuyển Ảnh Nhai Cốt, khiến cả trường phải sửa hồ sơ phế thú."
+        },
+        {
+          "name": "Cắn Vỡ Khiên Giải Đấu",
+          "progressionTarget": {
+            "systemId": "beast_growth",
+            "trackId": "canine",
+            "rankId": "commander",
+            "minorStageId": "steady"
+          },
+          "socialResult": "Được công nhận là chiến thú đội trưởng cấp thành phố."
+        },
+        {
+          "name": "Gọi Tên Mẫu Ấn",
+          "progressionTarget": {
+            "systemId": "beast_growth",
+            "trackId": "canine",
+            "rankId": "lord",
+            "minorStageId": "peak"
+          },
+          "socialResult": "Các Vương Thú ngủ sâu bắt đầu xem nó là đồng loại."
+        }
+      ]
+    },
+    {
+      "id": "luu_mien",
+      "name": "Lưu Miên",
+      "role": "ally",
+      "agenda": "Cô muốn đỗ vào đội nghiên cứu bí cảnh bằng năng lực thật, không bằng họ hàng trong học viện, nên cần chứng cứ về các nhánh tiến hóa bị che giấu.",
+      "antagonistClass": null,
+      "startLocationId": "inspection_yard",
+      "startingProgressions": [
+        {
+          "systemId": "tamer_license",
+          "trackId": "research",
+          "rankId": "trainee",
+          "minorStageId": "steady"
+        }
+      ],
+      "milestones": [
+        {
+          "name": "Lập Hồ Sơ Khuyển Ảnh",
+          "progressionTarget": {
+            "systemId": "tamer_license",
+            "trackId": "research",
+            "rankId": "registered",
+            "minorStageId": "steady"
+          },
+          "socialResult": "Có tên trên báo cáo kiểm định đầu tiên, thoát vai trợ lý vô danh."
+        },
+        {
+          "name": "Chứng Minh Mẫu Ấn",
+          "progressionTarget": {
+            "systemId": "tamer_license",
+            "trackId": "research",
+            "rankId": "bronze",
+            "minorStageId": "peak"
+          },
+          "socialResult": "Được Viện Khảo Cứu cấp ghế quan sát bí cảnh."
+        },
+        {
+          "name": "Đòi Lại Kho Mẫu Bản",
+          "progressionTarget": {
+            "systemId": "tamer_license",
+            "trackId": "research",
+            "rankId": "silver",
+            "minorStageId": "peak"
+          },
+          "socialResult": "Trở thành người quản lý dữ liệu tiến hóa công khai của đội Trần Kính."
+        }
+      ]
+    },
+    {
+      "id": "luc_tuan",
+      "name": "Lục Tuấn",
+      "role": "antagonist",
+      "agenda": "Người thừa kế Gia tộc Lục muốn đoạt quán quân giải Hạ Thành để đổi lấy ghế kế nhiệm và giữ quyền khai thác Mẫu Sào cho nhà mình.",
+      "antagonistClass": "Thế gia kế thừa giả",
+      "startLocationId": "city_arena",
+      "startingProgressions": [
+        {
+          "systemId": "tamer_license",
+          "trackId": "combat",
+          "rankId": "bronze",
+          "minorStageId": "peak"
+        }
+      ],
+      "milestones": [
+        {
+          "name": "Giữ Cúp Hạ Thành",
+          "progressionTarget": {
+            "systemId": "tamer_license",
+            "trackId": "combat",
+            "rankId": "silver",
+            "minorStageId": "initial"
+          },
+          "socialResult": "Đủ tư cách nhận quyền thừa kế đội thú của gia tộc."
+        },
+        {
+          "name": "Đội Trưởng Khu Vực",
+          "progressionTarget": {
+            "systemId": "tamer_license",
+            "trackId": "combat",
+            "rankId": "gold",
+            "minorStageId": "steady"
+          },
+          "socialResult": "Có quyền chọn đối thủ và phân phối suất dự tuyển."
+        },
+        {
+          "name": "Đổi Cờ Gia Tộc",
+          "progressionTarget": {
+            "systemId": "tamer_license",
+            "trackId": "combat",
+            "rankId": "platinum",
+            "minorStageId": "initial"
+          },
+          "socialResult": "Buộc gia tộc phải chấp nhận liên minh bình đẳng với Trần Kính hoặc mất người kế thừa."
+        }
+      ]
+    },
+    {
+      "id": "ta_hanh",
+      "name": "Tạ Hành",
+      "role": "authority",
+      "agenda": "Giáo quan trưởng muốn bảo toàn uy tín máy kiểm định và vị trí quản kho, vì một nhánh ẩn được xác thực sẽ khiến những năm báo cáo của ông bị điều tra.",
+      "antagonistClass": "Quan chức học viện",
+      "startLocationId": "inspection_yard",
+      "startingProgressions": [
+        {
+          "systemId": "tamer_license",
+          "trackId": "inspection",
+          "rankId": "silver",
+          "minorStageId": "peak"
+        }
+      ],
+      "milestones": [
+        {
+          "name": "Khóa Báo Cáo Dị Biến",
+          "progressionTarget": {
+            "systemId": "tamer_license",
+            "trackId": "inspection",
+            "rankId": "gold",
+            "minorStageId": "initial"
+          },
+          "socialResult": "Có quyền tạm đình chỉ mọi kiểm định viên cấp thấp."
+        },
+        {
+          "name": "Giữ Ghế Giám Khảo",
+          "progressionTarget": {
+            "systemId": "tamer_license",
+            "trackId": "inspection",
+            "rankId": "gold",
+            "minorStageId": "peak"
+          },
+          "socialResult": "Can thiệp được luật giải đấu thành phố."
+        },
+        {
+          "name": "Bị Buộc Mở Kho",
+          "progressionTarget": {
+            "systemId": "tamer_license",
+            "trackId": "inspection",
+            "rankId": "platinum",
+            "minorStageId": "initial"
+          },
+          "socialResult": "Phải công khai kho dữ liệu, từ đối thủ quyền lực thành người bị giám sát."
+        }
+      ]
+    },
+    {
+      "id": "doan_hac",
+      "name": "Đoàn Hạc",
+      "role": "antagonist",
+      "agenda": "Chủ Phòng Thí Nghiệm Hắc Tảo muốn mua hoặc bắt sống mọi cá thể có huyết mạch Mẫu Ấn để độc quyền thuốc tăng trưởng.",
+      "antagonistClass": "Tư bản phòng thí nghiệm",
+      "startLocationId": "black_alley_lab",
+      "startingProgressions": [
+        {
+          "systemId": "tamer_license",
+          "trackId": "research",
+          "rankId": "gold",
+          "minorStageId": "steady"
+        }
+      ],
+      "milestones": [
+        {
+          "name": "Thu Mua Huyết Mạch",
+          "progressionTarget": {
+            "systemId": "tamer_license",
+            "trackId": "research",
+            "rankId": "gold",
+            "minorStageId": "peak"
+          },
+          "socialResult": "Khống chế chợ vật liệu ngầm của Hạ Thành."
+        },
+        {
+          "name": "Cướp Mẫu Sào",
+          "progressionTarget": {
+            "systemId": "tamer_license",
+            "trackId": "research",
+            "rankId": "platinum",
+            "minorStageId": "steady"
+          },
+          "socialResult": "Trở thành đối tác bí mật của một nhánh Liên Minh."
+        },
+        {
+          "name": "Mở Lồng Vương Thú",
+          "progressionTarget": {
+            "systemId": "tamer_license",
+            "trackId": "research",
+            "rankId": "master",
+            "minorStageId": "initial"
+          },
+          "socialResult": "Bị buộc lộ mặt khi kế hoạch gây ra nguy cơ thú triều toàn khu vực."
+        }
+      ]
+    }
+  ],
+  "worldKernel": {
+    "worlds": [
+      {
+        "id": "linh_thu_gioi",
+        "name": "Linh Thú Giới",
+        "civilizationState": "Một thế giới đô thị hóa quanh các trường huấn thú, đấu trường, bí cảnh và tuyến vận chuyển vật liệu. Sủng thú là sức chiến đấu, lao động và địa vị; Liên Minh Ngự Thú cấp giấy phép, còn gia tộc cùng học viện nắm phần lớn bí cảnh.",
+        "locations": [
+          {
+            "id": "kennel_basement",
+            "name": "Chuồng Ngầm Số Bảy",
+            "note": "Khu nhốt thú bị bỏ rơi dưới Trường Huấn Thú Hạ Thành, nơi Trần Kính làm việc và gặp Sửu Khuyển."
+          },
+          {
+            "id": "inspection_yard",
+            "name": "Sân Kiểm Định Hạ Thành",
+            "note": "Nơi máy kiểm định phân cấp sủng thú, tổ chức đấu khảo hạch và công bố kết quả công khai."
+          },
+          {
+            "id": "city_arena",
+            "name": "Đấu Trường Vạn Thú",
+            "note": "Đấu trường thành phố cho giải tân nhân, vòng tuyển khu vực và những trận thách đấu có giám sát."
+          },
+          {
+            "id": "black_alley_lab",
+            "name": "Phố Sau Hắc Tảo",
+            "note": "Khu phòng thí nghiệm tư nhân thu mua thú lỗi, vật liệu cấm và mẫu huyết mạch."
+          },
+          {
+            "id": "nest_rift",
+            "name": "Bí Cảnh Mẫu Sào",
+            "note": "Khe nứt sinh thái chứa xương tổ, Tủy Thạch và Mẫu Ấn; giấy phép thăm dò bị các thế lực tranh đoạt."
+          }
+        ],
+        "factions": [
+          {
+            "id": "lower_school",
+            "name": "Trường Huấn Thú Hạ Thành",
+            "agenda": "Đào tạo ngự thú sư, giữ độc quyền kiểm định địa phương và bảo vệ uy tín thiết bị phân cấp."
+          },
+          {
+            "id": "luc_house",
+            "name": "Gia tộc Lục",
+            "agenda": "Duy trì quyền khai thác Bí cảnh Mẫu Sào bằng đội thú tinh nhuệ và ảnh hưởng ở giải đấu."
+          },
+          {
+            "id": "alliance",
+            "name": "Liên Minh Ngự Thú",
+            "agenda": "Quản lý giấy phép, giải đấu và an toàn bí cảnh, đồng thời bí mật thu hồi mọi dấu vết Mẫu Ấn."
+          },
+          {
+            "id": "black_algae_lab",
+            "name": "Phòng Thí Nghiệm Hắc Tảo",
+            "agenda": "Biến huyết mạch hiếm thành thuốc tăng trưởng độc quyền, bất chấp tỷ lệ chết của sủng thú."
+          }
+        ]
+      }
+    ],
+    "progressionSystems": [
+      {
+        "id": "tamer_license",
+        "name": "Cấp Bậc Ngự Thú Sư",
+        "kind": "realm",
+        "subjectType": "character",
+        "tracks": [
+          {
+            "id": "combat",
+            "name": "Chiến đấu",
+            "note": "Quyền dự giải và chỉ huy đội thú."
+          },
+          {
+            "id": "inspection",
+            "name": "Kiểm định",
+            "note": "Quyền đánh giá huyết mạch và vật liệu."
+          },
+          {
+            "id": "research",
+            "name": "Nghiên cứu",
+            "note": "Quyền tiếp cận mẫu bản, hồ sơ và bí cảnh."
+          },
+          {
+            "id": "exploration",
+            "name": "Thăm dò",
+            "note": "Quyền lập đội vào khe nứt."
+          }
+        ],
+        "ranks": [
+          {
+            "id": "trainee",
+            "name": "Tập Sự",
+            "note": "Chưa được tự ký hồ sơ hoặc dự giải chính thức."
+          },
+          {
+            "id": "registered",
+            "name": "Chính Thức",
+            "note": "Có thể sở hữu và đăng ký một chiến thú."
+          },
+          {
+            "id": "bronze",
+            "name": "Đồng Bài",
+            "note": "Được dự giải thành phố và nhận hạn ngạch vật liệu thấp."
+          },
+          {
+            "id": "silver",
+            "name": "Bạc Bài",
+            "note": "Được dẫn đội vào bí cảnh cấp khu vực."
+          },
+          {
+            "id": "gold",
+            "name": "Kim Bài",
+            "note": "Có ghế dự bị trong hội đồng địa phương."
+          },
+          {
+            "id": "platinum",
+            "name": "Bạch Kim",
+            "note": "Đủ tư cách tranh ghế Liên Minh khu vực."
+          },
+          {
+            "id": "master",
+            "name": "Đại Sư",
+            "note": "Được cấp quyền công bố một hệ thống tiến hóa mới."
+          }
+        ],
+        "minorStages": [
+          {
+            "id": "initial",
+            "name": "Sơ Đoạn",
+            "note": "Vừa chạm cấp."
+          },
+          {
+            "id": "steady",
+            "name": "Ổn Định",
+            "note": "Đã kiểm soát được năng lực cấp bậc."
+          },
+          {
+            "id": "peak",
+            "name": "Đỉnh Phong",
+            "note": "Sẵn sàng khảo hạch lên cấp."
+          }
+        ]
+      },
+      {
+        "id": "beast_growth",
+        "name": "Cấp Bậc Sủng Thú",
+        "kind": "realm",
+        "subjectType": "asset",
+        "tracks": [
+          {
+            "id": "canine",
+            "name": "Khuyển Hệ",
+            "note": "Nhánh ban đầu của Sửu Khuyển, có thể rẽ sang săn giết, phòng thủ hoặc vương huyết."
+          }
+        ],
+        "ranks": [
+          {
+            "id": "mortal",
+            "name": "Phàm Thú",
+            "note": "Chưa thức tỉnh hạch thú."
+          },
+          {
+            "id": "spirit",
+            "name": "Linh Thú",
+            "note": "Có kỹ năng chủ động và liên kết chiến đấu."
+          },
+          {
+            "id": "commander",
+            "name": "Thống Lĩnh",
+            "note": "Có thể chỉ huy đàn thú hoặc áp chế cùng cấp."
+          },
+          {
+            "id": "lord",
+            "name": "Lĩnh Chủ",
+            "note": "Hình thành lãnh địa thú lực cục bộ."
+          },
+          {
+            "id": "king",
+            "name": "Vương Thú",
+            "note": "Mang huyết mạch có thể thay đổi quy tắc bí cảnh."
+          },
+          {
+            "id": "ancestor",
+            "name": "Tổ Thú",
+            "note": "Trần sức mạnh đã biết của thời đại, không thể cưỡng ép bồi dưỡng bằng tài nguyên thường."
+          }
+        ],
+        "minorStages": [
+          {
+            "id": "cub",
+            "name": "Ấu Thể",
+            "note": "Cơ thể và hạch thú chưa ổn định."
+          },
+          {
+            "id": "awakened",
+            "name": "Thức Tỉnh",
+            "note": "Kỹ năng đầu tiên thành hình."
+          },
+          {
+            "id": "steady",
+            "name": "Ổn Định",
+            "note": "Có thể chiến đấu liên tục."
+          },
+          {
+            "id": "peak",
+            "name": "Cực Hạn",
+            "note": "Chạm điều kiện tiến hóa tiếp theo."
+          }
+        ]
+      },
+      {
+        "id": "arena_seat",
+        "name": "Quyền Hạn Đấu Trường",
+        "kind": "organization",
+        "subjectType": "faction",
+        "tracks": [
+          {
+            "id": "governance",
+            "name": "Điều Hành",
+            "note": "Quyền đặt luật, lịch đấu và phân phối suất thi."
+          }
+        ],
+        "ranks": [
+          {
+            "id": "guest",
+            "name": "Khách Mời",
+            "note": "Chỉ được dự khán hoặc tài trợ."
+          },
+          {
+            "id": "member",
+            "name": "Thành Viên",
+            "note": "Có thể đề cử một tuyển thủ."
+          },
+          {
+            "id": "steward",
+            "name": "Chấp Sự",
+            "note": "Có quyền tổ chức vòng đấu."
+          },
+          {
+            "id": "council",
+            "name": "Nghị Tịch",
+            "note": "Có quyền sửa quy chế địa phương."
+          }
+        ],
+        "minorStages": []
+      }
+    ],
+    "progressionSubjects": [
+      {
+        "id": "su_khuyen_asset",
+        "name": "Sửu Khuyển",
+        "kind": "asset",
+        "startLocationId": "kennel_basement",
+        "startingProgressions": [
+          {
+            "systemId": "beast_growth",
+            "trackId": "canine",
+            "rankId": "mortal",
+            "minorStageId": "cub"
+          }
+        ]
+      }
+    ],
+    "gradeSystems": [
+      {
+        "id": "material_grade",
+        "name": "Phẩm Cấp Vật Liệu Thú",
+        "categories": [
+          "Hạch thú",
+          "Xương tổ",
+          "Linh dược thú",
+          "Trang bị khế ước"
+        ],
+        "tiers": [
+          {
+            "id": "ordinary",
+            "name": "Phàm Phẩm",
+            "note": "Vật liệu nuôi dưỡng cơ bản."
+          },
+          {
+            "id": "fine",
+            "name": "Linh Phẩm",
+            "note": "Có thể kích hoạt thức tỉnh."
+          },
+          {
+            "id": "rare",
+            "name": "Huyền Phẩm",
+            "note": "Dùng cho tiến hóa cấp Thống Lĩnh."
+          },
+          {
+            "id": "royal",
+            "name": "Vương Phẩm",
+            "note": "Mang mảnh quy tắc bí cảnh."
+          }
+        ],
+        "qualities": [
+          {
+            "id": "broken",
+            "name": "Tàn Khuyết",
+            "note": "Thiếu cấu trúc hoặc bị ô nhiễm."
+          },
+          {
+            "id": "standard",
+            "name": "Chuẩn",
+            "note": "Dùng được theo công thức công khai."
+          },
+          {
+            "id": "pure",
+            "name": "Tinh Thuần",
+            "note": "Giảm nguy cơ đột biến."
+          }
+        ],
+        "note": "Phẩm cấp vật liệu quyết định ngưỡng tiến hóa, nhưng điều kiện chiến đấu và khế ước vẫn không thể thay thế bằng tiền."
+      },
+      {
+        "id": "pham_huyet_mach",
+        "name": "Phẩm Huyết Mạch Sủng Thú",
+        "categories": [
+          "Huyết mạch",
+          "Chủng tộc"
+        ],
+        "tiers": [
+          {
+            "id": "huyet_mach_1",
+            "name": "Phàm Chủng",
+            "note": null
+          },
+          {
+            "id": "huyet_mach_2",
+            "name": "Tinh Anh",
+            "note": null
+          },
+          {
+            "id": "huyet_mach_3",
+            "name": "Thống Lĩnh",
+            "note": null
+          },
+          {
+            "id": "huyet_mach_4",
+            "name": "Quân Chủ",
+            "note": null
+          },
+          {
+            "id": "huyet_mach_5",
+            "name": "Vương Giả",
+            "note": null
+          },
+          {
+            "id": "huyet_mach_6",
+            "name": "Hoàng Giả",
+            "note": null
+          }
+        ],
+        "qualities": [],
+        "note": "Phẩm huyết mạch quyết định trần tiến hóa công khai; đường tiến hóa ẩn có thể vượt trần mà học viện không biết."
+      }
+    ],
+    "equivalences": [
+      {
+        "leftSystemId": "tamer_license",
+        "leftRankId": "bronze",
+        "rightSystemId": "beast_growth",
+        "rightRankId": "spirit",
+        "note": "Một ngự thú sư Đồng Bài thường chỉ ổn định khế ước với một Linh Thú."
+      },
+      {
+        "leftSystemId": "tamer_license",
+        "leftRankId": "silver",
+        "rightSystemId": "beast_growth",
+        "rightRankId": "commander",
+        "note": "Bạc Bài là ngưỡng phổ biến để chỉ huy Thống Lĩnh Thú trong bí cảnh khu vực."
+      },
+      {
+        "leftSystemId": "tamer_license",
+        "leftRankId": "gold",
+        "rightSystemId": "beast_growth",
+        "rightRankId": "lord",
+        "note": "Kim Bài mới đủ tư cách đăng ký chiến đấu có Lĩnh Chủ Thú tại đấu trường lớn."
+      }
+    ],
+    "economyLoops": [],
+    "launchProducts": [],
+    "openingContract": [
+      {
+        "chapterNumber": 1,
+        "proves": "Trần Kính nhìn thấy bảng tiến hóa ẩn của Sửu Khuyển và nhận ra Tủy Thạch vụn là chìa khóa, trong khi máy kiểm định ghi nó là Phàm Thú tàn khuyết.",
+        "namedLevelOrGrade": "Phàm Thú · Tàn Khuyết",
+        "visibleResult": "Hắn dùng phần thưởng dọn chuồng đổi lấy Tủy Thạch vụn, bảng 【Đường tiến hóa ẩn】 sáng lên trước mắt.",
+        "witnessReaction": "Lưu Miên sững người vì chỉ số hạch thú thay đổi; Tạ Hành ra lệnh ghi lại con chó để thu hồi.",
+        "commercialAction": null
+      },
+      {
+        "chapterNumber": 2,
+        "proves": "Sửu Khuyển hoàn thành điều kiện cắn vỡ giáp xương trong trận khảo hạch và tiến hóa công khai.",
+        "namedLevelOrGrade": "Linh Thú · Linh Phẩm",
+        "visibleResult": "Nó đổi hình thành Khuyển Ảnh Nhai Cốt, thức tỉnh kỹ năng 【Ảnh Nhai】 và đánh ngã thú khảo hạch.",
+        "witnessReaction": "Đám học viên đổi từ cười nhạo sang tranh nhau thách đấu; Tạ Hành muốn tịch thu để tái kiểm.",
+        "commercialAction": null
+      },
+      {
+        "chapterNumber": 3,
+        "proves": "Đường tiến hóa không chỉ cho sức mạnh mà còn chỉ ra đối thủ khắc chế: Khuyển Ảnh Nhai Cốt có thể phá lớp giáp của Nham Giáp Trư bằng đòn đánh đúng nhịp.",
+        "namedLevelOrGrade": "Linh Thú · Chuẩn",
+        "visibleResult": "Trần Kính thắng trận kiểm định, lấy lại quyền sở hữu lồng Số Bảy và điểm khảo hạch Chính Thức.",
+        "witnessReaction": "Lục Tuấn trực tiếp gửi thư thách đấu, xem đây là vết nhơ với đội thú của gia tộc.",
+        "commercialAction": null
+      },
+      {
+        "chapterNumber": 4,
+        "proves": "Trần Kính dùng Dấu Vết mới mở để tìm được vật liệu thay thế cho bước ổn định, chứng minh tiến hóa ẩn có thể lặp lại chứ không phải may mắn.",
+        "namedLevelOrGrade": "Ngự Thú Sư Chính Thức · Linh Phẩm Tinh Thuần",
+        "visibleResult": "Khuyển Ảnh Nhai Cốt giữ ổn định kỹ năng 【Ảnh Nhai】, Trần Kính nhận huy hiệu Chính Thức và suất dự giải tân nhân.",
+        "witnessReaction": "Trường huấn thú muốn chiêu mộ hắn với điều kiện giao nộp hồ sơ; Hắc Tảo âm thầm treo giá mua con thú.",
+        "commercialAction": null
+      }
+    ],
+    "openingLedger": []
+  },
+  "arena": "Sân Kiểm Định Hạ Thành mở đầu bằng trận khảo hạch một chọi một; sau đó là Đấu Trường Vạn Thú, giải thành phố, giải khu vực, Bí cảnh Mẫu Sào và nghị trường Liên Minh.",
+  "novelty": "Điểm mới nằm ở việc tiến hóa không phải bấm nút nhận thưởng: mỗi nhánh là một bài toán gồm vật liệu, địa hình, đối thủ và ý chí riêng của sủng thú; bảng chỉ chỉ đường, không thay main chiến đấu hay thuyết phục bạn đồng hành.",
+  "endingDirection": "Ở hồi cuối, Trần Kính dẫn Khuyển Ảnh Nhai Cốt tiến đến Tổ Thú, mở Mẫu Ấn trung tâm và buộc Liên Minh công khai toàn bộ đường tiến hóa bị độc quyền. Hắn không phá hủy khế ước; hắn lập luật mới để sủng thú có quyền từ chối, còn ngự thú sư bình dân có thể dùng thành tích đấu trường đổi lấy cơ hội tiến hóa hợp pháp.",
+  "voiceSheet": {
+    "pov": "third_limited",
+    "register": "Nhịp nhanh, câu gọn, ưu tiên hành động nhìn thấy được. Trần Kính nói ít nhưng luôn chốt bằng giá, điều kiện hoặc kết quả; Sửu Khuyển có độc thoại ngắn, ngang bướng và thực dụng trong các đoạn khế ước.",
+    "chapterTitleRule": "Mỗi tiêu đề phải gọi thẳng đấu trường hoặc mục tiêu, lợi thế tiến hóa và phần thưởng: “Kiểm Định: Sửu Khuyển thức tỉnh Ảnh Nhai, lấy suất dự giải”",
+    "showsSystemPanel": true,
+    "reactionRule": "Khi bảng gọi đúng cấp, phẩm hoặc kỹ năng mới, phản ứng không dừng ở kinh ngạc: người chứng kiến phải tranh suất hợp tác, đưa giá chiêu mộ, gửi thư thách đấu, sửa thái độ hoặc dùng quyền hạn để ngăn Trần Kính. Mỗi trận thắng công khai phải tạo ít nhất một cơ hội tài nguyên và một hành động đối kháng mới.",
+    "taboos": [
+      "Không dùng tên quốc gia, thành phố, thương hiệu hay nhân vật có thật.",
+      "Không để tiến hóa tự thành công nếu chưa trả giá bằng điều kiện cụ thể.",
+      "Không biến Sửu Khuyển thành công cụ im lặng; nó phải có lựa chọn và phản ứng riêng.",
+      "Không dùng hiểu lầm kéo dài thay cho xung đột lợi ích.",
+      "Không tăng cấp chỉ bằng thông báo bảng mà không có kết quả chiến đấu hoặc xã hội nhìn thấy."
+    ]
+  }
+}

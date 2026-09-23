@@ -1,7 +1,9 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
+import { zodToJsonSchema } from 'zod-to-json-schema';
 import {
-  assertSerialLaunchable, HARD_CONTINUITY_KINDS, OpeningAuditProviderSchema, PremiseSchema, premiseLint, processDensity,
+  assertSerialLaunchable, HARD_CONTINUITY_KINDS, LegacyChapterDigestSchema, OpeningAuditProviderSchema, PremiseSchema,
+  premiseLint, processDensity, ProposedPremiseSchema,
   processProseFindings, PROCESS_DENSITY_LIMIT, SOFT_CONTINUITY_KINDS,
 } from '@/services/serial/contracts';
 import {
@@ -171,5 +173,16 @@ describe('archetypes: a new lane is data, and each lane gets only its own craft'
     expect(PremiseSchema.safeParse(beast).success).toBe(true);
     expect(PremiseSchema.safeParse({ ...beast, archetype: 'two_world_commerce' }).success).toBe(false);
     expect(PremiseSchema.safeParse({ ...beast, archetype: 'khong_ton_tai' }).success).toBe(false);
+  });
+});
+
+describe('policy lock: models are never shown the retired v3 fields', () => {
+  test('premise drafts and v2 digests are requested without lived-causality fields', () => {
+    const premiseSchema = JSON.stringify(zodToJsonSchema(ProposedPremiseSchema, { target: 'jsonSchema7', $refStrategy: 'none' }));
+    const digestSchema = JSON.stringify(zodToJsonSchema(LegacyChapterDigestSchema, { target: 'jsonSchema7', $refStrategy: 'none' }));
+    expect(premiseSchema).not.toMatch(/narrativeFoundation/);
+    expect(premiseSchema).toMatch(/archetype/);
+    expect(digestSchema).not.toMatch(/narrativeEvidence/);
+    expect(readFileSync('src/services/serial/agents.ts', 'utf8')).toMatch(/schema: ProposedPremiseSchema/);
   });
 });

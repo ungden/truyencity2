@@ -21,6 +21,8 @@
     "factory:writing-smoke": "node --import tsx scripts/factory-writing-smoke.ts",
     "factory:window-repair": "node --import tsx scripts/factory-window-repair.ts",
     "serial:run": "node --import tsx scripts/serial-run.ts",
+    "serial:propose": "node --import tsx scripts/serial-propose.ts",
+    "serial:cover": "node --import tsx scripts/serial-cover.ts",
     "serial:trial": "node --import tsx scripts/serial-continuation-trial.ts",
     "serial:reconcile-state": "node --import tsx scripts/serial-reconcile-state.ts",
     "serial:backfill-assets": "node --import tsx scripts/serial-backfill-asset-ledger.ts",

@@ -812,6 +812,8 @@ Trả lại đúng một object JSON đã sửa, không giải thích.`,
         throw new StoryFactoryError('infra_blocked', 'Provider output failed application schema validation after one correction.', {
           issues: parsed.error.issues,
           usage: usageTotal,
+          // A paid, nearly valid output is worth keeping for a person to repair.
+          candidate: raw,
         });
       }
       return { value: parsed.data, usage: usageTotal };
@@ -820,6 +822,7 @@ Trả lại đúng một object JSON đã sửa, không giải thích.`,
       throw new StoryFactoryError('infra_blocked', 'Provider output failed application schema validation.', {
         issues: parsed.error.issues,
         usage,
+        candidate: raw,
       });
     }
     return { value: parsed.data, usage };
