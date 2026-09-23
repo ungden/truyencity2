@@ -1,18 +1,22 @@
 # “Tôi sẽ làm điểm giao dịch lớn nhất Đông Hà!”
 
-Lâm Việt xếp lại tấm bảng thu mua vừa nhận, rồi nhìn Đội Tro Tàn đứng trước quầy.
+Lâm Việt mở cửa quầy, lấy ba bản bí tịch từ túi trữ vật ra rồi đặt thẳng lên mặt bàn.
 
-Cô gái tóc ngắn đã giắt bản Man Ngưu Luyện Thể Quyết vào bên hông.
+“Đội Tro Tàn, đơn đã trả trước giao trước.”
 
-“Da Thiết Giáp Ngưu đã bán xong.”
+Cô gái tóc ngắn bước lên đầu tiên.
 
-Thanh niên cầm dao phay cải tạo vuốt mép áo, giọng vẫn còn hưng phấn.
+Nàng không hỏi giá nữa, chỉ nhìn dấu quầy trên bìa sách, rồi đưa tay nhận lấy.
 
-“Lần sau tôi sẽ cắt sâu hơn vào khe khớp.”
+“Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm.”
 
-Người cầm khiên vỗ lên bìa bí tịch trong ngực.
+Thanh niên gầy cầm dao phay cải tạo nhận bản thứ hai, ngón tay siết chặt mép giấy.
 
-“Ta luyện xong rồi đi.”
+“Lần này săn Thiết Giáp Ngưu, tôi phụ trách cắt khe khớp.”
+
+Người cầm khiên nhận bản cuối cùng, cười khàn.
+
+“Ta giữ đầu nó. Hai đứa đánh vào sườn.”
 
 Ba người không hô hào gì.
 
@@ -20,15 +24,17 @@ Họ chỉ tự chia lại vị trí săn.
 
 Cô gái tóc ngắn nhìn hai đồng đội.
 
-“Không bán chiến lợi phẩm cho Cao Nguyên nữa.”
+“Không bán chiến lợi phẩm cho Cao Nguyên nữa, vậy phải săn thứ hắn không dám ép giá.”
 
-“Thiết Giáp Ngưu đổi được đường đi tiếp.” Người cầm khiên gật đầu. “Lần sau, chúng ta mang thứ tốt hơn về đây.”
+“Thiết Giáp Ngưu.” Người cầm khiên gật đầu. “Da dày, thịt nặng, nhưng đổi được đường đi tiếp.”
 
 Lâm Việt đẩy tờ đơn cũ sang một bên.
 
-“Luyện chắc đã.”
+Đơn đã hoàn tất.
 
-Thanh niên gầy quay người đi luôn.
+【Giao dịch: Lâm Việt → Ba thành viên Đội Tro Tàn: 3 bản Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm】
+
+Thanh niên gầy nhét bí tịch vào trong áo, quay người đi luôn.
 
 “Lâm chủ quầy, lần sau có công pháp hợp cung, giữ cho tôi một bản.”
 
@@ -92,7 +98,7 @@ Một đội trưởng Thành Vệ lập tức quay sang Chu Dã.
 
 Người kia im miệng.
 
-Ánh mắt ông ta lại chuyển sang cánh cửa Đội Tro Tàn vừa bước ra.
+Ánh mắt ông ta lại chuyển sang ba quyển bí tịch vừa được nhận đi.
 
 Nếu người không dị năng cũng có thể trở thành Luyện Khí tầng một, các đội săn sẽ không còn bị những dị năng giả nắm cổ mãi.
 

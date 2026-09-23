@@ -1,13 +1,36 @@
 {
-  "passed": false,
-  "summary": "Chương 1–2 trả kim thủ chỉ và lời hứa bán công pháp tốt, móc cuối chương vẫn kéo đọc tiếp. Tuy nhiên, trình tự giao bí tịch bị lặp và tự mâu thuẫn giữa chương 3–4.",
-  "findings": [
+  "before": {
+    "passed": false,
+    "summary": "Chương bốn vẫn có đơn tổ chức và mục tiêu mới, nhưng trình tự của Đội Tro Tàn tự mâu thuẫn với chương ba, làm hỏng cảm giác thành quả nối tiếp.",
+    "findings": [
+      {
+        "kind": "timeline",
+        "chapterNumber": 4,
+        "quote": "“Đội Tro Tàn, đơn đã trả trước giao trước.”",
+        "explain": "Chương 3 đã cho Đội Tro Tàn nhận đủ ba bản bí tịch, rồi dùng chúng đi săn Thiết Giáp Ngưu và bán chiến lợi phẩm cho Lâm Việt. Chương 4 lại giao chính ba bản ấy lần đầu và để họ chuẩn bị đi săn, đảo ngược kết quả đã xảy ra.",
+        "repair": "Chọn một mốc giao hàng duy nhất: либо giữ cảnh giao bí tịch ở chương 3 và mở chương 4 bằng việc Đội Tro Tàn trở về sau chuyến săn; hoặc bỏ cảnh họ nhận bí tịch, săn Thiết Giáp Ngưu và bán hàng ở chương 3 để dời toàn bộ chuỗi đó sang sau chương 4."
+      }
+    ]
+  },
+  "rounds": [
     {
-      "kind": "timeline",
-      "chapterNumber": 4,
-      "quote": "“Đội Tro Tàn, đơn đã trả trước giao trước.”",
-      "explain": "Đầu chương 3, Đội Tro Tàn đã nhận đủ ba bản bí tịch, mang chúng đi săn Thiết Giáp Ngưu. Nhưng chương 4 lại giao đúng ba bản của cùng đơn trả trước lần nữa. Hơn nữa, chương 3 chỉ mua ba bản từ Thanh Huyền sau cảnh giao đầu chương, khiến lần giao đầu xảy ra trước khi có hàng.",
-      "repair": "Chọn một lần giao duy nhất. Hợp lý nhất: bỏ cảnh giao bí tịch ở đầu chương 3, để Đội Tro Tàn nhận hàng ở chương 4 rồi mới đi săn ở chương sau; hoặc giữ cảnh chương 3 và sửa chương 4 thành cảnh họ trở lại báo chiến tích, không giao lại bí tịch."
+      "repaired": [
+        4
+      ],
+      "findings": [
+        {
+          "kind": "timeline",
+          "chapterNumber": 4,
+          "quote": "“Đội Tro Tàn, đơn đã trả trước giao trước.”",
+          "explain": "Chương 3 đã cho Đội Tro Tàn nhận đủ ba bản bí tịch, rồi dùng chúng đi săn Thiết Giáp Ngưu và bán chiến lợi phẩm cho Lâm Việt. Chương 4 lại giao chính ba bản ấy lần đầu và để họ chuẩn bị đi săn, đảo ngược kết quả đã xảy ra.",
+          "repair": "Chọn một mốc giao hàng duy nhất: либо giữ cảnh giao bí tịch ở chương 3 và mở chương 4 bằng việc Đội Tro Tàn trở về sau chuyến săn; hoặc bỏ cảnh họ nhận bí tịch, săn Thiết Giáp Ngưu và bán hàng ở chương 3 để dời toàn bộ chuỗi đó sang sau chương 4."
+        }
+      ]
     }
-  ]
+  ],
+  "after": {
+    "passed": true,
+    "summary": "Bốn chương đã trả kim thủ chỉ, bán được công pháp và đan dược bằng cảnh giao dịch nhìn thấy, đồng thời chương bốn mở đơn tổ chức và mục tiêu mới đủ mạnh để kéo sang chương năm.",
+    "findings": []
+  }
 }

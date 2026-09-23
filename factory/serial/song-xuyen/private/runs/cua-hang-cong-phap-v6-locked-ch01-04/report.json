@@ -1,7 +1,7 @@
 {
   "chapters": 4,
-  "totalUsd": 0.467,
-  "perChapterUsd": 0.117,
+  "totalUsd": 0.525,
+  "perChapterUsd": 0.131,
   "reading": {
     "chapters": 4,
     "average": 4.03,
@@ -10,8 +10,8 @@
   "processDensity": [
     3.9,
     3.6,
-    2.4,
-    1.8
+    1.9,
+    1.9
   ],
   "openingAudit": {
     "passed": true,
