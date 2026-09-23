@@ -828,6 +828,18 @@ describe('never start a paid call without time to finish it', () => {
   });
 });
 
+describe('judge reads where the previous chapter left off', () => {
+  test('the judge brief carries the previous ending and the prompt names the sequence check', () => {
+    const brief = buildJudgeBrief({
+      premise, bible: baseBible(), cycle: cycle(), chapterNumber: 8, title: 'Chương tám', prose: 'x'.repeat(900),
+      previousChapter: 'Đầu chương. '.repeat(400) + '“Đưa ba bản về đây trước. Sau đó Đội Tro Tàn đi săn.”',
+    });
+    expect(brief.doanCuoiChuongTruoc).toMatch(/Đưa ba bản về đây trước/);
+    expect(brief.doanCuoiChuongTruoc.split(/\s+/).length).toBeLessThanOrEqual(300);
+    expect(JUDGE_SYSTEM_PROMPT).toMatch(/doanCuoiChuongTruoc[\s\S]*timeline/);
+  });
+});
+
 describe('judge review binding', () => {
   const chapter = {
     chapterNumber: 4,

@@ -337,7 +337,9 @@ export async function writeOneChapter(input: {
     const result = await judgeChapter({
       provider, routes,
       premise,
-      judgeBrief: buildJudgeBrief({ premise, bible, cycle, chapterNumber, title: draft.title, prose: draft.content }),
+      judgeBrief: buildJudgeBrief({
+        premise, bible, cycle, chapterNumber, title: draft.title, prose: draft.content, previousChapter: input.previousChapter,
+      }),
       chapter: { chapterNumber, title: draft.title, content: draft.content },
     });
     usages.push(result.usage);

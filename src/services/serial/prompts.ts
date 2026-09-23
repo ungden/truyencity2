@@ -11,7 +11,7 @@ import playbookData from './playbook.json';
  * composed in at the marked point. Changing craft is a data edit; changing the
  * contract is a code change. They rot at different speeds.
  */
-export const SERIAL_PROMPT_VERSION = `serial-prompts-35-ledger-order + playbook-${playbookData.version}`;
+export const SERIAL_PROMPT_VERSION = `serial-prompts-36-judge-reads-previous-ending + playbook-${playbookData.version}`;
 
 export const WRITER_SYSTEM_PROMPT = `Bạn là tác giả truyện mạng tiếng Việt, viết truyện dài nhiều chương ra hằng ngày.
 
@@ -38,6 +38,7 @@ Mỗi dòng bangSoLieu hiện thành một bảng 【】 đúng lúc giao dịch
 export const JUDGE_SYSTEM_PROMPT = `Bạn đọc và soát chương truyện mạng tiếng Việt.
 
 LỖI LOGIC (lỗ hổng độc giả sẽ chỉ ra): chỉ báo lỗi có bằng chứng nguyên văn. Các loại gồm: người chết trở lại; tụt/nhảy cấp trái hệ; vị trí bất khả; sai thời gian; biết bí mật chưa được biết; mâu thuẫn Bible; kim thủ chỉ tự có thêm tác dụng ngoài rule, scope và nấc hiện tại; cấp nghề hoặc cấp cửa hàng tự đổi trái trạng thái. Một khả năng chỉ “có vẻ không hợp lý” không phải bằng chứng.
+doanCuoiChuongTruoc là đoạn cuối chương liền trước. Nếu chương này mở ra hoặc diễn tiếp trái với điều vừa được hẹn hay vừa xảy ra ở đó — việc đã hẹn làm trước lại bị bỏ qua, việc chưa làm đã xong, người đang ở chỗ khác bỗng có mặt — dùng timeline và trích câu trái ngược.
 Kim thủ chỉ là lợi thế đã duyệt, không phải cái cớ để phát sinh bất kỳ vật phẩm hay quyền lực nào có chữ “hệ thống”. Nếu prose tạo lực đẩy, cưỡng chế, liên lạc xuyên giới, sản xuất hoặc quyền quản lý chưa có trong nấc hiện tại, dùng golden_finger_scope.
 LỖI SỐ LIỆU (được sửa một lần, không bao giờ vứt chương): bangSoLieu là con số đúng của chương do hệ thống tính. Nếu văn bản nêu lượng, giá hay người nhận khác bangSoLieu, dùng transaction_contradiction và trích đúng câu sai. Nếu văn bản cho một món quan trọng đổi chủ mà bangSoLieu không có, dùng resource_provenance. Không tự làm lại phép tính tồn kho từ soTaiSanDauChuong.
 mocVongKhachHangChuongNay là kết quả đã hẹn cho chương hiện tại. Nếu prose chỉ nhắc hoặc hẹn sang chương sau thay vì hoàn tất mốc mua, dùng kiếm thành quả, chứng minh công khai hay quay lại nâng cấp tương ứng, ghi steering cụ thể; nếu nó còn làm sai giao dịch/canon thì dùng continuity phù hợp.

@@ -1,7 +1,7 @@
 {
   "chapters": 4,
-  "totalUsd": 0.449,
-  "perChapterUsd": 0.112,
+  "totalUsd": 0.467,
+  "perChapterUsd": 0.117,
   "reading": {
     "chapters": 4,
     "average": 4.03,
@@ -14,10 +14,8 @@
     1.8
   ],
   "openingAudit": {
-    "passed": false,
-    "findings": [
-      "Ch.3 timeline"
-    ]
+    "passed": true,
+    "findings": []
   },
   "narrativeReview": null
 }

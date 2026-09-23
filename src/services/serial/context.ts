@@ -298,6 +298,8 @@ export function buildJudgeBrief(input: {
   chapterNumber: number;
   title: string;
   prose: string;
+  /** The previous chapter's text; the judge checks this chapter picks up where it left off. */
+  previousChapter?: string | null;
 }) {
   const { premise, bible, cycle, chapterNumber } = input;
   const sheet = cycle.beatSheets.find(item => item.chapterNumber === chapterNumber);
@@ -338,6 +340,7 @@ export function buildJudgeBrief(input: {
     hopDongMoDau: premise.worldKernel.openingContract.find(item => item.chapterNumber === chapterNumber) ?? null,
     khongDuocTrai: mustNotContradict(bible, premise, castIds),
     tomTatChuongTruoc: bible.recentSummary,
+    doanCuoiChuongTruoc: previousTail(input.previousChapter ?? null, 300),
     cumTuDaMon: bible.styleMemory,
   };
 }
