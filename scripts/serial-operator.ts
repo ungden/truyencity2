@@ -16,7 +16,7 @@
 import dotenv from 'dotenv';
 import { readFileSync } from 'node:fs';
 import { createClient } from '@supabase/supabase-js';
-import { assertSerialLaunchable, OpeningAuditSchema, PremiseSchema, SerialRoutesSchema } from '@/services/serial/contracts';
+import { assertSerialLaunchable, PremiseSchema, readStoredOpeningAudit, SerialRoutesSchema } from '@/services/serial/contracts';
 import { repairOpeningUntilClean, splitOpeningFindings } from '@/services/serial/engine';
 import { geminiProvider } from '@/services/story-factory/provider';
 import { DEFAULT_SERIAL_ROUTES } from '@/services/serial/routes';
@@ -194,7 +194,8 @@ async function repairOpening(): Promise<void> {
     .eq('kind', 'chapter').eq('chapter_number', 4).not('opening_audit', 'is', null)
     .order('started_at', { ascending: false }).limit(1).maybeSingle();
   if (run.error) throw run.error;
-  const audit = OpeningAuditSchema.parse(run.data?.opening_audit ?? { passed: true, summary: 'Không có audit.', findings: [] });
+  const audit = readStoredOpeningAudit(run.data?.opening_audit);
+  if (!audit) throw new Error('repair-opening found no readable chapter-four opening audit.');
   const { local } = splitOpeningFindings(audit);
   console.log(JSON.stringify({ dryRun: !apply, chapters: chapters.map(item => item.chapterNumber), local }, null, 2));
   if (!apply || local.length === 0) return;

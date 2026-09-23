@@ -6,6 +6,7 @@ import { geminiProvider } from '@/services/story-factory/provider';
 import { StoryFactoryError } from '@/services/story-factory/contracts';
 import {
   BibleSchema, ChapterDigestSchema, ChapterDraftSchema, CyclePlanSchema, JudgeVerdictSchema, PremiseSchema, SerialRoutesSchema, scorecardAverage,
+  storedOpeningAudit,
   type Bible, type CyclePlan, type Premise, type SerialRoutes,
 } from './contracts';
 import { SERIAL_PROMPT_VERSION } from './prompts';
@@ -566,7 +567,7 @@ async function stageWrite(
     commitUsages = [...outcome.usages, ...audited.usages];
     commitCostUsd = Number((outcome.costUsd + audited.costUsd).toFixed(6));
     const savedAudit = await db.from('serial_runs').update({
-      opening_audit: { ...audited.audit, narrativeReview: audited.narrativeReview },
+      opening_audit: storedOpeningAudit(audited.audit, audited.narrativeReview),
     }).eq('id', runId);
     if (savedAudit.error) throw savedAudit.error;
 

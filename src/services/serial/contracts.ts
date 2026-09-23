@@ -888,6 +888,22 @@ const openingAuditSchema = <K extends [string, ...string[]]>(kinds: K) => z.obje
 export const OpeningAuditSchema = openingAuditSchema([...OPENING_AUDIT_KINDS, ...LEGACY_OPENING_AUDIT_KINDS]);
 /** What the auditor model may return today. */
 export const OpeningAuditProviderSchema = openingAuditSchema([...OPENING_AUDIT_KINDS]);
+
+/**
+ * The one reader of `serial_runs.opening_audit`. The runtime stores the audit together
+ * with the (v3-only) narrative review; every consumer goes through here, so the writer
+ * and the readers cannot drift apart again.
+ */
+export function storedOpeningAudit(audit: OpeningAudit, narrativeReview: unknown): Record<string, unknown> {
+  return { ...audit, narrativeReview: narrativeReview ?? null };
+}
+
+export function readStoredOpeningAudit(value: unknown): OpeningAudit | null {
+  if (!value || typeof value !== 'object') return null;
+  const { narrativeReview: _review, ...audit } = value as Record<string, unknown>;
+  const parsed = OpeningAuditSchema.safeParse(audit);
+  return parsed.success ? parsed.data : null;
+}
 export type OpeningAudit = z.infer<typeof OpeningAuditSchema>;
 
 export const CHAPTER_WORD_RANGE = { min: 1_600, max: 2_600 } as const;

@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { readStoredOpeningAudit, storedOpeningAudit } from '@/services/serial/contracts';
 
 const migration = readFileSync(
   'supabase/migrations/20260919160350_serial_launch_operations.sql',
@@ -102,5 +103,16 @@ describe('operator writes cannot report success without changing anything', () =
     const checks = source.match(/expectRows\((?!result)/g)?.length ?? 0;
     expect(updates).toBeGreaterThan(0);
     expect(checks).toBe(updates);
+  });
+});
+
+describe('stored opening audit', () => {
+  test('what the runtime writes is what the operator reads back', () => {
+    const audit = { passed: false, summary: 'Chương 4 giao lại hàng.', findings: [{
+      kind: 'timeline' as const, chapterNumber: 4, quote: 'Đội Tro Tàn nhận đủ hàng', explain: 'Giao hai lần.', repair: 'Giữ một lần giao.',
+    }] };
+    const stored = JSON.parse(JSON.stringify(storedOpeningAudit(audit, { findings: [] })));
+    expect(readStoredOpeningAudit(stored)).toEqual(audit);
+    expect(readStoredOpeningAudit(null)).toBeNull();
   });
 });
