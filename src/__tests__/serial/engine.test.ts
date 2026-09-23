@@ -2,8 +2,8 @@ import type { ProviderUsage, StoryModelProvider } from '@/services/story-factory
 import type { ChapterDigest, ChapterDraft, CyclePlan, JudgeVerdict, OpeningAudit, SceneMode } from '@/services/serial/contracts';
 import { DEFAULT_SERIAL_ROUTES } from '@/services/serial/routes';
 import {
-  auditFourChapterOpening, cycleReadyToClose, foldVolume, planNextCycle, readingHealth,
-  SerialCheckpointError, writeOneChapter,
+  auditFourChapterOpening, cyclePull, cycleReadyToClose, foldVolume, LOW_PULL_THRESHOLD, lowPullStreak,
+  planNextCycle, readingHealth, SerialCheckpointError, writeOneChapter,
 } from '@/services/serial/engine';
 import { normalizeChapterDraft } from '@/services/serial/agents';
 import { assetLedgerSlice, buildCyclePlannerBrief, buildExtractorBrief, buildJudgeBrief, buildWriterBrief, collectSteering, refreshStyleMemory, relevantCast } from '@/services/serial/context';
@@ -235,11 +235,23 @@ describe('chapter loop', () => {
     expect(provider.calls).not.toContain('extractor');
   });
 
-  test('prose the reader accepts but state cannot absorb pauses with its private draft', async () => {
+  test('an extractor entry the merge cannot absorb is set aside instead of rejecting accepted prose', async () => {
     const invalid = { ...goodDigest, coreChanges: { ...goodDigest.coreChanges, hooksPaid: ['hook_khong_ton_tai'] } };
+    const provider = stubProvider({ writer: [draft()], judge: [cleanVerdict()], extractor: [invalid] });
+    const result = await writeOneChapter(chapterInput(provider));
+
+    expect(result.status).toBe('committed');
+    if (result.status !== 'committed') return;
+    expect(result.digest.coreChanges.hooksPaid).toEqual([]);
+    expect(result.mergeNotes.join(' ')).toMatch(/hook_khong_ton_tai/);
+    expect(provider.calls.filter(call => call === 'extractor')).toHaveLength(1);
+  });
+
+  test('a digest for the wrong chapter still pauses with its private draft after one repair', async () => {
+    const wrongChapter = { ...goodDigest, chapterNumber: 9 };
     const provider = stubProvider({
       writer: [draft()], judge: [cleanVerdict()],
-      extractor: [invalid, invalid],
+      extractor: [wrongChapter, wrongChapter],
     });
     const result = await writeOneChapter(chapterInput(provider));
 
@@ -247,23 +259,23 @@ describe('chapter loop', () => {
     if (result.status !== 'needs_review') return;
     expect(result.reviewKind).toBe('extractor');
     expect(result.chapter.content).toBe(draft().content);
-    expect(result.rejectedDigest).toMatchObject({ chapterNumber: 8 });
-    expect(result.reason).toMatch(/unknown_hook/);
+    expect(result.reason).toMatch(/chapter_sequence/);
     expect(provider.calls.filter(call => call === 'extractor')).toHaveLength(2);
   });
 
-  test('a bad extractor id gets one cheap repair without rewriting valid prose', async () => {
+  test('an invented world id becomes a named thing without another extractor call', async () => {
     const provider = stubProvider({
       writer: [draft()], judge: [cleanVerdict()],
       extractor: [
         { ...goodDigest, coreChanges: { ...goodDigest.coreChanges, worldFactsRevealed: [{ id: 'doi_tam_thoi', note: 'Một đội vừa ký đơn.' }] } },
-        goodDigest,
       ],
     });
     const result = await writeOneChapter(chapterInput(provider));
     expect(result.status).toBe('committed');
+    if (result.status !== 'committed') return;
+    expect(result.digest.newNamedThings).toContain('Một đội vừa ký đơn.');
     expect(provider.calls.filter(call => call === 'writer')).toHaveLength(1);
-    expect(provider.calls.filter(call => call === 'extractor')).toHaveLength(2);
+    expect(provider.calls.filter(call => call === 'extractor')).toHaveLength(1);
   });
 
   test('worn phrases the judge quoted come back as the next chapter ban list', async () => {
@@ -283,13 +295,23 @@ describe('four-chapter opening audit', () => {
   const chapters = Array.from({ length: 4 }, (_, index) => ({
     chapterNumber: index + 1,
     title: `Mở hàng lần ${index + 1}`,
-    content: 'Một giao dịch có nguồn hàng và thanh toán rõ ràng. '.repeat(30),
+    content: `${'Một giao dịch có nguồn hàng và thanh toán rõ ràng. '.repeat(30)}\n\n【Giao dịch hoàn tất: 3 tinh hạch Nhất giai】`,
   }));
 
-  test('requires a named supplier and consideration, not a floating system receipt', () => {
-    expect(OPENING_AUDITOR_SYSTEM_PROMPT).toContain('không cho biết thu từ ai và đổi lấy gì không đủ chứng minh nguồn');
-    expect(OPENING_AUDITOR_SYSTEM_PROMPT).toContain('vượt quá giá niêm yết');
-    expect(OPENING_AUDITOR_SYSTEM_PROMPT).toContain('Sổ giao dịch chuẩn');
+  test('reads like an acquiring editor, not an inventory clerk', () => {
+    expect(OPENING_AUDITOR_SYSTEM_PROMPT).toContain('muốn bấm chương năm');
+    expect(OPENING_AUDITOR_SYSTEM_PROMPT).toMatch(/golden_finger_late[\s\S]*reward_hook_missing[\s\S]*title_promise_unpaid/);
+    expect(OPENING_AUDITOR_SYSTEM_PROMPT).not.toContain('Sổ giao dịch chuẩn');
+    expect(OPENING_AUDITOR_SYSTEM_PROMPT).not.toMatch(/cộng trừ khớp|giá niêm yết/);
+  });
+
+  test('a system lane whose opening never shows the system fails in code', async () => {
+    const provider = stubProvider({ auditor: [{ passed: true, summary: 'Mở đầu ổn.', findings: [] }] });
+    const noPanel = chapters.map(chapter => ({ ...chapter, content: chapter.content.replaceAll('【', '[').replaceAll('】', ']') }));
+    const result = await auditFourChapterOpening({ provider, routes: DEFAULT_SERIAL_ROUTES, premise, chapters: noPanel });
+    expect(premise.voiceSheet.showsSystemPanel).toBe(true);
+    expect(result.audit.passed).toBe(false);
+    expect(result.audit.findings.map(finding => finding.kind)).toContain('system_panel_missing');
   });
 
   test('runs once over all four chapters and records a clean pass', async () => {
@@ -571,7 +593,8 @@ describe('context selection', () => {
     const extractor = buildExtractorBrief({
       premise, bible, chapterNumber: 8, title: 'Dùng phù', prose: 'Lâm Việt giao Hộ Thân Phù số 01.',
     });
-    expect(extractor.soTaiSanDauChuong.activeLots[0].lotId).toBe('c7_ho_than_01');
+    // Quantities are owned by the planned ledger; the extractor no longer reconstructs them.
+    expect(extractor).not.toHaveProperty('soTaiSanDauChuong');
   });
 
   test('relevant cast prefers the protagonist, then whoever the beats name', () => {
@@ -597,5 +620,123 @@ describe('context selection', () => {
       cleanVerdict({ scorecard: { opening: 5, anticipation: 2, payoff: 4, newness: 4, endHook: 5 } }),
       cleanVerdict({ scorecard: { opening: 4, anticipation: 1, payoff: 4, newness: 5, endHook: 5 } }),
     ])).toEqual({ chapters: 2, average: 3.95, weakest: 'anticipation' });
+  });
+});
+
+describe('code-owned ledger and reader-facing gates', () => {
+  const ledger = [
+    {
+      eventId: 'c8_nhap_phu', kind: 'acquire' as const, assetId: 'ho_than_phu', assetName: 'Hộ Thân Phù',
+      quantity: 3, unit: 'lá', fungible: true, sourceLotId: null, fromOwnerId: null, fromOwnerName: null,
+      toOwnerId: 'lam_viet', toOwnerName: 'Lâm Việt', note: 'Mua ở quầy phù Thanh Lô.',
+    },
+    {
+      eventId: 'c8_ban_phu', kind: 'transfer' as const, assetId: 'ho_than_phu', assetName: 'Hộ Thân Phù',
+      quantity: 1, unit: 'lá', fungible: true, sourceLotId: 'c8_nhap_phu', fromOwnerId: 'lam_viet', fromOwnerName: 'Lâm Việt',
+      toOwnerId: 'bay_thach', toOwnerName: 'Bảy Thạch', note: 'Bảy Thạch trả ba tinh hạch Nhất giai.',
+    },
+  ];
+  const ledgerCycle = () => {
+    const base = cycle();
+    return { ...base, beatSheets: base.beatSheets.map(beat => ({ ...beat, ledger })) };
+  };
+
+  test('the writer copies numbers rendered by code from the planned ledger', () => {
+    const writerBrief = buildWriterBrief({ premise, bible: baseBible(), cycle: ledgerCycle(), chapterNumber: 8, previousChapter: null });
+    expect(writerBrief.bangSoLieu).toEqual([
+      'Nhập: Lâm Việt nhận 3 lá Hộ Thân Phù. Mua ở quầy phù Thanh Lô.',
+      'Giao dịch: Lâm Việt → Bảy Thạch: 1 lá Hộ Thân Phù. Bảy Thạch trả ba tinh hạch Nhất giai.',
+    ]);
+    expect(WRITER_SYSTEM_PROMPT).toMatch(/bangSoLieu/);
+  });
+
+  test('the committed ledger is the plan, whatever the extractor thought changed hands', async () => {
+    const extractorGuess = {
+      ...goodDigest,
+      coreChanges: {
+        ...goodDigest.coreChanges,
+        assetEvents: [{ ...ledger[0], eventId: 'c8_doan_bua', quantity: 99 }],
+      },
+    };
+    const provider = stubProvider({ writer: [draft()], judge: [cleanVerdict()], extractor: [extractorGuess] });
+    const result = await writeOneChapter({ ...chapterInput(provider), cycle: ledgerCycle() });
+    expect(result.status).toBe('committed');
+    if (result.status !== 'committed') return;
+    expect(result.digest.coreChanges.assetEvents.map(event => event.eventId)).toEqual(['c8_nhap_phu', 'c8_ban_phu']);
+    expect(result.bible.symbolicCore.activeAssetLots.map(lot => [lot.lotId, lot.ownerId, lot.quantity])).toEqual([
+      ['c8_nhap_phu', 'lam_viet', 2],
+      ['c8_ban_phu', 'bay_thach', 1],
+    ]);
+  });
+
+  test('a price slip that survives its repair is committed, a plot hole is not', async () => {
+    const priceSlip: JudgeVerdict['continuity'] = [{
+      kind: 'transaction_contradiction',
+      quote: 'Bảy Thạch đặt bốn tinh hạch lên quầy.',
+      explain: 'bangSoLieu ghi ba tinh hạch.',
+    }];
+    const provider = stubProvider({
+      writer: [draft(), draft()],
+      judge: [cleanVerdict({ continuity: priceSlip }), cleanVerdict({ continuity: priceSlip })],
+      extractor: [goodDigest],
+    });
+    const result = await writeOneChapter(chapterInput(provider));
+    expect(result.status).toBe('committed');
+    if (result.status !== 'committed') return;
+    expect(result.verdict.continuity).toEqual(priceSlip);
+    expect(provider.calls).toEqual(['writer', 'judge', 'writer', 'judge', 'extractor']);
+  });
+
+  test('an impossible planned sale costs one planner retry, never a chapter', async () => {
+    const overspend = cycle();
+    const bad = {
+      ...overspend,
+      beatSheets: overspend.beatSheets.map(beat => ({
+        ...beat,
+        ledger: [ledger[0], { ...ledger[1], quantity: 5 }],
+      })),
+    };
+    const provider = stubProvider({ planner: [bad, ledgerCycle()] });
+    const result = await planNextCycle({
+      provider, routes: DEFAULT_SERIAL_ROUTES, premise, bible: baseBible(),
+      previousCycle: null, cycleNumber: 2, volumeNumber: 1, startChapter: 8, recentVerdicts: [],
+    });
+    expect(provider.calls).toEqual(['planner', 'planner']);
+    expect(result.cycle.beatSheets[0].ledger?.[1].quantity).toBe(1);
+  });
+
+  test('a planner that forgets the chapter prefix is corrected, references included', async () => {
+    const unprefixed = cycle();
+    const plan = {
+      ...unprefixed,
+      beatSheets: unprefixed.beatSheets.map(beat => ({
+        ...beat,
+        ledger: [
+          { ...ledger[0], eventId: 'nhap_phu' },
+          { ...ledger[1], eventId: 'ban_phu', sourceLotId: 'nhap_phu' },
+        ],
+      })),
+    };
+    const provider = stubProvider({ planner: [plan] });
+    const result = await planNextCycle({
+      provider, routes: DEFAULT_SERIAL_ROUTES, premise, bible: baseBible(),
+      previousCycle: null, cycleNumber: 2, volumeNumber: 1, startChapter: 8, recentVerdicts: [],
+    });
+    expect(provider.calls).toEqual(['planner']);
+    expect(result.cycle.beatSheets[0].ledger?.map(event => [event.eventId, event.sourceLotId])).toEqual([
+      ['c8_nhap_phu', null],
+      ['c8_ban_phu', 'c8_nhap_phu'],
+    ]);
+  });
+
+  test('two low-pull cycles in a row are a pattern; one is steering', () => {
+    const low = cleanVerdict({ scorecard: { opening: 2, anticipation: 2, payoff: 1, newness: 2, endHook: 2 } });
+    const high = cleanVerdict();
+    expect(cyclePull([low, low])).toBe(1.8);
+    expect(cyclePull([])).toBeNull();
+    expect(lowPullStreak(cyclePull([low]), cyclePull([low]))).toBe(true);
+    expect(lowPullStreak(cyclePull([low]), cyclePull([high]))).toBe(false);
+    expect(lowPullStreak(cyclePull([low]), null)).toBe(false);
+    expect(LOW_PULL_THRESHOLD).toBe(2.5);
   });
 });

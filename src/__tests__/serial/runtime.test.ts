@@ -294,8 +294,9 @@ describe('serial runtime', () => {
   });
 
   test('extractor failure preserves the private prose and never replans or deletes the cycle', async () => {
+    // A digest for the wrong chapter is the one extractor error that cannot be set aside.
     const badDigest = {
-      chapterNumber: 8,
+      chapterNumber: 9,
       title: 'Ca kiểm hàng',
       summary: 'Lâm Việt kiểm hàng rồi ghi sổ.',
       payoffKind: null,
@@ -414,6 +415,68 @@ describe('serial runtime', () => {
     });
     await runSerialTick({ db, provider: unusedProvider });
     expect(rpcCalls.find(call => call.fn === 'publish_serial_cycle')?.args.p_next_stage).toBe('plan_cycle');
+  });
+
+  test('a retired lived-causality premise pauses before planning or writing spends anything', async () => {
+    for (const stage of ['plan_cycle', 'write'] as const) {
+      const { db, writes } = fakeDb({
+        rows: { serial_novels: { ...novelRow(), premise: livedPremise() } },
+        rpc: { claim_serial_job: job({ stage }) },
+      });
+      const result = await runSerialTick({ db, provider: unusedProvider });
+      expect(result.detail).toMatch(/lived-causality đã ngừng dùng/);
+      expect(writes.filter(write => write.table === 'serial_jobs').at(-1)?.value).toMatchObject({ status: 'paused' });
+    }
+  });
+
+  const pullVerdict = (score: number) => ({
+    continuity: [],
+    scorecard: { opening: score, anticipation: score, payoff: score, newness: score, endHook: score },
+    craft: { protagonistAgency: 4, sceneLife: 4, worldLogic: 4, dialogueNaturalness: 4, structuralFreshness: 4 },
+    repetition: [], aiFlavor: [], steering: [],
+  });
+  const heldCycle = (narrativeReview: unknown) => ({
+    id: 'cy1', cycle_number: 3, start_chapter: 21, end_chapter: 30, narrative_review: narrativeReview,
+    plan: cycle({ cycleNumber: 3, startChapter: 21, plannedEndChapter: 30, beatSheets: [{
+      ...cycle().beatSheets[0], chapterNumber: 21,
+    }] }),
+  });
+
+  test('a second low-pull cycle in a row stays private for a person to read', async () => {
+    const { db, writes, rpcCalls } = fakeDb({
+      rows: {
+        serial_cycles: heldCycle(null),
+        serial_runs: [{ chapter_number: 21, verdict: pullVerdict(2) }, { chapter_number: 22, verdict: pullVerdict(1) }],
+      },
+      rpc: { claim_serial_job: job({ stage: 'publish_cycle' }), publish_serial_cycle: { startChapter: 21, endChapter: 30 } },
+    });
+    const result = await runSerialTick({ db, provider: unusedProvider });
+    expect(result.detail).toMatch(/Hai chu kỳ liền có điểm kéo đọc dưới 2.5/);
+    expect(rpcCalls.map(call => call.fn)).not.toContain('publish_serial_cycle');
+    expect(writes.find(write => write.table === 'serial_cycles')?.value).toMatchObject({ narrative_review: { lowPullHold: { current: 1.5 } } });
+    expect(writes.filter(write => write.table === 'serial_jobs').at(-1)?.value).toMatchObject({ status: 'paused' });
+  });
+
+  test('resuming a held cycle is the decision to publish it', async () => {
+    const { db, rpcCalls } = fakeDb({
+      rows: {
+        serial_cycles: heldCycle({ lowPullHold: { at: '2026-09-23T00:00:00.000Z', current: 1.5, previous: 1.5 } }),
+        serial_runs: [{ chapter_number: 21, verdict: pullVerdict(1) }],
+      },
+      rpc: { claim_serial_job: job({ stage: 'publish_cycle' }), publish_serial_cycle: { startChapter: 21, endChapter: 30 } },
+    });
+    const result = await runSerialTick({ db, provider: unusedProvider });
+    expect(result.detail).toBe('Published chapters 21-30.');
+    expect(rpcCalls.map(call => call.fn)).toContain('publish_serial_cycle');
+  });
+
+  test('a strong cycle publishes without a hold', async () => {
+    const { db, rpcCalls } = fakeDb({
+      rows: { serial_cycles: heldCycle(null), serial_runs: [{ chapter_number: 21, verdict: pullVerdict(4) }] },
+      rpc: { claim_serial_job: job({ stage: 'publish_cycle' }), publish_serial_cycle: { startChapter: 21, endChapter: 30 } },
+    });
+    await runSerialTick({ db, provider: unusedProvider });
+    expect(rpcCalls.map(call => call.fn)).toContain('publish_serial_cycle');
   });
 
   test('a lived-causality cycle is reviewed with its plan before publish and blocking prose keeps every draft private', async () => {

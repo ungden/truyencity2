@@ -1,6 +1,6 @@
 import type { StoryModelProvider, ProviderUsage } from '@/services/story-factory/provider';
 import {
-  ChapterDigestSchema, ChapterDraftSchema, CyclePlanSchema, JudgeProviderVerdictSchema, OpeningAuditSchema, PremiseSchema,
+  ChapterDigestSchema, ChapterDraftSchema, CyclePlanSchema, JudgeProviderVerdictSchema, OpeningAuditProviderSchema, PremiseSchema,
   RollingCyclePlanSchema,
   type ChapterDigest, type ChapterDraft, type CyclePlan, type JudgeVerdict, type OpeningAudit, type Premise,
   type SerialRoutes,
@@ -8,7 +8,6 @@ import {
 import {
   PREMISE_SYSTEM_PROMPT, WRITER_SYSTEM_PANEL_RULE,
 } from './prompts';
-import { narrativeCraft, type NarrativeCraftProfile } from '@/services/narrative/foundation';
 import { StoryFactoryError } from '@/services/story-factory/contracts';
 import { serialSystemPrompt } from './foundation';
 
@@ -107,7 +106,7 @@ export async function auditOpening(input: {
     model: input.routes.judge,
     system: serialSystemPrompt('opening', input.premise),
     prompt: brief(input.auditBrief),
-    schema: OpeningAuditSchema,
+    schema: OpeningAuditProviderSchema,
     temperature: 0,
     timeoutMs: SUPPORT_TIMEOUT_MS,
   });
@@ -186,14 +185,11 @@ export async function proposePremise(input: {
   routes: SerialRoutes;
   lane: string;
   avoid: string[];
-  craftProfile?: NarrativeCraftProfile;
 }): Promise<AgentResult<Premise>> {
   const result = await input.provider.json({
     model: input.routes.premise,
-    system: input.craftProfile
-      ? `Bạn dựng premise schemaVersion 3 với narrativeFoundation đầy đủ.\n\n${narrativeCraft(input.craftProfile)}\n\nKhông khóa số chương phải bán hàng hoặc lên cấp. World Kernel vẫn dùng stable IDs; các mảng thương mại/cấp bậc có thể rỗng nếu chưa thuộc mở đầu. Với two_world_commerce phiên bản hiện tại, commerceFantasy là bắt buộc và phải dùng đúng stable character/world IDs.`
-      : PREMISE_SYSTEM_PROMPT,
-    prompt: brief({ lane: input.lane, craftProfile: input.craftProfile ?? null, khongDuocTrungVoi: input.avoid }),
+    system: PREMISE_SYSTEM_PROMPT,
+    prompt: brief({ lane: input.lane, khongDuocTrungVoi: input.avoid }),
     schema: PremiseSchema,
     temperature: 1,
     timeoutMs: SUPPORT_TIMEOUT_MS,

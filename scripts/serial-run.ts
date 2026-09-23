@@ -18,7 +18,7 @@ import { geminiProvider } from '@/services/story-factory/provider';
 import type { ProviderUsage } from '@/services/story-factory/provider';
 import {
   BibleSchema, ChapterDigestSchema, CyclePlanSchema, JudgeVerdictSchema, PremiseSchema,
-  type Bible, type ChapterDigest, type CyclePlan, type JudgeVerdict,
+  type Bible, type ChapterDigest, type CyclePlan, type JudgeVerdict, assertSerialLaunchable,
 } from '@/services/serial/contracts';
 import { DEFAULT_SERIAL_ROUTES } from '@/services/serial/routes';
 import { applyDigest, seedBible } from '@/services/serial/state';
@@ -106,6 +106,8 @@ async function main(): Promise<void> {
     };
   }
   const premise = PremiseSchema.parse(premiseInput);
+  // --foundation-review upgrades to the retired v3 policy; refuse before any spend.
+  assertSerialLaunchable(premise);
   let bible: Bible = seedBible({ premise });
 
   console.log(JSON.stringify({

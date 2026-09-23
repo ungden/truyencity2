@@ -16,7 +16,7 @@
 import dotenv from 'dotenv';
 import { readFileSync } from 'node:fs';
 import { createClient } from '@supabase/supabase-js';
-import { PremiseSchema } from '@/services/serial/contracts';
+import { assertSerialLaunchable, PremiseSchema } from '@/services/serial/contracts';
 import { DEFAULT_SERIAL_ROUTES } from '@/services/serial/routes';
 import { SERIAL_PROMPT_VERSION } from '@/services/serial/prompts';
 import { seedBible } from '@/services/serial/state';
@@ -79,6 +79,7 @@ async function seed(): Promise<void> {
   const premisePath = value('premise');
   if (!premisePath) throw new Error('seed requires --premise=<file.json>');
   const premise = PremiseSchema.parse(JSON.parse(readFileSync(premisePath, 'utf8')));
+  assertSerialLaunchable(premise);
   const slug = value('slug') ?? slugify(premise.title);
   console.log(JSON.stringify({
     dryRun: !apply, title: premise.title, slug, lane: premise.lane,
@@ -189,6 +190,9 @@ async function setStatus(next: 'ready' | 'paused', label: string): Promise<void>
           }
         : null;
     if (!approval) throw new Error('approve requires a job awaiting premise approval or chapter-four opening review.');
+    const novel = await db.from('serial_novels').select('premise').eq('id', job.data.serial_novel_id).single();
+    if (novel.error) throw novel.error;
+    assertSerialLaunchable(PremiseSchema.parse(novel.data.premise));
     console.log(JSON.stringify({ dryRun: !apply, command: label, gate: approval.gate, jobId }, null, 2));
     if (!apply) return;
     const approved = await db.from('serial_novels').update(approval.patch).eq('id', job.data.serial_novel_id);

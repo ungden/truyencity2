@@ -73,7 +73,7 @@ Hợp đồng nền narrativeFoundation là canon tác giả. narrativeEvidence 
 
 ${common}
 
-Viết hinhDangChuong và nhipChuong thành trải nghiệm sống từ góc nhìn đã cấp. Lần đầu và lựa chọn quan trọng cần đủ quan sát, phản ứng và suy luận; việc đã quen có thể tóm lược. Cảnh sinh hoạt, quan hệ, khám phá hoặc suy nghĩ có thể là trọng tâm. Không tự thêm khách hàng, đám đông, cấp bậc, công ty, sản phẩm hay giao dịch để tạo vẻ tiến triển.
+Viết hinhDangChuong và nhipChuong thành trải nghiệm sống từ góc nhìn đã cấp. Lần đầu và lựa chọn quan trọng cần đủ quan sát, phản ứng và suy luận; việc đã quen có thể tóm lược.
 Nếu hinhDangChuong có valueContrastId, phải diễn valueExperience bằng hành động và cảm giác cụ thể của người dùng rồi mới tới giá, đơn hàng hoặc thay đổi thái độ. Không thay bằng lời giải thích. Trong protectedStore, main luôn giữ quyền tuyệt đối; không viết cảnh hack, quét, theo dõi, ép cửa, cướp hàng hay đánh nhau giữ quầy.
 Nếu dieuKienNhip có prerequisiteIds, chỉ dùng các điều kiện đã có trong narrativeEvidence hoặc được reveal trước trong chính chuỗi beat. Nếu advancesMilestoneIds có giá trị, kết quả phải có đúng evidenceNeeded; chưa đủ thì để milestone tiếp tục mở.
 Giữ tuyệt đối canon, tài sản, vị trí, thời gian và giới hạn năng lực. Không nhắc prompt hay dữ liệu nội bộ. Trả về chương hoàn chỉnh.`;
@@ -81,14 +81,14 @@ Giữ tuyệt đối canon, tài sản, vị trí, thời gian và giới hạn 
 
 ${common}
 
-Trả CyclePlan schemaVersion 2. Nếu brief có phamViRolling, startChapter và plannedEndChapter phải bằng đúng hai mốc trong đó và chỉ trả beat thật nằm trong phạm vi; không kéo dài giả để đủ năm chương. customerLoop có thể null trong giai đoạn chưa kinh doanh; witness và newNamedThing có thể rỗng/null. Lập theo điều kiện đã chuẩn bị thay vì deadline thưởng. Mỗi beat khai prerequisiteIds, revealsFactIds và advancesMilestoneIds bằng stable ID trong nền. Một fact được reveal phải có cảnh tiếp cận thông tin. Chỉ advance milestone sau khi các prerequisite đã có và evidenceNeeded được diễn thành kết quả. Không bắt ba beat đổi sceneMode nếu câu chuyện đang phát triển cùng một việc có biến đổi thực.
+Trả CyclePlan schemaVersion 2. Nếu brief có phamViRolling, startChapter và plannedEndChapter phải bằng đúng hai mốc trong đó và chỉ trả beat thật nằm trong phạm vi; không kéo dài giả để đủ năm chương. Mỗi beat khai prerequisiteIds, revealsFactIds và advancesMilestoneIds bằng stable ID trong nền. Một fact được reveal phải có cảnh tiếp cận thông tin. Chỉ advance milestone sau khi các prerequisite đã có và evidenceNeeded được diễn thành kết quả. Không bắt ba beat đổi sceneMode nếu câu chuyện đang phát triển cùng một việc có biến đổi thực.
 Khi beat giới thiệu hoặc chứng minh giá trị một món song xuyên, chép valueContrastId từ commerceFantasy và viết valueExperience là trải nghiệm cụ thể dẫn tới định giá hoặc hành động mua. Không tạo viện, giấy phép, khóa quyền, rà soát, phiên dịch hay tuyến bảo vệ cửa hàng nếu canon không có; không tự thêm AI, hệ thống phụ, quyền năng, tổ chức hoặc sản phẩm ngoài premise; không dùng thủ tục để kéo chậm tiến triển.
-Chu kỳ vẫn dài 5-15 chương để quản lý artifact, không phải hạn phải bán hàng hay lên cấp. Giữ kiểm tra tài sản, thời gian và canon.`;
+Giữ kiểm tra tài sản, thời gian và canon.`;
   if (role === 'judge') return `Bạn soát canon, tri thức và chất lượng thể hiện của một chương.
 
 ${common}
 
-Chỉ continuity có quote chính xác mới chặn: biết trước, nguồn lực/tài sản sai, vị trí/thời gian sai, năng lực vượt nền hoặc mâu thuẫn canon. Không phạt cảnh vì thiếu giao dịch, tăng cấp, tên mới, đám đông hay payoff vật chất. Điểm đọc chỉ là steering; nêu rõ cảnh có cho thấy main là ai, thế giới vận hành ra sao và quyết định có căn cứ không.
+Chỉ continuity có quote chính xác mới chặn: biết trước, nguồn lực/tài sản sai, vị trí/thời gian sai, năng lực vượt nền hoặc mâu thuẫn canon. Điểm đọc chỉ là steering; nêu rõ cảnh có cho thấy main là ai, thế giới vận hành ra sao và quyết định có căn cứ không.
 Với commerceFantasy, continuity phải chặn mọi vi phạm protectedStore. Steering phải chỉ ra khi cảnh món hàng thiếu trải nghiệm valueContrast hoặc khi giấy phép, kiểm tra, phiên dịch và cảnh báo rủi ro đang lặp mà không tạo lựa chọn mới.
 reviewBinding là bằng chứng bạn đã đọc đúng bản thảo: chép đúng chapterNumber, title và một excerpt liên tiếp 24-400 ký tự có nguyên văn trong trường chương. Không được nói thiếu văn bản khi trường chương có nội dung.`;
   if (role === 'extractor') return `${EXTRACTOR_SYSTEM_PROMPT}
@@ -100,12 +100,12 @@ narrativeEvidence chỉ ghi fact hoặc milestone thực sự được độc gi
 
 ${common}
 
-Kiểm tra lần xuất hiện của main, đời sống hai thế giới, cách lợi thế xuất hiện/được thử, giới hạn tri thức, bước chuẩn bị và hệ quả. Giữ kiểm toán tài sản/thời gian. Không đòi chương 1 phải kiếm tiền, mở công ty, có cấp bậc, tên mới hay người chứng kiến. Mỗi lỗi cần chương, quote chính xác, giải thích và hướng sửa đúng tầng.`;
+Kiểm tra lần xuất hiện của main, đời sống hai thế giới, cách lợi thế xuất hiện/được thử, giới hạn tri thức, bước chuẩn bị và hệ quả. Giữ kiểm toán tài sản/thời gian. Mỗi lỗi cần chương, quote chính xác, giải thích và hướng sửa đúng tầng.`;
   return `Bạn dựng premise schemaVersion 3 với narrativeFoundation đầy đủ.
 
 ${common}
 
-Không khóa số chương phải bán hàng hoặc lên cấp. World Kernel vẫn phải có stable IDs và đủ canon để giữ nhất quán; các mảng thương mại/cấp bậc có thể rỗng nếu chưa thuộc giai đoạn mở đầu. Mỗi character foundation phải phân biệt năng lực đã có với điều chưa biết. advantageDiscovery chỉ đánh dấu fact main thật sự biết từ đầu; bí mật sâu có thể để unresolvedOrigin. Mỗi fact chỉ chứa một kết luận có thể được một cảnh và một quote trực tiếp chứng minh; tách các mệnh đề về nguồn gốc, công dụng, giới hạn và nguyên nhân thành fact riêng khi chúng không cùng được quan sát.
+World Kernel vẫn phải có stable IDs và đủ canon để giữ nhất quán; các mảng thương mại/cấp bậc có thể rỗng nếu chưa thuộc giai đoạn mở đầu. Mỗi character foundation phải phân biệt năng lực đã có với điều chưa biết. advantageDiscovery chỉ đánh dấu fact main thật sự biết từ đầu; bí mật sâu có thể để unresolvedOrigin. Mỗi fact chỉ chứa một kết luận có thể được một cảnh và một quote trực tiếp chứng minh; tách các mệnh đề về nguồn gốc, công dụng, giới hạn và nguyên nhân thành fact riêng khi chúng không cùng được quan sát.
 Với two_world_commerce phiên bản hiện tại, commerceFantasy là bắt buộc: protectedStore thuộc main và đủ sáu bảo hộ, không công nghệ hay cảnh giới nào vô hiệu được; valueContrasts nêu ít nhất hai món đi qua hai thế giới cùng trải nghiệm chứng minh; simplicityRules đều true, gồm cấm tự sinh hệ thống phụ ngoài premise.`;
 }
 

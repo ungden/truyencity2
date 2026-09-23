@@ -540,6 +540,13 @@ const CyclePlanObjectSchema = z.object({
     valueContrastId: id.nullable().optional(),
     /** Concrete use/reaction/result that makes the value gap pleasurable on the page. */
     valueExperience: line.nullable().optional(),
+    /**
+     * Every quantity that changes hands in this chapter, declared by the planner and
+     * validated by code before any prose exists. Code renders it into the numbers the
+     * Writer shows and applies it to the ledger at commit; nobody reconstructs
+     * arithmetic from prose afterwards.
+     */
+    ledger: z.array(AssetEventSchema).max(8).optional(),
     endHookKind: z.enum(['threat', 'question', 'declaration', 'opportunity', 'reward', 'reveal']),
   }).strict().superRefine((beat, ctx) => {
     if (Boolean(beat.valueContrastId) !== Boolean(beat.valueExperience)) ctx.addIssue({
@@ -676,13 +683,22 @@ export const JudgeReviewBindingSchema = z.object({
   excerpt: z.string().trim().min(24).max(400),
 }).strict();
 
+/**
+ * Continuity a reader would call a plot hole. Anything else a judge cites — a price
+ * that drifted, a receipt without a supplier — is repaired once and then committed:
+ * numbers are owned by the planned ledger, so a prose slip is a typo, not a reason to
+ * throw the chapter away. Discarding eventful chapters for arithmetic is what left
+ * only uneventful ones alive in the September pilots.
+ */
+export const HARD_CONTINUITY_KINDS = [
+  'dead_returns', 'progression_regressed', 'location_impossible', 'timeline',
+  'knows_too_much', 'contradicts_bible', 'golden_finger_scope', 'progression_contradiction',
+] as const;
+export const SOFT_CONTINUITY_KINDS = ['transaction_contradiction', 'resource_provenance'] as const;
+
 export const JudgeVerdictSchema = z.object({
   continuity: z.array(z.object({
-    kind: z.enum([
-      'dead_returns', 'progression_regressed', 'location_impossible', 'timeline',
-      'knows_too_much', 'contradicts_bible', 'golden_finger_scope',
-      'transaction_contradiction', 'resource_provenance', 'progression_contradiction',
-    ]),
+    kind: z.enum([...HARD_CONTINUITY_KINDS, ...SOFT_CONTINUITY_KINDS]),
     quote: z.string().trim().min(4).max(400),
     explain: line,
   }).strict()).max(10),
@@ -731,27 +747,34 @@ export type JudgeVerdict = z.infer<typeof JudgeVerdictSchema>;
 
 // ---------------------------------------------------------- Opening audit
 
-/** Objective cross-chapter defects that a per-chapter judge cannot see. */
-export const OpeningAuditFindingSchema = z.object({
-  kind: z.enum([
-    'inventory_arithmetic',
-    'resource_provenance',
-    'transaction_continuity',
-    'timeline',
-    'format_duplicate_title',
-    'opening_contract',
-    'unapproved_cost',
-  ]),
-  chapterNumber: z.number().int().min(1).max(4),
-  quote: z.string().trim().min(4).max(500),
-  explain: line,
-  repair: line,
-}).strict();
+/**
+ * What an editor checks before a book enters the library: did the golden finger pay
+ * out, did every chapter leave something to want, did the title's promise start to
+ * cash. The first three kinds survive only so audits persisted before 2026-09-23 still
+ * parse; the auditor is no longer asked to do inventory arithmetic.
+ */
+export const LEGACY_OPENING_AUDIT_KINDS = ['inventory_arithmetic', 'resource_provenance', 'transaction_continuity'] as const;
+export const OPENING_AUDIT_KINDS = [
+  'golden_finger_late',
+  'reward_hook_missing',
+  'title_promise_unpaid',
+  'system_panel_missing',
+  'opening_contract',
+  'timeline',
+  'format_duplicate_title',
+  'unapproved_cost',
+] as const;
 
-export const OpeningAuditSchema = z.object({
+const openingAuditSchema = <K extends [string, ...string[]]>(kinds: K) => z.object({
   passed: z.boolean(),
   summary: line,
-  findings: z.array(OpeningAuditFindingSchema).max(12),
+  findings: z.array(z.object({
+    kind: z.enum(kinds),
+    chapterNumber: z.number().int().min(1).max(4),
+    quote: z.string().trim().min(4).max(500),
+    explain: line,
+    repair: line,
+  }).strict()).max(12),
 }).strict().superRefine((audit, ctx) => {
   if (audit.passed !== (audit.findings.length === 0)) {
     ctx.addIssue({
@@ -761,9 +784,20 @@ export const OpeningAuditSchema = z.object({
     });
   }
 });
+
+/** Persisted audits, including the retired arithmetic kinds. */
+export const OpeningAuditSchema = openingAuditSchema([...OPENING_AUDIT_KINDS, ...LEGACY_OPENING_AUDIT_KINDS]);
+/** What the auditor model may return today. */
+export const OpeningAuditProviderSchema = openingAuditSchema([...OPENING_AUDIT_KINDS]);
 export type OpeningAudit = z.infer<typeof OpeningAuditSchema>;
 
 export const CHAPTER_WORD_RANGE = { min: 1_600, max: 2_600 } as const;
+
+/** The five reader-pull dimensions only: did this chapter make anyone want the next one. */
+export function pullAverage(verdict: JudgeVerdict): number {
+  const s = verdict.scorecard;
+  return (s.opening + s.anticipation + s.payoff + s.newness + s.endHook) / 5;
+}
 
 export function scorecardAverage(verdict: JudgeVerdict): number {
   const s = verdict.scorecard;
@@ -793,3 +827,17 @@ export const SerialRoutesSchema = z.object({
   routeVersion: z.string().trim().min(3),
 }).strict();
 export type SerialRoutes = z.infer<typeof SerialRoutesSchema>;
+
+/**
+ * Only the Faloo-shaped premise (schema v2) may start or continue a story. Schema v3
+ * ("lived-causality", 2026-09-21) replaced the craft playbook with rules forbidding
+ * transactions, ranks, new names and crowds unless earned slowly; both pilots written
+ * under it spent ten chapters on inspection forms and never paid the title's promise.
+ * v3 still parses so its stored novels stay readable. See
+ * docs/WRITING_SYSTEM_AUDIT_2026-09-23.md.
+ */
+export function assertSerialLaunchable(premise: Premise): void {
+  if (premise.schemaVersion !== 2) {
+    throw new Error('Serial chỉ khởi chạy premise văn phạm Faloo (schemaVersion 2). Premise v3 lived-causality đã ngừng dùng từ 2026-09-23.');
+  }
+}

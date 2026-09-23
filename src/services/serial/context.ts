@@ -1,4 +1,4 @@
-import type { Bible, ChapterDigest, CyclePlan, JudgeVerdict, PayoffKind, Premise } from './contracts';
+import type { AssetEvent, Bible, ChapterDigest, CyclePlan, JudgeVerdict, PayoffKind, Premise } from './contracts';
 import { payoffKindIds } from './playbook';
 import { overdueHooks, recentPayoffKinds } from './state';
 
@@ -67,6 +67,23 @@ export function assetLedgerSlice(bible: Bible, castIds: string[], semanticText =
       || (event.toOwnerId ? focusedOwners.has(event.toOwnerId) : false))
     .slice(-ASSET_EVENT_SLICE_LIMIT);
   return { activeLots, recentEvents };
+}
+
+const formatQuantity = (value: number): string =>
+  Number.isInteger(value) ? String(value) : value.toLocaleString('vi-VN', { maximumFractionDigits: 3 });
+
+/**
+ * The chapter's numbers, rendered by code from the planned ledger. The Writer copies
+ * them; it never computes them. In a lane with a system panel these lines are what the
+ * reader sees inside 【】 — the receipt is the reward.
+ */
+export function renderLedgerLines(events: AssetEvent[]): string[] {
+  return events.map(event => {
+    const amount = `${formatQuantity(event.quantity)} ${event.unit} ${event.assetName}`;
+    if (event.kind === 'acquire') return `Nhập: ${event.toOwnerName} nhận ${amount}. ${event.note}`;
+    if (event.kind === 'transfer') return `Giao dịch: ${event.fromOwnerName ?? event.fromOwnerId} → ${event.toOwnerName}: ${amount}. ${event.note}`;
+    return `Tiêu hao: ${event.fromOwnerName ?? event.fromOwnerId} dùng ${amount}. ${event.note}`;
+  });
 }
 
 /**
@@ -252,6 +269,7 @@ export function buildWriterBrief(input: {
     soGiaoDichMoDau: chapterNumber <= 4
       ? premise.worldKernel.openingLedger.filter(entry => entry.chapterNumber <= chapterNumber)
       : [],
+    bangSoLieu: renderLedgerLines(sheet.ledger ?? []),
     nhanVatLienQuan: castIds.map(id => ({
       ten: nameOf(bible, id),
       hoSo: bible.castSheet.find(entry => entry.id === id)?.sheet ?? '',
@@ -303,6 +321,7 @@ export function buildJudgeBrief(input: {
     } : null,
     vongKhachHangChuKy: cycle.customerLoop,
     mocVongKhachHangChuongNay: customerLoopMilestone(cycle, chapterNumber),
+    bangSoLieu: renderLedgerLines(sheet?.ledger ?? []),
     narrativeFoundation: premise.narrativeFoundation ?? null,
     narrativeEvidence: bible.symbolicCore.narrativeEvidence,
     durableNarrativeState: {
@@ -336,7 +355,6 @@ export function buildExtractorBrief(input: {
   const currentRungIndex = input.premise.goldenFinger.evolution.findIndex(
     rung => rung.id === input.bible.symbolicCore.mc.goldenFingerRungId,
   );
-  const assetLedger = assetLedgerSlice(input.bible, castIds, input.prose);
   const plannedNarrative = input.cycle?.beatSheets.find(beat => beat.chapterNumber === input.chapterNumber);
   return {
     chuongSo: input.chapterNumber,
@@ -373,11 +391,6 @@ export function buildExtractorBrief(input: {
     phucButDangMo: input.bible.symbolicCore.openHooks
       .filter(hook => hook.status !== 'paid' && hook.status !== 'dropped')
       .map(hook => ({ id: hook.id, noiDung: hook.what })),
-    soTaiSanDauChuong: assetLedger,
-    chuSoHuuTaiSanDaBiet: [
-      ...input.bible.castSheet.map(entry => ({ id: entry.id, ten: entry.name })),
-      ...input.premise.worldKernel.worlds.flatMap(world => world.factions.map(faction => ({ id: faction.id, ten: faction.name }))),
-    ],
     narrativeFoundation: input.premise.narrativeFoundation ?? null,
     bangChungNarrativeTheoBeat: plannedNarrative ? {
       factIds: plannedNarrative.revealsFactIds,

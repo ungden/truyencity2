@@ -1,10 +1,10 @@
 import { readFileSync } from 'node:fs';
 import {
-  PremiseSchema, CyclePlanSchema, scorecardAverage, type ChapterDigest,
+  assertSerialLaunchable, PremiseSchema, CyclePlanSchema, scorecardAverage, type ChapterDigest,
 } from '@/services/serial/contracts';
 import {
   applyDigest, assertBibleCoherence, assertCycleAssetCoherence, assertPayoffRotation, assertStanceHeld, overdueHooks, progressionRankIndex,
-  rebuildBibleFromDigests, recentPayoffKinds, seedBible, SerialStateError,
+  rebuildBibleFromDigests, recentPayoffKinds, sanitizeDigest, seedBible, SerialStateError,
 } from '@/services/serial/state';
 import { WRITER_SYSTEM_PROMPT, CYCLE_PLANNER_SYSTEM_PROMPT, JUDGE_SYSTEM_PROMPT, PREMISE_SYSTEM_PROMPT } from '@/services/serial/prompts';
 import { payoffKindIds, activeRules, staleRules } from '@/services/serial/playbook';
@@ -345,7 +345,8 @@ describe('writer prompt encodes the measured Faloo rules', () => {
   test('openings and endings center on what readers want to see', () => {
     expect(WRITER_SYSTEM_PROMPT).toMatch(/việc độc giả muốn thấy tiếp/);
     expect(WRITER_SYSTEM_PROMPT).toMatch(/MỖI CHƯƠNG PHẢI THÊM MỘT THỨ MỚI CÓ TÊN/);
-    expect(WRITER_SYSTEM_PROMPT).toMatch(/phần thưởng sắp mở, khách lớn tìm đến/);
+    expect(WRITER_SYSTEM_PROMPT).toMatch(/phần thưởng hiện tên nhưng chưa mở, khách lớn bước vào/);
+    expect(WRITER_SYSTEM_PROMPT).toMatch(/Không kết bằng suy ngẫm êm/);
     expect(WRITER_SYSTEM_PROMPT).toMatch(/Tối đa ba dòng cho toàn bộ quá khứ/);
   });
 
@@ -360,7 +361,8 @@ describe('writer prompt encodes the measured Faloo rules', () => {
     expect(JUDGE_SYSTEM_PROMPT).toMatch(/chỉ báo lỗi có bằng chứng nguyên văn/);
     expect(JUDGE_SYSTEM_PROMPT).toMatch(/golden_finger_scope/);
     expect(JUDGE_SYSTEM_PROMPT).toMatch(/transaction_contradiction/);
-    expect(JUDGE_SYSTEM_PROMPT).toMatch(/activeLots là hàng còn tồn/);
+    expect(JUDGE_SYSTEM_PROMPT).toMatch(/bangSoLieu là con số đúng của chương/);
+    expect(JUDGE_SYSTEM_PROMPT).toMatch(/không bao giờ vứt chương/);
     expect(JUDGE_SYSTEM_PROMPT).toMatch(/không bao giờ chặn chương/);
   });
 
@@ -490,5 +492,48 @@ describe('broker stance', () => {
       recentCycles: [climax('protagonist'), climax('protagonist'), climax('protagonist')],
     })).not.toThrow();
     expect(() => assertStanceHeld({ stance: 'broker', recentCycles: [climax('protagonist')] })).not.toThrow();
+  });
+});
+
+describe('sanitizing an extractor digest', () => {
+  test('entries the merge would reject are set aside and the rest applies cleanly', () => {
+    const bible = baseBible();
+    const messy = digest({
+      coreChanges: {
+        died: ['khong_ai_ca'],
+        moved: [{ characterId: 'lam_viet', toLocationId: 'dia_diem_bia' }],
+        worldFactsRevealed: [{ id: 'doi_tam_thoi', note: 'Đội Tro Tàn tạm lập.' }],
+        hooksPlanted: [{ id: 'hook_moi', what: 'Tô Vãn hẹn quay lại.', dueByChapter: 3 }],
+        hooksPaid: ['hook_khong_ton_tai'],
+        learnedFinger: ['nguoi_la'],
+        progressionChanges: [{ subjectId: 'lam_viet', systemId: 'tu_tien', trackId: null, toRankId: 'khong_co_cap', toMinorStageId: null, why: 'Đột phá.' }],
+        goldenFingerRungChange: { toRungId: 'thuong_hoi_song_gioi', why: 'Nhảy nấc.' },
+      },
+    });
+    expect(() => applyDigest({ premise, bible, digest: messy })).toThrow(SerialStateError);
+
+    const { digest: clean, dropped } = sanitizeDigest({ premise, bible, digest: messy });
+    expect(dropped.length).toBeGreaterThanOrEqual(7);
+    expect(clean.coreChanges.died).toEqual([]);
+    expect(clean.coreChanges.moved).toEqual([]);
+    expect(clean.coreChanges.worldFactsRevealed).toEqual([]);
+    expect(clean.newNamedThings).toContain('Đội Tro Tàn tạm lập.');
+    expect(clean.coreChanges.hooksPlanted).toEqual([{ id: 'hook_moi', what: 'Tô Vãn hẹn quay lại.', dueByChapter: 13 }]);
+    expect(clean.coreChanges.goldenFingerRungChange).toBeNull();
+    const next = applyDigest({ premise, bible, digest: clean });
+    expect(next.symbolicCore.chapterNumber).toBe(8);
+    expect(next.symbolicCore.openHooks.map(hook => hook.id)).toContain('hook_moi');
+  });
+
+  test('a valid digest passes through untouched', () => {
+    const clean = digest();
+    expect(sanitizeDigest({ premise, bible: baseBible(), digest: clean })).toEqual({ digest: clean, dropped: [] });
+  });
+});
+
+describe('launch gate', () => {
+  test('only the Faloo-shaped premise may start or continue a story', () => {
+    expect(() => assertSerialLaunchable(premise)).not.toThrow();
+    expect(() => assertSerialLaunchable({ ...premise, schemaVersion: 3 })).toThrow(/schemaVersion 2/);
   });
 });

@@ -1,8 +1,14 @@
 # Serial engine
 
-## Narrative Foundation v3 (opt-in)
+## Premise v3 "lived-causality" is retired (2026-09-23)
 
-Premise schema v3 uses `lived-causality-2026-09-21.1` and requires a `narrativeFoundation`. Its cycle schema v2 plans from explicit prerequisites and committed narrative evidence; a cycle may have no customer loop while the story is still living, discovering, or preparing. Premise v2 and cycle v1 retain the legacy contract. Stories are upgraded one at a time after review; the runtime does not auto-convert stored premises.
+Premise schema v3 (`lived-causality-2026-09-21.1`) replaced the craft playbook with rules
+that forbade transactions, ranks, new names and crowds unless earned slowly. Both pilots
+written under it spent ten chapters on inspection forms and never paid their titles'
+promise ([audit](WRITING_SYSTEM_AUDIT_2026-09-23.md)). `assertSerialLaunchable` now refuses
+any premise that is not schema v2 in `serial:operator seed`, `approve` and `serial:run`, and
+the runtime pauses a v3 job before planning or writing. v3 still parses so stored novels
+stay readable; its code is pending deletion.
 
 The replacement for the story factory. It writes web serials in the Faloo mould: short
 cycles of desire and payoff, a golden finger that evolves, named multi-axis progression, and a
@@ -34,6 +40,34 @@ cron */5  →  /api/cron/serial  →  reconcile_serial_jobs  →  runSerialTicks
 | `write` | Writer → Judge → [repair] → [rewrite] → Extractor → merge → commit as a **draft** | `write`, or `publish_cycle` at the cycle's last chapter |
 | `publish_cycle` | For v3, review the exact private cycle against its foundation, checkpoint Bible and complete rolling-plan history; then publish atomically only if the review passes | `plan_cycle`, or `fold_volume` every 10 cycles |
 
+### Numbers belong to the plan
+
+Every quantity that changes hands — goods, price, crystals, stock — is declared by the
+planner in `beatSheets[].ledger` (acquire / transfer / consume). Code prefixes the ids,
+replays the ledger over the current lots and rejects an impossible sale **before any prose
+exists**, costing one planner retry. The Writer receives `bangSoLieu`, lines rendered by
+code, and copies the numbers (inside 【】 in a system lane). At commit the digest's
+`assetEvents` are replaced by the planned ledger; the Extractor no longer counts anything.
+
+This replaced an opening audit that did inventory arithmetic over prose and an extractor
+that reconstructed asset events from it. Together they discarded 93 of 113 pilot chapter
+runs, and because transactions are where arithmetic slips happen, only chapters without
+transactions survived.
+
+### What stops a chapter, and what does not
+
+| Finding | Response |
+|---|---|
+| Plot hole (dead returns, rank regression, impossible place/time, knows too much, contradicts Bible, golden finger overreach) | One targeted repair; if it survives, replan |
+| Number or provenance slip (`transaction_contradiction`, `resource_provenance`) | One targeted repair; if it survives, **commit** — the ledger is the truth |
+| Extractor id the merge cannot absorb | `sanitizeDigest` sets the entry aside (reported in the tick detail); the chapter commits |
+| Low reader-pull score on one chapter or cycle | Steering for the next plan, never a block |
+| Two consecutive cycles averaging below 2.5 on the five pull dimensions | Cycle held private and job paused once; `resume` publishes it |
+
+The opening audit (chapter 4) is an acquiring editor's read: golden finger paid by the end
+of chapter 2, chapters 1–3 end on a reveal or a want, the title's promise paid by chapter 3,
+and — checked in code — at least one 【】 panel in a system lane.
+
 Paid chapter work is checkpointed by completed layer. If Judge, revision, Extractor,
 semantic evidence verification or literary review fails after prose exists, the run stores
 the draft and the last completed artifacts in `draft_artifact`. The next tick resumes at
@@ -59,7 +93,7 @@ Readers never see a partial cycle. Chapters land in `chapters` with
 | `CyclePlan` | `serial_cycles.plan` | Cycle planner |
 | `ChapterDigest`, `JudgeVerdict` | `serial_runs` | Extractor and Judge |
 
-The approved `Premise` is schema v2: the commercial page and an immutable `worldKernel`
+The approved `Premise` is schema v2 — the only launchable version: the commercial page and an immutable `worldKernel`
 travel as one approval package. The kernel holds both worlds, locations, factions,
 progression and grade systems, equivalences, economy loops, launch products, cast paths and
 the four-chapter opening contract.

@@ -3,7 +3,7 @@ import { mergeProviderUsage, type ProviderUsage, type StoryModelProvider } from 
 import { StoryFactoryError } from '@/services/story-factory/contracts';
 import { groundEvidenceSpan } from '@/services/story-factory/validation';
 import {
-  BibleSchema, ChapterDigestSchema, CyclePlanSchema, RollingCyclePlanSchema, scorecardAverage,
+  BibleSchema, ChapterDigestSchema, CyclePlanSchema, HARD_CONTINUITY_KINDS, pullAverage, RollingCyclePlanSchema, scorecardAverage,
   type Bible, type ChapterDigest, type ChapterDraft, type CyclePlan, type JudgeVerdict,
   OpeningAuditSchema, type OpeningAudit, type Premise, type SerialRoutes,
 } from './contracts';
@@ -13,7 +13,8 @@ import {
   buildOpeningAuditBrief, collectSteering, refreshStyleMemory,
 } from './context';
 import {
-  applyDigest, assertBibleCoherence, assertCycleAssetCoherence, assertPayoffRotation, overdueHooks, SerialStateError,
+  applyDigest, assertBibleCoherence, assertCycleAssetCoherence, assertCycleLedger, assertPayoffRotation,
+  normalizeCycleLedger, overdueHooks, sanitizeDigest, SerialStateError,
 } from './state';
 import {
   assertNarrativeDigest, assertNarrativePlan, canonicalizeNarrativeLearnerIds, recoverNarrativeEvidence,
@@ -24,9 +25,13 @@ import type { NarrativeReview } from '@/services/narrative/foundation';
 /**
  * The chapter loop and the cycle lifecycle.
  *
- * A cited contradiction buys one repair. Surviving evidence goes back to planning;
- * regenerating the chapter with the same context does not diagnose the source.
+ * A cited contradiction buys one repair. A plot hole that survives it goes back to
+ * planning; a number that survives it is committed, because numbers belong to the
+ * planned ledger and the prose is only allowed to copy them. Extractor mistakes are
+ * set aside by `sanitizeDigest` instead of rejecting a chapter the judge accepted.
  */
+
+const HARD_KINDS = new Set<string>(HARD_CONTINUITY_KINDS);
 
 export interface ChapterCommitted {
   status: 'committed';
@@ -34,6 +39,8 @@ export interface ChapterCommitted {
   bible: Bible;
   verdict: JudgeVerdict;
   digest: ChapterDigest;
+  /** Extractor entries set aside instead of blocking the chapter. Telemetry only. */
+  mergeNotes: string[];
   attempts: number;
   usages: ProviderUsage[];
   costUsd: number;
@@ -174,12 +181,24 @@ export async function auditFourChapterOpening(input: {
       repair: 'Chỉ giữ tên chương trong trường title và mở thân chương bằng câu truyện đầu tiên.',
     }];
   });
-  const audit = OpeningAuditSchema.parse(formatFindings.length === 0
+  // A system lane whose opening never shows the system has hidden the reader's reward.
+  const panelFindings = input.premise.voiceSheet.showsSystemPanel
+    && !input.chapters.some(chapter => chapter.content.includes('【'))
+    ? [{
+      kind: 'system_panel_missing' as const,
+      chapterNumber: 2,
+      quote: input.chapters[1].content.trim().split(/\r?\n/).filter(Boolean).slice(-1)[0]?.slice(0, 500) ?? input.chapters[1].title,
+      explain: 'Truyện có hệ thống hiện cho độc giả nhưng bốn chương mở đầu không có bảng 【】 nào.',
+      repair: 'Cho thông báo hệ thống, hóa đơn hoặc bảng thăng cấp hiện nguyên văn trong 【】 đúng khoảnh khắc nhận thưởng.',
+    }]
+    : [];
+  const codeFindings = [...formatFindings, ...panelFindings];
+  const audit = OpeningAuditSchema.parse(codeFindings.length === 0
     ? result.value
     : {
       passed: false,
-      summary: `Có ${formatFindings.length} lỗi định dạng tiêu đề xác định bằng code. ${result.value.summary}`,
-      findings: [...formatFindings, ...result.value.findings].slice(0, 12),
+      summary: `Có ${codeFindings.length} lỗi xác định bằng code. ${result.value.summary}`,
+      findings: [...codeFindings, ...result.value.findings].slice(0, 12),
     });
   const usages = [result.usage, ...(narrative ? [narrative.usage] : [])];
   return { audit, narrativeReview: narrative?.review ?? null, usages, costUsd: totalCost(usages) };
@@ -295,14 +314,15 @@ export async function writeOneChapter(input: {
     }
   }
 
-  if (verdict.continuity.length > 0) {
-    const evidence = verdict.continuity.map(finding =>
+  const plotHoles = verdict.continuity.filter(finding => HARD_KINDS.has(finding.kind));
+  if (plotHoles.length > 0) {
+    const evidence = plotHoles.map(finding =>
       `${finding.kind}: ${finding.explain} Quote: ${finding.quote}`
     ).join(' | ');
     return {
       status: 'needs_replan', chapterNumber,
       reason: `Contradiction survived one repair. Reconcile the supplied canon and beat before writing again. ${evidence}`.slice(0, 4_000),
-      findings: verdict.continuity, verdict, attempts, usages, costUsd: totalCost(usages),
+      findings: plotHoles, verdict, attempts, usages, costUsd: totalCost(usages),
     };
   }
 
@@ -319,15 +339,25 @@ export async function writeOneChapter(input: {
       return checkpoint(error, 'extractor', draft, attempts, verdict);
     }
   }
-  const groundDigestEvidence = (digest: ChapterDigest): ChapterDigest => ChapterDigestSchema.parse(canonicalizeNarrativeLearnerIds(bible, {
-    ...digest,
-    narrativeEvidence: digest.narrativeEvidence.map(evidence => ({
-      ...evidence,
-      quote: draft.content.includes(evidence.quote)
-        ? evidence.quote
-        : groundEvidenceSpan(draft.content, evidence.quote) ?? evidence.quote,
-    })),
-  }));
+  const plannedLedger = cycle.beatSheets.find(beat => beat.chapterNumber === chapterNumber)?.ledger ?? [];
+  let mergeNotes: string[] = [];
+  const groundDigestEvidence = (digest: ChapterDigest): ChapterDigest => {
+    const grounded = ChapterDigestSchema.parse(canonicalizeNarrativeLearnerIds(bible, {
+      ...digest,
+      narrativeEvidence: digest.narrativeEvidence.map(evidence => ({
+        ...evidence,
+        quote: draft.content.includes(evidence.quote)
+          ? evidence.quote
+          : groundEvidenceSpan(draft.content, evidence.quote) ?? evidence.quote,
+      })),
+      // The ledger is the plan's, validated before the Writer ran. Whatever the
+      // extractor thought it saw changing hands is not consulted.
+      coreChanges: { ...digest.coreChanges, assetEvents: plannedLedger },
+    }));
+    const sanitized = sanitizeDigest({ premise, bible, digest: grounded });
+    mergeNotes = sanitized.dropped;
+    return ChapterDigestSchema.parse(sanitized.digest);
+  };
   extracted = { ...extracted, value: groundDigestEvidence(extracted.value) };
 
   let nextBible: Bible;
@@ -407,7 +437,7 @@ export async function writeOneChapter(input: {
         status: 'committed',
         chapter: { chapterNumber, title: draft.title, content: draft.content },
         bible: BibleSchema.parse({ ...nextBible, styleMemory: refreshStyleMemory(nextBible, [verdict]) }),
-        verdict, digest: extracted.value, attempts, usages, costUsd: totalCost(usages), inputFingerprint,
+        verdict, digest: extracted.value, mergeNotes, attempts, usages, costUsd: totalCost(usages), inputFingerprint,
       };
     }
     // The prose already passed. Give the cheap extractor one visible, bounded repair
@@ -444,7 +474,7 @@ export async function writeOneChapter(input: {
             status: 'committed',
             chapter: { chapterNumber, title: draft.title, content: draft.content },
             bible: BibleSchema.parse({ ...nextBible, styleMemory: refreshStyleMemory(nextBible, [verdict]) }),
-            verdict, digest: extracted.value, attempts, usages, costUsd: totalCost(usages), inputFingerprint,
+            verdict, digest: extracted.value, mergeNotes, attempts, usages, costUsd: totalCost(usages), inputFingerprint,
           };
         } catch (recoveryError) {
           if (!(recoveryError instanceof SerialStateError)) {
@@ -464,7 +494,7 @@ export async function writeOneChapter(input: {
     status: 'committed',
     chapter: { chapterNumber, title: draft.title, content: draft.content },
     bible: BibleSchema.parse({ ...nextBible, styleMemory: refreshStyleMemory(nextBible, [verdict]) }),
-    verdict, digest: extracted.value, attempts, usages, costUsd: totalCost(usages), inputFingerprint,
+    verdict, digest: extracted.value, mergeNotes, attempts, usages, costUsd: totalCost(usages), inputFingerprint,
   };
 }
 
@@ -507,7 +537,7 @@ export async function planNextCycle(input: {
     provider: input.provider, routes: input.routes, premise: input.premise, plannerBrief, rolling,
   });
   usages.push(first.usage);
-  const firstCycle = planSchema.parse({ ...first.value, editorialNotes: input.editorialNotes ?? [] }) as CyclePlan;
+  const firstCycle = normalizeCycleLedger(planSchema.parse({ ...first.value, editorialNotes: input.editorialNotes ?? [] }) as CyclePlan);
   const assertPlan = (candidate: CyclePlan): void => {
     if (candidate.beatSheets[0]?.chapterNumber !== input.startChapter) {
       throw new SerialStateError(
@@ -560,6 +590,7 @@ export async function planNextCycle(input: {
     if (!input.activeCycle) {
       assertPayoffRotation(input.previousCycle, candidate);
       assertCycleAssetCoherence(input.bible, candidate, input.startChapter);
+      assertCycleLedger(input.bible, candidate, input.startChapter);
       assertNarrativePlan(input.premise, input.bible, candidate);
     } else {
       const merged = CyclePlanSchema.parse({
@@ -568,6 +599,7 @@ export async function planNextCycle(input: {
         editorialNotes: input.editorialNotes ?? [],
       });
       assertCycleAssetCoherence(input.bible, merged, input.startChapter);
+      assertCycleLedger(input.bible, merged, input.startChapter);
       assertNarrativePlan(input.premise, input.bible, merged);
     }
   };
@@ -583,7 +615,7 @@ export async function planNextCycle(input: {
       rolling,
     });
     usages.push(retry.usage);
-    const retryCycle = planSchema.parse({ ...retry.value, editorialNotes: input.editorialNotes ?? [] }) as CyclePlan;
+    const retryCycle = normalizeCycleLedger(planSchema.parse({ ...retry.value, editorialNotes: input.editorialNotes ?? [] }) as CyclePlan);
     assertPlan(retryCycle);
     return { cycle: retryCycle, usages, costUsd: totalCost(usages) };
   }
@@ -646,4 +678,21 @@ export function readingHealth(verdicts: JudgeVerdict[]): {
   const average = verdicts.reduce((sum, verdict) => sum + scorecardAverage(verdict), 0) / verdicts.length;
   const weakest = totals.reduce((low, item) => (item.total < low.total ? item : low), totals[0]);
   return { chapters: verdicts.length, average: Number(average.toFixed(2)), weakest: weakest.key };
+}
+
+/**
+ * Below this average reader-pull score (opening, anticipation, payoff, newness, end
+ * hook), a cycle reads like the September pilots: competent, and nothing to come back
+ * for. One weak cycle is steering; two in a row is a story a person should read before
+ * any more of it is published.
+ */
+export const LOW_PULL_THRESHOLD = 2.5;
+
+export function cyclePull(verdicts: JudgeVerdict[]): number | null {
+  if (verdicts.length === 0) return null;
+  return Number((verdicts.reduce((sum, verdict) => sum + pullAverage(verdict), 0) / verdicts.length).toFixed(2));
+}
+
+export function lowPullStreak(current: number | null, previous: number | null): boolean {
+  return current !== null && previous !== null && current < LOW_PULL_THRESHOLD && previous < LOW_PULL_THRESHOLD;
 }

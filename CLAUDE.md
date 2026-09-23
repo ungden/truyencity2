@@ -29,8 +29,11 @@ add validators or rules to it.
 
 `src/services/serial/` is the replacement, built 2026-09-19. Read
 [docs/SERIAL_ENGINE.md](docs/SERIAL_ENGINE.md) before touching it, and
-[docs/REDESIGN_PLAN.md](docs/REDESIGN_PLAN.md) for why it exists. It has not written a
-chapter yet; `SERIAL_ENGINE_ENABLED` is unset.
+[docs/REDESIGN_PLAN.md](docs/REDESIGN_PLAN.md) for why it exists. Its first two pilots
+(20 chapters, premise v3 "lived-causality") read as inspection logs, not 爽文 — see
+[docs/WRITING_SYSTEM_AUDIT_2026-09-23.md](docs/WRITING_SYSTEM_AUDIT_2026-09-23.md). v3 is
+retired; only schema v2 premises launch, numbers are owned by the planned ledger, and
+arithmetic never discards a chapter. `SERIAL_ENGINE_ENABLED` is unset.
 
 ## The writing system (incumbent)
 
@@ -110,7 +113,7 @@ and a silent production stall.
 
 ```bash
 npm run typecheck
-npm test                 # 329
+npm test                 # 447
 npm run security:secrets
 ```
 

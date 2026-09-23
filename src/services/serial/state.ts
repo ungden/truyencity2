@@ -174,6 +174,209 @@ function applyAssetEvents(input: {
   return { lots: [...lots.values()], recentEvents: recorded.slice(-120) };
 }
 
+/**
+ * Give every planned ledger event the chapter prefix the merge requires, and follow
+ * the rename into later references inside the same window. A planner that writes
+ * `ban_dan_1` instead of `c8_ban_dan_1` has not made a story mistake.
+ */
+export function normalizeCycleLedger(cycle: CyclePlan): CyclePlan {
+  const renamed = new Map<string, string>();
+  return {
+    ...cycle,
+    beatSheets: cycle.beatSheets.map(beat => ({
+      ...beat,
+      ledger: (beat.ledger ?? []).map(event => {
+        const prefix = `c${beat.chapterNumber}_`;
+        const eventId = event.eventId.startsWith(prefix)
+          ? event.eventId
+          : `${prefix}${event.eventId.replace(/^c\d+_/, '')}`.slice(0, 64);
+        if (eventId !== event.eventId) renamed.set(event.eventId, eventId);
+        const sourceLotId = event.sourceLotId ? renamed.get(event.sourceLotId) ?? event.sourceLotId : null;
+        return { ...event, eventId, sourceLotId };
+      }),
+    })),
+  };
+}
+
+/**
+ * Replay the planned ledger from `fromChapter` on top of the current lots. This is the
+ * only arithmetic check in the engine, and it runs before a single word is written: an
+ * impossible sale costs one planner retry, never a chapter.
+ */
+export function assertCycleLedger(bible: Bible, cycle: CyclePlan, fromChapter: number): void {
+  let lots = bible.symbolicCore.activeAssetLots;
+  let recent = bible.symbolicCore.recentAssetEvents;
+  for (const beat of [...cycle.beatSheets].sort((a, b) => a.chapterNumber - b.chapterNumber)) {
+    if (beat.chapterNumber < fromChapter || (beat.ledger ?? []).length === 0) continue;
+    try {
+      const next = applyAssetEvents({ chapterNumber: beat.chapterNumber, lots, priorEvents: recent, events: beat.ledger ?? [] });
+      lots = next.lots;
+      recent = next.recentEvents;
+    } catch (error) {
+      if (!(error instanceof SerialStateError)) throw error;
+      fail(error.rule, `Sổ giao dịch chương ${beat.chapterNumber}: ${error.message}`);
+    }
+  }
+}
+
+/** The lots a chapter starts from, after the planned ledger of earlier beats in the window. */
+export function lotsBeforeChapter(bible: Bible, cycle: CyclePlan, chapterNumber: number): AssetLot[] {
+  let lots = bible.symbolicCore.activeAssetLots;
+  let recent = bible.symbolicCore.recentAssetEvents;
+  for (const beat of [...cycle.beatSheets].sort((a, b) => a.chapterNumber - b.chapterNumber)) {
+    if (beat.chapterNumber <= bible.symbolicCore.chapterNumber || beat.chapterNumber >= chapterNumber) continue;
+    const next = applyAssetEvents({ chapterNumber: beat.chapterNumber, lots, priorEvents: recent, events: beat.ledger ?? [] });
+    lots = next.lots;
+    recent = next.recentEvents;
+  }
+  return lots;
+}
+
+/**
+ * Keep what the extractor got right and set aside what it got wrong, instead of
+ * rejecting prose a reader already accepted. Every rule the merge enforces is checked
+ * here in the same order; an entry that would break it is dropped with a note. The
+ * merge stays strict, so a sanitized digest is exactly what a replay will accept.
+ */
+export function sanitizeDigest(input: { premise: Premise; bible: Bible; digest: ChapterDigest }): {
+  digest: ChapterDigest;
+  dropped: string[];
+} {
+  const { premise, bible, digest } = input;
+  const dropped: string[] = [];
+  const drop = (note: string) => { dropped.push(note); return false; };
+  const core = bible.symbolicCore;
+  const chapter = digest.chapterNumber;
+  const alive = new Map(core.cast.map(member => [member.id, member.alive]));
+  const locationIds = new Set(premise.worldKernel.worlds.flatMap(world => world.locations.map(location => location.id)));
+  const systems = new Map(premise.worldKernel.progressionSystems.map(system => [system.id, system]));
+  const worldEntityIds = new Set(premise.worldKernel.worlds.flatMap(world => [
+    world.id, ...world.locations.map(location => location.id), ...world.factions.map(faction => faction.id),
+  ]));
+  const validRef = (state: { systemId: string; rankId: string; trackId: string | null; minorStageId: string | null }) => {
+    const system = systems.get(state.systemId);
+    return Boolean(system
+      && system.ranks.some(rank => rank.id === state.rankId)
+      && (!state.trackId || system.tracks.some(track => track.id === state.trackId))
+      && (!state.minorStageId || system.minorStages.some(stage => stage.id === state.minorStageId)));
+  };
+  const changes = digest.coreChanges;
+  const fallbackLocation = core.mc.locationId;
+
+  const newCast = changes.newCast.flatMap(arrival => {
+    if (alive.has(arrival.id)) { drop(`newCast ${arrival.id}: đã có trong cast`); return []; }
+    const locationId = locationIds.has(arrival.locationId) ? arrival.locationId : fallbackLocation;
+    if (locationId !== arrival.locationId) dropped.push(`newCast ${arrival.id}: địa điểm ${arrival.locationId} không có trong canon, đặt tại ${locationId}`);
+    alive.set(arrival.id, true);
+    return [{
+      ...arrival,
+      locationId,
+      startingProgressions: arrival.startingProgressions.filter(state =>
+        validRef(state) || drop(`newCast ${arrival.id}: tiến triển ${state.systemId}/${state.rankId} không hợp lệ`)),
+    }];
+  });
+
+  const died = changes.died.filter(deadId => {
+    if (!alive.has(deadId)) return drop(`died ${deadId}: nhân vật không tồn tại`);
+    if (!alive.get(deadId)) return drop(`died ${deadId}: đã chết từ trước`);
+    alive.set(deadId, false);
+    return true;
+  });
+
+  const knownSubjects = new Set([...alive.keys(), ...premise.worldKernel.progressionSubjects.map(subject => subject.id)]);
+  const progressions = new Map(core.progressions.map(state => [`${state.subjectId}:${state.systemId}:${state.trackId ?? ''}`, state]));
+  for (const arrival of newCast) {
+    for (const state of arrival.startingProgressions) {
+      progressions.set(`${arrival.id}:${state.systemId}:${state.trackId ?? ''}`, { subjectId: arrival.id, ...state });
+    }
+  }
+  const progressionChanges = changes.progressionChanges.filter(change => {
+    const label = `progression ${change.subjectId}/${change.systemId}→${change.toRankId}`;
+    if (!knownSubjects.has(change.subjectId)) return drop(`${label}: chủ thể không tồn tại`);
+    if (alive.get(change.subjectId) === false) return drop(`${label}: nhân vật đã chết`);
+    const system = systems.get(change.systemId);
+    if (!system || !validRef({ ...change, rankId: change.toRankId, minorStageId: change.toMinorStageId })) {
+      return drop(`${label}: id hệ/cấp không có trong canon`);
+    }
+    const nextRank = system.ranks.findIndex(rank => rank.id === change.toRankId);
+    const nextMinor = change.toMinorStageId ? system.minorStages.findIndex(stage => stage.id === change.toMinorStageId) : -1;
+    const key = `${change.subjectId}:${change.systemId}:${change.trackId ?? ''}`;
+    const previous = progressions.get(key);
+    if (previous) {
+      const previousRank = system.ranks.findIndex(rank => rank.id === previous.rankId);
+      if (nextRank < previousRank || nextRank > previousRank + 1) return drop(`${label}: không phải bước kế tiếp`);
+      if (nextRank === previousRank && system.minorStages.length > 0) {
+        const previousMinor = previous.minorStageId ? system.minorStages.findIndex(stage => stage.id === previous.minorStageId) : -1;
+        if (nextMinor < previousMinor || nextMinor > previousMinor + 1) return drop(`${label}: không phải tiểu cảnh kế tiếp`);
+      }
+    } else if (nextRank !== 0 || (system.minorStages.length > 0 && nextMinor > 0)) {
+      return drop(`${label}: phải vào hệ từ cấp đầu`);
+    }
+    progressions.set(key, {
+      subjectId: change.subjectId, systemId: change.systemId, trackId: change.trackId,
+      rankId: change.toRankId, minorStageId: change.toMinorStageId,
+    });
+    return true;
+  });
+
+  let goldenFingerRungChange = changes.goldenFingerRungChange;
+  if (goldenFingerRungChange) {
+    const previous = goldenFingerRungIndex(premise, core.mc.goldenFingerRungId);
+    const next = goldenFingerRungIndex(premise, goldenFingerRungChange.toRungId);
+    if (next !== previous + 1) {
+      dropped.push(`goldenFinger→${goldenFingerRungChange.toRungId}: không phải nấc kế tiếp`);
+      goldenFingerRungChange = null;
+    }
+  }
+
+  const moved = changes.moved.filter(move => {
+    if (!alive.has(move.characterId)) return drop(`moved ${move.characterId}: nhân vật không tồn tại`);
+    if (!alive.get(move.characterId)) return drop(`moved ${move.characterId}: nhân vật đã chết`);
+    if (!locationIds.has(move.toLocationId)) return drop(`moved ${move.characterId}: địa điểm ${move.toLocationId} không có trong canon`);
+    return true;
+  });
+
+  const newNamedThings = [...digest.newNamedThings];
+  const worldFactsRevealed = changes.worldFactsRevealed.filter(fact => {
+    if (worldEntityIds.has(fact.id)) return true;
+    if (newNamedThings.length < 8) newNamedThings.push(fact.note.slice(0, 400));
+    return drop(`worldFact ${fact.id}: không phải thực thể canon, chuyển sang newNamedThings`);
+  });
+
+  const learnedFinger = changes.learnedFinger.filter(learnerId =>
+    alive.has(learnerId) || drop(`learnedFinger ${learnerId}: nhân vật không tồn tại`));
+
+  const openHookIds = new Set(core.openHooks.map(hook => hook.id));
+  const hooksPlanted = changes.hooksPlanted.flatMap(hook => {
+    if (openHookIds.has(hook.id)) { drop(`hook ${hook.id}: đã tồn tại`); return []; }
+    openHookIds.add(hook.id);
+    if (hook.dueByChapter > chapter) return [hook];
+    dropped.push(`hook ${hook.id}: hạn ${hook.dueByChapter} không ở tương lai, dời về chương ${chapter + 5}`);
+    return [{ ...hook, dueByChapter: chapter + 5 }];
+  });
+  const unpaid = new Set([
+    ...core.openHooks.filter(hook => hook.status !== 'paid').map(hook => hook.id),
+    ...hooksPlanted.map(hook => hook.id),
+  ]);
+  const hooksPaid = changes.hooksPaid.filter(hookId => {
+    if (!unpaid.has(hookId)) return drop(`hookPaid ${hookId}: chưa gieo hoặc đã trả`);
+    unpaid.delete(hookId);
+    return true;
+  });
+
+  return {
+    digest: {
+      ...digest,
+      newNamedThings,
+      coreChanges: {
+        ...changes, newCast, died, progressionChanges, goldenFingerRungChange,
+        moved, worldFactsRevealed, learnedFinger, hooksPlanted, hooksPaid,
+      },
+    },
+    dropped,
+  };
+}
+
 export function rebuildBibleFromDigests(input: {
   premise: Premise;
   digests: ChapterDigest[];
