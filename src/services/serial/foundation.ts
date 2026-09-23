@@ -162,10 +162,8 @@ export function assertNarrativeDigest(input: {
 }): void {
   const { premise, bible, digest, prose, cycle } = input;
   const foundation = narrativeFoundation(premise);
-  if (!foundation) {
-    if (digest.narrativeEvidence.length) throw new SerialStateError('legacy_narrative_evidence', 'Legacy stories cannot write lived-causality evidence.');
-    return;
-  }
+  // Non-v3 digests have any volunteered evidence removed by sanitizeDigest first.
+  if (!foundation) return;
   const validIds = new Set([
     ...foundation.facts.map(item => item.id),
     ...foundation.milestones.map(item => item.id),

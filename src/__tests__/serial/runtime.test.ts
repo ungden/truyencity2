@@ -417,6 +417,22 @@ describe('serial runtime', () => {
     expect(rpcCalls.find(call => call.fn === 'publish_serial_cycle')?.args.p_next_stage).toBe('plan_cycle');
   });
 
+  test('a tick without time for the Writer defers without opening a run or counting a failure', async () => {
+    const { db, writes } = fakeDb({
+      rows: {
+        serial_novels: novelRow(),
+        serial_cycles: { id: 'cy1', plan: cycle(), start_chapter: 8, end_chapter: 16 },
+        serial_runs: null,
+        chapters: null,
+      },
+      rpc: { claim_serial_job: job({ retry_count: 2 }) },
+    });
+    const result = await runSerialTick({ db, provider: unusedProvider, deadline: Date.now() + 5_000 });
+    expect(result.status).toBe('deferred');
+    expect(writes.some(write => write.table === 'serial_runs' && write.op === 'insert')).toBe(false);
+    expect(writes.filter(write => write.table === 'serial_jobs').at(-1)?.value).toMatchObject({ status: 'ready', retry_count: 2 });
+  });
+
   test('a retired lived-causality premise pauses before planning or writing spends anything', async () => {
     for (const stage of ['plan_cycle', 'write'] as const) {
       const { db, writes } = fakeDb({

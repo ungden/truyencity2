@@ -548,13 +548,7 @@ const CyclePlanObjectSchema = z.object({
      */
     ledger: z.array(AssetEventSchema).max(8).optional(),
     endHookKind: z.enum(['threat', 'question', 'declaration', 'opportunity', 'reward', 'reveal']),
-  }).strict().superRefine((beat, ctx) => {
-    if (Boolean(beat.valueContrastId) !== Boolean(beat.valueExperience)) ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: beat.valueContrastId ? ['valueExperience'] : ['valueContrastId'],
-      message: 'A value contrast id and its on-page experience must be planned together.',
-    });
-  })).min(1).max(3),
+  }).strict()).min(1).max(3),
   /** Human/auditor findings carried unchanged into every Writer brief for this replan. */
   editorialNotes: z.array(para).max(8).default([]),
 }).strict();
@@ -626,6 +620,53 @@ function validateCyclePlan(cycle: z.infer<typeof CyclePlanObjectSchema>, ctx: z.
       message: 'The full customer loop must close within the first five chapters of the cycle.',
     });
   }
+}
+
+/**
+ * What the planner model is asked to return: the plan's shape without its cross-field
+ * rules. Chapter spans, loop schedules and paired fields are mechanical; a model that
+ * gets one wrong has not made a story mistake, and rejecting its whole plan for it is
+ * how the old factory lost 46% of its planning runs. `normalizeCyclePlanShape` repairs
+ * those fields in code; only what it cannot repair reaches the strict schema.
+ */
+export const CyclePlanShapeSchema = CyclePlanObjectSchema;
+type CyclePlanShape = z.infer<typeof CyclePlanShapeSchema>;
+
+export function normalizeCyclePlanShape(plan: CyclePlanShape, options: { rolling: boolean }): CyclePlanShape {
+  const start = plan.startChapter;
+  let end = plan.plannedEndChapter;
+  if (!options.rolling) end = Math.min(Math.max(end, start + 4), start + 14);
+  const first = plan.beatSheets[0]?.chapterNumber ?? start;
+  const beatSheets = plan.beatSheets
+    .map((beat, index) => {
+      const paired = Boolean(beat.valueContrastId) && Boolean(beat.valueExperience);
+      return {
+        ...beat,
+        chapterNumber: first + index,
+        valueContrastId: paired ? beat.valueContrastId : null,
+        valueExperience: paired ? beat.valueExperience : null,
+      };
+    })
+    .filter((beat, index) => index === 0 || beat.chapterNumber <= end);
+  end = Math.max(end, beatSheets[0]?.chapterNumber ?? end);
+  let customerLoop = plan.customerLoop;
+  if (customerLoop && !options.rolling) {
+    const { purchaseChapter, useToEarnChapter, publicProofChapter, returnUpgradeChapter } = customerLoop.schedule;
+    const ordered = [purchaseChapter, useToEarnChapter, publicProofChapter, returnUpgradeChapter];
+    const valid = ordered.every((chapter, index) => index === 0 || chapter > ordered[index - 1])
+      && purchaseChapter >= start && purchaseChapter <= start + 1
+      && returnUpgradeChapter <= Math.min(end, start + 4);
+    if (!valid) customerLoop = {
+      ...customerLoop,
+      schedule: {
+        purchaseChapter: start,
+        useToEarnChapter: start + 1,
+        publicProofChapter: start + 2,
+        returnUpgradeChapter: Math.min(start + 3, end),
+      },
+    };
+  }
+  return { ...plan, plannedEndChapter: end, beatSheets, customerLoop };
 }
 
 /** Durable cycle contract. A new cycle owns a five-to-fifteen chapter promise. */

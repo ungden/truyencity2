@@ -82,6 +82,8 @@ next one fail CI:
 | `premiseLint` in `assertSerialLaunchable` | An opening ledger written as accounting, a hook that postpones the promise, fewer than 6 rungs |
 | `processProseFindings` (code, per chapter) | Bookkeeping/inspection prose above 14 words per 1,000 — sent to the one repair |
 | `metaLeakFindings` (code, per chapter) | Brief vocabulary ("thứ mới có tên", "ở chương 2") in the story |
+| `normalizeCyclePlanShape` | A whole plan rejected for a mechanical field (span, loop schedule, unpaired ids) — repaired in code |
+| Deadline guards (`assertTimeFor`) | A paid call cut off by the function ceiling |
 
 `serial:run` runs the chapter-four opening audit and reports `processDensity` per chapter,
 so a pilot tests the same gates as a launch.
@@ -266,10 +268,13 @@ CRON_SECRET                    # same secret as every other cron
 NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, GEMINI_API_KEY, OPENAI_API_KEY
 ```
 
-`maxDuration` on `/api/cron/serial` is 300s, the ceiling without Fluid compute. A chapter is
-a write, a judge and an extract — roughly 150s — so it fits, and the tick loop refuses to
-start a stage it cannot finish. Enabling Fluid on the Vercel project allows raising it to
-800s, at which point the same code simply drains more stages per invocation.
+`maxDuration` on `/api/cron/serial` is 300s. The cron hands the engine a deadline
+(start + 285s) and **no paid call starts without the time to finish it** (Writer 180s,
+Judge/Extractor 120s, Planner 200s, plus 10s headroom). When time runs short the finished
+layers are checkpointed, the job goes back to `ready` without counting a failure, and the
+next tick resumes at that layer — a draft is never bought twice. A plan that fails
+validation with no time left for its retry stores the correction as `PLAN_RETRY:` in
+`last_error`; the next tick's first planner call fixes it. Fluid compute is not required.
 
 ## Status
 

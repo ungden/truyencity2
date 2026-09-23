@@ -1,7 +1,6 @@
 import type { StoryModelProvider, ProviderUsage } from '@/services/story-factory/provider';
 import {
-  ChapterDigestSchema, ChapterDraftSchema, CyclePlanSchema, JudgeProviderVerdictSchema, OpeningAuditProviderSchema, PremiseSchema,
-  RollingCyclePlanSchema,
+  ChapterDigestSchema, ChapterDraftSchema, CyclePlanShapeSchema, JudgeProviderVerdictSchema, OpeningAuditProviderSchema, PremiseSchema,
   type ChapterDigest, type ChapterDraft, type CyclePlan, type JudgeVerdict, type OpeningAudit, type Premise,
   type SerialRoutes,
 } from './contracts';
@@ -179,7 +178,7 @@ export async function planCycle(input: {
     model: input.routes.planner,
     system: serialSystemPrompt('planner', input.premise),
     prompt: brief(input.plannerBrief),
-    schema: input.rolling ? RollingCyclePlanSchema : CyclePlanSchema,
+    schema: CyclePlanShapeSchema,
     temperature: 0.8,
     timeoutMs: PLANNER_TIMEOUT_MS,
   });

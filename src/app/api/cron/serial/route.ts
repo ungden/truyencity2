@@ -4,10 +4,9 @@ import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import { isSerialEnabled, runSerialTicks, TICK_BUDGET_MS } from '@/services/serial';
 
 /**
- * 300s is the Vercel default ceiling without Fluid compute. A chapter is a write, a
- * judge and an extract — roughly 150s in practice — so it fits, and `runSerialTicks`
- * stops starting stages it cannot finish. Raise this to 800 once Fluid is enabled on
- * the project and the engine will simply drain more stages per invocation.
+ * 300s is the Vercel ceiling without Fluid compute. The engine is handed the deadline and
+ * never starts a paid call it cannot finish before it: completed layers are checkpointed
+ * and the next tick resumes there, so a slow planner or a repair costs time, not money.
  */
 export const maxDuration = 300;
 export const dynamic = 'force-dynamic';
@@ -33,6 +32,8 @@ export async function GET(request: NextRequest) {
       db,
       budgetMs: Math.min(TICK_BUDGET_MS, maxDuration * 1_000 - 40_000),
       owner: `serial-cron-${startedAt}`,
+      // Leave room to write the checkpoint and the HTTP response after the last call.
+      deadline: startedAt + maxDuration * 1_000 - 15_000,
     });
     return NextResponse.json({
       status: 'ok',

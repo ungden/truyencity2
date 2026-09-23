@@ -10,9 +10,10 @@ import {
 } from './contracts';
 import { SERIAL_PROMPT_VERSION } from './prompts';
 import {
-  auditFourChapterOpening, cyclePull, foldVolume, lowPullStreak, LOW_PULL_THRESHOLD, planNextCycle,
-  SerialCheckpointError, writeOneChapter, type ChapterOutcome, type SerialDraftCheckpoint,
+  assertTimeFor, auditFourChapterOpening, cyclePull, foldVolume, lowPullStreak, LOW_PULL_THRESHOLD, planNextCycle,
+  SerialCheckpointError, SerialDeadlineError, writeOneChapter, type ChapterOutcome, type SerialDraftCheckpoint,
 } from './engine';
+import { CHAPTER_TIMEOUT_MS, SUPPORT_TIMEOUT_MS } from './agents';
 import { SerialStateError } from './state';
 import { NarrativeReviewSchema, narrativeReviewGate } from '@/services/narrative/foundation';
 import { reviewNarrativeSequence } from './foundation';
@@ -42,7 +43,10 @@ export function serialFailureDisposition(error: unknown, retryCount: number): 'p
   return retryCount >= 3 ? 'paused' : 'ready';
 }
 
-export const editorialNotesFromError = (value: string | null): string[] => value
+/** A plan that failed validation with no time left for its retry, fixed by the next tick. */
+export const PLAN_RETRY_PREFIX = 'PLAN_RETRY: ';
+
+export const editorialNotesFromError = (value: string | null): string[] => value && !value.startsWith(PLAN_RETRY_PREFIX)
   ? value.split(/\s+\|\s+/).map(note => note.trim().slice(0, 1_200)).filter(Boolean).slice(0, 8)
   : [];
 
@@ -129,7 +133,8 @@ interface SerialNovelRow {
 }
 
 export interface SerialTickResult {
-  status: 'idle' | 'completed' | 'failed';
+  /** deferred: stopped before a paid call it had no time to finish; resumes next tick. */
+  status: 'idle' | 'completed' | 'failed' | 'deferred';
   jobId?: string;
   stage?: SerialStage;
   chapterNumber?: number;
@@ -175,6 +180,17 @@ async function pauseRetiredPremise(db: SupabaseClient, job: SerialJobRow, stage:
   return { status: 'completed', jobId: job.id, stage, detail: reason };
 }
 
+/** Hand the job back for the next tick without counting a failure. */
+async function deferJob(
+  db: SupabaseClient, job: SerialJobRow, stage: SerialStage, error: SerialDeadlineError,
+  patch: Record<string, unknown> = {},
+): Promise<SerialTickResult> {
+  await releaseLease(db, job, {
+    status: 'ready', retry_count: job.retry_count ?? 0, next_run_at: new Date().toISOString(), ...patch,
+  });
+  return { status: 'deferred', jobId: job.id, stage, detail: error.message };
+}
+
 /** Cycle rows carry the Bible as it stood before their first chapter, for a clean rollback. */
 async function openCycle(db: SupabaseClient, input: {
   job: SerialJobRow; novelId: string; cycle: CyclePlan; bible: Bible;
@@ -195,7 +211,7 @@ async function openCycle(db: SupabaseClient, input: {
 }
 
 async function stagePlanCycle(
-  db: SupabaseClient, provider: StoryModelProvider, job: SerialJobRow,
+  db: SupabaseClient, provider: StoryModelProvider, job: SerialJobRow, deadline?: number,
 ): Promise<SerialTickResult> {
   const { premise, bible, routes } = await loadNovel(db, job.serial_novel_id);
   if (premise.schemaVersion !== 2) return pauseRetiredPremise(db, job, 'plan_cycle');
@@ -239,12 +255,29 @@ async function stagePlanCycle(
       startChapter: job.current_chapter + 1,
       fixedEndChapter: extending ? (lastCycle?.end_chapter as number | undefined) : undefined,
       recentVerdicts,
+      deadline,
+      correction: job.last_error?.startsWith(PLAN_RETRY_PREFIX) ? job.last_error.slice(PLAN_RETRY_PREFIX.length) : null,
       editorialNotes: mergeEditorialNotes(
         editorialNotesFromError(job.last_error),
         active?.success ? active.data.editorialNotes : [],
       ),
     });
   } catch (error) {
+    if (error instanceof SerialDeadlineError) {
+      if (error.usages.length) {
+        const saved = await db.from('serial_runs').insert({
+          serial_novel_id: job.serial_novel_id, cycle_id: null, kind: 'plan_cycle', status: 'failed',
+          usage: error.usages, cost_usd: Number(error.usages.reduce((sum, usage) => sum + usage.costUsd, 0).toFixed(6)),
+          route_version: routes.routeVersion, prompt_version: SERIAL_PROMPT_VERSION,
+          error: `Deferred retry: ${error.correction ?? ''}`.slice(0, 2_000),
+          finished_at: new Date().toISOString(),
+        });
+        if (saved.error) throw saved.error;
+      }
+      return deferJob(db, job, 'plan_cycle', error, error.correction
+        ? { last_error: `${PLAN_RETRY_PREFIX}${error.correction}`.slice(0, 2_000) }
+        : {});
+    }
     const evidence = error instanceof StoryFactoryError && error.evidence && typeof error.evidence === 'object'
       ? error.evidence as { usage?: ProviderUsage; issues?: unknown }
       : null;
@@ -303,6 +336,8 @@ async function stagePlanCycle(
 
   await releaseLease(db, job, {
     stage: 'write', status: 'ready', current_cycle_id: cycleId, next_run_at: new Date().toISOString(),
+    // A deferred plan's correction has now been applied; do not feed it to the next plan.
+    ...(job.last_error?.startsWith(PLAN_RETRY_PREFIX) ? { last_error: null } : {}),
   });
 
   return {
@@ -313,7 +348,7 @@ async function stagePlanCycle(
 }
 
 async function stageWrite(
-  db: SupabaseClient, provider: StoryModelProvider, job: SerialJobRow,
+  db: SupabaseClient, provider: StoryModelProvider, job: SerialJobRow, deadline?: number,
 ): Promise<SerialTickResult> {
   if (!job.current_cycle_id) {
     await releaseLease(db, job, { stage: 'plan_cycle', status: 'ready', next_run_at: new Date().toISOString() });
@@ -360,6 +395,13 @@ async function stageWrite(
     .maybeSingle();
   if (checkpointError) throw checkpointError;
   const resumeArtifact = parseDraftCheckpoint((checkpointRow as { draft_artifact?: unknown } | null)?.draft_artifact);
+  // Do not open a run row for a chapter this tick cannot even start.
+  try {
+    assertTimeFor(resumeArtifact ? SUPPORT_TIMEOUT_MS : CHAPTER_TIMEOUT_MS, deadline);
+  } catch (error) {
+    if (error instanceof SerialDeadlineError) return deferJob(db, job, 'write', error);
+    throw error;
+  }
 
   const { data: runRow, error: runError } = await db.from('serial_runs').insert({
     serial_novel_id: job.serial_novel_id, cycle_id: cycle.cycleNumber ? job.current_cycle_id : null,
@@ -375,6 +417,7 @@ async function stageWrite(
       provider, routes, premise, bible, cycle, chapterNumber,
       previousChapter: (previous as { content?: string } | null)?.content ?? null,
       resumeArtifact,
+      deadline,
     });
   } catch (error) {
     if (!(error instanceof SerialCheckpointError)) {
@@ -399,6 +442,10 @@ async function stageWrite(
       error: error.message.slice(0, 4_000), finished_at: new Date().toISOString(),
     }).eq('id', runId);
     if (saved.error) throw saved.error;
+    if (error.underlying instanceof SerialDeadlineError) {
+      const deferred = await deferJob(db, job, 'write', error.underlying);
+      return { ...deferred, chapterNumber, costUsd, detail: `Saved ${error.checkpoint.resumeFrom} checkpoint. ${error.underlying.message}` };
+    }
     const retryCount = (job.retry_count ?? 0) + 1;
     await releaseLease(db, job, {
       status: serialFailureDisposition(error.underlying, retryCount),
@@ -475,6 +522,7 @@ async function stageWrite(
     ];
     let audited: Awaited<ReturnType<typeof auditFourChapterOpening>>;
     try {
+      assertTimeFor(SUPPORT_TIMEOUT_MS, deadline);
       audited = await auditFourChapterOpening({
         provider, routes, premise, chapters, bible,
         startBible: startBible.success ? startBible.data : undefined,
@@ -497,6 +545,10 @@ async function stageWrite(
         finished_at: new Date().toISOString(),
       }).eq('id', runId);
       if (saved.error) throw saved.error;
+      if (error instanceof SerialDeadlineError) {
+        const deferred = await deferJob(db, job, 'write', error);
+        return { ...deferred, chapterNumber, costUsd: failedCost, detail: `Saved literary-review checkpoint. ${error.message}` };
+      }
       const retryCount = (job.retry_count ?? 0) + 1;
       await releaseLease(db, job, {
         status: serialFailureDisposition(error, retryCount), retry_count: retryCount,
@@ -836,6 +888,8 @@ export async function runSerialTick(input: {
   db: SupabaseClient;
   provider?: StoryModelProvider;
   owner?: string;
+  /** Epoch ms after which no paid call may start; the hosting function's ceiling. */
+  deadline?: number;
 }): Promise<SerialTickResult> {
   const { db } = input;
   const provider = input.provider ?? geminiProvider;
@@ -860,13 +914,14 @@ export async function runSerialTick(input: {
 
   try {
     switch (job.stage) {
-      case 'plan_cycle': return await stagePlanCycle(db, provider, job);
-      case 'write': return await stageWrite(db, provider, job);
+      case 'plan_cycle': return await stagePlanCycle(db, provider, job, input.deadline);
+      case 'write': return await stageWrite(db, provider, job, input.deadline);
       case 'publish_cycle': return await stagePublishCycle(db, provider, job);
       case 'fold_volume': return await stageFoldVolume(db, job);
       default: throw new Error(`Unknown serial stage ${String(job.stage)}`);
     }
   } catch (stageError) {
+    if (stageError instanceof SerialDeadlineError) return deferJob(db, job, job.stage, stageError);
     // A malformed contract/key will not heal by rerunning the same paid stage.
     const message = stageError instanceof Error ? stageError.message : String(stageError);
     const evidence = stageError instanceof StoryFactoryError && stageError.evidence && typeof stageError.evidence === 'object'
@@ -894,6 +949,7 @@ export async function runSerialTicks(input: {
   provider?: StoryModelProvider;
   budgetMs?: number;
   owner?: string;
+  deadline?: number;
 }): Promise<{ results: SerialTickResult[]; costUsd: number }> {
   const budget = input.budgetMs ?? TICK_BUDGET_MS;
   const startedAt = Date.now();
@@ -904,11 +960,11 @@ export async function runSerialTicks(input: {
     const elapsed = Date.now() - startedAt;
     if (elapsed + slowest * 1.5 > budget) break;
     const before = Date.now();
-    const result = await runSerialTick({ db: input.db, provider: input.provider, owner: input.owner });
+    const result = await runSerialTick({ db: input.db, provider: input.provider, owner: input.owner, deadline: input.deadline });
     slowest = Math.max(slowest, Date.now() - before);
     if (result.status === 'idle') break;
     results.push(result);
-    if (result.status === 'failed') break;
+    if (result.status === 'failed' || result.status === 'deferred') break;
   }
 
   return { results, costUsd: Number(results.reduce((sum, r) => sum + (r.costUsd ?? 0), 0).toFixed(4)) };

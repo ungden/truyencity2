@@ -1,0 +1,1243 @@
+{
+  "schemaVersion": 2,
+  "lane": "thuc_tinh_toan_dan",
+  "title": "Song Xuyên Mạt Thế: Cửa Hàng Của Ta Bán Công Pháp Tu Tiên",
+  "hook": "Khi cả Đông Hà còn mò mẫm cách tiến hóa, Lâm Việt đã đặt đan dược và bí tịch tu tiên lên kệ bán bằng tinh hạch.",
+  "blurb": "Lâm Việt xuyên tới Thanh Huyền Giới, làm Đan đồ Luyện Khí tầng ba đang bị đuổi khỏi đan phòng. Cùng lúc đó, Song Giới Thương Điếm mở một cửa hàng thật giữa Đông Hà ba tháng sau ngày virus thức tỉnh khiến hung thú, thực vật và con người cùng tiến hóa. Một viên Tịnh Mạch Đan giúp Hứa An hoàn tất thức tỉnh trước cả phố; một quyển Man Ngưu Luyện Thể Quyết khiến Chu Dã, kẻ không có dị năng, bước vào Luyện Khí tầng một. Khách dùng tinh hạch và thịt hung thú mua hàng trên kệ, còn Lâm Việt mang những tài nguyên đã tuyệt tích vì khai thác quá độ về Thanh Huyền Giới. Hắn không truyền đạo miễn phí: hắn bán con đường đi lên, thu mua thành quả của khách rồi dùng từng giao dịch để trở thành Luyện Đan Sư và dựng thương hội lớn nhất hai giới.",
+  "readerFantasy": "Đặt đúng bí tịch, đan dược lên kệ, nhìn khách gọi đúng phẩm cấp rồi tranh mua; mỗi khách mạnh lên lại mang về đơn hàng và tài nguyên lớn hơn.",
+  "presentation": {
+    "coverPath": "/covers/serial-pilots/cua-hang-cong-phap-tu-tien.webp",
+    "tagline": "Công pháp đặt lên kệ, tinh hạch mang tới quầy.",
+    "shortDescription": "Xuyên thành Đan đồ sắp bị đuổi, Lâm Việt mở một cửa hàng thật giữa Đông Hà thời đại tiến hóa. Hắn bán đan dược, bí tịch và pháp khí để thu tinh hạch, thịt hung thú cùng linh thực — những tài nguyên đang trở nên tuyệt tích ở tu tiên giới.",
+    "tags": [
+      "Song Xuyên",
+      "Tu Tiên",
+      "Mạt Thế Tiến Hóa",
+      "Kinh Doanh",
+      "Luyện Đan",
+      "Sảng Văn"
+    ],
+    "sellingPoints": [
+      "Cửa hàng là kim thủ chỉ hữu hình: hàng đặt lên kệ, khách trả giá và tranh mua ngay tại quầy.",
+      "Công pháp bán lấy tiền và tài nguyên; khách hàng tự tu luyện, lập đội, mở võ quán rồi quay lại bằng đơn lớn hơn.",
+      "Tinh hạch, thịt hung thú và linh thực mạt thế trở thành nhiên liệu tăng nghề, luyện đan và dựng thương hội ở tu tiên giới.",
+      "Cảnh giới, nghề nghiệp, phẩm cấp hàng hóa và cấp thương điếm cùng tăng theo những trục độc lập, dễ nhớ và có thành quả nhìn thấy."
+    ]
+  },
+  "goldenFinger": {
+    "name": "Song Giới Thương Điếm",
+    "rule": "Cửa hàng thật nằm tại Đông Hà; cửa sau nối thẳng nơi ở và kho của Lâm Việt tại Thanh Huyền Giới. Toàn bộ cửa hàng và ngưỡng nối là lãnh vực tuyệt đối của Lâm Việt: hành vi thù địch, cưỡng ép vào cửa, trộm hàng và theo dõi đều vô hiệu; hắn có thể trục xuất khách và thu hồi hàng chưa thanh toán. Lâm Việt tự chọn hàng, giá bán và chính sách thu mua.",
+    "scope": "Cửa hàng không tự tạo hàng, truyền kiến thức hay ban sức mạnh. Giá trị đến từ chênh lệch giữa hai giới và hàng Lâm Việt luyện, mua hoặc tổ chức được. Rủi ro bên ngoài vẫn tồn tại nhưng không tạo tuyến chống cướp hay đánh nhau giữ quầy.",
+    "evolution": [
+      {
+        "id": "ke_ban_le",
+        "name": "Kệ bán lẻ",
+        "changesUse": "Niêm yết hàng có tên, phẩm cấp và giá; khách tự chọn rồi thanh toán tại quầy."
+      },
+      {
+        "id": "kho_thu_mua",
+        "name": "Kho thu mua",
+        "changesUse": "Công khai danh mục tinh hạch, thịt hung thú và linh thực cần mua theo giai."
+      },
+      {
+        "id": "don_dat_hang",
+        "name": "Đơn đặt hàng",
+        "changesUse": "Nhận yêu cầu đan dược, bí tịch và pháp khí theo đội hoặc nghề nghiệp."
+      },
+      {
+        "id": "hoi_vien_to_chuc",
+        "name": "Hội viên tổ chức",
+        "changesUse": "Ký giá, hạn mức hàng và quyền ưu tiên riêng cho đội săn, tông môn và thương hội."
+      },
+      {
+        "id": "chi_nhanh",
+        "name": "Chi nhánh",
+        "changesUse": "Mở điểm giao dịch có quản sự tại các thành khác mà không cần Lâm Việt đứng quầy."
+      },
+      {
+        "id": "thuong_hoi_song_gioi",
+        "name": "Thương hội song giới",
+        "changesUse": "Điều phối luyện chế, thu mua và phân phối quy mô hai nền văn minh."
+      }
+    ]
+  },
+  "conflictLadder": {
+    "survival": "Lâm Việt cần tài nguyên luyện đan để giữ thân phận ngoại môn, còn khách Đông Hà cần phương pháp mạnh lên trước hung thú tiến hóa.",
+    "rules": "Đan Các muốn kiểm soát lò và đan phương; Liên minh Đông Hà muốn cấp phép mọi hàng hóa giúp thức tỉnh.",
+    "ideology": "Công pháp là truyền thừa phải khóa trong tông môn hay thương phẩm ai trả đúng giá cũng có thể mua để đổi đời.",
+    "self": "Từ kẻ chỉ muốn thoát bị đuổi, Lâm Việt chủ động chọn trở thành người đặt giá cho con đường tu luyện của cả hai giới."
+  },
+  "hiddenThread": "Virus thức tỉnh và sự cạn kiệt yêu thú tại Thanh Huyền Giới đều để lại cùng một loại đạo văn trong tinh hạch. Ban đầu nó chỉ là ký hiệu người mua dùng để phân loại thuộc tính; khoảng giữa truyện, các lò cổ chứng minh hai tai biến là hai pha của một chu kỳ linh khí nhân tạo, buộc thương hội của Lâm Việt bước vào tuyến chính.",
+  "payoffStance": "mixed",
+  "oppositionEngine": "Mỗi khách mạnh lên làm thay đổi phần chia chiến lợi phẩm ở Đông Hà; mỗi lô tinh hạch và huyết nhục Lâm Việt đưa về cắt lợi nhuận của đan phòng, nhà buôn yêu thú và thế lực giữ bí tịch. Đối thủ xuất hiện vì giao dịch thành công đang lấy mất người mua, nguồn hàng hoặc quyền định giá của họ.",
+  "castSeed": [
+    {
+      "id": "lam_viet",
+      "name": "Lâm Việt",
+      "role": "protagonist",
+      "agenda": "Dùng giao dịch hai giới trở thành Luyện Đan Sư và tự lập thương hội.",
+      "antagonistClass": null,
+      "startLocationId": "kho_lam_viet",
+      "startingProgressions": [
+        {
+          "systemId": "tu_tien",
+          "trackId": null,
+          "rankId": "luyen_khi_3",
+          "minorStageId": null
+        },
+        {
+          "systemId": "nghe_tu_tien",
+          "trackId": "luyen_dan_su",
+          "rankId": "dan_do",
+          "minorStageId": null
+        }
+      ],
+      "milestones": [
+        {
+          "name": "Nhất giai Luyện Đan Sư",
+          "progressionTarget": {
+            "systemId": "nghe_tu_tien",
+            "trackId": "luyen_dan_su",
+            "rankId": "nghe_nhat_giai",
+            "minorStageId": null
+          },
+          "socialResult": "Có tư cách nhận đơn đan dược chính thức ở Thanh Lô Phường."
+        },
+        {
+          "name": "Chủ điểm giao dịch Đông Hà",
+          "progressionTarget": {
+            "systemId": "cap_thuong_diem",
+            "trackId": null,
+            "rankId": "don_dat_hang",
+            "minorStageId": null
+          },
+          "socialResult": "Các đội săn chủ động gửi danh sách mua và hàng thu mua."
+        },
+        {
+          "name": "Chủ thương hội hai giới",
+          "progressionTarget": {
+            "systemId": "cap_thuong_diem",
+            "trackId": null,
+            "rankId": "thuong_hoi_song_gioi",
+            "minorStageId": null
+          },
+          "socialResult": "Đặt tiêu chuẩn phẩm cấp và giao dịch xuyên hai nền văn minh."
+        }
+      ]
+    },
+    {
+      "id": "hua_an",
+      "name": "Hứa An",
+      "role": "ally",
+      "agenda": "Dùng năng lực vừa thức tỉnh để giành vị trí chính thức trong đội trinh sát.",
+      "antagonistClass": null,
+      "startLocationId": "pho_dong_ha",
+      "startingProgressions": [
+        {
+          "systemId": "tien_hoa_mat_the",
+          "trackId": null,
+          "rankId": "nhat_giai",
+          "minorStageId": "so_ky"
+        }
+      ],
+      "milestones": [
+        {
+          "name": "Lôi hệ Nhất giai trung kỳ",
+          "progressionTarget": {
+            "systemId": "tien_hoa_mat_the",
+            "trackId": null,
+            "rankId": "nhat_giai",
+            "minorStageId": "trung_ky"
+          },
+          "socialResult": "Được đội trinh sát mời vào tổ tác chiến."
+        },
+        {
+          "name": "Đội phó trinh sát",
+          "progressionTarget": {
+            "systemId": "tien_hoa_mat_the",
+            "trackId": null,
+            "rankId": "nhi_giai",
+            "minorStageId": "so_ky"
+          },
+          "socialResult": "Tự quyết định ngân sách mua đan và phù cho đội."
+        },
+        {
+          "name": "Chủ đội khai hoang",
+          "progressionTarget": {
+            "systemId": "tien_hoa_mat_the",
+            "trackId": null,
+            "rankId": "tam_giai",
+            "minorStageId": "so_ky"
+          },
+          "socialResult": "Nắm khu săn và nguồn tinh hạch riêng."
+        }
+      ]
+    },
+    {
+      "id": "chu_da",
+      "name": "Chu Dã",
+      "role": "ally",
+      "agenda": "Chứng minh người không thức tỉnh dị năng vẫn có thể tu luyện và lập đội riêng.",
+      "antagonistClass": null,
+      "startLocationId": "pho_dong_ha",
+      "startingProgressions": [],
+      "milestones": [
+        {
+          "name": "Luyện Khí tầng một",
+          "progressionTarget": {
+            "systemId": "tu_tien",
+            "trackId": null,
+            "rankId": "luyen_khi_1",
+            "minorStageId": null
+          },
+          "socialResult": "Trở thành người tu công pháp đầu tiên được cả phố chứng kiến."
+        },
+        {
+          "name": "Đội trưởng luyện thể",
+          "progressionTarget": {
+            "systemId": "tu_tien",
+            "trackId": null,
+            "rankId": "luyen_khi_3",
+            "minorStageId": null
+          },
+          "socialResult": "Thu hút những người không dị năng mua bí tịch theo đội."
+        },
+        {
+          "name": "Chủ võ quán Đông Hà",
+          "progressionTarget": {
+            "systemId": "tu_tien",
+            "trackId": null,
+            "rankId": "truc_co",
+            "minorStageId": "so_ky"
+          },
+          "socialResult": "Mở con đường giai cấp mới ngoài hệ thống dị năng."
+        }
+      ]
+    },
+    {
+      "id": "to_van",
+      "name": "Tô Vãn",
+      "role": "authority",
+      "agenda": "Mua được nguồn hàng ổn định để đội thành vệ Đông Hà vượt lên các khu khác.",
+      "antagonistClass": null,
+      "startLocationId": "tram_dong_ha",
+      "startingProgressions": [
+        {
+          "systemId": "tien_hoa_mat_the",
+          "trackId": null,
+          "rankId": "nhi_giai",
+          "minorStageId": "trung_ky"
+        }
+      ],
+      "milestones": [
+        {
+          "name": "Khách tổ chức đầu tiên",
+          "progressionTarget": null,
+          "socialResult": "Ký đơn mua đan và phù cho cả đội thành vệ."
+        },
+        {
+          "name": "Tam giai đỉnh phong",
+          "progressionTarget": {
+            "systemId": "tien_hoa_mat_the",
+            "trackId": null,
+            "rankId": "tam_giai",
+            "minorStageId": "dinh_phong"
+          },
+          "socialResult": "Giành quyền phân phối chiến lợi phẩm khu Đông."
+        },
+        {
+          "name": "Chủ thành Đông Hà",
+          "progressionTarget": {
+            "systemId": "tien_hoa_mat_the",
+            "trackId": null,
+            "rankId": "tu_giai",
+            "minorStageId": "hau_ky"
+          },
+          "socialResult": "Biến hợp đồng với cửa hàng thành chính sách mở thành."
+        }
+      ]
+    },
+    {
+      "id": "han_duoc_su",
+      "name": "Hàn Dược Sư",
+      "role": "authority",
+      "agenda": "Độc quyền nguồn thịt hung thú và tinh hạch sạch để khôi phục tửu lâu linh thiện.",
+      "antagonistClass": null,
+      "startLocationId": "thanh_lo_phuong",
+      "startingProgressions": [
+        {
+          "systemId": "nghe_tu_tien",
+          "trackId": "linh_tru_su",
+          "rankId": "nghe_nhat_giai",
+          "minorStageId": null
+        }
+      ],
+      "milestones": [
+        {
+          "name": "Người mua lô đầu",
+          "progressionTarget": null,
+          "socialResult": "Gọi đúng giai thịt hung thú và đặt hàng ngay tại chợ."
+        },
+        {
+          "name": "Nhị giai Linh Trù Sư",
+          "progressionTarget": {
+            "systemId": "nghe_tu_tien",
+            "trackId": "linh_tru_su",
+            "rankId": "nghe_nhi_giai",
+            "minorStageId": null
+          },
+          "socialResult": "Khôi phục biển hiệu Hàn gia linh thiện."
+        },
+        {
+          "name": "Chủ liên minh linh thiện",
+          "progressionTarget": {
+            "systemId": "nghe_tu_tien",
+            "trackId": "linh_tru_su",
+            "rankId": "nghe_tam_giai",
+            "minorStageId": null
+          },
+          "socialResult": "Trở thành khách mua định kỳ của kho thu mua."
+        }
+      ]
+    },
+    {
+      "id": "cao_nguyen",
+      "name": "Cao Nguyên",
+      "role": "antagonist",
+      "agenda": "Giữ độc quyền tinh hạch và quyền thu phí đội săn ở Đông Hà.",
+      "antagonistClass": "đầu nậu tài nguyên mạt thế",
+      "startLocationId": "cho_tinh_hach",
+      "startingProgressions": [
+        {
+          "systemId": "tien_hoa_mat_the",
+          "trackId": null,
+          "rankId": "nhi_giai",
+          "minorStageId": "hau_ky"
+        }
+      ],
+      "milestones": [
+        {
+          "name": "Ép giá cửa hàng",
+          "progressionTarget": null,
+          "socialResult": "Gom đầu nậu buộc đội săn không bán tinh hạch cho Lâm Việt."
+        },
+        {
+          "name": "Đại lý Tam giai",
+          "progressionTarget": {
+            "systemId": "tien_hoa_mat_the",
+            "trackId": null,
+            "rankId": "tam_giai",
+            "minorStageId": "so_ky"
+          },
+          "socialResult": "Dùng sức mạnh mới tranh hợp đồng tổ chức."
+        },
+        {
+          "name": "Đối tác bất đắc dĩ",
+          "progressionTarget": null,
+          "socialResult": "Phải mua công pháp theo giá niêm yết để giữ người của mình."
+        }
+      ]
+    },
+    {
+      "id": "lu_truong_lao",
+      "name": "Lữ Trưởng Lão",
+      "role": "antagonist",
+      "agenda": "Giữ đan phương và nguồn yêu thú trong tay Đan Các ngoại môn.",
+      "antagonistClass": "trưởng lão độc quyền tông môn",
+      "startLocationId": "dan_cac_ngoai_mon",
+      "startingProgressions": [
+        {
+          "systemId": "tu_tien",
+          "trackId": null,
+          "rankId": "truc_co",
+          "minorStageId": "trung_ky"
+        },
+        {
+          "systemId": "nghe_tu_tien",
+          "trackId": "luyen_dan_su",
+          "rankId": "nghe_nhi_giai",
+          "minorStageId": null
+        }
+      ],
+      "milestones": [
+        {
+          "name": "Tịch thu lò đan",
+          "progressionTarget": null,
+          "socialResult": "Buộc Lâm Việt rời hệ thống phân phối của Đan Các."
+        },
+        {
+          "name": "Tranh nguồn tinh hạch",
+          "progressionTarget": {
+            "systemId": "nghe_tu_tien",
+            "trackId": "luyen_dan_su",
+            "rankId": "nghe_tam_giai",
+            "minorStageId": null
+          },
+          "socialResult": "Dựng đan hội cạnh tranh bằng nguồn lực tông môn."
+        },
+        {
+          "name": "Mất quyền định giá",
+          "progressionTarget": null,
+          "socialResult": "Khách hàng công khai chuyển sang tiêu chuẩn của thương hội song giới."
+        }
+      ]
+    }
+  ],
+  "worldKernel": {
+    "worlds": [
+      {
+        "id": "thanh_huyen_gioi",
+        "name": "Thanh Huyền Giới",
+        "civilizationState": "Tu tiên văn minh đã khai thác yêu thú và linh khoáng qua nhiều thế hệ. Bí tịch, lò đan và nghề nghiệp bị tông môn cùng thế gia nắm giữ; huyết nhục hung thú và tinh hạch thuần khiết trở thành tài nguyên hiếm có giá cao.",
+        "locations": [
+          {
+            "id": "kho_lam_viet",
+            "name": "Kho của Lâm Việt",
+            "note": "Kho nhỏ cạnh nơi ở ngoại môn, là đầu bên Thanh Huyền của cửa sau thương điếm."
+          },
+          {
+            "id": "thanh_lo_phuong",
+            "name": "Thanh Lô Phường",
+            "note": "Phường thị dưới chân tông môn, tập trung lò đan, tửu lâu linh thiện và cửa hàng vật liệu."
+          },
+          {
+            "id": "dan_cac_ngoai_mon",
+            "name": "Đan Các Ngoại Môn",
+            "note": "Nơi Đan đồ làm việc và bị kiểm soát bằng tư cách, lò cùng đan phương."
+          }
+        ],
+        "factions": [
+          {
+            "id": "thanh_lo_dan_cac",
+            "name": "Thanh Lô Đan Các",
+            "agenda": "Giữ độc quyền đào tạo Luyện Đan Sư và phân phối đan dược ngoại môn."
+          },
+          {
+            "id": "han_gia_linh_thien",
+            "name": "Hàn Gia Linh Thiện",
+            "agenda": "Khôi phục chuỗi tửu lâu bằng nguyên liệu hung thú ổn định, rõ phẩm cấp."
+          }
+        ]
+      },
+      {
+        "id": "dong_ha_mat_the",
+        "name": "Đông Hà Thức Tỉnh",
+        "civilizationState": "Virus thức tỉnh không tạo zombie mà khiến sinh vật đồng loạt tiến hóa. Điện lưới, logistics và chính quyền liên vùng đứt đoạn; các thành khu giữ được công nghệ cũ nhưng thiếu hệ thống tu luyện, nên dị năng giả và đội săn đang tự đặt luật mới.",
+        "locations": [
+          {
+            "id": "pho_dong_ha",
+            "name": "Phố Thương Điếm Đông Hà",
+            "note": "Dãy phố đông người sống sót, nơi cửa hàng của Lâm Việt mở quầy và mọi phản ứng đều công khai."
+          },
+          {
+            "id": "tram_dong_ha",
+            "name": "Trạm Thành Vệ Đông Hà",
+            "note": "Đầu mối nhiệm vụ, phân phối vật tư và hợp đồng đội săn."
+          },
+          {
+            "id": "cho_tinh_hach",
+            "name": "Chợ Tinh Hạch",
+            "note": "Thị trường đầu nậu mua bán tinh hạch theo giai và thuộc tính."
+          }
+        ],
+        "factions": [
+          {
+            "id": "thanh_ve_dong_ha",
+            "name": "Thành Vệ Đông Hà",
+            "agenda": "Ổn định thành khu và mua năng lực chiến đấu có thể nhân rộng cho cả đội."
+          },
+          {
+            "id": "lien_minh_doi_san",
+            "name": "Liên Minh Đội Săn",
+            "agenda": "Nắm quyền chia bãi săn, tinh hạch và giá vật tư tiến hóa."
+          }
+        ]
+      }
+    ],
+    "progressionSystems": [
+      {
+        "id": "tu_tien",
+        "name": "Cảnh giới Tu Tiên",
+        "kind": "realm",
+        "subjectType": "character",
+        "tracks": [],
+        "ranks": [
+          {
+            "id": "luyen_khi_1",
+            "name": "Luyện Khí tầng một",
+            "note": null
+          },
+          {
+            "id": "luyen_khi_2",
+            "name": "Luyện Khí tầng hai",
+            "note": null
+          },
+          {
+            "id": "luyen_khi_3",
+            "name": "Luyện Khí tầng ba",
+            "note": null
+          },
+          {
+            "id": "luyen_khi_4",
+            "name": "Luyện Khí tầng bốn",
+            "note": null
+          },
+          {
+            "id": "luyen_khi_5",
+            "name": "Luyện Khí tầng năm",
+            "note": null
+          },
+          {
+            "id": "luyen_khi_6",
+            "name": "Luyện Khí tầng sáu",
+            "note": null
+          },
+          {
+            "id": "luyen_khi_7",
+            "name": "Luyện Khí tầng bảy",
+            "note": null
+          },
+          {
+            "id": "luyen_khi_8",
+            "name": "Luyện Khí tầng tám",
+            "note": null
+          },
+          {
+            "id": "luyen_khi_9",
+            "name": "Luyện Khí tầng chín",
+            "note": null
+          },
+          {
+            "id": "truc_co",
+            "name": "Trúc Cơ",
+            "note": null
+          },
+          {
+            "id": "kim_dan",
+            "name": "Kim Đan",
+            "note": null
+          },
+          {
+            "id": "nguyen_anh",
+            "name": "Nguyên Anh",
+            "note": null
+          },
+          {
+            "id": "hoa_than",
+            "name": "Hóa Thần",
+            "note": null
+          },
+          {
+            "id": "luyen_hu",
+            "name": "Luyện Hư",
+            "note": null
+          },
+          {
+            "id": "hop_the",
+            "name": "Hợp Thể",
+            "note": null
+          },
+          {
+            "id": "dai_thua",
+            "name": "Đại Thừa",
+            "note": null
+          }
+        ],
+        "minorStages": [
+          {
+            "id": "so_ky",
+            "name": "Sơ kỳ",
+            "note": null
+          },
+          {
+            "id": "trung_ky",
+            "name": "Trung kỳ",
+            "note": null
+          },
+          {
+            "id": "hau_ky",
+            "name": "Hậu kỳ",
+            "note": null
+          },
+          {
+            "id": "dinh_phong",
+            "name": "Đỉnh phong",
+            "note": null
+          }
+        ]
+      },
+      {
+        "id": "tien_hoa_mat_the",
+        "name": "Cấp Tiến Hóa Mạt Thế",
+        "kind": "ability",
+        "subjectType": "character",
+        "tracks": [],
+        "ranks": [
+          {
+            "id": "nhat_giai",
+            "name": "Nhất giai",
+            "note": null
+          },
+          {
+            "id": "nhi_giai",
+            "name": "Nhị giai",
+            "note": null
+          },
+          {
+            "id": "tam_giai",
+            "name": "Tam giai",
+            "note": null
+          },
+          {
+            "id": "tu_giai",
+            "name": "Tứ giai",
+            "note": null
+          },
+          {
+            "id": "ngu_giai",
+            "name": "Ngũ giai",
+            "note": null
+          },
+          {
+            "id": "luc_giai",
+            "name": "Lục giai",
+            "note": null
+          },
+          {
+            "id": "that_giai",
+            "name": "Thất giai",
+            "note": null
+          },
+          {
+            "id": "bat_giai",
+            "name": "Bát giai",
+            "note": null
+          }
+        ],
+        "minorStages": [
+          {
+            "id": "so_ky",
+            "name": "Sơ kỳ",
+            "note": null
+          },
+          {
+            "id": "trung_ky",
+            "name": "Trung kỳ",
+            "note": null
+          },
+          {
+            "id": "hau_ky",
+            "name": "Hậu kỳ",
+            "note": null
+          },
+          {
+            "id": "dinh_phong",
+            "name": "Đỉnh phong",
+            "note": null
+          }
+        ]
+      },
+      {
+        "id": "nghe_tu_tien",
+        "name": "Nghề Tu Tiên",
+        "kind": "profession",
+        "subjectType": "character",
+        "tracks": [
+          {
+            "id": "luyen_dan_su",
+            "name": "Luyện Đan Sư",
+            "note": null
+          },
+          {
+            "id": "luyen_khi_su",
+            "name": "Luyện Khí Sư",
+            "note": null
+          },
+          {
+            "id": "linh_thuc_su",
+            "name": "Linh Thực Sư",
+            "note": null
+          },
+          {
+            "id": "ngu_thu_su",
+            "name": "Ngự Thú Sư",
+            "note": null
+          },
+          {
+            "id": "linh_tru_su",
+            "name": "Linh Trù Sư",
+            "note": null
+          },
+          {
+            "id": "tran_phap_su",
+            "name": "Trận Pháp Sư",
+            "note": null
+          }
+        ],
+        "ranks": [
+          {
+            "id": "dan_do",
+            "name": "Học đồ",
+            "note": null
+          },
+          {
+            "id": "nghe_nhat_giai",
+            "name": "Nhất giai",
+            "note": null
+          },
+          {
+            "id": "nghe_nhi_giai",
+            "name": "Nhị giai",
+            "note": null
+          },
+          {
+            "id": "nghe_tam_giai",
+            "name": "Tam giai",
+            "note": null
+          },
+          {
+            "id": "nghe_tu_giai",
+            "name": "Tứ giai",
+            "note": null
+          },
+          {
+            "id": "nghe_ngu_giai",
+            "name": "Ngũ giai",
+            "note": null
+          },
+          {
+            "id": "nghe_luc_giai",
+            "name": "Lục giai",
+            "note": null
+          },
+          {
+            "id": "nghe_that_giai",
+            "name": "Thất giai",
+            "note": null
+          },
+          {
+            "id": "nghe_bat_giai",
+            "name": "Bát giai",
+            "note": null
+          }
+        ],
+        "minorStages": []
+      },
+      {
+        "id": "do_thanh_thao",
+        "name": "Độ Thành Thạo",
+        "kind": "ability",
+        "subjectType": "character",
+        "tracks": [
+          {
+            "id": "man_nguu_quyet",
+            "name": "Man Ngưu Luyện Thể Quyết",
+            "note": null
+          }
+        ],
+        "ranks": [
+          {
+            "id": "nhap_mon",
+            "name": "Nhập môn",
+            "note": null
+          },
+          {
+            "id": "thuan_thuc",
+            "name": "Thuần thục",
+            "note": null
+          },
+          {
+            "id": "tieu_thanh",
+            "name": "Tiểu thành",
+            "note": null
+          },
+          {
+            "id": "dai_thanh",
+            "name": "Đại thành",
+            "note": null
+          },
+          {
+            "id": "vien_man",
+            "name": "Viên mãn",
+            "note": null
+          },
+          {
+            "id": "xuat_than_nhap_hoa",
+            "name": "Xuất thần nhập hóa",
+            "note": null
+          }
+        ],
+        "minorStages": []
+      },
+      {
+        "id": "cap_thuong_diem",
+        "name": "Cấp Song Giới Thương Điếm",
+        "kind": "business",
+        "subjectType": "asset",
+        "tracks": [],
+        "ranks": [
+          {
+            "id": "ke_ban_le",
+            "name": "Kệ bán lẻ",
+            "note": null
+          },
+          {
+            "id": "kho_thu_mua",
+            "name": "Kho thu mua",
+            "note": null
+          },
+          {
+            "id": "don_dat_hang",
+            "name": "Đơn đặt hàng",
+            "note": null
+          },
+          {
+            "id": "hoi_vien_to_chuc",
+            "name": "Hội viên tổ chức",
+            "note": null
+          },
+          {
+            "id": "chi_nhanh",
+            "name": "Chi nhánh",
+            "note": null
+          },
+          {
+            "id": "thuong_hoi_song_gioi",
+            "name": "Thương hội song giới",
+            "note": null
+          }
+        ],
+        "minorStages": []
+      }
+    ],
+    "progressionSubjects": [
+      {
+        "id": "song_gioi_thuong_diem",
+        "name": "Song Giới Thương Điếm",
+        "kind": "asset",
+        "startLocationId": "pho_dong_ha",
+        "startingProgressions": [
+          {
+            "systemId": "cap_thuong_diem",
+            "trackId": null,
+            "rankId": "ke_ban_le",
+            "minorStageId": null
+          }
+        ]
+      }
+    ],
+    "gradeSystems": [
+      {
+        "id": "pham_cap_tu_tien",
+        "name": "Phẩm cấp công pháp và vật phẩm",
+        "categories": [
+          "Công pháp",
+          "Đan dược",
+          "Phù lục",
+          "Pháp khí"
+        ],
+        "tiers": [
+          {
+            "id": "vat_pham_nhat_giai",
+            "name": "Nhất giai",
+            "note": null
+          },
+          {
+            "id": "vat_pham_nhi_giai",
+            "name": "Nhị giai",
+            "note": null
+          },
+          {
+            "id": "vat_pham_tam_giai",
+            "name": "Tam giai",
+            "note": null
+          },
+          {
+            "id": "vat_pham_tu_giai",
+            "name": "Tứ giai",
+            "note": null
+          },
+          {
+            "id": "vat_pham_ngu_giai",
+            "name": "Ngũ giai",
+            "note": null
+          },
+          {
+            "id": "vat_pham_luc_giai",
+            "name": "Lục giai",
+            "note": null
+          },
+          {
+            "id": "vat_pham_that_giai",
+            "name": "Thất giai",
+            "note": null
+          },
+          {
+            "id": "vat_pham_bat_giai",
+            "name": "Bát giai",
+            "note": null
+          }
+        ],
+        "qualities": [
+          {
+            "id": "ha_pham",
+            "name": "Hạ phẩm",
+            "note": null
+          },
+          {
+            "id": "trung_pham",
+            "name": "Trung phẩm",
+            "note": null
+          },
+          {
+            "id": "thuong_pham",
+            "name": "Thượng phẩm",
+            "note": null
+          },
+          {
+            "id": "cuc_pham",
+            "name": "Cực phẩm",
+            "note": null
+          }
+        ],
+        "note": "Tên đầy đủ luôn gồm giai và phẩm; người hiểu nghề phải gọi đủ khi thẩm định."
+      },
+      {
+        "id": "tai_nguyen_tien_hoa",
+        "name": "Tài nguyên tiến hóa",
+        "categories": [
+          "Tinh hạch kim",
+          "Tinh hạch mộc",
+          "Tinh hạch thủy",
+          "Tinh hạch hỏa",
+          "Tinh hạch thổ",
+          "Tinh hạch lôi",
+          "Huyết nhục hung thú",
+          "Linh thực tiến hóa"
+        ],
+        "tiers": [
+          {
+            "id": "tai_nguyen_nhat_giai",
+            "name": "Nhất giai",
+            "note": null
+          },
+          {
+            "id": "tai_nguyen_nhi_giai",
+            "name": "Nhị giai",
+            "note": null
+          },
+          {
+            "id": "tai_nguyen_tam_giai",
+            "name": "Tam giai",
+            "note": null
+          },
+          {
+            "id": "tai_nguyen_tu_giai",
+            "name": "Tứ giai",
+            "note": null
+          },
+          {
+            "id": "tai_nguyen_ngu_giai",
+            "name": "Ngũ giai",
+            "note": null
+          },
+          {
+            "id": "tai_nguyen_luc_giai",
+            "name": "Lục giai",
+            "note": null
+          },
+          {
+            "id": "tai_nguyen_that_giai",
+            "name": "Thất giai",
+            "note": null
+          },
+          {
+            "id": "tai_nguyen_bat_giai",
+            "name": "Bát giai",
+            "note": null
+          }
+        ],
+        "qualities": [],
+        "note": "Tinh hạch ghi giai cộng thuộc tính. Thuộc tính mở ứng dụng luyện đan, luyện khí hoặc tu luyện khác nhau; không mặc định tạo tác dụng xấu."
+      }
+    ],
+    "equivalences": [
+      {
+        "leftSystemId": "tu_tien",
+        "leftRankId": "luyen_khi_1",
+        "rightSystemId": "tien_hoa_mat_the",
+        "rightRankId": "nhat_giai",
+        "note": "Chỉ là mốc tham chiếu sức mạnh đầu truyện, không đồng nhất kỹ năng hay con đường tu luyện."
+      },
+      {
+        "leftSystemId": "tu_tien",
+        "leftRankId": "truc_co",
+        "rightSystemId": "tien_hoa_mat_the",
+        "rightRankId": "tam_giai",
+        "note": "Tham chiếu đấu trường thành khu; kết quả còn tùy công pháp, dị năng và trang bị."
+      }
+    ],
+    "economyLoops": [
+      {
+        "id": "tu_tien_sang_mat_the",
+        "name": "Bán đường tu luyện",
+        "fromWorldId": "thanh_huyen_gioi",
+        "toWorldId": "dong_ha_mat_the",
+        "goods": [
+          "Đan dược",
+          "Bí tịch",
+          "Phù lục",
+          "Pháp khí"
+        ],
+        "buyer": "Hứa An, Chu Dã, Thành Vệ Đông Hà và các đội săn mua theo phẩm cấp niêm yết.",
+        "settlement": "Tinh hạch, huyết nhục hung thú, linh thực và vật liệu tiến hóa được cửa hàng ghi nhận trực tiếp.",
+        "reinvestment": "Lâm Việt dùng hàng thu mua để luyện đan, tăng khí huyết, mua lò và đổi tư cách nghề nghiệp ở Thanh Huyền Giới."
+      },
+      {
+        "id": "mat_the_sang_tu_tien",
+        "name": "Tài nguyên hung thú hồi lưu",
+        "fromWorldId": "dong_ha_mat_the",
+        "toWorldId": "thanh_huyen_gioi",
+        "goods": [
+          "Thịt hung thú",
+          "Tinh hạch theo thuộc tính",
+          "Linh thực tiến hóa"
+        ],
+        "buyer": "Hàn Dược Sư, tửu lâu linh thiện, lò đan và Luyện Khí Sư Thanh Lô Phường trả linh thạch hoặc đặt hàng.",
+        "settlement": "Linh thạch ở lại Thanh Huyền Giới, không đổi thẳng sang tiền hiện đại.",
+        "reinvestment": "Linh thạch thuê lò, mua dược liệu, trả công nghề phụ và mở mạng phân phối độc lập khỏi Đan Các."
+      }
+    ],
+    "launchProducts": [
+      {
+        "id": "tinh_mach_dan",
+        "name": "Tịnh Mạch Đan",
+        "category": "Đan dược",
+        "gradeSystemId": "pham_cap_tu_tien",
+        "tierId": "vat_pham_nhat_giai",
+        "qualityId": "ha_pham",
+        "effect": "Ổn định kinh mạch đang bị năng lượng thức tỉnh xung kích, giúp Hứa An hoàn tất quá trình thức tỉnh Lôi hệ.",
+        "targetBuyer": "Người đang thức tỉnh và đội trinh sát Đông Hà.",
+        "introducedChapter": 1
+      },
+      {
+        "id": "man_nguu_luyen_the_quyet",
+        "name": "Man Ngưu Luyện Thể Quyết",
+        "category": "Công pháp",
+        "gradeSystemId": "pham_cap_tu_tien",
+        "tierId": "vat_pham_nhat_giai",
+        "qualityId": "trung_pham",
+        "effect": "Dùng khí huyết hấp thu linh khí để người không có dị năng bước vào Luyện Khí.",
+        "targetBuyer": "Chu Dã và nhóm người không thức tỉnh dị năng.",
+        "introducedChapter": 2
+      },
+      {
+        "id": "thit_thiet_giap_nguu",
+        "name": "Thịt Thiết Giáp Ngưu",
+        "category": "Huyết nhục hung thú",
+        "gradeSystemId": "tai_nguyen_tien_hoa",
+        "tierId": "tai_nguyen_nhat_giai",
+        "qualityId": null,
+        "effect": "Nguyên liệu linh thiện giàu khí huyết đã hiếm tại Thanh Huyền Giới.",
+        "targetBuyer": "Hàn Dược Sư và tửu lâu linh thiện Thanh Lô Phường.",
+        "introducedChapter": 3
+      },
+      {
+        "id": "tinh_hach_hoa_nhat_giai",
+        "name": "Tinh hạch Hỏa hệ Nhất giai",
+        "category": "Tinh hạch hỏa",
+        "gradeSystemId": "tai_nguyen_tien_hoa",
+        "tierId": "tai_nguyen_nhat_giai",
+        "qualityId": null,
+        "effect": "Nhiên liệu sạch cho lò luyện đan và nguyên liệu phối chế đan dược khí huyết.",
+        "targetBuyer": "Luyện Đan Sư và Luyện Khí Sư Thanh Lô Phường.",
+        "introducedChapter": 3
+      }
+    ],
+    "openingContract": [
+      {
+        "chapterNumber": 1,
+        "proves": "Song Giới Thương Điếm là cửa hàng thật, nhận hàng lên kệ và hoàn tất thanh toán bằng tài nguyên mạt thế.",
+        "namedLevelOrGrade": "Tịnh Mạch Đan Nhất giai hạ phẩm; Hứa An Nhất giai sơ kỳ.",
+        "visibleResult": "Hứa An hết co giật, thức tỉnh Lôi Quang trước đám đông và đánh vỡ bia thử.",
+        "witnessReaction": "Người biết đan dược gọi đủ phẩm cấp, đám đông hô giá, hỏi còn bao nhiêu viên và chen tới quầy.",
+        "commercialAction": "Lô đầu bán hết; Hứa An trả tinh hạch và đặt giữ viên tiếp theo cho đồng đội."
+      },
+      {
+        "chapterNumber": 2,
+        "proves": "Bí tịch là thương phẩm có giá, người không dị năng vẫn có con đường tăng cấp bằng giao dịch.",
+        "namedLevelOrGrade": "Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm; Luyện Khí tầng một.",
+        "visibleResult": "Chu Dã vận hành chu thiên đầu tiên và để lại quyền ấn trên bia đo lực.",
+        "witnessReaction": "Nhóm người bị đánh giá không có dị năng gọi tên Luyện Khí tầng một rồi tranh hỏi giá bí tịch.",
+        "commercialAction": "Chu Dã mua bí tịch; những người khác góp tinh hạch đăng ký lô công pháp kế tiếp."
+      },
+      {
+        "chapterNumber": 3,
+        "proves": "Tài nguyên mạt thế có người mua thật ở Thanh Huyền Giới và tạo vốn nghề nghiệp cho Lâm Việt.",
+        "namedLevelOrGrade": "Thịt Thiết Giáp Ngưu Nhất giai; tinh hạch Hỏa hệ Nhất giai.",
+        "visibleResult": "Hàn Dược Sư chế biến một đĩa linh thiện làm khí huyết thực khách tăng rõ trên thạch trụ.",
+        "witnessReaction": "Linh Trù Sư gọi đúng giai, các tửu lâu nâng giá ngay tại sạp và hỏi sản lượng lô sau.",
+        "commercialAction": "Hàn Dược Sư mua trọn thịt, một lò đan đặt tinh hạch Hỏa và trả trước linh thạch."
+      },
+      {
+        "chapterNumber": 4,
+        "proves": "Khách hàng mạnh lên sẽ quay lại bằng đơn hàng tổ chức, còn nghề của main tăng độc lập với cảnh giới.",
+        "namedLevelOrGrade": "Hứa An Nhất giai trung kỳ; Chu Dã Luyện Khí tầng một; mục tiêu Nhất giai Luyện Đan Sư.",
+        "visibleResult": "Hai người cùng đội thành vệ trở lại, trưng kết quả kiểm tra và đặt danh sách mua cho cả đội.",
+        "witnessReaction": "Người mua gọi tên hai hệ cấp khác nhau, đổi cách xưng hô với Lâm Việt và yêu cầu quyền ưu tiên.",
+        "commercialAction": "Tô Vãn ký đơn đầu tiên; Lâm Việt tuyên bố mục tiêu thành điểm giao dịch lớn nhất Đông Hà và thi Nhất giai Luyện Đan Sư."
+      }
+    ],
+    "openingLedger": [
+      {
+        "id": "mo_dau_01_nguon_tinh_mach_dan",
+        "chapterNumber": 1,
+        "kind": "acquisition",
+        "asset": "Tịnh Mạch Đan Nhất giai hạ phẩm",
+        "quantity": "6 viên",
+        "from": "Quầy thanh lý Bách Dược tại Thanh Lô Phường",
+        "to": "Lâm Việt",
+        "consideration": "Lâm Việt dùng hai linh thạch hạ phẩm cuối cùng mua trọn lô có phiếu hàng trước khi mở cửa; đây là hàng mua, không phải cửa hàng tự tạo.",
+        "resultingStatus": "Tồn đầu kỳ của Song Giới Thương Điếm là đúng sáu viên Tịnh Mạch Đan."
+      },
+      {
+        "id": "mo_dau_02_ban_hua_an",
+        "chapterNumber": 1,
+        "kind": "sale",
+        "asset": "Tịnh Mạch Đan Nhất giai hạ phẩm",
+        "quantity": "1 viên",
+        "from": "Song Giới Thương Điếm",
+        "to": "Hứa An",
+        "consideration": "Hứa An trả đúng ba tinh hạch Lôi hệ Nhất giai theo giá niêm yết.",
+        "resultingStatus": "Hứa An sở hữu và dùng một viên; tồn kho Tịnh Mạch Đan còn năm viên."
+      },
+      {
+        "id": "mo_dau_03_ban_thanh_ve",
+        "chapterNumber": 1,
+        "kind": "sale",
+        "asset": "Tịnh Mạch Đan Nhất giai hạ phẩm",
+        "quantity": "5 viên",
+        "from": "Song Giới Thương Điếm",
+        "to": "Tô Vãn đại diện Thành Vệ Đông Hà",
+        "consideration": "Tô Vãn trả đúng mười lăm tinh hạch Nhất giai hỗn hợp, ba viên cho mỗi viên đan.",
+        "resultingStatus": "Lô sáu viên bán hết; cửa hàng nhận tổng cộng mười tám tinh hạch từ hai giao dịch."
+      },
+      {
+        "id": "mo_dau_04_giu_suat_hua_an",
+        "chapterNumber": 1,
+        "kind": "reservation",
+        "asset": "Tịnh Mạch Đan của lô kế tiếp",
+        "quantity": "1 suất",
+        "from": "Song Giới Thương Điếm",
+        "to": "Hứa An",
+        "consideration": "Giữ tên Hứa An ở vị trí đầu danh sách lô sau; chưa thu gì.",
+        "resultingStatus": "Hứa An đứng đầu danh sách lô Tịnh Mạch Đan kế tiếp."
+      },
+      {
+        "id": "mo_dau_05_nguon_bi_tich",
+        "chapterNumber": 2,
+        "kind": "acquisition",
+        "asset": "Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm",
+        "quantity": "1 bản chép được phép bán",
+        "from": "Quầy bí tịch phổ thông Thanh Lô Phường",
+        "to": "Lâm Việt",
+        "consideration": "Lâm Việt dùng một linh thạch hạ phẩm mua bản chép phổ thông có dấu quầy; bí tịch không do cửa hàng tự tạo.",
+        "resultingStatus": "Cửa hàng có đúng một bản sẵn để giao ngay."
+      },
+      {
+        "id": "mo_dau_06_ban_chu_da",
+        "chapterNumber": 2,
+        "kind": "sale",
+        "asset": "Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm",
+        "quantity": "1 bản",
+        "from": "Song Giới Thương Điếm",
+        "to": "Chu Dã",
+        "consideration": "Chu Dã trả đúng bốn tinh hạch Nhất giai của chính mình.",
+        "resultingStatus": "Chu Dã sở hữu bí tịch; tồn bản giao ngay trở về không."
+      },
+      {
+        "id": "mo_dau_07_don_tro_tan",
+        "chapterNumber": 2,
+        "kind": "order",
+        "asset": "Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm",
+        "quantity": "3 bản",
+        "from": "Song Giới Thương Điếm",
+        "to": "Đội Tro Tàn",
+        "consideration": "Ba thành viên góp đủ mười hai tinh hạch Nhất giai, trả trước bốn viên mỗi bản.",
+        "resultingStatus": "Đội Tro Tàn đã trả đủ, chờ nhận ba bản."
+      },
+      {
+        "id": "mo_dau_08_thu_mua_tro_tan",
+        "chapterNumber": 3,
+        "kind": "acquisition",
+        "asset": "Thịt Thiết Giáp Ngưu Nhất giai và tinh hạch Hỏa hệ Nhất giai",
+        "quantity": "6 cân thịt và 5 viên tinh hạch Hỏa",
+        "from": "Đội Tro Tàn, chiến lợi phẩm chuyến săn Thiết Giáp Ngưu",
+        "to": "Lâm Việt",
+        "consideration": "Lâm Việt trả Đội Tro Tàn mười một tinh hạch Nhất giai hỗn hợp: một viên mỗi cân thịt, một viên mỗi tinh hạch Hỏa.",
+        "resultingStatus": "Lâm Việt giữ sáu cân thịt và năm tinh hạch Hỏa để mang sang Thanh Lô Phường."
+      },
+      {
+        "id": "mo_dau_09_ban_nguyen_lieu",
+        "chapterNumber": 3,
+        "kind": "sale",
+        "asset": "Thịt Thiết Giáp Ngưu Nhất giai và tinh hạch Hỏa hệ Nhất giai",
+        "quantity": "6 cân thịt và 5 viên tinh hạch Hỏa",
+        "from": "Lâm Việt",
+        "to": "Hàn Dược Sư và Hỏa Văn Lô",
+        "consideration": "Hàn Dược Sư mua sáu cân thịt, Hỏa Văn Lô mua năm tinh hạch Hỏa, đều bốn linh thạch hạ phẩm mỗi đơn vị.",
+        "resultingStatus": "Lâm Việt thu bốn mươi bốn linh thạch hạ phẩm."
+      },
+      {
+        "id": "mo_dau_10_nhap_ba_bi_tich",
+        "chapterNumber": 3,
+        "kind": "acquisition",
+        "asset": "Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm",
+        "quantity": "3 bản chép được phép bán",
+        "from": "Quầy bí tịch phổ thông Thanh Lô Phường",
+        "to": "Lâm Việt",
+        "consideration": "Lâm Việt dùng ba trong số bốn mươi bốn linh thạch vừa thu để mua ba bản, mỗi bản một linh thạch.",
+        "resultingStatus": "Cửa hàng có đủ ba bản để hoàn tất đơn đã trả trước của Đội Tro Tàn; Lâm Việt còn bốn mươi mốt linh thạch từ lô nguyên liệu."
+      },
+      {
+        "id": "mo_dau_11_giao_don_tro_tan",
+        "chapterNumber": 4,
+        "kind": "settlement",
+        "asset": "Man Ngưu Luyện Thể Quyết Nhất giai trung phẩm",
+        "quantity": "3 bản",
+        "from": "Song Giới Thương Điếm",
+        "to": "Ba thành viên Đội Tro Tàn có tên trên đơn",
+        "consideration": "Giao ba bản đơn đã trả trước, không thu thêm.",
+        "resultingStatus": "Ba thành viên Đội Tro Tàn mỗi người cầm một bản."
+      },
+      {
+        "id": "mo_dau_12_don_thanh_ve",
+        "chapterNumber": 4,
+        "kind": "order",
+        "asset": "Tịnh Mạch Đan Nhất giai hạ phẩm",
+        "quantity": "6 viên",
+        "from": "Song Giới Thương Điếm",
+        "to": "Tô Vãn đại diện Thành Vệ Đông Hà",
+        "consideration": "Ba tinh hạch mỗi viên; Tô Vãn trả trước sáu tinh hạch, phần còn lại trả khi nhận hàng. Suất của Hứa An thành viên đầu tiên.",
+        "resultingStatus": "Thành Vệ Đông Hà là khách tổ chức đầu tiên của cửa hàng."
+      }
+    ]
+  },
+  "arena": "Thanh Huyền Giới cạn tài nguyên yêu thú và Đông Hà thức tỉnh sau đứt gãy văn minh, nối với nhau bằng một cửa hàng thương mại thật.",
+  "novelty": "Công pháp tu tiên được bán như hàng trên kệ; khách mạt thế có đường tăng cấp và địa vị riêng rồi quay lại tạo đơn hàng ngày càng lớn.",
+  "endingDirection": "Lâm Việt biến cửa hàng thành thương hội hai giới, công khai phẩm cấp và nguồn hàng để phá thế độc quyền tu luyện, đồng thời dùng mạng khách hàng đã tự trưởng thành ngăn chu kỳ linh khí nhân tạo nuốt cả hai thế giới.",
+  "voiceSheet": {
+    "pov": "third_limited",
+    "register": "Nam tần thương mại, nhịp nhanh, nhiều thoại mua bán và so giá. Thành quả được đo bằng cấp bậc có tên, đơn hàng, người mua và địa vị mới; khách hàng có tham vọng cùng đường đi lên riêng.",
+    "chapterTitleRule": "Dùng một câu nói hoặc câu nghĩ có thái độ, ưu tiên câu hô giá, gọi phẩm cấp hoặc tuyên bố mục tiêu xuất hiện trong chương.",
+    "showsSystemPanel": true,
+    "reactionRule": "Khi giá trị hoặc cấp bậc được chứng minh, người hiểu nghề phải gọi đúng tên giai, phẩm hoặc cảnh giới; người xung quanh công khai kinh ngạc, hỏi dồn hoặc hô giá, rồi phản ứng phải chuyển thành tranh mua, đặt hàng, mời hợp tác hay đổi cách đối đãi.",
+    "taboos": [
+      "Không biến Lâm Việt thành chúa cứu thế",
+      "Không truyền công pháp miễn phí",
+      "Không có zombie hay thi triều",
+      "Không dùng tác dụng xấu tùy tiện để trì hoãn thành quả",
+      "Không quy linh thạch thẳng thành tiền hiện đại"
+    ]
+  }
+}

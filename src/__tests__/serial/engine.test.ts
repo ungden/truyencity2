@@ -3,7 +3,8 @@ import { metaLeakFindings, type ChapterDigest, type ChapterDraft, type CyclePlan
 import { DEFAULT_SERIAL_ROUTES } from '@/services/serial/routes';
 import {
   auditFourChapterOpening, cyclePull, cycleReadyToClose, foldVolume, LOW_PULL_THRESHOLD, lowPullStreak,
-  planNextCycle, readingHealth, SerialCheckpointError, writeOneChapter,
+  planNextCycle, readingHealth, SerialCheckpointError, SerialDeadlineError, writeOneChapter,
+  type SerialDraftCheckpoint,
 } from '@/services/serial/engine';
 import { normalizeChapterDraft } from '@/services/serial/agents';
 import { assetLedgerSlice, buildCyclePlannerBrief, buildExtractorBrief, buildJudgeBrief, buildWriterBrief, collectSteering, refreshStyleMemory, relevantCast } from '@/services/serial/context';
@@ -753,5 +754,76 @@ describe('code-owned ledger and reader-facing gates', () => {
     expect(lowPullStreak(cyclePull([low]), cyclePull([high]))).toBe(false);
     expect(lowPullStreak(cyclePull([low]), null)).toBe(false);
     expect(LOW_PULL_THRESHOLD).toBe(2.5);
+  });
+});
+
+describe('never start a paid call without time to finish it', () => {
+  const soon = () => Date.now() + 5_000;
+  /** Wrap a stub so the tick's remaining time collapses right after the first paid call. */
+  const exhaustAfterFirstCall = (provider: StoryModelProvider & { calls: string[] }, clock: { deadline: number }) => ({
+    ...provider,
+    async json(args: never) {
+      const result = await (provider.json as (value: never) => Promise<unknown>)(args);
+      clock.deadline = Date.now() + 30_000;
+      return result;
+    },
+  }) as unknown as StoryModelProvider;
+
+  test('a tick too short for the Writer spends nothing', async () => {
+    const provider = stubProvider({ writer: [draft()], judge: [cleanVerdict()], extractor: [goodDigest] });
+    await expect(writeOneChapter({ ...chapterInput(provider), deadline: soon() })).rejects.toBeInstanceOf(SerialDeadlineError);
+    expect(provider.calls).toEqual([]);
+  });
+
+  test('a draft written late in the tick is checkpointed before the judge, then resumed without rewriting', async () => {
+    const provider = stubProvider({ writer: [draft()], judge: [cleanVerdict()], extractor: [goodDigest] });
+    const clock = { deadline: Date.now() + 10 * 60_000 };
+    // A live getter: the compiled object spread would freeze it at its first value.
+    const withClock = <T extends object>(value: T) => Object.defineProperty(value, 'deadline', { get: () => clock.deadline }) as T & { deadline: number };
+    const input = withClock(chapterInput(exhaustAfterFirstCall(provider, clock)));
+    const error = await writeOneChapter(input).catch(caught => caught);
+    expect(error).toBeInstanceOf(SerialCheckpointError);
+    const checkpoint = (error as SerialCheckpointError).checkpoint;
+    expect((error as SerialCheckpointError).underlying).toBeInstanceOf(SerialDeadlineError);
+    expect(checkpoint.resumeFrom).toBe('judge');
+    expect(provider.calls).toEqual(['writer']);
+
+    const resumed = await writeOneChapter({ ...chapterInput(provider), resumeArtifact: checkpoint });
+    expect(resumed.status).toBe('committed');
+    expect(provider.calls).toEqual(['writer', 'judge', 'extractor']);
+  });
+
+  test('a plan that fails validation with no time for its retry hands the correction to the next tick', async () => {
+    const previous = cycle({ cycleNumber: 1, startChapter: 1, plannedEndChapter: 7, climax: { payoffKind: 'nghich_tap' } });
+    const provider = stubProvider({ planner: [cycle({ climax: { payoffKind: 'nghich_tap' } })] });
+    const clock = { deadline: Date.now() + 10 * 60_000 };
+    const planInput = Object.defineProperty({
+      provider: exhaustAfterFirstCall(provider, clock), routes: DEFAULT_SERIAL_ROUTES, premise, bible: baseBible(),
+      previousCycle: previous, cycleNumber: 2, volumeNumber: 1, startChapter: 8, recentVerdicts: [] as JudgeVerdict[],
+    }, 'deadline', { get: () => clock.deadline }) as Parameters<typeof planNextCycle>[0];
+    const error = await planNextCycle(planInput).catch(caught => caught);
+    expect(error).toBeInstanceOf(SerialDeadlineError);
+    expect((error as SerialDeadlineError).correction).toMatch(/payoff kind/);
+    expect((error as SerialDeadlineError).usages).toHaveLength(1);
+    expect(provider.calls).toEqual(['planner']);
+  });
+
+  test('mechanical plan fields are repaired in code instead of costing a retry', async () => {
+    const broken = cycle();
+    const plan = {
+      ...broken,
+      plannedEndChapter: broken.startChapter + 2,
+      customerLoop: { ...broken.customerLoop!, schedule: { purchaseChapter: 8, useToEarnChapter: 8, publicProofChapter: 20, returnUpgradeChapter: 9 } },
+      beatSheets: broken.beatSheets.map(beat => ({ ...beat, valueContrastId: 'thuoc_sang_mat_the', valueExperience: null })),
+    };
+    const provider = stubProvider({ planner: [plan] });
+    const result = await planNextCycle({
+      provider, routes: DEFAULT_SERIAL_ROUTES, premise, bible: baseBible(),
+      previousCycle: null, cycleNumber: 2, volumeNumber: 1, startChapter: 8, recentVerdicts: [],
+    });
+    expect(provider.calls).toEqual(['planner']);
+    expect(result.cycle.plannedEndChapter).toBe(12);
+    expect(result.cycle.customerLoop?.schedule).toEqual({ purchaseChapter: 8, useToEarnChapter: 9, publicProofChapter: 10, returnUpgradeChapter: 11 });
+    expect(result.cycle.beatSheets[0].valueContrastId).toBeNull();
   });
 });

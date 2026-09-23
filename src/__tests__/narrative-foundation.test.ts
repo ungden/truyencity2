@@ -8,7 +8,7 @@ import {
   narrativeCraft,
   narrativeReviewGate,
 } from '@/services/narrative/foundation';
-import { BibleSchema, PremiseSchema, CyclePlanSchema, ChapterDigestSchema, type CyclePlan } from '@/services/serial/contracts';
+import { BibleSchema, PremiseSchema, CyclePlanSchema, ChapterDigestSchema, type CyclePlan, normalizeCyclePlanShape } from '@/services/serial/contracts';
 import {
   assertNarrativeDigest,
   assertNarrativePlan,
@@ -253,10 +253,12 @@ describe('versioned narrative foundation', () => {
       beatSheets: [{ ...withProduct.beatSheets[0], valueContrastId: 'hang_tu_bia' }],
     });
     expect(() => assertNarrativePlan(premise, bible, unknown)).toThrow(/unknown value contrast/i);
-    expect(() => CyclePlanSchema.parse({
+    // An id without its on-page experience is a mechanical slip: repaired in code, not rejected.
+    const unpaired = normalizeCyclePlanShape({
       ...planned,
-      beatSheets: [{ ...planned.beatSheets[0], valueContrastId: 'rau_tuoi_sang_tuong_lai' }],
-    })).toThrow(/experience/i);
+      beatSheets: [{ ...planned.beatSheets[0], valueContrastId: 'rau_tuoi_sang_tuong_lai', valueExperience: null }],
+    }, { rolling: false });
+    expect(unpaired.beatSheets[0]).toMatchObject({ valueContrastId: null, valueExperience: null });
   });
 
   test('Story Factory disables fixed payoff deadlines only for an opted-in profile', () => {

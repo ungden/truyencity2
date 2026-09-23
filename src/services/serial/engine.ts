@@ -3,11 +3,14 @@ import { mergeProviderUsage, type ProviderUsage, type StoryModelProvider } from 
 import { StoryFactoryError } from '@/services/story-factory/contracts';
 import { groundEvidenceSpan } from '@/services/story-factory/validation';
 import {
-  BibleSchema, ChapterDigestSchema, CyclePlanSchema, HARD_CONTINUITY_KINDS, metaLeakFindings, processProseFindings, pullAverage, RollingCyclePlanSchema, scorecardAverage,
+  BibleSchema, ChapterDigestSchema, CyclePlanSchema, CyclePlanShapeSchema, HARD_CONTINUITY_KINDS, normalizeCyclePlanShape, metaLeakFindings, processProseFindings, pullAverage, RollingCyclePlanSchema, scorecardAverage,
   type Bible, type ChapterDigest, type ChapterDraft, type CyclePlan, type JudgeVerdict,
   OpeningAuditSchema, type OpeningAudit, type Premise, type SerialRoutes,
 } from './contracts';
-import { auditOpening, extractDigest, judgeChapter, planCycle, reviseChapter, writeChapter } from './agents';
+import {
+  auditOpening, CHAPTER_TIMEOUT_MS, extractDigest, judgeChapter, planCycle, PLANNER_TIMEOUT_MS, reviseChapter,
+  SUPPORT_TIMEOUT_MS, writeChapter,
+} from './agents';
 import {
   buildCyclePlannerBrief, buildExtractorBrief, buildJudgeBrief, buildWriterBrief,
   buildOpeningAuditBrief, collectSteering, refreshStyleMemory,
@@ -32,6 +35,39 @@ import type { NarrativeReview } from '@/services/narrative/foundation';
  */
 
 const HARD_KINDS = new Set<string>(HARD_CONTINUITY_KINDS);
+
+/**
+ * A paid call is never started without the time to finish it. The function hosting a
+ * tick has a hard ceiling (300s on Vercel); a call cut off by it is paid for and lost.
+ * Instead the engine stops before the call, the finished layers are checkpointed, and
+ * the next tick resumes exactly there. Nothing is bought twice.
+ */
+export class SerialDeadlineError extends Error {
+  constructor(
+    public readonly neededMs: number,
+    public readonly leftMs: number,
+    public readonly usages: ProviderUsage[] = [],
+    /** For planning: the validation message the next tick's planner must fix. */
+    public readonly correction: string | null = null,
+  ) {
+    super(`Deferred to the next tick: the next call needs ${Math.round(neededMs / 1_000)}s, ${Math.max(0, Math.round(leftMs / 1_000))}s remain.`);
+    this.name = 'SerialDeadlineError';
+  }
+}
+
+/** Headroom for the database writes that follow a call. */
+export const DEADLINE_MARGIN_MS = 10_000;
+
+export function assertTimeFor(
+  neededMs: number,
+  deadline: number | undefined,
+  usages: ProviderUsage[] = [],
+  correction: string | null = null,
+): void {
+  if (deadline === undefined) return;
+  const leftMs = deadline - Date.now();
+  if (leftMs < neededMs + DEADLINE_MARGIN_MS) throw new SerialDeadlineError(neededMs, leftMs, usages, correction);
+}
 
 export interface ChapterCommitted {
   status: 'committed';
@@ -213,6 +249,8 @@ export async function writeOneChapter(input: {
   chapterNumber: number;
   previousChapter: string | null;
   resumeArtifact?: SerialDraftCheckpoint | null;
+  /** Epoch ms after which no paid call may start. Omit for no ceiling (CLI, tests). */
+  deadline?: number;
 }): Promise<ChapterOutcome> {
   const { provider, routes, premise, bible, cycle, chapterNumber } = input;
   assertBibleCoherence(premise, bible);
@@ -247,6 +285,7 @@ export async function writeOneChapter(input: {
   };
 
   const judge = async (draft: ChapterDraft): Promise<JudgeVerdict> => {
+    assertTimeFor(SUPPORT_TIMEOUT_MS, input.deadline);
     const result = await judgeChapter({
       provider, routes,
       premise,
@@ -273,12 +312,14 @@ export async function writeOneChapter(input: {
   if (resumed) {
     draft = { title: resumed.chapter.title, content: resumed.chapter.content };
   } else {
+    assertTimeFor(CHAPTER_TIMEOUT_MS, input.deadline);
     const first = await writeChapter({ provider, routes, premise, writerBrief });
     usages.push(first.usage);
     draft = first.value;
   }
   if (resumed?.resumeFrom === 'revision') {
     try {
+      assertTimeFor(CHAPTER_TIMEOUT_MS, input.deadline);
       const repaired = await reviseChapter({
         provider, routes, premise, writerBrief, rejected: draft, findings: verdict?.continuity ?? [],
       });
@@ -298,9 +339,12 @@ export async function writeOneChapter(input: {
     }
   }
 
-  // One targeted repair against the cited passages.
-  if (verdict.continuity.length > 0) {
+  // One targeted repair against the cited passages — only for a first draft that has
+  // not already passed review in an earlier tick.
+  const reviewedEarlier = Boolean(resumed && ['extractor', 'verifier', 'literary_review'].includes(resumed.resumeFrom));
+  if (verdict.continuity.length > 0 && attempts === 1 && !reviewedEarlier) {
     try {
+      assertTimeFor(CHAPTER_TIMEOUT_MS, input.deadline);
       const repaired = await reviseChapter({
         provider, routes, premise, writerBrief, rejected: draft, findings: verdict.continuity,
       });
@@ -335,6 +379,7 @@ export async function writeOneChapter(input: {
     extracted = { value: resumed.digest };
   } else {
     try {
+      assertTimeFor(SUPPORT_TIMEOUT_MS, input.deadline);
       const result = await extractDigest({ provider, routes, premise, extractorBrief });
       usages.push(result.usage);
       extracted = result;
@@ -446,6 +491,7 @@ export async function writeOneChapter(input: {
     // The prose already passed. Give the cheap extractor one visible, bounded repair
     // against the deterministic merge error before throwing away an entire private cycle.
     try {
+      assertTimeFor(SUPPORT_TIMEOUT_MS, input.deadline);
       const repaired = await extractDigest({
         provider, routes,
         premise,
@@ -519,6 +565,9 @@ export async function planNextCycle(input: {
   fixedEndChapter?: number;
   recentVerdicts: JudgeVerdict[];
   editorialNotes?: string[];
+  /** A validation error from the previous tick's plan, fixed on this first attempt. */
+  correction?: string | null;
+  deadline?: number;
 }): Promise<{ cycle: CyclePlan; usages: ProviderUsage[]; costUsd: number }> {
   assertBibleCoherence(input.premise, input.bible);
   const usages: ProviderUsage[] = [];
@@ -536,11 +585,22 @@ export async function planNextCycle(input: {
 
   const rolling = Boolean(input.activeCycle);
   const planSchema = rolling ? RollingCyclePlanSchema : CyclePlanSchema;
+  assertTimeFor(PLANNER_TIMEOUT_MS, input.deadline, [], input.correction ?? null);
   const first = await planCycle({
-    provider: input.provider, routes: input.routes, premise: input.premise, plannerBrief, rolling,
+    provider: input.provider, routes: input.routes, premise: input.premise, rolling,
+    plannerBrief: input.correction ? { ...plannerBrief, loiVuaMacPhai: input.correction } : plannerBrief,
   });
   usages.push(first.usage);
-  const firstCycle = normalizeCycleLedger(planSchema.parse({ ...first.value, editorialNotes: input.editorialNotes ?? [] }) as CyclePlan);
+  // Mechanical fields are repaired in code; anything left over is a story-level problem
+  // the planner gets one chance to fix, like any other validation failure.
+  const toPlan = (value: unknown): CyclePlan => {
+    const shaped = normalizeCyclePlanShape(CyclePlanShapeSchema.parse(value), { rolling });
+    const parsed = planSchema.safeParse({ ...shaped, editorialNotes: input.editorialNotes ?? [] });
+    if (!parsed.success) {
+      throw new SerialStateError('plan_shape', parsed.error.issues.map(issue => `${issue.path.join('.')}: ${issue.message}`).join(' | ').slice(0, 1_500));
+    }
+    return normalizeCycleLedger(parsed.data as CyclePlan);
+  };
   const assertPlan = (candidate: CyclePlan): void => {
     if (candidate.beatSheets[0]?.chapterNumber !== input.startChapter) {
       throw new SerialStateError(
@@ -607,10 +667,13 @@ export async function planNextCycle(input: {
     }
   };
   try {
+    const firstCycle = toPlan(first.value);
     assertPlan(firstCycle);
     return { cycle: firstCycle, usages, costUsd: totalCost(usages) };
   } catch (error) {
     if (!(error instanceof SerialStateError)) throw error;
+    // No room for a second plan in this tick: hand the correction to the next one.
+    assertTimeFor(PLANNER_TIMEOUT_MS, input.deadline, usages, error.message);
     const retry = await planCycle({
       provider: input.provider, routes: input.routes,
       premise: input.premise,
@@ -618,7 +681,7 @@ export async function planNextCycle(input: {
       rolling,
     });
     usages.push(retry.usage);
-    const retryCycle = normalizeCycleLedger(planSchema.parse({ ...retry.value, editorialNotes: input.editorialNotes ?? [] }) as CyclePlan);
+    const retryCycle = toPlan(retry.value);
     assertPlan(retryCycle);
     return { cycle: retryCycle, usages, costUsd: totalCost(usages) };
   }
