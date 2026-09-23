@@ -698,6 +698,10 @@ describe('code-owned ledger and reader-facing gates', () => {
     const [line] = splitLedgerLines([ticket], ticket.toOwnerId ?? undefined).panel;
     expect(line).toMatch(/nhận 1 Phiếu Khảo Hạch Chính Thức$/);
     expect(splitLedgerLines([{ ...ticket, unit: 'tấm' }], ticket.toOwnerId ?? undefined).panel[0]).toMatch(/1 tấm Phiếu Khảo Hạch/);
+    const master = { ...ticket, assetName: 'Thẻ Chủ Lục', unit: 'thẻ chủ' };
+    expect(splitLedgerLines([master], ticket.toOwnerId ?? undefined).panel[0]).toMatch(/nhận 1 Thẻ Chủ Lục$/);
+    const shard = { ...ticket, assetName: 'Thẻ hỏng', unit: 'thẻ chủ' };
+    expect(splitLedgerLines([shard], ticket.toOwnerId ?? undefined).panel[0]).toMatch(/nhận 1 thẻ chủ Thẻ hỏng$/);
   });
 
   test('the committed ledger is the plan, whatever the extractor thought changed hands', async () => {

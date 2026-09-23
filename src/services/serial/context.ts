@@ -78,15 +78,15 @@ const formatQuantity = (value: number): string =>
  * reader sees inside 【】 — the receipt is the reward.
  */
 /**
- * "1 phiếu Phiếu Khảo Hạch", "1 thẻ Thẻ Tên": when the name already opens with its unit,
- * the unit is dropped, or every panel stutters. Compared without case or diacritic folding
- * beyond lower-casing: Vietnamese units are single words.
+ * "1 phiếu Phiếu Khảo Hạch", "1 thẻ chủ Thẻ Chủ Lục": when the name already opens with
+ * its unit (one word or several), the unit is dropped, or every panel stutters.
  */
 function measureWord(unit: string, assetName: string): string {
-  const word = unit.trim();
+  const word = unit.trim().replace(/\s+/g, ' ');
   if (!word) return '';
-  const first = assetName.trim().split(/\s+/)[0] ?? '';
-  return first.toLocaleLowerCase('vi') === word.toLocaleLowerCase('vi') ? '' : `${word} `;
+  const name = assetName.trim().replace(/\s+/g, ' ').toLocaleLowerCase('vi');
+  const lower = word.toLocaleLowerCase('vi');
+  return name === lower || name.startsWith(`${lower} `) ? '' : `${word} `;
 }
 
 export function renderLedgerLines(events: AssetEvent[]): string[] {
