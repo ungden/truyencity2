@@ -19,6 +19,12 @@ import { serialSystemPrompt } from './foundation';
 /** Chapter calls must leave room for a judge call inside the same invocation. */
 export const CHAPTER_TIMEOUT_MS = 180_000;
 export const SUPPORT_TIMEOUT_MS = 120_000;
+/**
+ * The planner now writes every beat's ledger as well as its prose intent, so its output
+ * is the largest of any call. It runs in its own tick (plan_cycle), which leaves room
+ * under the 300s function ceiling that a chapter tick does not have.
+ */
+export const PLANNER_TIMEOUT_MS = 200_000;
 
 const brief = (value: unknown): string => JSON.stringify(value, null, 1);
 
@@ -175,7 +181,7 @@ export async function planCycle(input: {
     prompt: brief(input.plannerBrief),
     schema: input.rolling ? RollingCyclePlanSchema : CyclePlanSchema,
     temperature: 0.8,
-    timeoutMs: SUPPORT_TIMEOUT_MS,
+    timeoutMs: PLANNER_TIMEOUT_MS,
   });
   return { value: result.value, usage: result.usage };
 }
