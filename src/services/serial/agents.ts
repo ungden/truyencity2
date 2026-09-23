@@ -59,6 +59,19 @@ export function reviewBindingMismatch(
     : `excerpt not found (${matched}/${excerptWords} words): ${binding.excerpt.slice(0, 120)}`;
 }
 
+/**
+ * The reader renders plain text: a model's **bold** reached the first published chapter
+ * as literal asterisks. Emphasis markers and heading hashes are removed in code; scene
+ * breaks and 【】 panels are left alone.
+ */
+export function stripMarkdown(content: string): string {
+  return content
+    .replace(/\*\*([^*\n]+?)\*\*/g, '$1')
+    .replace(/__([^_\n]+?)__/g, '$1')
+    .replace(/(^|[\s(“"])\*([^*\s][^*\n]*?[^*\s]|[^*\s])\*(?=[\s).,!?;:”"]|$)/gm, '$1$2')
+    .replace(/^#{1,6}\s+/gm, '');
+}
+
 /** Remove a model-emitted Markdown heading that merely repeats the structured title. */
 export function normalizeChapterDraft(draft: ChapterDraft): ChapterDraft {
   const title = draft.title.replace(/^chương\s+\d+\s*:\s*/iu, '').trim();
@@ -69,7 +82,7 @@ export function normalizeChapterDraft(draft: ChapterDraft): ChapterDraft {
     while (lines.length > 1 && lines[1].trim() === '') lines.splice(1, 1);
     lines.shift();
   }
-  return ChapterDraftSchema.parse({ ...draft, title, content: lines.join('\n').trim() });
+  return ChapterDraftSchema.parse({ ...draft, title, content: stripMarkdown(lines.join('\n')).trim() });
 }
 
 export async function writeChapter(input: {

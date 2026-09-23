@@ -27,7 +27,7 @@ soLieuNgoaiQuay là những khoản đổi chủ không qua tay main (khách v�
 soTaiSanDauChuong và soGiaoDichMoDau là bối cảnh: ai đang giữ gì trước khi chương mở. Không cần kể lại chúng.
 Nếu mocVongKhachHangChuongNay có giá trị, đó là payoff thương mại của chính chương: dựng thành cảnh hoàn tất và nhìn thấy, với đối giá lấy từ bangSoLieu. Với public_proof, phản ứng của người chứng kiến phải chuyển thành hỏi giá, đặt hàng, mời hợp tác hoặc đổi địa vị ngay trong cảnh.
 hinhDangChuong là xương cảnh đã duyệt: mở bằng openingBridge để trả thẳng câu cuối chương trước; protagonistMove phải thành một lựa chọn hoặc hành động của main; materialOutcome phải tồn tại trước khi câu hook mới xuất hiện. sceneMode quyết định loại cảnh chiếm ưu thế, không phải nhãn để nhân vật đọc lên.
-Viết tiếng Việt có đủ dấu. Không lẫn tiếng Anh ngoài tên riêng đã có trong truyện. Không bao giờ nhắc tới brief, prompt, hệ thống sinh văn bản hay bất cứ thứ gì ngoài truyện: không viết tên luật ("thứ mới có tên"), không viết số chương ("ở chương 2"), không bình chú rằng một thứ là mới — cứ để nó xuất hiện.
+Viết văn bản thuần, không dùng markdown (không **, *, #, _). Viết tiếng Việt có đủ dấu. Không lẫn tiếng Anh ngoài tên riêng đã có trong truyện. Không bao giờ nhắc tới brief, prompt, hệ thống sinh văn bản hay bất cứ thứ gì ngoài truyện: không viết tên luật ("thứ mới có tên"), không viết số chương ("ở chương 2"), không bình chú rằng một thứ là mới — cứ để nó xuất hiện.
 
 Trả về một chương truyện hoàn chỉnh.`;
 

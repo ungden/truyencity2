@@ -6,7 +6,7 @@ import {
   planNextCycle, readingHealth, repairOpeningChapters, repairOpeningUntilClean, SerialCheckpointError, SerialDeadlineError, splitOpeningFindings, writeOneChapter,
   type SerialDraftCheckpoint,
 } from '@/services/serial/engine';
-import { normalizeChapterDraft, reviewBindingMismatch } from '@/services/serial/agents';
+import { normalizeChapterDraft, reviewBindingMismatch, stripMarkdown } from '@/services/serial/agents';
 import { assetLedgerSlice, splitLedgerLines, buildCyclePlannerBrief, buildExtractorBrief, buildJudgeBrief, buildWriterBrief, collectSteering, refreshStyleMemory, relevantCast } from '@/services/serial/context';
 import { seedBible } from '@/services/serial/state';
 import { premise, baseBible, cycle } from './fixtures';
@@ -114,6 +114,12 @@ const chapterInput = (provider: StoryModelProvider) => ({
 });
 
 describe('chapter loop', () => {
+  test('markdown emphasis never reaches the reader as literal symbols', () => {
+    expect(stripMarkdown('Trên đó chỉ có một dòng.\n\n**Tịnh Mạch Đan — ba tinh hạch.**\n\n*Thôi xong.*\n\n# Hết'))
+      .toBe('Trên đó chỉ có một dòng.\n\nTịnh Mạch Đan — ba tinh hạch.\n\nThôi xong.\n\nHết');
+    expect(stripMarkdown('【Giao dịch: 3 × 2 viên】 và 5*3 = 15')).toBe('【Giao dịch: 3 × 2 viên】 và 5*3 = 15');
+  });
+
   test('structured title owns the heading and duplicate Markdown is stripped', () => {
     const normalized = normalizeChapterDraft(draft({
       title: '“Đông Hà lớn nhất, ta mới vừa bắt đầu!”',
