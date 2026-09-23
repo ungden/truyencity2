@@ -1,27 +1,13 @@
 {
-  "before": [
+  "passed": false,
+  "summary": "Chương 1–2 trả kim thủ chỉ và lời hứa bán công pháp tốt, móc cuối chương vẫn kéo đọc tiếp. Tuy nhiên, trình tự giao bí tịch bị lặp và tự mâu thuẫn giữa chương 3–4.",
+  "findings": [
     {
       "kind": "timeline",
-      "chapterNumber": 3,
-      "quote": "“Thiết Giáp Ngưu.”\n\nThanh niên cầm dao phay kéo khóa túi ra, mùi máu nóng lập tức tràn khắp cửa hàng.",
-      "explain": "Cuối chương hai, Chu Dã chốt: “Đưa ba bản về đây trước. Sau đó… Đội Tro Tàn đi săn Thiết Giáp Ngưu.” Nhưng mở chương ba, Đội Tro Tàn đã mang chiến lợi phẩm Thiết Giáp Ngưu đến bán, còn bí tịch mãi chương bốn mới được giao.",
-      "repair": "Mở chương ba bằng việc Lâm Việt mang ba bản bí tịch về giao cho Đội Tro Tàn, họ luyện rồi mới đi săn và mang Thiết Giáp Ngưu về; chương bốn không giao lại ba bản lần nữa."
+      "chapterNumber": 4,
+      "quote": "“Đội Tro Tàn, đơn đã trả trước giao trước.”",
+      "explain": "Đầu chương 3, Đội Tro Tàn đã nhận đủ ba bản bí tịch, mang chúng đi săn Thiết Giáp Ngưu. Nhưng chương 4 lại giao đúng ba bản của cùng đơn trả trước lần nữa. Hơn nữa, chương 3 chỉ mua ba bản từ Thanh Huyền sau cảnh giao đầu chương, khiến lần giao đầu xảy ra trước khi có hàng.",
+      "repair": "Chọn một lần giao duy nhất. Hợp lý nhất: bỏ cảnh giao bí tịch ở đầu chương 3, để Đội Tro Tàn nhận hàng ở chương 4 rồi mới đi săn ở chương sau; hoặc giữ cảnh chương 3 và sửa chương 4 thành cảnh họ trở lại báo chiến tích, không giao lại bí tịch."
     }
-  ],
-  "repaired": [
-    3
-  ],
-  "after": {
-    "passed": false,
-    "summary": "Chương 3 và 4 cùng kể một lần giao ba bí tịch cho Đội Tro Tàn, làm thứ tự giao hàng tự mâu thuẫn và khiến mạch chương bốn bị lặp cảnh thay vì đẩy đơn Thành Vệ lên cao trào mới.",
-    "findings": [
-      {
-        "kind": "timeline",
-        "chapterNumber": 4,
-        "quote": "“Đội Tro Tàn, đơn đã trả trước giao trước.”",
-        "explain": "Cảnh này đã diễn ra ngay đầu chương 3: Đội Tro Tàn nhận đủ ba bản, rồi lập tức đi săn Thiết Giáp Ngưu và đem chiến lợi phẩm về bán. Chương 4 lại giao đúng ba bản ấy như lần đầu, trái với diễn tiến đã thấy và làm khách quay lại bị thành giao dịch lặp.",
-        "repair": "Chỉ giữ một lần giao hàng. Nếu cần khớp nhịp hiện tại, giữ việc giao ở chương 3 và đổi đầu chương 4 thành cảnh Đội Tro Tàn mang chiến lợi phẩm/đơn mua mới trở lại; hoặc bỏ cảnh giao ở chương 3, đồng thời viết lại chuyến săn để họ chỉ đi săn sau khi nhận sách ở chương 4."
-      }
-    ]
-  }
+  ]
 }

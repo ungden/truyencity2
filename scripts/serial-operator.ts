@@ -188,12 +188,16 @@ async function repairOpening(): Promise<void> {
   const { local } = splitOpeningFindings(audit);
   console.log(JSON.stringify({ dryRun: !apply, chapters: chapters.map(item => item.chapterNumber), local }, null, 2));
   if (!apply || local.length === 0) return;
-  const repaired = await repairOpeningUntilClean({ provider: geminiProvider, routes, premise, chapters, audit });
-  for (const chapter of repaired.chapters.filter(item => repaired.repaired.includes(item.chapterNumber))) {
-    const saved = await db.from('chapters').update({ title: chapter.title, content: chapter.content, updated_at: new Date().toISOString() })
-      .eq('novel_id', job.data.novel_id).eq('chapter_number', chapter.chapterNumber).eq('publication_state', 'draft');
-    if (saved.error) throw saved.error;
-  }
+  const repaired = await repairOpeningUntilClean({
+    provider: geminiProvider, routes, premise, chapters, audit,
+    onRepaired: async (revised, numbers) => {
+      for (const chapter of revised.filter(item => numbers.includes(item.chapterNumber))) {
+        const saved = await db.from('chapters').update({ title: chapter.title, content: chapter.content, updated_at: new Date().toISOString() })
+          .eq('novel_id', job.data.novel_id).eq('chapter_number', chapter.chapterNumber).eq('publication_state', 'draft');
+        if (saved.error) throw saved.error;
+      }
+    },
+  });
   const noted = await db.from('serial_jobs').update({
     last_error: repaired.audit.passed ? null : `Sau sửa cục bộ vẫn còn: ${repaired.audit.findings.map(item => `Ch.${item.chapterNumber} ${item.kind}`).join(' | ')}`,
   }).eq('id', jobId);

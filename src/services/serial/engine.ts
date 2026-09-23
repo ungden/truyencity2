@@ -301,6 +301,8 @@ export async function repairOpeningUntilClean(input: {
   audit: OpeningAudit;
   maxRounds?: number;
   deadline?: number;
+  /** Persist each round's revisions before the next paid call, so a failure loses nothing. */
+  onRepaired?: (chapters: Array<{ chapterNumber: number; title: string; content: string }>, repaired: number[]) => Promise<void> | void;
 }): Promise<{
   chapters: Array<{ chapterNumber: number; title: string; content: string }>;
   audit: OpeningAudit;
@@ -319,6 +321,7 @@ export async function repairOpeningUntilClean(input: {
     usages.push(...repaired.usages);
     chapters = repaired.chapters;
     rounds.push({ repaired: repaired.repaired, findings: local });
+    await input.onRepaired?.(chapters, repaired.repaired);
     assertTimeFor(SUPPORT_TIMEOUT_MS, input.deadline, usages);
     const again = await auditFourChapterOpening({ provider: input.provider, routes: input.routes, premise: input.premise, chapters });
     usages.push(...again.usages);

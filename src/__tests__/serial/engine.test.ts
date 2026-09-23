@@ -907,10 +907,13 @@ describe('opening repair follows a fix that moved the problem next door', () => 
         { passed: true, summary: 'Sạch.', findings: [] },
       ],
     });
+    const saved: number[][] = [];
     const result = await repairOpeningUntilClean({
       provider, routes: DEFAULT_SERIAL_ROUTES, premise, chapters: opening,
       audit: { passed: false, summary: 'Chương 3 sai trình tự.', findings: [finding(3)] },
+      onRepaired: (_chapters, numbers) => { saved.push(numbers); },
     });
+    expect(saved).toEqual([[3], [4]]);
     expect(provider.calls).toEqual(['writer', 'auditor', 'writer', 'auditor']);
     expect(result.audit.passed).toBe(true);
     expect(result.repaired).toEqual([3, 4]);

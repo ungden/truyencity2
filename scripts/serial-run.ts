@@ -424,18 +424,21 @@ async function main(): Promise<void> {
     writeJson(join(outDir, 'opening-audit.json'), audited.audit);
     // Same path a reviewer takes with `serial:operator repair-opening`: local notes are
     // fixed in place (at most two rounds), then audited again. Structural findings replan.
-    const repaired = await repairOpeningUntilClean({
-      provider, routes: DEFAULT_SERIAL_ROUTES, premise, chapters: writtenChapters.slice(0, 4), audit: audited.audit,
-    });
-    if (repaired.rounds.length) {
-      usages.push(...repaired.usages);
-      for (const chapter of repaired.chapters.filter(item => repaired.repaired.includes(item.chapterNumber))) {
+    const saveRepaired = (repairedChapters: typeof writtenChapters, numbers: number[]) => {
+      for (const chapter of repairedChapters.filter(item => numbers.includes(item.chapterNumber))) {
         const file = join(outDir, `chapter-${String(chapter.chapterNumber).padStart(3, '0')}.md`);
         const original = file.replace(/\.md$/, '.pre-repair.md');
         if (existsSync(file) && !existsSync(original)) renameSync(file, original);
         atomicWrite(file, `# ${chapter.title}\n\n${chapter.content}\n`);
         writtenChapters[chapter.chapterNumber - 1] = chapter;
       }
+    };
+    const repaired = await repairOpeningUntilClean({
+      provider, routes: DEFAULT_SERIAL_ROUTES, premise, chapters: writtenChapters.slice(0, 4), audit: audited.audit,
+      onRepaired: saveRepaired,
+    });
+    if (repaired.rounds.length) {
+      usages.push(...repaired.usages);
       openingAudit = repaired.audit;
       writeJson(join(outDir, 'opening-audit.json'), { before: audited.audit, rounds: repaired.rounds, after: repaired.audit });
     }
