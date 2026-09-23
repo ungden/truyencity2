@@ -12,7 +12,7 @@ import { seedBible } from '@/services/serial/state';
 import { premise, baseBible, cycle } from './fixtures';
 import {
   CYCLE_PLANNER_SYSTEM_PROMPT, EXTRACTOR_SYSTEM_PROMPT, JUDGE_SYSTEM_PROMPT,
-  OPENING_AUDITOR_SYSTEM_PROMPT, WRITER_SYSTEM_PROMPT,
+  OPENING_AUDITOR_SYSTEM_PROMPT, promptsFor, WRITER_SYSTEM_PROMPT,
 } from '@/services/serial/prompts';
 
 const usage = (model: string, costUsd = 0.02): ProviderUsage => ({
@@ -950,5 +950,34 @@ describe('opening repair follows a fix that moved the problem next door', () => 
     });
     expect(provider.calls).toEqual([]);
     expect(result.rounds).toEqual([]);
+  });
+});
+
+describe('the customer loop belongs to commerce archetypes', () => {
+  test('a commerce plan without a loop costs one retry; another archetype drops an invented one', async () => {
+    const withoutLoop = { ...cycle(), customerLoop: null };
+    const commerce = stubProvider({ planner: [withoutLoop, cycle()] });
+    await planNextCycle({
+      provider: commerce, routes: DEFAULT_SERIAL_ROUTES, premise, bible: baseBible(),
+      previousCycle: null, cycleNumber: 2, volumeNumber: 1, startChapter: 8, recentVerdicts: [],
+    });
+    expect(commerce.calls).toEqual(['planner', 'planner']);
+
+    const beastPremise = { ...premise, archetype: 'beast_taming' };
+    const beastPlanner = promptsFor('beast_taming').planner;
+    const calls: string[] = [];
+    const beastProvider = {
+      async text() { throw new Error('unused'); },
+      async json<T>(input: { system: string; model: string }) {
+        calls.push(input.system === beastPlanner ? 'beast-planner' : 'other');
+        return { value: cycle() as T, usage: usage(input.model) };
+      },
+    } as StoryModelProvider;
+    const result = await planNextCycle({
+      provider: beastProvider, routes: DEFAULT_SERIAL_ROUTES, premise: beastPremise, bible: baseBible(),
+      previousCycle: null, cycleNumber: 2, volumeNumber: 1, startChapter: 8, recentVerdicts: [],
+    });
+    expect(calls).toEqual(['beast-planner']);
+    expect(result.cycle.customerLoop).toBeNull();
   });
 });

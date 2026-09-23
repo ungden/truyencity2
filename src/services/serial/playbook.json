@@ -1,5 +1,5 @@
 {
-  "version": "2026-09-23.1",
+  "version": "2026-09-24.2",
   "note": "Craft that dates. Code owns contracts; this file owns taste. Edit here, not in prompts.ts.",
   "payoffKinds": [
     {
@@ -223,7 +223,10 @@
       "status": "active",
       "observedAt": "2026-09-19",
       "evidence": "docs/FALOO_CRAFT.md §4b — lựa chọn nhịp kinh thương của dự án",
-      "text": "Kinh doanh tích lũy rồi mở rộng: một giao dịch đem lại tiền, uy tín, đối tác hoặc công nghệ để làm thương vụ lớn hơn. Chọn bước nhảy đáng kể về khách hàng, sản phẩm hay thị trường khi cơ hội chín muồi."
+      "text": "Kinh doanh tích lũy rồi mở rộng: một giao dịch đem lại tiền, uy tín, đối tác hoặc công nghệ để làm thương vụ lớn hơn. Chọn bước nhảy đáng kể về khách hàng, sản phẩm hay thị trường khi cơ hội chín muồi.",
+      "archetypes": [
+        "two_world_commerce"
+      ]
     },
     {
       "id": "activate_in_chapter_one",
@@ -263,7 +266,10 @@
       "status": "active",
       "observedAt": "2026-09-20",
       "evidence": "Biên tập trực tiếp hai pilot Song Xuyên, chương 1-10",
-      "text": "GIỮ ĐÚNG LỜI HỨA SONG XUYÊN\nTrong mỗi cửa sổ ba chương, giá trị phải quay được ít nhất một vòng giữa hai thế giới hoặc mở một công dụng mới của hàng đã đổi. Nhân vật chính đồng thời phải có một việc chỉ hắn quyết định được và nhận một bước tiến dùng được: tay nghề, thực lực, nguồn hàng, quyền giao dịch hoặc khách hàng mới. Đồng minh được hưởng cú thắng của họ, nhưng truyện vẫn cho thấy vì sao hành động của main làm vòng tiếp theo lớn hơn."
+      "text": "GIỮ ĐÚNG LỜI HỨA SONG XUYÊN\nTrong mỗi cửa sổ ba chương, giá trị phải quay được ít nhất một vòng giữa hai thế giới hoặc mở một công dụng mới của hàng đã đổi. Nhân vật chính đồng thời phải có một việc chỉ hắn quyết định được và nhận một bước tiến dùng được: tay nghề, thực lực, nguồn hàng, quyền giao dịch hoặc khách hàng mới. Đồng minh được hưởng cú thắng của họ, nhưng truyện vẫn cho thấy vì sao hành động của main làm vòng tiếp theo lớn hơn.",
+      "archetypes": [
+        "two_world_commerce"
+      ]
     },
     {
       "id": "customer_returns_stronger",
@@ -271,7 +277,10 @@
       "status": "active",
       "observedAt": "2026-09-20",
       "evidence": "Chỉ đạo biên tập trực tiếp của người dùng, 2026-09-20",
-      "text": "VÒNG KHÁCH HÀNG ĐI LÊN\nChọn ít nhất một khách làm trục phụ của chu kỳ: họ đến vì một nỗi khổ cụ thể, bỏ tài nguyên mua một món, dùng món đó mạnh lên hoặc mở nghề, tự đi săn/làm ăn/hoàn thành nhiệm vụ để kiếm phần thưởng cấp cao hơn, công khai thể hiện trước người từng coi thường, rồi quay lại cửa hàng với tiền và địa vị mới để hỏi món đắt hơn. Mỗi lần quay lại phải đổi cấp hàng, quy mô đơn hoặc thân phận khách; không dùng lại cùng một màn kiểm tra."
+      "text": "VÒNG KHÁCH HÀNG ĐI LÊN\nChọn ít nhất một khách làm trục phụ của chu kỳ: họ đến vì một nỗi khổ cụ thể, bỏ tài nguyên mua một món, dùng món đó mạnh lên hoặc mở nghề, tự đi săn/làm ăn/hoàn thành nhiệm vụ để kiếm phần thưởng cấp cao hơn, công khai thể hiện trước người từng coi thường, rồi quay lại cửa hàng với tiền và địa vị mới để hỏi món đắt hơn. Mỗi lần quay lại phải đổi cấp hàng, quy mô đơn hoặc thân phận khách; không dùng lại cùng một màn kiểm tra.",
+      "archetypes": [
+        "two_world_commerce"
+      ]
     },
     {
       "id": "opponents_keep_their_will",
@@ -295,7 +304,10 @@
       "status": "active",
       "observedAt": "2026-09-19",
       "evidence": "https://www.sohu.com/a/876257711_122129349",
-      "text": "SONG XUYÊN: GIÁ TRỊ CHÊNH LỆCH GIỮA HAI THẾ GIỚI\nCửa xuyên là phương tiện đi lại tự do. Thứ thường bên này giải nhu cầu lớn bên kia; hàng đổi về lại mở năng lực, sản phẩm hoặc thế lực mới. Nêu hai chiều giá trị và người hưởng lợi. scope để null khi premise đã đủ rõ; nếu dùng, chỉ mô tả phạm vi chức năng."
+      "text": "SONG XUYÊN: GIÁ TRỊ CHÊNH LỆCH GIỮA HAI THẾ GIỚI\nCửa xuyên là phương tiện đi lại tự do. Thứ thường bên này giải nhu cầu lớn bên kia; hàng đổi về lại mở năng lực, sản phẩm hoặc thế lực mới. Nêu hai chiều giá trị và người hưởng lợi. scope để null khi premise đã đủ rõ; nếu dùng, chỉ mô tả phạm vi chức năng.",
+      "archetypes": [
+        "two_world_commerce"
+      ]
     },
     {
       "id": "economy_must_close",
@@ -303,7 +315,10 @@
       "status": "active",
       "observedAt": "2026-09-19",
       "evidence": "genreCanon.quyDoiVeTraiDat",
-      "text": "VÒNG TIỀN PHẢI KHÉP KÍN, VÀ PHẢI CÓ NGƯỜI MUA CÓ THẬT Ở CẢ HAI ĐẦU.\nSai lầm điển hình: quy tiền tệ của thế giới bên kia ra tiền Việt. Linh thạch là tiền tệ nội bộ của tu tiên giới — Trái Đất không có chợ linh thạch, không người mua, không giá tham chiếu. Viết 'một viên linh thạch bằng tháng lương' là lỗ logic độc giả thấy ngay.\nĐúng phải là ba nhánh: (1) hàng Trái Đất bán bên kia lấy tiền tệ bên kia; (2) tiền tệ đó Ở LẠI bên kia làm vốn — mua đan, mua công pháp, thuê người, mua chỗ đứng cho người của mình, tức là quyền lực lớn lên ở bên kia; (3) thứ mang về Trái Đất phải là thứ Trái Đất đã có chợ sẵn: vàng bạc, ngọc đá quý, dược liệu đông y, cổ vật, vật liệu lạ đem giám định.\nNêu đích danh người mua ở mỗi đầu. Không nêu được thì chưa phải premise."
+      "text": "VÒNG TIỀN PHẢI KHÉP KÍN, VÀ PHẢI CÓ NGƯỜI MUA CÓ THẬT Ở CẢ HAI ĐẦU.\nSai lầm điển hình: quy tiền tệ của thế giới bên kia ra tiền Việt. Linh thạch là tiền tệ nội bộ của tu tiên giới — Trái Đất không có chợ linh thạch, không người mua, không giá tham chiếu. Viết 'một viên linh thạch bằng tháng lương' là lỗ logic độc giả thấy ngay.\nĐúng phải là ba nhánh: (1) hàng Trái Đất bán bên kia lấy tiền tệ bên kia; (2) tiền tệ đó Ở LẠI bên kia làm vốn — mua đan, mua công pháp, thuê người, mua chỗ đứng cho người của mình, tức là quyền lực lớn lên ở bên kia; (3) thứ mang về Trái Đất phải là thứ Trái Đất đã có chợ sẵn: vàng bạc, ngọc đá quý, dược liệu đông y, cổ vật, vật liệu lạ đem giám định.\nNêu đích danh người mua ở mỗi đầu. Không nêu được thì chưa phải premise.",
+      "archetypes": [
+        "two_world_commerce"
+      ]
     },
     {
       "id": "modern_side_is_parallel",
@@ -311,7 +326,10 @@
       "status": "active",
       "observedAt": "2026-09-19",
       "evidence": "https://wap.faloo.com/1261957.html",
-      "text": "PHÍA HIỆN ĐẠI LÀ THẾ GIỚI SONG SONG, KHÔNG PHẢI VIỆT NAM THẬT.\nĐây là quy ước sẵn có của dòng này: bộ nào cũng mở bằng 'xuyên tới thế giới song song'. Lý do rất thực dụng — không ai bắt bẻ được địa lý hay luật lệ, không chạm chuyện nhạy cảm, và tác giả dựng thẳng ra được cái tổ chức mà cốt truyện cần.\nGiữ nguyên kết cấu đời sống cho quen thuộc: điện thoại, app giao hàng, cửa hàng tiện lợi, tiệm vàng, phòng trọ, chợ, giới đông y.\nTuyệt đối không nhắc tới chuyện ngôn ngữ ở bất cứ đâu — không cùng tiếng, không rào cản, không phiên dịch, không ai phải học nói. Nêu ra là tự đẻ ra một câu hỏi mà không ai hỏi.\nBỏ sạch tên thật: thành phố, tỉnh, quốc gia, thương hiệu, cơ quan nhà nước, nhân vật và sự kiện lịch sử, triều đại có thật. Thay bằng tên tự đặt và dùng nhất quán cả bộ.\nMột thành phố tự đặt tên là một thực thể có tên — nó đếm vào luật mỗi chương phải thêm một thứ mới."
+      "text": "PHÍA HIỆN ĐẠI LÀ THẾ GIỚI SONG SONG, KHÔNG PHẢI VIỆT NAM THẬT.\nĐây là quy ước sẵn có của dòng này: bộ nào cũng mở bằng 'xuyên tới thế giới song song'. Lý do rất thực dụng — không ai bắt bẻ được địa lý hay luật lệ, không chạm chuyện nhạy cảm, và tác giả dựng thẳng ra được cái tổ chức mà cốt truyện cần.\nGiữ nguyên kết cấu đời sống cho quen thuộc: điện thoại, app giao hàng, cửa hàng tiện lợi, tiệm vàng, phòng trọ, chợ, giới đông y.\nTuyệt đối không nhắc tới chuyện ngôn ngữ ở bất cứ đâu — không cùng tiếng, không rào cản, không phiên dịch, không ai phải học nói. Nêu ra là tự đẻ ra một câu hỏi mà không ai hỏi.\nBỏ sạch tên thật: thành phố, tỉnh, quốc gia, thương hiệu, cơ quan nhà nước, nhân vật và sự kiện lịch sử, triều đại có thật. Thay bằng tên tự đặt và dùng nhất quán cả bộ.\nMột thành phố tự đặt tên là một thực thể có tên — nó đếm vào luật mỗi chương phải thêm một thứ mới.",
+      "archetypes": [
+        "two_world_commerce"
+      ]
     },
     {
       "id": "never_mention_language",
@@ -319,7 +337,10 @@
       "status": "active",
       "observedAt": "2026-09-19",
       "evidence": "genreCanon.theGioiHienDai.ngonNgu",
-      "text": "NGÔN NGỮ KHÔNG BAO GIỜ LÀ MỘT CHỦ ĐỀ\nNhân vật hai thế giới nói chuyện với nhau bình thường. Không viết cảnh ngạc nhiên vì hiểu được nhau, không rào cản tiếng nói, không phiên dịch, không ai học nói, không chữ viết nào cần giải mã trừ khi brief khoá điều đó thành một biến cố.\nĐộc giả truyện convert chưa bao giờ hỏi câu này. Nhắc tới là tự tạo ra thắc mắc."
+      "text": "NGÔN NGỮ KHÔNG BAO GIỜ LÀ MỘT CHỦ ĐỀ\nNhân vật hai thế giới nói chuyện với nhau bình thường. Không viết cảnh ngạc nhiên vì hiểu được nhau, không rào cản tiếng nói, không phiên dịch, không ai học nói, không chữ viết nào cần giải mã trừ khi brief khoá điều đó thành một biến cố.\nĐộc giả truyện convert chưa bao giờ hỏi câu này. Nhắc tới là tự tạo ra thắc mắc.",
+      "archetypes": [
+        "two_world_commerce"
+      ]
     },
     {
       "id": "protagonist_needs_contrast",
@@ -335,7 +356,10 @@
       "status": "active",
       "observedAt": "2026-09-19",
       "evidence": "https://wap.faloo.com/1446664.html",
-      "text": "KHÔNG LIỆT KÊ MẶT HÀNG — GHÉP MỘT MÓN CỤ THỂ VÀO MỘT NỖI KHỔ CỤ THỂ.\nBộ 3.000 chương đang chạy của Faloo bán hàng thế này trong phần giới thiệu:\n  'Trời lạnh cóng không có nổi miếng ăn nóng? Cơm tự sôi, tìm hiểu đi!'\n  'Khí hậu khắc nghiệt, lính chết rét hàng loạt? Miếng dán giữ nhiệt, dán một cái là ấm cả người.'\nMỗi dòng là một cú 'ừ nhỉ, cái đó đúng là dùng được thật'. Đó mới là chỗ sướng.\nViết 'bán mì gói, bật lửa, pin' là liệt kê danh mục — không ai thấy gì cả. Phải nêu đích danh món hàng, đích danh nỗi khổ nó giải, và người đang chịu nỗi khổ đó là ai.\nTiêu đề chương được phép chính là câu chào hàng đó."
+      "text": "KHÔNG LIỆT KÊ MẶT HÀNG — GHÉP MỘT MÓN CỤ THỂ VÀO MỘT NỖI KHỔ CỤ THỂ.\nBộ 3.000 chương đang chạy của Faloo bán hàng thế này trong phần giới thiệu:\n  'Trời lạnh cóng không có nổi miếng ăn nóng? Cơm tự sôi, tìm hiểu đi!'\n  'Khí hậu khắc nghiệt, lính chết rét hàng loạt? Miếng dán giữ nhiệt, dán một cái là ấm cả người.'\nMỗi dòng là một cú 'ừ nhỉ, cái đó đúng là dùng được thật'. Đó mới là chỗ sướng.\nViết 'bán mì gói, bật lửa, pin' là liệt kê danh mục — không ai thấy gì cả. Phải nêu đích danh món hàng, đích danh nỗi khổ nó giải, và người đang chịu nỗi khổ đó là ai.\nTiêu đề chương được phép chính là câu chào hàng đó.",
+      "archetypes": [
+        "two_world_commerce"
+      ]
     },
     {
       "id": "protected_store_domain",
@@ -343,7 +367,10 @@
       "status": "active",
       "observedAt": "2026-09-22",
       "evidence": "Chỉ đạo biên tập trực tiếp của người dùng, 2026-09-22",
-      "text": "CỬA HÀNG LÀ LÃNH VỰC TUYỆT ĐỐI CỦA MAIN\nTrong truyện song xuyên cửa hàng, toàn bộ cửa hàng và ngưỡng nối là vùng an toàn tuyệt đối: hành vi thù địch, cưỡng ép vào cửa, trộm hàng và theo dõi đều vô hiệu; main có thể trục xuất khách và thu hồi hàng chưa thanh toán. Chênh lệch công nghệ, cảnh giới, quyền lực hay số lượng không thể vượt qua luật này. Không dùng hack, cướp quầy, ép mở cửa hay đánh nhau giữ cửa hàng làm xung đột. Bên ngoài cửa hàng vẫn có nguy hiểm; trong cửa hàng, truyện tập trung vào trao đổi, định giá, khách mạnh lên và cửa hàng phát triển."
+      "text": "CỬA HÀNG LÀ LÃNH VỰC TUYỆT ĐỐI CỦA MAIN\nTrong truyện song xuyên cửa hàng, toàn bộ cửa hàng và ngưỡng nối là vùng an toàn tuyệt đối: hành vi thù địch, cưỡng ép vào cửa, trộm hàng và theo dõi đều vô hiệu; main có thể trục xuất khách và thu hồi hàng chưa thanh toán. Chênh lệch công nghệ, cảnh giới, quyền lực hay số lượng không thể vượt qua luật này. Không dùng hack, cướp quầy, ép mở cửa hay đánh nhau giữ cửa hàng làm xung đột. Bên ngoài cửa hàng vẫn có nguy hiểm; trong cửa hàng, truyện tập trung vào trao đổi, định giá, khách mạnh lên và cửa hàng phát triển.",
+      "archetypes": [
+        "two_world_commerce"
+      ]
     },
     {
       "id": "product_value_experience",
@@ -351,7 +378,10 @@
       "status": "active",
       "observedAt": "2026-09-22",
       "evidence": "Chỉ đạo biên tập trực tiếp của người dùng, 2026-09-22",
-      "text": "CHO ĐỘC GIẢ TRẢI NGHIỆM CHÊNH LỆCH GIÁ TRỊ\nMón hàng quen, rẻ hoặc lỗi thời ở thế giới nguồn phải giải một nhu cầu đắt đỏ ở thế giới đích. Khi giới thiệu món mới, cho một người cụ thể nhìn, ngửi, nếm, mặc, dùng hoặc thử công dụng; từ trải nghiệm đó họ mới hỏi giá, tranh suất, đặt thêm hay đổi thái độ. Không thay cảnh sướng này bằng thuyết minh, đám đông đồng thanh, giấy phép, khóa quyền, viện kiểm tra hoặc nhiều vòng xác minh. Không tự sinh AI, hệ thống phụ, quyền năng, tổ chức hay sản phẩm ngoài premise để tạo việc. Hai thế giới giao tiếp bình thường; bước kiểm đã quen phải kể gọn."
+      "text": "CHO ĐỘC GIẢ TRẢI NGHIỆM CHÊNH LỆCH GIÁ TRỊ\nMón hàng quen, rẻ hoặc lỗi thời ở thế giới nguồn phải giải một nhu cầu đắt đỏ ở thế giới đích. Khi giới thiệu món mới, cho một người cụ thể nhìn, ngửi, nếm, mặc, dùng hoặc thử công dụng; từ trải nghiệm đó họ mới hỏi giá, tranh suất, đặt thêm hay đổi thái độ. Không thay cảnh sướng này bằng thuyết minh, đám đông đồng thanh, giấy phép, khóa quyền, viện kiểm tra hoặc nhiều vòng xác minh. Không tự sinh AI, hệ thống phụ, quyền năng, tổ chức hay sản phẩm ngoài premise để tạo việc. Hai thế giới giao tiếp bình thường; bước kiểm đã quen phải kể gọn.",
+      "archetypes": [
+        "two_world_commerce"
+      ]
     },
     {
       "id": "conflict_changes_dimension",
@@ -360,6 +390,94 @@
       "observedAt": "2026-09-19",
       "evidence": "https://www.zhihu.com/question/373347616",
       "text": "MỞ RỘNG ĐẤU TRƯỜNG TỪ THÀNH QUẢ\nconflictLadder là bốn hướng để chọn theo truyện: survival — có chỗ đứng; rules — tác động luật chơi; ideology — xây trật tự mình muốn; self — chọn tham vọng và cách sống. Đường ngầm gieo sớm, nhập tuyến chính để mở khám phá mới."
+    },
+    {
+      "id": "card_is_the_reward",
+      "role": "writer",
+      "archetypes": [
+        "card_profession"
+      ],
+      "text": "THẺ LÀ PHẦN THƯỞNG\nMỗi thẻ mới hiện trong bảng 【】 với tên thẻ, phẩm màu, chủng tộc, cấp và kỹ năng có tên. Luyện thẻ là khoảnh khắc sướng: nguyên liệu vào, ánh sáng đổi màu, phẩm cao hơn người khác tưởng. Quái vật và thẻ đều do truyện tự đặt tên, tuyệt đối không mượn thẻ, quái hay nhân vật của game, anime có thật. Cắt chương ngay khi phẩm màu mới vừa lộ.",
+      "status": "active",
+      "observedAt": "2026-09-24",
+      "evidence": "docs/FALOO_TRENDS_2026-09-24.md"
+    },
+    {
+      "id": "card_ladder",
+      "role": "planner",
+      "archetypes": [
+        "card_profession"
+      ],
+      "text": "THANG PHẨM MÀU DẪN CHU KỲ\nMỗi chu kỳ đưa ít nhất một thẻ chủ lực lên phẩm màu cao hơn hoặc mở một phép dung hợp mới, rồi đem nó ra đấu trường công khai: kiểm định học viện, giải đấu, bí cảnh, hầm ngục. Đối thủ là người cùng hệ luyện thẻ hoặc học viện đối địch có thẻ mạnh hơn trên giấy.",
+      "status": "active",
+      "observedAt": "2026-09-24",
+      "evidence": "docs/FALOO_TRENDS_2026-09-24.md"
+    },
+    {
+      "id": "heir_reveal_is_the_reward",
+      "role": "writer",
+      "archetypes": [
+        "clan_legacy"
+      ],
+      "text": "TƯ CHẤT HẬU DUỆ LÀ PHẦN THƯỞNG\nMỗi khi một hậu duệ hay đệ tử được xác nhận tư chất, bảng 【】 hiện phẩm tư chất, linh căn/huyết mạch có tên và phần thưởng hệ thống mở ra. Hôn nhân là liên minh và lựa chọn, kể kín đáo, không có cảnh tình dục. Thời gian được phép nhảy tháng, năm giữa các chương; mỗi lần nhảy phải để lại một thay đổi nhìn thấy của gia tộc.",
+      "status": "active",
+      "observedAt": "2026-09-24",
+      "evidence": "docs/FALOO_TRENDS_2026-09-24.md"
+    },
+    {
+      "id": "clan_rises_in_status",
+      "role": "planner",
+      "archetypes": [
+        "clan_legacy"
+      ],
+      "text": "GIA TỘC LÊN CẤP THEO CHU KỲ\nMỗi chu kỳ gia tộc giành được một thứ đo được: linh mạch, cửa hàng, ghế trong liên minh, cấp gia tộc mới, hay một hậu duệ đạt cảnh giới vượt đối thủ cùng tuổi. Đối thủ là gia tộc hay tông môn đang chèn ép, và mỗi chu kỳ có một người trong họ đối thủ bị hậu duệ nhà main vượt mặt công khai.",
+      "status": "active",
+      "observedAt": "2026-09-24",
+      "evidence": "docs/FALOO_TRENDS_2026-09-24.md"
+    },
+    {
+      "id": "evolution_is_a_choice",
+      "role": "writer",
+      "archetypes": [
+        "beast_taming"
+      ],
+      "text": "TIẾN HÓA LÀ LỰA CHỌN VÀ LÀ CÚ LỘ DIỆN\nMain chọn đường tiến hóa bằng hiểu biết người khác không có; khi tiến hóa xảy ra, bảng 【】 hiện tên mới, chủng tộc, phẩm cấp và kỹ năng mới. Sủng thú có tính cách và có thể độc thoại mà người khác không nghe được — khoảng chênh thông tin ấy là cái sướng. Người từng chê con thú phải nhìn thấy kết quả.",
+      "status": "active",
+      "observedAt": "2026-09-24",
+      "evidence": "docs/FALOO_TRENDS_2026-09-24.md"
+    },
+    {
+      "id": "arena_ladder",
+      "role": "planner",
+      "archetypes": [
+        "beast_taming"
+      ],
+      "text": "ĐẤU TRƯỜNG LÊN BẬC\nMỗi chu kỳ đặt một đấu trường công khai cao hơn: kiểm định trường, giải thành phố, giải khu vực, bí cảnh, liên minh ngự thú. Trước trận, đối thủ và khán giả đánh giá thấp sủng thú của main; trận đấu phải thắng bằng đường tiến hóa hoặc kỹ năng mà main đã chuẩn bị ở các chương trước.",
+      "status": "active",
+      "observedAt": "2026-09-24",
+      "evidence": "docs/FALOO_TRENDS_2026-09-24.md"
+    },
+    {
+      "id": "rules_are_the_puzzle",
+      "role": "writer",
+      "archetypes": [
+        "rule_horror"
+      ],
+      "text": "BỘ QUY TẮC LÀ CÂU ĐỐ\nMỗi phó bản hiện bộ quy tắc nguyên văn, đánh số, trong đó có điều sai hoặc điều bị cài bẫy. Nỗi sợ đến từ chi tiết đời thường lệch đi và từ người khác chết vì làm sai, không từ máu me miêu tả kỹ. Main thắng bằng suy luận có căn cứ từ chính quy tắc và lợi thế riêng; độc giả phải có đủ manh mối để thấy cú phá giải là công bằng. Kết thúc phó bản bằng bảng 【】 đánh giá và phần thưởng.",
+      "status": "active",
+      "observedAt": "2026-09-24",
+      "evidence": "docs/FALOO_TRENDS_2026-09-24.md"
+    },
+    {
+      "id": "instance_ladder",
+      "role": "planner",
+      "archetypes": [
+        "rule_horror"
+      ],
+      "text": "PHÓ BẢN LÊN BẬC\nMỗi chu kỳ là một phó bản trọn vẹn (vào, đọc quy tắc, leo thang nguy hiểm, phá giải, thưởng) hoặc hai phó bản ngắn. Phó bản sau có bộ quy tắc phức tạp hơn, nhiều người chơi hơn và một người chơi đối địch muốn cướp phần thưởng. Không lặp lại cùng một kiểu bẫy quy tắc ở hai chu kỳ liền nhau.",
+      "status": "active",
+      "observedAt": "2026-09-24",
+      "evidence": "docs/FALOO_TRENDS_2026-09-24.md"
     }
   ],
   "genreCanon": {
@@ -427,5 +545,57 @@
       "tranCanhSucManh": "Phải đặt trần cho hệ thống sức mạnh ngay từ đầu, nếu không hậu kỳ vỡ.",
       "evidence": "https://www.zhihu.com/question/373347616"
     }
-  }
+  },
+  "archetypes": [
+    {
+      "id": "two_world_commerce",
+      "name": "Song xuyên buôn bán",
+      "worlds": 2,
+      "commerce": true,
+      "promise": "Món thường ở thế giới này là báu vật ở thế giới kia; mỗi khách mua mạnh lên rồi quay lại với đơn lớn hơn.",
+      "loop": "Nhập hàng → khách dùng thấy hiệu quả → định giá, tranh mua → khách mạnh lên quay lại mua cấp cao hơn → cửa hàng lên cấp.",
+      "addedAt": "2026-09-19",
+      "evidence": "docs/FALOO_CRAFT.md §4b"
+    },
+    {
+      "id": "card_profession",
+      "name": "Toàn dân chức nghiệp — luyện thẻ",
+      "worlds": 1,
+      "commerce": false,
+      "promise": "Ai cũng thức tỉnh chức nghiệp năm mười tám tuổi; main có cách luyện thẻ không ai có, mỗi thẻ mới lên phẩm màu cao hơn và đổi luôn thực lực của chính hắn.",
+      "loop": "Gom nguyên liệu/quái vật → luyện hoặc dung hợp thẻ → mở phẩm màu (Trắng → Lục → Lam → Tím → Kim → Đỏ) trong bảng 【】 → dùng thẻ thắng trận, kiểm định hay bí cảnh → phần thưởng đổi ra nguyên liệu tốt hơn.",
+      "addedAt": "2026-09-24",
+      "evidence": "https://b.faloo.com/1530098.html — #1 月票 toàn trang 2026-09-24"
+    },
+    {
+      "id": "clan_legacy",
+      "name": "Gia tộc tu tiên — đa tử đa phúc",
+      "worlds": 1,
+      "commerce": false,
+      "promise": "Gia tộc sa sút có main nhận hệ thống thưởng theo hậu duệ: mỗi đứa con, mỗi đệ tử thiên phú cao mở một phần thưởng lớn, và cả dòng họ trỗi dậy từng đời.",
+      "loop": "Kết thân, liên hôn hoặc thu đồ đệ có tư chất → hậu duệ ra đời/nhập môn → bảng 【】 xếp tư chất và mở thưởng → dùng thưởng đánh bại đối thủ, giành tài nguyên cho gia tộc → gia tộc lên cấp, mở lãnh địa mới.",
+      "addedAt": "2026-09-24",
+      "evidence": "https://b.faloo.com/1541877.html — #14 月票 sau chưa đầy 2 tháng"
+    },
+    {
+      "id": "beast_taming",
+      "name": "Ngự thú — tiến hóa sủng thú",
+      "worlds": 1,
+      "commerce": false,
+      "promise": "Main biết trước đường tiến hóa mà thiên hạ không thấy; con sủng thú bị coi thường lớn lên qua từng lần tiến hóa đổi hình, và mỗi trận đấu công khai chứng minh con mắt của hắn.",
+      "loop": "Phát hiện đường tiến hóa ẩn → tìm vật liệu/đối thủ cần thiết → tiến hóa đổi tên, đổi hình, đổi kỹ năng trong bảng 【】 → thắng giải đấu, bí cảnh hoặc đối thủ đã khinh thường → danh tiếng mở tài nguyên cho lần tiến hóa sau.",
+      "addedAt": "2026-09-24",
+      "evidence": "https://b.faloo.com/1530890.html — 月打赏#12, 周点击 danh mục #2"
+    },
+    {
+      "id": "rule_horror",
+      "name": "Quy tắc quái đàm — sinh tồn phó bản",
+      "worlds": 1,
+      "commerce": false,
+      "promise": "Mỗi phó bản quái đàm là một bộ quy tắc có điều đúng điều sai; main có lợi thế riêng để đọc xuyên quy tắc, thoát chết trong khi người khác chết, và mỗi lần thông quan là một bậc sức mạnh mới.",
+      "loop": "Vào phó bản → đọc bộ quy tắc (có điều sai) → dùng lợi thế tìm quy tắc thật trong lúc nguy hiểm tăng dần → phá giải cú chốt → bảng 【】 xếp hạng thông quan, thưởng vật phẩm quỷ dị → phó bản kế khó hơn.",
+      "addedAt": "2026-09-24",
+      "evidence": "https://b.faloo.com/1549005.html — 7/9 sách 诡异/规则 mở mới nằm trong 新书PK danh mục"
+    }
+  ]
 }

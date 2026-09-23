@@ -5,7 +5,7 @@ import {
   type SerialRoutes,
 } from './contracts';
 import {
-  PREMISE_SYSTEM_PROMPT, WRITER_SYSTEM_PANEL_RULE,
+  promptsFor, WRITER_SYSTEM_PANEL_RULE,
 } from './prompts';
 import { StoryFactoryError } from '@/services/story-factory/contracts';
 import { groundEvidenceSpan } from '@/services/story-factory/validation';
@@ -225,12 +225,13 @@ export async function proposePremise(input: {
   provider: StoryModelProvider;
   routes: SerialRoutes;
   lane: string;
+  archetype?: string;
   avoid: string[];
 }): Promise<AgentResult<Premise>> {
   const result = await input.provider.json({
     model: input.routes.premise,
-    system: PREMISE_SYSTEM_PROMPT,
-    prompt: brief({ lane: input.lane, khongDuocTrungVoi: input.avoid }),
+    system: promptsFor(input.archetype).premise,
+    prompt: brief({ lane: input.lane, archetype: input.archetype ?? null, khongDuocTrungVoi: input.avoid }),
     schema: PremiseSchema,
     temperature: 1,
     timeoutMs: SUPPORT_TIMEOUT_MS,

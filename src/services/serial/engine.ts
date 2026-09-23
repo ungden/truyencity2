@@ -7,6 +7,7 @@ import {
   type Bible, type ChapterDigest, type ChapterDraft, type CyclePlan, type JudgeVerdict,
   OpeningAuditSchema, type OpeningAudit, type Premise, type SerialRoutes,
 } from './contracts';
+import { archetypeOf } from './playbook';
 import {
   auditOpening, CHAPTER_TIMEOUT_MS, reviewBindingMismatch, extractDigest, judgeChapter, planCycle, PLANNER_TIMEOUT_MS, reviseChapter,
   SUPPORT_TIMEOUT_MS, writeChapter,
@@ -685,12 +686,18 @@ export async function planNextCycle(input: {
   usages.push(first.usage);
   // Mechanical fields are repaired in code; anything left over is a story-level problem
   // the planner gets one chance to fix, like any other validation failure.
+  const commerceShape = archetypeOf(input.premise.archetype)?.commerce ?? true;
   const toPlan = (value: unknown): CyclePlan => {
     const shaped = normalizeCyclePlanShape(CyclePlanShapeSchema.parse(value), { rolling });
     const parsed = planSchema.safeParse({ ...shaped, editorialNotes: input.editorialNotes ?? [] });
     if (!parsed.success) {
       throw new SerialStateError('plan_shape', parsed.error.issues.map(issue => `${issue.path.join('.')}: ${issue.message}`).join(' | ').slice(0, 1_500));
     }
+    // Only commerce archetypes run the customer loop; the rest must not invent one.
+    if (commerceShape && !rolling && !parsed.data.customerLoop) {
+      throw new SerialStateError('plan_shape', 'customerLoop: a commerce cycle needs a customer loop.');
+    }
+    if (!commerceShape && parsed.data.customerLoop) parsed.data.customerLoop = null;
     return normalizeCycleLedger(parsed.data as CyclePlan);
   };
   const assertPlan = (candidate: CyclePlan): void => {

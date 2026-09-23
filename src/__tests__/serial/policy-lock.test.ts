@@ -1,14 +1,14 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import {
-  assertSerialLaunchable, HARD_CONTINUITY_KINDS, OpeningAuditProviderSchema, premiseLint, processDensity,
+  assertSerialLaunchable, HARD_CONTINUITY_KINDS, OpeningAuditProviderSchema, PremiseSchema, premiseLint, processDensity,
   processProseFindings, PROCESS_DENSITY_LIMIT, SOFT_CONTINUITY_KINDS,
 } from '@/services/serial/contracts';
 import {
   CYCLE_PLANNER_SYSTEM_PROMPT, EXTRACTOR_SYSTEM_PROMPT, JUDGE_SYSTEM_PROMPT, OPENING_AUDITOR_SYSTEM_PROMPT,
-  PREMISE_SYSTEM_PROMPT, WRITER_SYSTEM_PANEL_RULE, WRITER_SYSTEM_PROMPT,
+  PREMISE_SYSTEM_PROMPT, promptsFor, WRITER_SYSTEM_PANEL_RULE, WRITER_SYSTEM_PROMPT,
 } from '@/services/serial/prompts';
-import { activeRules, antiPayoffViolations, playbook, PlaybookSchema } from '@/services/serial/playbook';
+import { activeRules, antiPayoffViolations, archetypeIds, archetypeOf, playbook, PlaybookSchema } from '@/services/serial/playbook';
 import { SERIAL_PREMISE_CATALOG } from '@/services/serial/catalog';
 
 /**
@@ -123,5 +123,53 @@ describe('policy lock: ledger prose is measured, not debated', () => {
     const chapter = pilot('cua-hang-cong-phap-v5-faloo-ch01-04/chapter-001.md');
     expect(processDensity(chapter)).toBeLessThan(PROCESS_DENSITY_LIMIT);
     expect(processProseFindings(chapter)).toEqual([]);
+  });
+});
+
+describe('archetypes: a new lane is data, and each lane gets only its own craft', () => {
+  const NON_COMMERCE = ['card_profession', 'clan_legacy', 'beast_taming', 'rule_horror'];
+
+  test('every archetype prompt is free of payoff-forbidding directions', () => {
+    for (const archetype of archetypeIds()) {
+      for (const [role, text] of Object.entries(promptsFor(archetype))) {
+        expect({ archetype, role, violations: antiPayoffViolations(text) }).toEqual({ archetype, role, violations: [] });
+      }
+    }
+  });
+
+  test('commerce craft stays in commerce stories and each lane brings its own loop', () => {
+    for (const archetype of NON_COMMERCE) {
+      const prompts = promptsFor(archetype);
+      expect(archetypeOf(archetype)).toMatchObject({ commerce: false, worlds: 1 });
+      expect(prompts.writer).not.toMatch(/SONG XUYÊN|CỬA HÀNG LÀ LÃNH VỰC/);
+      expect(prompts.planner).not.toMatch(/customerLoop chọn một khách/);
+      expect(prompts.planner).toMatch(/customerLoop luôn null/);
+      expect(prompts.writer).toContain(archetypeOf(archetype)!.promise);
+      expect(activeRules('writer', archetype).some(rule => rule.archetypes?.includes(archetype))).toBe(true);
+      expect(activeRules('planner', archetype).some(rule => rule.archetypes?.includes(archetype))).toBe(true);
+    }
+    expect(promptsFor('two_world_commerce').planner).toMatch(/customerLoop chọn một khách/);
+  });
+
+  test('a one-world, non-commerce premise validates without shop machinery; commerce still needs it', () => {
+    const [{ premise }] = SERIAL_PREMISE_CATALOG;
+    const world = premise.worldKernel.worlds[0];
+    const home = world.locations[0].id;
+    const local = new Set(world.locations.map(location => location.id));
+    const beast = {
+      ...premise,
+      archetype: 'beast_taming',
+      castSeed: premise.castSeed.map(member => ({ ...member, startLocationId: local.has(member.startLocationId) ? member.startLocationId : home })),
+      worldKernel: {
+        ...premise.worldKernel,
+        worlds: [world],
+        progressionSubjects: premise.worldKernel.progressionSubjects.map(subject => ({ ...subject, startLocationId: home })),
+        economyLoops: [], launchProducts: [], openingLedger: [],
+        openingContract: premise.worldKernel.openingContract.map(row => ({ ...row, commercialAction: null })),
+      },
+    };
+    expect(PremiseSchema.safeParse(beast).success).toBe(true);
+    expect(PremiseSchema.safeParse({ ...beast, archetype: 'two_world_commerce' }).success).toBe(false);
+    expect(PremiseSchema.safeParse({ ...beast, archetype: 'khong_ton_tai' }).success).toBe(false);
   });
 });

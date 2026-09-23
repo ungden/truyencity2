@@ -147,6 +147,25 @@ That is the inversion against the old engine, which handed the Writer a ledger o
 deltas and asked it to dramatise them. `architecture` tests assert the brief contains no
 `requiredDelta` or `mechanicUse`.
 
+## Archetypes: a new lane is data
+
+`playbook.json → archetypes` lists the genre shapes the engine writes. Each declares its
+world count, whether it runs the commerce machinery (customer loop, launch products, opening
+ledger), the reader promise and the payoff loop. `Premise.archetype` picks one (default
+`two_world_commerce`); `promptsFor(archetype)` composes every role's prompt with that
+shape's promise, loop and only the rules tagged for it (`rules[].archetypes`). Adding a lane
+is a playbook entry, its rules and a premise — no code.
+
+| Archetype | Worlds | Commerce | Evidence |
+|---|---|---|---|
+| `two_world_commerce` | 2 | yes | the first production story |
+| `card_profession` | 1 | no | Faloo #1 月票, 2026-09 |
+| `clan_legacy` | 1 | no | Faloo #14 月票 within two months |
+| `beast_taming` | 1 | no | Faloo 月打赏 #12 |
+| `rule_horror` | 1 | no | 7 of 9 new 诡异 originals in 新书PK |
+
+Measurements: [`FALOO_TRENDS_2026-09-24.md`](FALOO_TRENDS_2026-09-24.md).
+
 ## Craft lives in data, not in prompts
 
 `src/services/serial/playbook.json` holds every rule about taste: how to open a chapter,

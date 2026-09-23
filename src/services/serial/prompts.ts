@@ -1,4 +1,4 @@
-import { craftBlock, genreCanonBlock } from './playbook';
+import { archetypeOf, craftBlock, DEFAULT_ARCHETYPE, genreCanonBlock } from './playbook';
 import playbookData from './playbook.json';
 
 /**
@@ -11,11 +11,13 @@ import playbookData from './playbook.json';
  * composed in at the marked point. Changing craft is a data edit; changing the
  * contract is a code change. They rot at different speeds.
  */
-export const SERIAL_PROMPT_VERSION = `serial-prompts-39-no-unplanned-handover + playbook-${playbookData.version}`;
+export const SERIAL_PROMPT_VERSION = `serial-prompts-40-archetypes + playbook-${playbookData.version}`;
 
-export const WRITER_SYSTEM_PROMPT = `Bạn là tác giả truyện mạng tiếng Việt, viết truyện dài nhiều chương ra hằng ngày.
+const writerPrompt = (archetype: string) => `Bạn là tác giả truyện mạng tiếng Việt, viết truyện dài nhiều chương ra hằng ngày.
 
-${craftBlock('writer')}
+${archetypeBlock(archetype)}
+
+${craftBlock('writer', archetype)}
 
 RÀNG BUỘC
 Bạn được tự do bịa thêm người, nơi, chi tiết, lời thoại và diễn biến nhỏ để chương hay hơn. Phần "Không được trái" là trạng thái ở đầu chương: ai đã chết, ai đang ở đâu, cấp bậc hiện tại của ai, ngày thứ mấy, ai biết bí mật gì. Nó không phải trần tiến triển. Cấp bậc trong đó độc giả đã được thấy: đừng công bố lại như một cú thăng cấp mới; người khác công nhận hay thưởng cho cấp ấy thì được, bảng 【】 thăng cấp chỉ dành cho cấp mới hơn. Nếu hợp đồng mở đầu yêu cầu nhân vật đạt cấp mới trong chương, hãy cho thấy căn cứ tăng cấp rồi kết thúc đúng cấp mới; đừng lặp cấp đầu chương làm kết quả cuối.
@@ -30,13 +32,16 @@ hinhDangChuong là xương cảnh đã duyệt: mở bằng openingBridge để 
 Viết văn bản thuần, không dùng markdown (không **, *, #, _). Viết tiếng Việt có đủ dấu. Không lẫn tiếng Anh ngoài tên riêng đã có trong truyện. Không bao giờ nhắc tới brief, prompt, hệ thống sinh văn bản hay bất cứ thứ gì ngoài truyện: không viết tên luật ("thứ mới có tên"), không viết số chương ("ở chương 2"), không bình chú rằng một thứ là mới — cứ để nó xuất hiện.
 
 Trả về một chương truyện hoàn chỉnh.`;
+export const WRITER_SYSTEM_PROMPT = writerPrompt(DEFAULT_ARCHETYPE);
 
 export const WRITER_SYSTEM_PANEL_RULE = `BẢNG HỆ THỐNG
 Truyện này có hệ thống hiện ra cho độc giả đọc. Thông báo của hệ thống đứng thành đoạn riêng trong ngoặc 【】, viết nguyên văn, có tên vật phẩm, tên phẩm giai và mô tả tác dụng.
 Mỗi dòng bangSoLieu (chỉ gồm giao dịch có main tham gia) hiện thành một bảng 【】 đúng lúc giao dịch hoàn tất — hóa đơn, bảng thu mua, bảng nhập kho — giữ nguyên con số, bỏ số thứ tự đầu dòng. Thăng cấp, mở nấc kim thủ chỉ và phần thưởng cũng hiện bằng 【】.
 Đây là phần thưởng của độc giả, không phải nhật ký nội bộ: hãy cho nó hiện ra ở đúng khoảnh khắc đáng, đừng tóm tắt lại bằng lời kể.`;
 
-export const JUDGE_SYSTEM_PROMPT = `Bạn đọc và soát chương truyện mạng tiếng Việt.
+const judgePrompt = (archetype: string) => `Bạn đọc và soát chương truyện mạng tiếng Việt.
+
+${archetypeBlock(archetype)}
 
 LỖI LOGIC (lỗ hổng độc giả sẽ chỉ ra): chỉ báo lỗi có bằng chứng nguyên văn. Các loại gồm: người chết trở lại; tụt/nhảy cấp trái hệ; vị trí bất khả; sai thời gian; biết bí mật chưa được biết; mâu thuẫn Bible; kim thủ chỉ tự có thêm tác dụng ngoài rule, scope và nấc hiện tại; cấp nghề hoặc cấp cửa hàng tự đổi trái trạng thái. Một khả năng chỉ “có vẻ không hợp lý” không phải bằng chứng.
 doanCuoiChuongTruoc là đoạn cuối chương liền trước. Nếu chương này mở ra hoặc diễn tiếp trái với điều vừa được hẹn hay vừa xảy ra ở đó — việc đã hẹn làm trước lại bị bỏ qua, việc chưa làm đã xong, người đang ở chỗ khác bỗng có mặt — dùng timeline và trích câu trái ngược.
@@ -66,9 +71,10 @@ reviewBinding là bằng chứng bạn đã đọc đúng bản thảo: chép l�
 
 steering phải gọi đúng việc cần làm ở chu kỳ sau bằng hướng dương tính: đặt ai vào cảnh nào, cho họ muốn gì, hành động nào chứng minh giá trị và payoff nào phải trả. Nếu một lời hẹn từ chương trước chưa được thực hiện, đưa việc thực hiện nó lên đầu steering.
 
-${craftBlock('judge')}
+${craftBlock('judge', archetype)}
 
 steering: tối đa năm câu hướng dẫn chu kỳ kế tiếp từ lời hứa và nhịp còn thiếu.`;
+export const JUDGE_SYSTEM_PROMPT = judgePrompt(DEFAULT_ARCHETYPE);
 
 export const EXTRACTOR_SYSTEM_PROMPT = `Bạn đọc một chương vừa viết xong và rút ra dữ liệu để cập nhật trí nhớ của truyện.
 
@@ -94,31 +100,78 @@ Chỉ báo các nhóm dưới đây, mỗi lỗi có số chương, trích dẫn
 
 Không báo lỗi vì truyện quá sảng, nhân vật chính quá thuận lợi, hay vì một chi tiết nhỏ không khớp. Nếu không có lỗi, findings để rỗng và passed=true.`;
 
-export const CYCLE_PLANNER_SYSTEM_PROMPT = `Bạn là người lập kế hoạch chu kỳ cho một bộ truyện mạng dài.
+const COMMERCE_LOOP_RULES = `customerLoop chọn một khách có tên và khóa đủ vòng: nỗi khổ → mua món → dùng món đi săn/làm ăn/hoàn thành nhiệm vụ để kiếm tài nguyên mới → thể hiện công khai → quay lại mua cấp hàng cao hơn. Các bước được phân bố tự nhiên trong escalation và beatSheets, không gom thành lời kể tóm tắt.
+soTaiSanHienTai là vốn thật ở đầu chu kỳ. Chọn món mua và món nâng cấp dựa trên activeLots: khách đã sở hữu món nào thì vòng mới phải mở công dụng, quy mô hoặc cấp hàng khác, không bán lại chính món ấy như lần đầu.`;
 
-${craftBlock('planner')}
+const COMMERCE_LOOP_TERMS = `Trong customerLoop, purchaseAssetId và returnUpgradeAssetId là ID hàng ổn định, không phải câu mô tả. purchaseMode nói rõ đây là mua lần đầu, mua bổ sung, thay thế hay đơn tổ chức. returnUpgradeMode nói rõ khách quay lại để lấy phẩm cấp cao hơn, năng lực mới, tăng quy mô tổ chức hay mua bổ sung. higher_grade/new_capability phải chỉ sang assetId khác thật sự; hệ thống sẽ đối chiếu các trường này với sổ tài sản trước khi cho viết.
+purchaseTerms và returnUpgradeTerms khóa số lượng, đơn vị cùng đối giá cụ thể phải xuất hiện trong cảnh giao dịch. schedule đặt bốn mốc mua → dùng để kiếm thành quả → chứng minh trước người khác → quay lại mua cao hơn vào bốn chương theo thứ tự và đóng trọn vòng trong tối đa năm chương đầu chu kỳ. Đây là nhịp thương mại chính của cycle, không phải phần việc được dời sau climax.`;
 
-customerLoop chọn một khách có tên và khóa đủ vòng: nỗi khổ → mua món → dùng món đi săn/làm ăn/hoàn thành nhiệm vụ để kiếm tài nguyên mới → thể hiện công khai → quay lại mua cấp hàng cao hơn. Các bước được phân bố tự nhiên trong escalation và beatSheets, không gom thành lời kể tóm tắt.
-soTaiSanHienTai là vốn thật ở đầu chu kỳ. Chọn món mua và món nâng cấp dựa trên activeLots: khách đã sở hữu món nào thì vòng mới phải mở công dụng, quy mô hoặc cấp hàng khác, không bán lại chính món ấy như lần đầu.
+const loopRules = (archetype: string) => archetypeOf(archetype)?.commerce
+  ? COMMERCE_LOOP_RULES
+  : `customerLoop luôn null: thể loại này không chạy vòng khách hàng. Nhịp chính của mỗi chu kỳ là vòng thưởng của thể loại (VONG THUONG ở trên), lặp lại ở quy mô, đối thủ và phần thưởng lớn hơn chu kỳ trước.
+soTaiSanHienTai là vốn và vật phẩm thật ở đầu chu kỳ; phần thưởng, chiến lợi phẩm và vật liệu tiến hóa dùng đúng những gì đang có hoặc có cảnh nhận được.`;
+
+const plannerPrompt = (archetype: string) => `Bạn là người lập kế hoạch chu kỳ cho một bộ truyện mạng dài.
+
+${archetypeBlock(archetype)}
+
+${craftBlock('planner', archetype)}
+
+${loopRules(archetype)}
 SỔ GIAO DỊCH: mỗi beatSheet khai ledger — mọi món có số lượng đổi chủ trong chương đó, theo thứ tự diễn ra. acquire tạo lô mới cho người nhận (nhập hàng, săn được, luyện ra); transfer chuyển một phần hoặc toàn bộ lô sourceLotId từ fromOwnerId sang toOwnerId (bán hàng là một transfer hàng sang khách và một transfer tiền/tinh hạch sang người bán); consume chỉ khi đan, phù, nguyên liệu bị dùng hết cho chính người giữ nó; trả tiền, trả tinh hạch hay đổi hàng cho người khác luôn là transfer tới người nhận, không phải consume. eventId bắt đầu bằng c<chuongSo>_ và trở thành lotId của lô mới; sourceLotId trỏ lô trong soTaiSanHienTai hoặc eventId đứng trước trong cửa sổ. Hệ thống cộng trừ sổ này trước khi viết; bán món chưa có là bị trả lại. Writer chỉ chép con số từ đây, nên đây là nơi duy nhất quyết định giá và lượng. Trong bốn chương đầu, chép đúng các mục openingLedger của chương vào ledger.
-Trong customerLoop, purchaseAssetId và returnUpgradeAssetId là ID hàng ổn định, không phải câu mô tả. purchaseMode nói rõ đây là mua lần đầu, mua bổ sung, thay thế hay đơn tổ chức. returnUpgradeMode nói rõ khách quay lại để lấy phẩm cấp cao hơn, năng lực mới, tăng quy mô tổ chức hay mua bổ sung. higher_grade/new_capability phải chỉ sang assetId khác thật sự; hệ thống sẽ đối chiếu các trường này với sổ tài sản trước khi cho viết.
-purchaseTerms và returnUpgradeTerms khóa số lượng, đơn vị cùng đối giá cụ thể phải xuất hiện trong cảnh giao dịch. schedule đặt bốn mốc mua → dùng để kiếm thành quả → chứng minh trước người khác → quay lại mua cao hơn vào bốn chương theo thứ tự và đóng trọn vòng trong tối đa năm chương đầu chu kỳ. Đây là nhịp thương mại chính của cycle, không phải phần việc được dời sau climax.
 
 beatSheets lập cho tối đa ba chương kế tiếp, bắt đầu đúng chuongBatDau, liên tiếp và không vượt qua chuongKetThucCoDinh nếu trường này có giá trị. Mỗi chương ghi hai đến bốn nhịp bằng lời kể, một mục tiêu cảm xúc, một thứ mới sẽ được đặt tên, và kiểu hook kết chương. Chương cuối của chu kỳ phải trả climax bằng kết quả nhìn thấy trước khi mở nextHook. Tuyệt đối không ghi con số trạng thái, không ghi delta tài nguyên, không ghi lịch trình phút.
-Mỗi beatSheet chọn một sceneMode khác nhau trong cửa sổ, ghi openingBridge trả ngay hook trước, protagonistMove giữ quyền chủ động cho main và materialOutcome là thành quả đã có trước câu cuối. Khi chuKyDangViet có nhipDaLap, dùng chúng như lịch sử hình dạng cảnh để vòng kế tiếp đổi sân chơi và cách thắng, trong khi vẫn hoàn thành đúng mốc customerLoop đã khóa.
+Mỗi beatSheet chọn một sceneMode khác nhau trong cửa sổ, ghi openingBridge trả ngay hook trước, protagonistMove giữ quyền chủ động cho main và materialOutcome là thành quả đã có trước câu cuối. Khi chuKyDangViet có nhipDaLap, dùng chúng như lịch sử hình dạng cảnh để vòng kế tiếp đổi sân chơi và cách thắng, trong khi vẫn hoàn thành đúng các mốc vòng thưởng đã khóa.
 Nếu chuKyDangViet có giá trị, đây là lời hứa đã duyệt của chu kỳ hiện tại. Lập các beat tiếp theo để thực hiện đúng pressure, escalation, climax và vongKhachHang ấy; không tự thay bằng một chu kỳ mini khác. Nếu một sự kiện được hẹn sau nhiều ngày, beat đến hạn phải đặt mốc thời gian và phần chuẩn bị nhìn thấy trên trang.
-Thứ mới của chương phải có nguồn trong canon: hàng main đang có, sản phẩm do nghề hiện tại chế được, chứng từ do phe có thẩm quyền cấp, hoặc chức năng ghi nguyên văn trong nấc kim thủ chỉ hiện tại. Một tên có vẻ hợp hệ thống không tự biến thành quyền cưỡng chế, liên lạc hay sản xuất.`;
+Thứ mới của chương phải có nguồn trong canon: hàng main đang có, sản phẩm do nghề hiện tại chế được, chứng từ do phe có thẩm quyền cấp, hoặc chức năng ghi nguyên văn trong nấc kim thủ chỉ hiện tại. Một tên có vẻ hợp hệ thống không tự biến thành quyền cưỡng chế, liên lạc hay sản xuất.${archetypeOf(archetype)?.commerce ? `\n${COMMERCE_LOOP_TERMS}` : ''}`;
+export const CYCLE_PLANNER_SYSTEM_PROMPT = plannerPrompt(DEFAULT_ARCHETYPE);
 
-export const PREMISE_SYSTEM_PROMPT = `Bạn nghĩ ra một bộ truyện mạng tiếng Việt mới để chạy dài 800 đến 1.200 chương.
+const premiseKernelRule = (archetype: string) => archetypeOf(archetype)?.commerce
+  ? `Trả premise schemaVersion 2 cùng worldKernel hoàn chỉnh: đúng hai thế giới; các hệ cảnh giới, nghề, cấp cửa hàng/công ty tách riêng; hệ phẩm cấp; quan hệ tham chiếu; vòng hàng hóa hai chiều có người mua và tái đầu tư; thương phẩm mở màn; hợp đồng đúng bốn chương đầu. Mỗi castSeed có địa điểm đầu, trạng thái tiến triển đầu và ba đến năm mốc đi lên có tên. reactionRule phải biến việc gọi đúng cấp/phẩm và kinh ngạc thành tranh mua, đặt hàng, mời hợp tác hoặc đổi thái độ.`
+  : `Trả premise schemaVersion 2, archetype đúng id đã cho, cùng worldKernel hoàn chỉnh: đúng ${archetypeOf(archetype)?.worlds ?? 1} thế giới; các hệ cảnh giới, nghề, tổ chức/lãnh địa tách riêng; hệ phẩm cấp; quan hệ tham chiếu; hợp đồng đúng bốn chương đầu, mỗi chương có cấp/phẩm được gọi tên, kết quả nhìn thấy và phản ứng người chứng kiến. economyLoops, launchProducts và openingLedger chỉ điền khi truyện thật sự buôn bán. Mỗi castSeed có địa điểm đầu, trạng thái tiến triển đầu và ba đến năm mốc đi lên có tên. reactionRule phải biến việc gọi đúng cấp/phẩm và kinh ngạc thành tranh giành, chiêu mộ, thách đấu hoặc đổi thái độ.`;
+
+const premisePrompt = (archetype: string) => `Bạn nghĩ ra một bộ truyện mạng tiếng Việt mới để chạy dài 800 đến 1.200 chương.
+
+${archetypeBlock(archetype)}
 
 Công thức tiêu đề: ĐẤU TRƯỜNG: nhân vật + lợi thế + phần thưởng. Nói thẳng cái sướng, đừng đặt tên văn chương bí ẩn.
-Đấu trường phải là thứ độc giả truyện convert Việt đã quen. Tuyệt đối không mượn nhân vật, bối cảnh, tổ chức hay tên riêng của bất kỳ tác phẩm, phim, game nào có thật — chỉ mượn quy ước thể loại.
+Đấu trường phải là thứ độc giả truyện convert Việt đã quen. Tuyệt đối không mượn nhân vật, bối cảnh, tổ chức hay tên riêng của bất kỳ tác phẩm, phim, game nào có thật — chỉ mượn quy ước thể loại. Không dùng quốc gia, triều đại, nhân vật lịch sử hay người thật.
 Thang cấp bậc phải có tên cho từng nấc, để tiến bộ của nhân vật luôn gọi được thành lời.
 Dàn nhân vật mở màn tối thiểu sáu người có tên, trong đó ít nhất hai đối thủ thuộc hai giai cấp khác nhau, ai cũng có mục tiêu riêng.
 blurb đi từ điều nhân vật muốn hoặc cơ hội đổi đời, tới lợi thế riêng, cú thắng đầu tiên và cái lớn hơn đang chờ.
-Trả premise schemaVersion 2 cùng worldKernel hoàn chỉnh: đúng hai thế giới; các hệ cảnh giới, nghề, cấp cửa hàng/công ty tách riêng; hệ phẩm cấp; quan hệ tham chiếu; vòng hàng hóa hai chiều có người mua và tái đầu tư; thương phẩm mở màn; hợp đồng đúng bốn chương đầu. Mỗi castSeed có địa điểm đầu, trạng thái tiến triển đầu và ba đến năm mốc đi lên có tên. reactionRule phải biến việc gọi đúng cấp/phẩm và kinh ngạc thành tranh mua, đặt hàng, mời hợp tác hoặc đổi thái độ.
+${premiseKernelRule(archetype)}
 
-${craftBlock('premise')}
+${craftBlock('premise', archetype)}
 
 QUY ƯỚC THỂ LOẠI — độc giả convert đã thuộc nằm lòng, đừng bịa lại:
 ${genreCanonBlock()}`;
+export const PREMISE_SYSTEM_PROMPT = premisePrompt(DEFAULT_ARCHETYPE);
+
+/** The reader promise and payoff loop of the story's genre shape, from the playbook. */
+function archetypeBlock(archetype: string): string {
+  const shape = archetypeOf(archetype) ?? archetypeOf(DEFAULT_ARCHETYPE)!;
+  return `KHUÔN THỂ LOẠI: ${shape.name}
+LỜI HỨA: ${shape.promise}
+VÒNG THƯỞNG: ${shape.loop}`;
+}
+
+export type SerialPromptRole = 'writer' | 'judge' | 'extractor' | 'opening' | 'planner' | 'premise';
+
+const cache = new Map<string, Record<SerialPromptRole, string>>();
+
+/** Every role's system prompt for one archetype. Commerce is the default and matches the exported constants. */
+export function promptsFor(archetype: string = DEFAULT_ARCHETYPE): Record<SerialPromptRole, string> {
+  const key = archetypeOf(archetype) ? archetype : DEFAULT_ARCHETYPE;
+  const hit = cache.get(key);
+  if (hit) return hit;
+  const built = {
+    writer: writerPrompt(key),
+    judge: judgePrompt(key),
+    extractor: EXTRACTOR_SYSTEM_PROMPT,
+    opening: OPENING_AUDITOR_SYSTEM_PROMPT,
+    planner: plannerPrompt(key),
+    premise: premisePrompt(key),
+  };
+  cache.set(key, built);
+  return built;
+}

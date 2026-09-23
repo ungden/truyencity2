@@ -26,9 +26,32 @@ const PayoffKindSchema = z.object({
 export const CRAFT_ROLES = ['writer', 'premise', 'planner', 'judge'] as const;
 export type CraftRole = (typeof CRAFT_ROLES)[number];
 
+/**
+ * A genre shape the engine can write: its reader promise and the loop the planner repeats.
+ * Kept as data so opening a new lane is a playbook edit plus a premise, not new code.
+ */
+const ArchetypeSchema = z.object({
+  id: z.string().trim().regex(/^[a-z0-9_]{3,48}$/),
+  name: z.string().trim().min(2).max(80),
+  /** How many worlds the premise's World Kernel must describe. */
+  worlds: z.union([z.literal(1), z.literal(2)]),
+  /** Commerce lanes carry the customer loop, launch products and the opening ledger. */
+  commerce: z.boolean(),
+  /** What the reader comes back for, in one or two sentences. */
+  promise: z.string().trim().min(20),
+  /** The repeatable payoff loop a cycle plan is built around. */
+  loop: z.string().trim().min(20),
+  addedAt: z.string().trim().optional(),
+  evidence: z.string().trim().optional(),
+}).strict();
+export type Archetype = z.infer<typeof ArchetypeSchema>;
+export const DEFAULT_ARCHETYPE = 'two_world_commerce';
+
 const CraftRuleSchema = z.object({
   id: z.string().trim().regex(/^[a-z0-9_]{3,48}$/),
   role: z.enum(['shared', ...CRAFT_ROLES]),
+  /** Absent: applies to every archetype. Present: only to these. */
+  archetypes: z.array(z.string().trim().min(3)).min(1).optional(),
   status: z.enum(['active', 'retired']),
   /** When the evidence behind this rule was last checked, not when it was written. */
   observedAt: z.string().trim().regex(/^\d{4}-\d{2}-\d{2}$/),
@@ -70,8 +93,16 @@ export const PlaybookSchema = z.object({
    */
   genreCanon: z.record(z.unknown()).optional(),
   payoffKinds: z.array(PayoffKindSchema).min(5),
+  archetypes: z.array(ArchetypeSchema).min(1),
   rules: z.array(CraftRuleSchema).min(1),
 }).strict().superRefine((book, ctx) => {
+  const archetypeIds = new Set(book.archetypes.map(item => item.id));
+  if (!archetypeIds.has(DEFAULT_ARCHETYPE)) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['archetypes'], message: `The default archetype ${DEFAULT_ARCHETYPE} must exist.` });
+  book.rules.forEach((rule, index) => {
+    for (const archetype of rule.archetypes ?? []) {
+      if (!archetypeIds.has(archetype)) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['rules', index, 'archetypes'], message: `Rule ${rule.id} names unknown archetype ${archetype}.` });
+    }
+  });
   book.rules.forEach((rule, index) => {
     const violations = antiPayoffViolations(rule.text);
     if (violations.length) ctx.addIssue({
@@ -96,13 +127,23 @@ export function playbook(): Playbook {
   return override ?? PlaybookSchema.parse(raw);
 }
 
-export function activeRules(role: CraftRole): CraftRule[] {
-  return playbook().rules.filter(rule => (rule.role === 'shared' || rule.role === role) && rule.status === 'active');
+export function activeRules(role: CraftRole, archetype: string = DEFAULT_ARCHETYPE): CraftRule[] {
+  return playbook().rules.filter(rule => (rule.role === 'shared' || rule.role === role)
+    && rule.status === 'active'
+    && (!rule.archetypes || rule.archetypes.includes(archetype)));
 }
 
-/** Shared editorial direction and role-specific craft, each included once. */
-export function craftBlock(role: CraftRole): string {
-  return activeRules(role).map(rule => rule.text).join('\n\n');
+/** Shared editorial direction and role-specific craft for one archetype, each included once. */
+export function craftBlock(role: CraftRole, archetype: string = DEFAULT_ARCHETYPE): string {
+  return activeRules(role, archetype).map(rule => rule.text).join('\n\n');
+}
+
+export function archetypeOf(id: string): Archetype | null {
+  return playbook().archetypes.find(item => item.id === id) ?? null;
+}
+
+export function archetypeIds(): string[] {
+  return playbook().archetypes.map(item => item.id);
 }
 
 /** Genre reference handed to the premise writer so it stops inventing broken economics. */

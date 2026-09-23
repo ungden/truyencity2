@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { payoffKindIds } from './playbook';
+import { archetypeOf, DEFAULT_ARCHETYPE, payoffKindIds } from './playbook';
 import {
   NarrativeEvidenceSchema,
   NarrativeFoundationSchema,
@@ -45,6 +45,10 @@ export const LANES = [
   'toan_dan_lanh_chua',
   'trong_sinh_biet_truoc',
   'thuc_tinh_toan_dan',
+  'toan_dan_chuc_nghiep',
+  'gia_toc_tu_tien',
+  'ngu_thu',
+  'quy_tac_quai_dam',
 ] as const;
 export type Lane = (typeof LANES)[number];
 
@@ -134,6 +138,8 @@ export const PremiseSchema = z.object({
   schemaVersion: z.union([z.literal(2), z.literal(3)]),
   narrativeFoundation: NarrativeFoundationSchema.optional(),
   lane: z.enum(LANES),
+  /** Genre shape from the playbook registry: world count, commerce loop, reader promise. */
+  archetype: z.string().trim().regex(/^[a-z0-9_]{3,48}$/).default(DEFAULT_ARCHETYPE),
   /** `ĐẤU TRƯỜNG: nhân vật + lợi thế + payoff`, the measured Faloo formula. */
   title: z.string().trim().min(12).max(120),
   /** One line a reader decides on. */
@@ -207,7 +213,7 @@ export const PremiseSchema = z.object({
       civilizationState: para,
       locations: z.array(z.object({ id, name: line, note: para }).strict()).min(2).max(20),
       factions: z.array(z.object({ id, name: line, agenda: para }).strict()).min(2).max(20),
-    }).strict()).length(2),
+    }).strict()).min(1).max(2),
     progressionSystems: z.array(z.object({
       id,
       name: line,
@@ -318,15 +324,22 @@ export const PremiseSchema = z.object({
     .filter(member => member.role === 'antagonist' && member.antagonistClass)
     .map(member => member.antagonistClass));
   if (premise.schemaVersion === 2 && antagonistClasses.size < 2) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['castSeed'], message: 'Legacy premise needs antagonists from at least two classes.' });
+  const shape = archetypeOf(premise.archetype);
+  if (!shape) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['archetype'], message: `Unknown archetype ${premise.archetype}.` });
+  } else if (premise.worldKernel.worlds.length !== shape.worlds) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['worldKernel', 'worlds'], message: `Archetype ${shape.id} needs exactly ${shape.worlds} world(s).` });
+  }
+  const commerce = shape?.commerce ?? true;
   if (premise.schemaVersion === 2 && (premise.castSeed.length < 6
     || premise.goldenFinger.evolution.length < 6
     || premise.goldenFinger.evolution.length > 8
     || premise.worldKernel.progressionSystems.length < 3
     || premise.worldKernel.gradeSystems.length < 2
-    || premise.worldKernel.economyLoops.length < 2
-    || premise.worldKernel.launchProducts.length < 4
-    || premise.worldKernel.openingLedger.length < 4)) {
-    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Legacy premise v2 must retain its original launch minimums.' });
+    || (commerce && (premise.worldKernel.economyLoops.length < 2
+      || premise.worldKernel.launchProducts.length < 4
+      || premise.worldKernel.openingLedger.length < 4)))) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Premise v2 must meet its launch minimums (commerce archetypes also need economy loops, launch products and an opening ledger).' });
   }
   const validateProgression = (state: z.infer<typeof ProgressionRefSchema>, path: (string | number)[]) => {
     const system = systems.get(state.systemId);
@@ -367,8 +380,8 @@ export const PremiseSchema = z.object({
   const chapters = premise.worldKernel.openingContract.map(item => item.chapterNumber).sort();
   if (premise.schemaVersion === 2 && chapters.join(',') !== '1,2,3,4') ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['worldKernel', 'openingContract'], message: 'Legacy opening contract must cover chapters 1, 2, 3 and 4 exactly once.' });
   if (premise.schemaVersion === 2 && premise.worldKernel.openingContract.some(item =>
-    !item.namedLevelOrGrade || !item.witnessReaction || !item.commercialAction)) {
-    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['worldKernel', 'openingContract'], message: 'Legacy opening rows require grade, witness, and commercial action.' });
+    !item.namedLevelOrGrade || !item.witnessReaction || (commerce && !item.commercialAction))) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['worldKernel', 'openingContract'], message: 'Opening rows require a named grade and a witness reaction; commerce archetypes also a commercial action.' });
   }
   if (premise.schemaVersion === 3 && premise.narrativeFoundation) {
     try {
@@ -586,10 +599,10 @@ function validateCyclePlan(cycle: z.infer<typeof CyclePlanObjectSchema>, ctx: z.
       message: 'A rolling beat window must use a different dominant scene mode for each chapter.',
     });
   }
-  if (minimumSpan === 5 && cycle.schemaVersion === 1 && (!cycle.customerLoop
-    || cycle.climax.witnesses.length === 0
+  // The customer loop is a commerce-archetype requirement, checked where the premise is known.
+  if (minimumSpan === 5 && cycle.schemaVersion === 1 && (cycle.climax.witnesses.length === 0
     || cycle.beatSheets.some(sheet => !sheet.newNamedThing))) {
-    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Legacy cycle v1 requires a customer loop, witnesses, and one new named thing per beat.' });
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Cycle v1 requires witnesses and one new named thing per beat.' });
   }
   const schedule = cycle.customerLoop?.schedule;
   if (!schedule) return;

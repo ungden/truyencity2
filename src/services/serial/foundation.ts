@@ -17,6 +17,7 @@ import {
   JUDGE_SYSTEM_PROMPT,
   OPENING_AUDITOR_SYSTEM_PROMPT,
   PREMISE_SYSTEM_PROMPT,
+  promptsFor,
   WRITER_SYSTEM_PROMPT,
 } from './prompts';
 import type { SerialRoutes } from './contracts';
@@ -57,14 +58,7 @@ export function serialSystemPrompt(
   premise: Premise,
 ): string {
   const foundation = narrativeFoundation(premise);
-  if (!foundation) return {
-    writer: WRITER_SYSTEM_PROMPT,
-    judge: JUDGE_SYSTEM_PROMPT,
-    extractor: EXTRACTOR_SYSTEM_PROMPT,
-    opening: OPENING_AUDITOR_SYSTEM_PROMPT,
-    planner: CYCLE_PLANNER_SYSTEM_PROMPT,
-    premise: PREMISE_SYSTEM_PROMPT,
-  }[role];
+  if (!foundation) return promptsFor(premise.archetype)[role];
   const craft = narrativeCraft(foundation.craftProfile);
   const common = `${craft}
 
