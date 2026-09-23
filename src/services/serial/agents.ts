@@ -113,6 +113,7 @@ export async function reviseChapter(input: {
 ĐANG SỬA BẢN BỊ TRẢ
 banBiTra là chương bạn vừa viết. loi là những chỗ mâu thuẫn với canon, mỗi lỗi có trích dẫn nguyên văn chỉ đúng chỗ hỏng.
 Sửa đúng những chỗ đó và mọi hệ quả của chúng. Giữ nguyên phần còn lại — đừng viết lại cả chương, và tuyệt đối đừng thêm sự kiện mới để che lỗi cũ.
+Tiêu đề là một câu trích từ chương: nếu bản sửa làm mất câu ấy, đặt lại tiêu đề bằng một câu có thái độ còn nằm trong chương, ưu tiên câu móc cuối.
 Trả về toàn bộ chương sau khi sửa.`;
   const result = await input.provider.json({
     model: input.routes.writer,
