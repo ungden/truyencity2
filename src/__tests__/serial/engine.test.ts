@@ -504,6 +504,7 @@ describe('context selection', () => {
     expect(last.chuongKeTiep).toBeNull();
     for (const archetype of archetypeIds()) {
       expect(promptsFor(archetype).writer).toMatch(/câu hook cuối chương dẫn thẳng vào việc chương sau làm/);
+      expect(promptsFor(archetype).writer).toMatch(/đoạn mở xử lý hoặc nối nó sang openingBridge/);
     }
   });
 
