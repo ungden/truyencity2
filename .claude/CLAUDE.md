@@ -93,23 +93,29 @@ Notes:
 
 ## Cron
 
-Two schedulers, verified 2026-08-13 against production:
+Two schedulers, verified 2026-09-25 against production. **Every HTTP cron lives in
+`vercel.json`**, versioned with its route; `vercel-crons.test.ts` fails if a scheduled path
+has no route. pg_cron runs only SQL.
 
-- **`story-factory` runs on Vercel Cron** (`vercel.json`, `*/2 * * * *`) — the writing
-  pipeline. It is NOT in `cron.job`, so it cannot be paused from SQL; pausing it means a
-  deploy or the Vercel dashboard.
-- **`serial` runs on Vercel Cron** (`*/5 * * * *`) — the replacement writing pipeline. It
-  returns `disabled` unless `SERIAL_ENGINE_ENABLED=true`.
-- **`health-check` runs on Vercel Cron** (`*/15 * * * *`, also hourly from pg_cron) and watches
-  the Serial fleet: a paused story, an opening waiting for review, a due job the cron is not
-  claiming, or a dead lease emails `STORY_FACTORY_ALERT_EMAIL` through Resend, one email per
-  incident per day (`src/services/serial/health.ts`).
-- **pg_cron runs the housekeeping jobs** (covers, health check, VIP expiry, RAG archive…),
-  listed in `cron.job`. Secret lives in Supabase Vault as `cron_secret`; every pg_cron job
-  sends `Authorization: Bearer ${CRON_SECRET}`.
+- **`serial`** (`*/5 * * * *`) — the writing pipeline. Returns `disabled` unless
+  `SERIAL_ENGINE_ENABLED=true`.
+- **`story-factory`** (`*/2 * * * *`) — the stopped incumbent; returns `disabled`
+  (`STORY_FACTORY_ENABLED` unset since 2026-09-24).
+- **`health-check`** (`*/15 * * * *`) — watches the Serial fleet: a paused story, an opening
+  waiting for review, a due job the cron is not claiming, a dead lease or a disabled engine
+  emails `STORY_FACTORY_ALERT_EMAIL` through Resend, one email per incident per day
+  (`src/services/serial/health.ts`).
+- **pg_cron** (`cron.job`) — four SQL jobs: `expire-stale-vip-orders`,
+  `expire-vip-subscriptions`, `expire-novel-boosts`, `rag-archive-weekly`. On 2026-09-25 six
+  HTTP jobs calling deleted routes were unscheduled; two of them carried `CRON_SECRET` as a
+  literal in their command, and that run history was purged.
 
-Rotating the secret: `openssl rand -hex 32` → `vault.update_secret` → update `CRON_SECRET`
-in Vercel → verify in `cron.job_run_details`.
+Vercel Cron sends `Authorization: Bearer ${CRON_SECRET}` itself. Rotating the secret means
+updating `CRON_SECRET` on `truyencity2` and redeploying (`vault` `cron_secret` is no longer
+read by any job).
+
+Something outside this repo still calls `/api/cron/write-chapters` every 5 minutes (404 at
+the middleware). It is not pg_cron, `vercel.json`, CI or an edge function.
 
 ## Monetisation
 

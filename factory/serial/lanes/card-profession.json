@@ -5,7 +5,7 @@
   "title": "Toàn Dân Chuyển Chức: Nghề Phụ Luyện Thẻ Của Ta Ra Thẻ Đỏ, Đoạt Cả Hầm Ngục",
   "hook": "Mười tám tuổi thức tỉnh nghề phụ Luyện Thẻ, Lâm Kha luyện ra thẻ Lục ngay tại lễ đường; mỗi màu thẻ mới còn biến thành thực lực của chính cậu, từ chuộc quầy sửa thẻ đến đoạt hầm ngục.",
   "blurb": "Lâm Kha chỉ muốn kiếm đủ năm triệu phiếu Minh để chuộc lại quầy sửa thẻ của cha trước ngày sang tên. Nhưng trong lễ thức tỉnh, nghề Luyện Thẻ bị cả lớp cười là nghề phụ lại cho cậu một bảng chưa từng tồn tại: gom nguyên liệu, luyện thẻ, dung hợp thẻ, mở phẩm màu Trắng đến Đỏ. Quan trọng hơn, mỗi lần cậu làm ra một màu mới, thực lực bản thân cũng đổi theo. Ba viên Sỏi Tro Nham bị vứt bên sân lễ biến thành Khiên Tro phẩm Lục, chặn đứng cú va đập của học viên tinh anh và khiến kiểm định viên phải gọi đúng phẩm màu trước toàn trường. Từ một người giao lõi quái ở khu trọ, Lâm Kha sẽ dùng thẻ thắng kiểm định, cướp suất hầm ngục, dựng đội săn và bước vào giải liên viện. Nhưng Phan gia đang giữ nguồn mực, nhà Đoàn cần quyền khai thác, còn tầng sâu Hầm Mưa Đen chỉ chờ người gom đủ sáu màu thẻ để mở ra.",
-  "readerFantasy": "Thấy Lâm Kha biến phế liệu thành thẻ phẩm cao, gọi đúng cấp để ép đối thủ đổi thái độ, rồi lấy chiến thắng và phần thưởng làm vốn leo từ khu trọ lên quyền khai thác hầm ngục.",
+  "readerFantasy": "Thấy Lâm Kha biến phế liệu thành thẻ phẩm cao, gọi đúng cấp để ép đối thủ đổi thái độ, sớm tung ra lá thẻ Đỏ tàn phẩm đầu tiên giữa hầm ngục khiến cả Vân Cảng chấn động, rồi lấy chiến thắng và phần thưởng làm vốn leo từ khu trọ lên quyền khai thác hầm ngục.",
   "presentation": {
     "coverPath": "/covers/serial-lanes/card-profession.webp",
     "tagline": "Luyện một thẻ, đổi một màu, mạnh một bậc.",
@@ -27,7 +27,7 @@
   },
   "goldenFinger": {
     "name": "Bảng Luyện Thẻ Vạn Tượng",
-    "rule": "Lâm Kha có thể đưa nguyên liệu, lõi quái hoặc thẻ hợp lệ vào bảng để nhận công thức, luyện thẻ và dung hợp theo cấu trúc nhìn thấy. Lần đầu hoàn thành mỗi phẩm màu Trắng, Lục, Lam, Tím, Kim, Đỏ, cậu nhận một Thẻ Chủ cùng màu nâng thực lực cá nhân. Bảng không tạo miễn phí nguyên liệu, không bảo đảm thành công khi thiếu điều kiện và không thể luyện vật vượt quá nguyên liệu đã có.",
+    "rule": "Lâm Kha có thể đưa nguyên liệu, lõi quái hoặc thẻ hợp lệ vào bảng để nhận công thức, luyện thẻ và dung hợp theo cấu trúc nhìn thấy. Lần đầu hoàn thành mỗi phẩm màu Trắng, Lục, Lam, Tím, Kim, Đỏ, cậu nhận một Thẻ Chủ cùng màu nâng thực lực cá nhân. Bảng không tạo miễn phí nguyên liệu, không bảo đảm thành công khi thiếu điều kiện và không thể luyện vật vượt quá nguyên liệu đã có. Ngoại lệ duy nhất theo nấc: ngay lần đầu vào hầm ngục, bảng hé một công thức thẻ Đỏ tàn khuyết; khi gom đủ vật liệu mà công thức ghi, Lâm Kha luyện được một lá thẻ Đỏ tàn phẩm chỉ dùng một lần, đủ để cả trận thấy màu đỏ, còn thẻ Đỏ hoàn chỉnh và Thẻ Chủ Đỏ vẫn phải đi qua đủ sáu màu.",
     "scope": "Áp dụng cho vật liệu, quái vật và thẻ thuộc hệ thống chức nghiệp của Liên bang Minh Lưu; Lâm Kha phải tự thu thập, chiến đấu, kiểm chứng và trả giá cho mọi lần luyện.",
     "evolution": [
       {
