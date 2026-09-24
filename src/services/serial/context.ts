@@ -236,6 +236,11 @@ export function relevantWorldSlice(input: {
   };
 }
 
+function nextChapterLead(cycle: CyclePlan, chapterNumber: number): { openingBridge: string; firstBeat: string } | null {
+  const next = cycle.beatSheets.find(item => item.chapterNumber === chapterNumber + 1);
+  return next ? { openingBridge: next.openingBridge, firstBeat: next.beats[0] ?? '' } : null;
+}
+
 export function buildWriterBrief(input: {
   premise: Premise;
   bible: Bible;
@@ -287,6 +292,9 @@ export function buildWriterBrief(input: {
     mucTieuCamXuc: sheet.emotionalTarget,
     thuMoiPhaiDatTen: sheet.newNamedThing,
     kieuHookKetChuong: sheet.endHookKind,
+    // What the next planned chapter opens on. A writer who could not see it ended
+    // chapter 2 on "the land check is in three days", which chapter 3 never held.
+    chuongKeTiep: nextChapterLead(cycle, chapterNumber),
     ghiChuBienTap: cycle.editorialNotes,
     narrativeFoundation: premise.narrativeFoundation ?? null,
     narrativeEvidence: bible.symbolicCore.narrativeEvidence,

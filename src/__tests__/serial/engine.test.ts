@@ -494,6 +494,19 @@ describe('cycle lifecycle', () => {
 });
 
 describe('context selection', () => {
+  test('the writer sees what the next planned chapter opens on, so its hook leads there', () => {
+    const plan = cycle();
+    const [first] = plan.beatSheets;
+    const withNext = { ...plan, beatSheets: [first, { ...first, chapterNumber: first.chapterNumber + 1, openingBridge: 'Sáng hôm sau, quầy đan mở cửa.' }] };
+    const brief = buildWriterBrief({ premise, bible: baseBible(), cycle: withNext, chapterNumber: first.chapterNumber, previousChapter: 'Câu cuối.' });
+    expect(brief.chuongKeTiep).toMatchObject({ openingBridge: 'Sáng hôm sau, quầy đan mở cửa.' });
+    const last = buildWriterBrief({ premise, bible: baseBible(), cycle: withNext, chapterNumber: first.chapterNumber + 1, previousChapter: 'Câu cuối.' });
+    expect(last.chuongKeTiep).toBeNull();
+    for (const archetype of archetypeIds()) {
+      expect(promptsFor(archetype).writer).toMatch(/câu hook cuối chương dẫn thẳng vào việc chương sau làm/);
+    }
+  });
+
   test('the writer brief carries beats and a short do-not-contradict list, never deltas', () => {
     const brief = buildWriterBrief({
       premise, bible: baseBible(), cycle: cycle(), chapterNumber: 8, previousChapter: 'Câu cuối.',
