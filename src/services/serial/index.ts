@@ -7,3 +7,4 @@ export * from './agents';
 export * from './engine';
 export * from './runtime';
 export * from './catalog';
+export * from './health';

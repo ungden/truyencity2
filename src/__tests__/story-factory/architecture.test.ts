@@ -332,8 +332,9 @@ describe('Story Factory architecture boundary', () => {
     expect(arc).toContain("foundationSystemPrompt(PLANNER_SYSTEM_PROMPT, input.kernel, 'arc')");
   });
 
-  test('health check uses the full database claim predicate', () => {
-    const route = read('src/app/api/cron/health-check/route.ts');
+  // The health-check cron watches the Serial fleet since the factory was switched off
+  // (2026-09-24); the factory's own cron heartbeat keeps the claim predicate check.
+  test('the factory heartbeat uses the full database claim predicate', () => {
     const heartbeat = read('src/app/api/cron/story-factory/route.ts');
     const claim = read(latestMigrationDefining('public.claim_story_factory_job'));
     const queueHealth = read(latestMigrationDefining('public.story_factory_claimable_queue_health'));
@@ -341,10 +342,7 @@ describe('Story Factory architecture boundary', () => {
     const healthPredicate = sliceBetween(queueHealth, "WHERE job.status IN ('setup', 'ready', 'finale')", '$$;');
     const normalizePredicate = (value: string) => value.replace(/\s+/g, ' ').trim().replace(/;$/, '');
     expect(normalizePredicate(healthPredicate)).toBe(normalizePredicate(claimPredicate));
-    expect(route).toContain("rpc('story_factory_claimable_queue_health'");
     expect(heartbeat).toContain("rpc('story_factory_claimable_queue_health'");
-    expect(route).toContain('oldestRunnableAgeMinutes');
-    expect(route).toContain('const stale = enabled && (oldestRunnableAgeMinutes ?? 0) > 30');
   });
 
   test('plan blocks require validated recovery instead of a generic revive', () => {

@@ -9,7 +9,9 @@ const RESEND_EMAILS_ENDPOINT = 'https://api.resend.com/emails';
 const DEFAULT_SITE_URL = 'https://www.truyencity.com';
 const MAX_RECIPIENTS = 4;
 
-export type StoryFactoryAlertKind = 'terminal_block' | 'stalled_cron' | 'cron_failure';
+export type StoryFactoryAlertKind = 'terminal_block' | 'stalled_cron' | 'cron_failure'
+  // Serial engine incidents, mailed directly by the health-check cron (never queued in the outbox).
+  | 'serial_paused' | 'serial_review' | 'serial_stalled' | 'serial_lease' | 'serial_disabled';
 
 export interface StoryFactoryOperatorAlert {
   kind: StoryFactoryAlertKind;
@@ -83,6 +85,14 @@ function boundedMessage(value: string): string {
   return value.trim().slice(0, 2_000);
 }
 
+function systemName(alert: StoryFactoryOperatorAlert): string {
+  return alert.kind.startsWith('serial_') ? 'Hệ viết truyện' : 'Story Factory';
+}
+
+function adminPath(alert: StoryFactoryOperatorAlert): string {
+  return alert.kind.startsWith('serial_') ? '/admin/serial' : '/admin';
+}
+
 function alertSubject(alert: StoryFactoryOperatorAlert): string {
   const chapter = typeof alert.chapterNumber === 'number' ? ` · Ch${alert.chapterNumber}` : '';
   return `[TruyenCity] Cần can thiệp: ${alert.title}${chapter}`;
@@ -98,13 +108,13 @@ function alertText(alert: StoryFactoryOperatorAlert, siteUrl: string): string {
     ['Mã lỗi', alert.errorCode],
   ].filter((field): field is [string, string] => Boolean(field[1]));
   return [
-    'Story Factory cần được kiểm tra.',
+    `${systemName(alert)} cần được kiểm tra.`,
     '',
     ...fields.map(([label, value]) => `${label}: ${value}`),
     '',
     boundedMessage(alert.message),
     '',
-    `Mở vận hành: ${siteUrl}/admin`,
+    `Mở vận hành: ${siteUrl}${adminPath(alert)}`,
   ].join('\n');
 }
 
@@ -118,12 +128,12 @@ function alertHtml(alert: StoryFactoryOperatorAlert, siteUrl: string): string {
     ['Mã lỗi', alert.errorCode],
   ].filter((field): field is [string, string] => Boolean(field[1]));
   return `<main style="font-family:Arial,sans-serif;max-width:640px;margin:auto;line-height:1.5">
-  <h2>Story Factory cần can thiệp</h2>
+  <h2>${escapeHtml(systemName(alert))} cần can thiệp</h2>
   <p>${escapeHtml(boundedMessage(alert.message))}</p>
   <table style="border-collapse:collapse">${details.map(([label, value]) => (
     `<tr><th style="text-align:left;padding:4px 12px 4px 0">${escapeHtml(label)}</th><td>${escapeHtml(value)}</td></tr>`
   )).join('')}</table>
-  <p><a href="${escapeHtml(`${siteUrl}/admin`)}">Mở trang vận hành TruyenCity</a></p>
+  <p><a href="${escapeHtml(`${siteUrl}${adminPath(alert)}`)}">Mở trang vận hành TruyenCity</a></p>
 </main>`;
 }
 

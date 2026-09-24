@@ -70,6 +70,8 @@ public/covers/*
 !public/covers/flagship-first-30/**
 !public/covers/serial-pilots/
 !public/covers/serial-pilots/**
+!public/covers/serial-lanes/
+!public/covers/serial-lanes/**
 
 # typescript
 *.tsbuildinfo

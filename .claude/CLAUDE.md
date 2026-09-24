@@ -100,6 +100,10 @@ Two schedulers, verified 2026-08-13 against production:
   deploy or the Vercel dashboard.
 - **`serial` runs on Vercel Cron** (`*/5 * * * *`) — the replacement writing pipeline. It
   returns `disabled` unless `SERIAL_ENGINE_ENABLED=true`.
+- **`health-check` runs on Vercel Cron** (`*/15 * * * *`, also hourly from pg_cron) and watches
+  the Serial fleet: a paused story, an opening waiting for review, a due job the cron is not
+  claiming, or a dead lease emails `STORY_FACTORY_ALERT_EMAIL` through Resend, one email per
+  incident per day (`src/services/serial/health.ts`).
 - **pg_cron runs the housekeeping jobs** (covers, health check, VIP expiry, RAG archive…),
   listed in `cron.job`. Secret lives in Supabase Vault as `cron_secret`; every pg_cron job
   sends `Authorization: Bearer ${CRON_SECRET}`.

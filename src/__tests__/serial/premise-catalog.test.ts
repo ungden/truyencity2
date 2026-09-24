@@ -1,4 +1,5 @@
-import { readFileSync, readdirSync } from 'node:fs';
+import { execSync } from 'node:child_process';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { PremiseSchema } from '@/services/serial/contracts';
 import { SERIAL_PREMISE_CATALOG } from '@/services/serial/catalog';
 import { archetypeOf } from '@/services/serial/playbook';
@@ -16,6 +17,14 @@ describe('Song Xuyên production packages', () => {
     expect(readdirSync('factory/serial/song-xuyen').filter(file => file.endsWith('.json'))).toEqual([
       '01-cua-hang-cong-phap-tu-tien.json', '02-rau-tuoi-doi-ai.json',
     ]);
+  });
+
+  test('every catalog cover is a committed file, so no story launches with a broken cover', () => {
+    const tracked = new Set(execSync('git ls-files public/covers', { encoding: 'utf8' }).split('\n'));
+    for (const { id, premise } of SERIAL_PREMISE_CATALOG) {
+      const file = `public${premise.presentation.coverPath}`;
+      expect({ id, exists: existsSync(file), committed: tracked.has(file) }).toEqual({ id, exists: true, committed: true });
+    }
   });
 
   test('every source file is the exact schema-valid v2 package exposed in catalog', () => {

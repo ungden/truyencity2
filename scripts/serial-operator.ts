@@ -14,7 +14,8 @@
  * gates: first the premise, then the four private opening chapters.
  */
 import dotenv from 'dotenv';
-import { readFileSync } from 'node:fs';
+import { execSync } from 'node:child_process';
+import { existsSync, readFileSync } from 'node:fs';
 import { createClient } from '@supabase/supabase-js';
 import { assertSerialLaunchable, PremiseSchema, readStoredOpeningAudit, SerialRoutesSchema } from '@/services/serial/contracts';
 import { repairOpeningUntilClean, splitOpeningFindings } from '@/services/serial/engine';
@@ -102,6 +103,15 @@ async function seed(): Promise<void> {
     routes: DEFAULT_SERIAL_ROUTES.routeVersion,
   }, null, 2));
   if (!apply) return;
+
+  // A cover that is missing, or on disk but ignored by git, is a broken image in production.
+  const coverFile = `public${premise.presentation.coverPath}`;
+  if (!existsSync(coverFile)) {
+    throw new Error(`${coverFile} does not exist. Run: npm run serial:cover -- --id=<catalog id> --apply`);
+  }
+  if (!execSync(`git ls-files -- ${JSON.stringify(coverFile)}`, { encoding: 'utf8' }).trim()) {
+    throw new Error(`${coverFile} is not committed, so production would serve a 404. Commit it (check .gitignore) and push before seeding.`);
+  }
 
   const existing = await db.from('novels').select('id,title').eq('slug', slug).maybeSingle();
   if (existing.error) throw existing.error;

@@ -86,6 +86,7 @@ describe('serial launch operations', () => {
   test('seed persists presentation data and refuses a duplicate slug', () => {
     expect(operator).toMatch(/description: premise\.presentation\.shortDescription/);
     expect(operator).toMatch(/cover_url: premise\.presentation\.coverPath/);
+    expect(operator).toMatch(/is not committed, so production would serve a 404/);
     expect(operator).toMatch(/genres: premise\.presentation\.tags/);
     expect(operator).toMatch(/seed is intentionally idempotent/);
   });
