@@ -37,9 +37,9 @@ arithmetic never discards a chapter. `SERIAL_ENGINE_ENABLED=true` in production 
 2026-09-24; the first story on it is *Song Xuyên Mạt Thế: Cửa Hàng Của Ta Bán Công Pháp Tu
 Tiên* (slug `cua-hang-cua-ta-ban-cong-phap-tu-tien`).
 
-Vercel has two projects building this repo. **`truyencity2` is production** (owns
-`www.truyencity.com`, holds the secrets). `truyencity` is the one this checkout is
-`vercel link`ed to; it has no environment variables. Change env vars on `truyencity2`.
+Vercel project **`truyencity2`** is production: it owns `www.truyencity.com`, holds the
+secrets and builds every push to `main`. The duplicate project `truyencity` (no domain, no
+env vars) was deleted on 2026-09-24; this checkout is `vercel link`ed to `truyencity2`.
 
 **When Serial writes a weak chapter, fix the premise or the plan — never forbid an event,
 never gate on arithmetic, never add a rejection rule for one failure.** That fix is how all
@@ -71,7 +71,8 @@ npm run factory:operator -- status            # what the fleet is doing
 npm run factory:operator -- revive --apply    # un-park blocked jobs
 ```
 
-`STORY_FACTORY_ENABLED=true` is required for any writing to happen at all.
+`STORY_FACTORY_ENABLED=true` is required for any writing to happen at all. It was removed
+from production on 2026-09-24; the cron still fires and returns `disabled`.
 
 ## Models
 
@@ -110,8 +111,8 @@ GEMINI_API_KEY
 OPENAI_API_KEY               # gpt-* text routes and the default cover model
 COVER_IMAGE_MODEL            # optional; default gpt-image-2.5-sunburst
 CRON_SECRET
-STORY_FACTORY_ENABLED=true
-SERIAL_ENGINE_ENABLED=true   # the replacement engine; unset today
+STORY_FACTORY_ENABLED        # unset in production since 2026-09-24 (incumbent stopped)
+SERIAL_ENGINE_ENABLED=true   # the replacement engine; on in production since 2026-09-24
 ```
 
 `verifyCronAuth` falls open in development when `CRON_SECRET` is unset. Make sure it is set
