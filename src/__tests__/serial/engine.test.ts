@@ -365,6 +365,16 @@ describe('cycle lifecycle', () => {
     expect(result.usages).toHaveLength(2);
   });
 
+  test('the plan version is set by code from the premise, whatever the planner wrote', async () => {
+    const provider = stubProvider({ planner: [{ ...cycle(), schemaVersion: 2 }] });
+    const result = await planNextCycle({
+      provider, routes: DEFAULT_SERIAL_ROUTES, premise, bible: baseBible(),
+      previousCycle: null, cycleNumber: 2, volumeNumber: 1, startChapter: 8, recentVerdicts: [cleanVerdict()],
+    });
+    expect(result.cycle.schemaVersion).toBe(1);
+    expect(result.usages).toHaveLength(1);
+  });
+
   test('a planner that repeats twice fails loudly rather than shipping the repetition', async () => {
     const previous = cycle({ cycleNumber: 1, startChapter: 1, plannedEndChapter: 7, climax: { payoffKind: 'nghich_tap' } });
     const provider = stubProvider({

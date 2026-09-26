@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic';
  * heartbeat in health_checks for the factory admin page.
  *
  * Each incident key is forwarded to Resend as the idempotency key, so repeated runs of
- * this cron (Vercel every 15 minutes, pg_cron hourly) send one email per incident a day.
+ * this cron (Vercel, every 15 minutes) send one email per incident a day.
  */
 const MAX_EMAILS_PER_RUN = 10;
 
@@ -21,12 +21,13 @@ export async function GET(request: NextRequest) {
   if (!verifyCronAuth(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const db = getSupabaseAdmin();
-  const [jobsResult, novelsResult] = await Promise.all([
+  const [jobsResult, novelsResult, lastRunResult] = await Promise.all([
     db.from('serial_jobs').select('id,serial_novel_id,status,stage,current_chapter,daily_target,chapters_today,quota_date,next_run_at,lease_until,last_error,updated_at'),
     db.from('serial_novels').select('id,title:premise->>title,schemaVersion:premise->>schemaVersion'),
+    db.from('serial_runs').select('started_at').order('started_at', { ascending: false }).limit(1).maybeSingle(),
   ]);
-  if (jobsResult.error || novelsResult.error) {
-    const message = jobsResult.error?.message ?? novelsResult.error?.message ?? 'Unknown health-check query failure';
+  if (jobsResult.error || novelsResult.error || lastRunResult.error) {
+    const message = jobsResult.error?.message ?? novelsResult.error?.message ?? lastRunResult.error?.message ?? 'Unknown health-check query failure';
     console.error('[health-check]', message);
     return NextResponse.json({ status: 'failed', error: message }, { status: 500 });
   }
@@ -41,7 +42,10 @@ export async function GET(request: NextRequest) {
     return { ...job, title: novel?.title ?? job.id, schemaVersion: Number(novel?.schemaVersion ?? 0) };
   });
 
-  const incidents = serialIncidents({ jobs, enabled: isSerialEnabled(), now: new Date() });
+  const incidents = serialIncidents({
+    jobs, enabled: isSerialEnabled(), now: new Date(),
+    lastRunAt: (lastRunResult.data as { started_at: string } | null)?.started_at ?? null,
+  });
   const deliveries: Array<{ key: string; status: string }> = [];
   for (const incident of incidents.slice(0, MAX_EMAILS_PER_RUN)) {
     const delivery = await notifyStoryFactoryOperator({

@@ -36,7 +36,12 @@ export interface SerialIncident {
   chapterNumber?: number;
 }
 
-/** A due job the cron has not claimed for this long means the cron is not running it. */
+/**
+ * The fleet is stalled when a story has been due this long AND the cron has started no run
+ * for this long. Per-story waiting is normal: one cron drains five stories in turn, and the
+ * last one after midnight can start half an hour late. The first version alerted per story
+ * and mailed five false "stalled" emails at 00:00 on 2026-09-26, when every quota reset at once.
+ */
 export const STALL_MINUTES = 30;
 /** A lease this far past its end means an invocation died without returning it. */
 export const LEASE_GRACE_MINUTES = 20;
@@ -55,10 +60,23 @@ function minutesSince(iso: string | null, now: Date): number | null {
   return (now.getTime() - new Date(iso).getTime()) / 60_000;
 }
 
+/**
+ * When a ready job became claimable. A job that used up yesterday's quota keeps yesterday's
+ * next_run_at, but it could not run before local midnight.
+ */
+export function dueSince(job: SerialJobHealthRow, today: string): string | null {
+  if (!job.next_run_at) return null;
+  if (job.quota_date === today) return job.next_run_at;
+  const midnight = `${today}T00:00:00+07:00`;
+  return new Date(job.next_run_at) > new Date(midnight) ? job.next_run_at : new Date(midnight).toISOString();
+}
+
 export function serialIncidents(input: {
   jobs: SerialJobHealthRow[];
   enabled: boolean;
   now: Date;
+  /** started_at of the newest serial run of any story: proof the cron is working. */
+  lastRunAt: string | null;
 }): SerialIncident[] {
   const { now } = input;
   const today = hoChiMinhDate(now);
@@ -110,19 +128,25 @@ export function serialIncidents(input: {
       }
       continue;
     }
-    if (job.status === 'ready' && input.enabled) {
-      const quotaLeft = job.quota_date !== today || job.chapters_today < job.daily_target;
-      const overdue = minutesSince(job.next_run_at, now);
-      if (quotaLeft && overdue !== null && overdue > STALL_MINUTES) {
-        incidents.push({
-          ...base,
-          kind: 'serial_stalled',
-          key: `serial:stalled:${job.id}:${today}`,
-          title: `Truyện đứng yên: ${job.title}`,
-          message: `Đến hạn chạy từ ${clock(job.next_run_at!)}, còn chỉ tiêu hôm nay, nhưng cron chưa nhận việc.`,
-        });
-      }
-    }
+  }
+
+  // One fleet incident: stories long due, and the cron has not started anything lately.
+  const longDue = !input.enabled ? [] : live.filter(job => {
+    if (job.status !== 'ready') return false;
+    const quotaLeft = job.quota_date !== today || job.chapters_today < job.daily_target;
+    const waited = minutesSince(dueSince(job, today), now);
+    return quotaLeft && waited !== null && waited > STALL_MINUTES;
+  });
+  const idle = minutesSince(input.lastRunAt, now);
+  if (longDue.length && (idle === null || idle > STALL_MINUTES)) {
+    incidents.push({
+      kind: 'serial_stalled',
+      // Keyed to the last run, so the text stays identical for as long as the stall lasts.
+      key: `serial:stalled:${input.lastRunAt ?? today}`,
+      title: 'Cron viết truyện không chạy',
+      message: `Có truyện đã đến hạn hơn ${STALL_MINUTES} phút, nhưng lượt chạy gần nhất `
+        + `${input.lastRunAt ? `bắt đầu lúc ${clock(input.lastRunAt)}` : 'chưa từng có'}.`,
+    });
   }
   return incidents;
 }

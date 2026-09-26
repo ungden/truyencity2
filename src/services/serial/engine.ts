@@ -692,7 +692,13 @@ export async function planNextCycle(input: {
   const commerceShape = archetypeOf(input.premise.archetype)?.commerce ?? true;
   const toPlan = (value: unknown): CyclePlan => {
     const shaped = normalizeCyclePlanShape(CyclePlanShapeSchema.parse(value), { rolling });
-    const parsed = planSchema.safeParse({ ...shaped, editorialNotes: input.editorialNotes ?? [] });
+    // The plan version follows the premise; it is code's to set, not the model's to choose.
+    // A planner that wrote schemaVersion 2 for a v2 premise cost a paid retry on 2026-09-26.
+    const parsed = planSchema.safeParse({
+      ...shaped,
+      schemaVersion: input.premise.narrativeFoundation ? 2 : 1,
+      editorialNotes: input.editorialNotes ?? [],
+    });
     if (!parsed.success) {
       throw new SerialStateError('plan_shape', parsed.error.issues.map(issue => `${issue.path.join('.')}: ${issue.message}`).join(' | ').slice(0, 1_500));
     }
