@@ -239,6 +239,19 @@ The checker's view of a story is procedural, so it no longer steers:
 - 【】 panels are the system's voice (readings, rewards, rank-ups, evolutions); trades and
   paperwork are told in prose. The ledger still owns every number.
 
+The same day the pipeline was trimmed to what each model decides:
+
+- The asset ledger holds goods, materials and money only. Rights, permits, certificates,
+  slots and contracts are story, not assets (8 of the beast-taming novel's 9 lots had been
+  paperwork). The Writer and Judge see one line per holding, never the event history.
+- The Judge no longer scores. Its self-scores averaged 4.1/5 on chapters editors scored
+  3–5/10; the low-pull hold built on them never fired and is gone.
+- Briefs dropped retired v3 fields, the opening contract/ledger after chapter 4, the golden
+  finger twice, and past beats' ledgers: writer −34%, judge −38%, planner −45%.
+- The planner no longer writes the plan version, editorial notes or v3 links; the
+  extractor no longer writes assetEvents. Code restores them (`CyclePlanOutputSchema`,
+  `LegacyChapterDigestSchema`).
+
 `policy-lock.test.ts` fails if the Judge schema or prompt regains steering or the planner
 takes verdicts. The fix removed prompt text rather than adding it: writer 1,586 → ~1,235
 words, judge 1,070 → ~780, and five overlapping planner rules became three.

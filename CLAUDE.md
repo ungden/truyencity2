@@ -76,7 +76,9 @@ from production on 2026-09-24; the cron still fires and returns `disabled`.
 
 ## Models
 
-Exact routes live in `src/services/story-factory/routes.ts`. All Gemini.
+Story Factory routes live in `src/services/story-factory/routes.ts` (all Gemini). Serial routes
+live in `src/services/serial/routes.ts`: `gpt-5.6-terra` for premise, planner, writer and judge,
+`gpt-5.6-luna` for the extractor.
 
 **No substitution, ever.** If the routed model fails, the stage throws and the job retries
 the SAME route on a later tick — never a different model or a template. The provider
