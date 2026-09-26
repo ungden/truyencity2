@@ -899,6 +899,21 @@ describe('never start a paid call without time to finish it', () => {
     expect(provider.calls).toEqual(['writer', 'judge', 'extractor']);
   });
 
+  test('a checkpoint from a discarded plan is never resumed: the chapter is written again', async () => {
+    const provider = stubProvider({ writer: [draft()], judge: [cleanVerdict()], extractor: [goodDigest] });
+    const clock = { deadline: Date.now() + 10 * 60_000 };
+    const withClock = <T extends object>(value: T) => Object.defineProperty(value, 'deadline', { get: () => clock.deadline }) as T & { deadline: number };
+    const error = await writeOneChapter(withClock(chapterInput(exhaustAfterFirstCall(provider, clock)))).catch(caught => caught);
+    const checkpoint = (error as SerialCheckpointError).checkpoint;
+    // The cycle was replanned: same chapter number, a different beat for it.
+    const base = chapterInput(provider);
+    const replanned = { ...base.cycle, beatSheets: base.cycle.beatSheets.map(sheet => ({ ...sheet, beats: [...sheet.beats, 'Nhịp mới sau khi lập lại kế hoạch.'] })) };
+    const fresh = stubProvider({ writer: [draft()], judge: [cleanVerdict()], extractor: [goodDigest] });
+    const result = await writeOneChapter({ ...chapterInput(fresh), cycle: replanned, resumeArtifact: checkpoint });
+    expect(result.status).toBe('committed');
+    expect(fresh.calls[0]).toBe('writer');
+  });
+
   test('a plan that fails validation with no time for its retry hands the correction to the next tick', async () => {
     const previous = cycle({ cycleNumber: 1, startChapter: 1, plannedEndChapter: 7, climax: { payoffKind: 'nghich_tap' } });
     const provider = stubProvider({ planner: [cycle({ climax: { payoffKind: 'nghich_tap' } })] });

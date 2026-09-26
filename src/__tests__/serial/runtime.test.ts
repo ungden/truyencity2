@@ -7,6 +7,7 @@ import { DEFAULT_SERIAL_ROUTES } from '@/services/serial/routes';
 import { CyclePlanSchema, PremiseSchema } from '@/services/serial/contracts';
 import { NARRATIVE_FOUNDATION_VERSION } from '@/services/narrative/foundation';
 import { seedBible } from '@/services/serial/state';
+import { serialChapterInputFingerprint } from '@/services/serial/engine';
 
 /**
  * A thenable stand-in for the Supabase query builder. Supabase's builder resolves when
@@ -415,9 +416,13 @@ describe('serial runtime', () => {
         serial_runs: {
           id: 'run2',
           draft_artifact: {
-            schemaVersion: 1, resumeFrom: 'extractor', attempts: 1,
+            schemaVersion: 2, resumeFrom: 'extractor', attempts: 1,
             chapter: { chapterNumber: 8, title: 'Ca kiểm hàng', content: 'x'.repeat(900) },
             verdict,
+            // Resume only a draft written for exactly these inputs.
+            inputFingerprint: serialChapterInputFingerprint({
+              premise, bible: baseBible(), cycle: cycle(), chapterNumber: 8, previousChapter: null,
+            }),
           },
         },
         chapters: null,

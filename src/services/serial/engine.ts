@@ -394,8 +394,10 @@ export async function writeOneChapter(input: {
 
   const resumeCandidate = input.resumeArtifact?.chapter.chapterNumber === chapterNumber
     ? input.resumeArtifact : null;
+  // Every version checks the fingerprint (premise, Bible, plan, previous chapter). A replan
+  // keeps the cycle id, so without it a draft written for the discarded plan was resumable.
   const resumed = resumeCandidate
-    && (premise.schemaVersion !== 3 || resumeCandidate.inputFingerprint === inputFingerprint)
+    && resumeCandidate.inputFingerprint === inputFingerprint
     && (!resumeCandidate.verdict || premise.schemaVersion !== 3
       || verdictMatchesChapter(resumeCandidate.verdict, resumeCandidate.chapter, chapterNumber))
     ? resumeCandidate : null;
