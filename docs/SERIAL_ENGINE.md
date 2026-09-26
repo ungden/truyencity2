@@ -61,7 +61,7 @@ transactions survived.
 | Plot hole (dead returns, rank regression, impossible place/time, knows too much, contradicts Bible, golden finger overreach) | One targeted repair; if it survives, replan |
 | Number or provenance slip (`transaction_contradiction`, `resource_provenance`) | One targeted repair; if it survives, **commit** — the ledger is the truth |
 | Extractor id the merge cannot absorb | `sanitizeDigest` sets the entry aside (reported in the tick detail); the chapter commits |
-| Low reader-pull score on one chapter or cycle | Steering for the next plan, never a block |
+| Low reader-pull score on one chapter or cycle | Recorded for the operator (and the two-cycle low-pull hold), never a block |
 | Two consecutive cycles averaging below 2.5 on the five pull dimensions | Cycle held private and job paused once; `resume` publishes it |
 
 Opening findings split in two. **Structural** (golden finger late, title promise unpaid,
@@ -218,7 +218,30 @@ Nothing parks waiting for a repair.
 | A cycle replans twice | Job `paused` — the one place a person is needed, and the job is to **read**, not to repair |
 | Lease expires mid-stage | `reconcile_serial_jobs` returns it with exponential backoff |
 
-A low reading score never blocks anything. It flows into the next cycle plan as steering.
+A low reading score never blocks anything.
+
+## Direction comes from the premise, not the checker (2026-09-26)
+
+Until 2026-09-26 the Judge wrote `steering` for the next cycle and the planner obeyed it.
+A third of those lines asked for clauses, witnesses, signed records and re-inspections
+("buộc đối phương ghi rõ điều kiện thắng"), and all five launch novels turned their
+protagonists into clerks by chapter 5; editors reading chapters 1–11 scored them 3–5/10.
+The checker's view of a story is procedural, so it no longer steers:
+
+- The Judge is not asked for steering (`JudgeProviderVerdictSchema` omits it; a stray one
+  is dropped). It finds plot holes and scores; that is all.
+- The planner climbs `loiHuaCotLoi` (`coreLadder` in `context.ts`): the title, hook and
+  blurb, the golden finger's current and next rung, and each rank the protagonist or a
+  story subject can reach next. Every cycle's climax lifts one of them on the page.
+- The planner sees how the last cycle won (`chuKyTruoc.khuonCanh`) and changes the arena
+  and the way of winning.
+- `chiDaoTuBienTap` carries only a person's notes and replan corrections.
+- 【】 panels are the system's voice (readings, rewards, rank-ups, evolutions); trades and
+  paperwork are told in prose. The ledger still owns every number.
+
+`policy-lock.test.ts` fails if the Judge schema or prompt regains steering or the planner
+takes verdicts. The fix removed prompt text rather than adding it: writer 1,586 → ~1,235
+words, judge 1,070 → ~780, and five overlapping planner rules became three.
 
 ## Two launch gates
 

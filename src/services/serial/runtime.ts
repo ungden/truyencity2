@@ -227,21 +227,6 @@ async function stagePlanCycle(
   const extending = job.current_cycle_id !== null;
   const previous = lastCycle && !extending ? CyclePlanSchema.safeParse(lastCycle.plan) : null;
   const active = lastCycle && extending ? CyclePlanSchema.safeParse(lastCycle.plan) : null;
-  const { data: recentRunRows, error: recentRunsError } = await db.from('serial_runs')
-    .select('verdict')
-    .eq('serial_novel_id', job.serial_novel_id)
-    .eq('kind', 'chapter')
-    .in('status', ['committed', 'published', 'failed', 'replanned'])
-    .not('verdict', 'is', null)
-    .order('finished_at', { ascending: false })
-    .limit(8);
-  if (recentRunsError) throw recentRunsError;
-  // collectSteering expects chronological input and prioritizes its newest entries.
-  const recentVerdicts = [...(recentRunRows ?? [])].reverse().flatMap(row => {
-    const parsed = JudgeVerdictSchema.safeParse((row as { verdict: unknown }).verdict);
-    return parsed.success ? [parsed.data] : [];
-  });
-
   const { data: lastChapter, error: lastChapterError } = await db.from('chapters')
     .select('content').eq('novel_id', job.novel_id).eq('chapter_number', job.current_chapter).maybeSingle();
   if (lastChapterError) throw lastChapterError;
@@ -261,7 +246,6 @@ async function stagePlanCycle(
         : Math.floor((((lastCycle?.cycle_number as number | undefined) ?? 0)) / CYCLES_PER_VOLUME) + 1,
       startChapter: job.current_chapter + 1,
       fixedEndChapter: extending ? (lastCycle?.end_chapter as number | undefined) : undefined,
-      recentVerdicts,
       deadline,
       correction: job.last_error?.startsWith(PLAN_RETRY_PREFIX) ? job.last_error.slice(PLAN_RETRY_PREFIX.length) : null,
       editorialNotes: mergeEditorialNotes(

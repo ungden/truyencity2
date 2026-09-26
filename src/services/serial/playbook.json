@@ -1,5 +1,5 @@
 {
-  "version": "2026-09-24.3",
+  "version": "2026-09-26.1",
   "note": "Craft that dates. Code owns contracts; this file owns taste. Edit here, not in prompts.ts.",
   "payoffKinds": [
     {
@@ -199,7 +199,7 @@
       "status": "active",
       "observedAt": "2026-09-19",
       "evidence": "docs/FALOO_CRAFT.md §4b — lựa chọn biên tập của người dùng, 2026-09-19",
-      "text": "LỜI HỨA VỚI ĐỘC GIẢ\nTheo readerFantasy: lợi thế tạo thành quả, thành quả tích lũy thành vốn cho tham vọng lớn hơn. Gây mong chờ bằng công dụng, phần thưởng và phản ứng. Đối kháng theo lợi ích va chạm; độ khó theo tình huống."
+      "text": "LỜI HỨA VỚI ĐỘC GIẢ\nTheo readerFantasy: lợi thế tạo thành quả, thành quả tích lũy thành vốn cho tham vọng lớn hơn. Main thắng bằng lợi thế, sức mạnh và mưu trí trong hành động. Gây mong chờ bằng công dụng, phần thưởng và phản ứng. Đối kháng theo lợi ích va chạm; độ khó theo tình huống."
     },
     {
       "id": "opposition_is_people",
@@ -250,15 +250,7 @@
       "status": "active",
       "observedAt": "2026-09-19",
       "evidence": "docs/FALOO_CRAFT.md §4b; https://b.faloo.com/1324795_3.html",
-      "text": "CHU KỲ LÀ MỘT LỜI HỨA ĐƯỢC THỰC HIỆN\nTrong 5–15 chương, pressure là cơ hội, tham vọng hoặc đối kháng; escalation là 3–6 bước làm kết quả đáng mong hơn. Chọn nhịp: khám phá → thử thành công → đơn hàng lớn; thể hiện → chấn động; hoặc đối đầu → nghiền ép → thu phục. Có phần thưởng dọc đường và kết quả dùng được ở vòng sau."
-    },
-    {
-      "id": "payoff_debt_is_paid_first",
-      "role": "planner",
-      "status": "active",
-      "observedAt": "2026-09-20",
-      "evidence": "Biên tập trực tiếp pilot Rau Tươi, chương 9-10",
-      "text": "TRẢ LỜI HỨA ĐANG NỢ TRƯỚC\nNếu chương trước đã hẹn một cuộc nghiệm thu, giao hàng, tỷ thí, mở thưởng hoặc đối chất, chương kế tiếp phải cho sự kiện ấy xảy ra và trả kết quả nhìn thấy trước khi mở lời hẹn mới. Beat cuối nằm trong ranh giới chu kỳ phải thực hiện climax của chu kỳ; không đặt phần thắng thật ra ngoài plannedEndChapter."
+      "text": "CHU KỲ LÀ MỘT LỜI HỨA ĐƯỢC THỰC HIỆN\nTrong 5–15 chương, pressure là cơ hội, tham vọng hoặc đối kháng; escalation là 3–6 bước làm kết quả đáng mong hơn; climax là nấc mới của lời hứa cốt lõi. Chọn nhịp: khám phá → thử thành công → đơn hàng lớn; thể hiện → chấn động; hoặc đối đầu → nghiền ép → thu phục. Lời hẹn chương trước để lại (tỷ thí, mở thưởng, giao hàng) xảy ra và có kết quả trước khi mở lời hẹn mới. Có phần thưởng dọc đường và kết quả dùng được ở vòng sau."
     },
     {
       "id": "title_promise_pays_early",
@@ -266,7 +258,7 @@
       "status": "active",
       "observedAt": "2026-09-23",
       "evidence": "docs/WRITING_SYSTEM_AUDIT_2026-09-23.md §2 — pilot \"Bán Công Pháp\" 10 chương chưa bán món nào",
-      "text": "LỜI HỨA Ở TIÊU ĐỀ ĐƯỢC TRẢ SỚM VÀ TRẢ ĐỀU\nThứ tiêu đề hứa (bán công pháp, lãnh chúa, thẻ bài...) phải xảy ra lần đầu trên trang trong ba chương đầu, rồi lặp lại ở quy mô lớn hơn mỗi chu kỳ. Mỗi hai đến ba chương có một cú sướng nhỏ nhìn thấy được; mỗi quyển đổi đấu trường, lớp đối thủ và loại phần thưởng. Thận trọng, kiểm định và chuẩn bị chỉ là gia vị một đoạn, không bao giờ là trọng tâm của một chương."
+      "text": "LỜI HỨA Ở TIÊU ĐỀ ĐƯỢC TRẢ SỚM VÀ TRẢ ĐỀU\nThứ tiêu đề hứa (bán công pháp, lãnh chúa, thẻ bài...) phải xảy ra lần đầu trên trang trong ba chương đầu, rồi lặp lại ở quy mô lớn hơn mỗi chu kỳ. Mỗi hai đến ba chương có một cú sướng nhỏ nhìn thấy được; mỗi quyển đổi đấu trường, lớp đối thủ và loại phần thưởng. Thận trọng, kiểm định, giấy tờ và chuẩn bị chỉ là gia vị một đoạn, không bao giờ là trọng tâm của một chương."
     },
     {
       "id": "two_worlds_and_protagonist_advance",
@@ -296,7 +288,7 @@
       "status": "active",
       "observedAt": "2026-09-19",
       "evidence": "story_factory_runs window_review verdicts, ch 70/85",
-      "text": "Đối thủ có lợi ích và hành động cụ thể. Kết cục theo thực lực và lựa chọn của họ: bị loại, chịu thua, quy phục hoặc còn lực để trở lại. Giải quyết cuộc đối đầu khi đã đủ cho cú thắng; đấu trường lớn hơn có người chơi và lợi ích mới."
+      "text": "Đối thủ có lợi ích và ra tay bằng thứ họ có: sức mạnh, tiền, người, thế lực. Thua thì mất thật — bị loại, chịu thua, quy phục hoặc rút lui để trở lại mạnh hơn — không quay lại đòi làm lại cùng một cuộc đấu. Giải quyết cuộc đối đầu khi đã đủ cho cú thắng; đấu trường lớn hơn có người chơi và lợi ích mới."
     },
     {
       "id": "broker_stance",
@@ -392,14 +384,6 @@
       ]
     },
     {
-      "id": "conflict_changes_dimension",
-      "role": "planner",
-      "status": "active",
-      "observedAt": "2026-09-19",
-      "evidence": "https://www.zhihu.com/question/373347616",
-      "text": "MỞ RỘNG ĐẤU TRƯỜNG TỪ THÀNH QUẢ\nconflictLadder là bốn hướng để chọn theo truyện: survival — có chỗ đứng; rules — tác động luật chơi; ideology — xây trật tự mình muốn; self — chọn tham vọng và cách sống. Đường ngầm gieo sớm, nhập tuyến chính để mở khám phá mới."
-    },
-    {
       "id": "card_is_the_reward",
       "role": "writer",
       "archetypes": [
@@ -460,7 +444,7 @@
       "archetypes": [
         "beast_taming"
       ],
-      "text": "ĐẤU TRƯỜNG LÊN BẬC\nMỗi chu kỳ đặt một đấu trường công khai cao hơn: kiểm định trường, giải thành phố, giải khu vực, bí cảnh, liên minh ngự thú. Trước trận, đối thủ và khán giả đánh giá thấp sủng thú của main; trận đấu phải thắng bằng đường tiến hóa hoặc kỹ năng mà main đã chuẩn bị ở các chương trước.",
+      "text": "ĐẤU TRƯỜNG LÊN BẬC\nMỗi chu kỳ đặt một đấu trường công khai cao hơn: giải đấu trường, giải thành phố, giải khu vực, bí cảnh, liên minh ngự thú. Trước trận, đối thủ và khán giả đánh giá thấp sủng thú của main; trận đấu phải thắng bằng đường tiến hóa hoặc kỹ năng mà main đã chuẩn bị ở các chương trước.",
       "status": "active",
       "observedAt": "2026-09-24",
       "evidence": "docs/FALOO_TRENDS_2026-09-24.md"

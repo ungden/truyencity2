@@ -62,7 +62,7 @@ describe('reader-led editorial direction', () => {
     const plan = cycle();
     const writer = buildWriterBrief({ premise, bible, cycle: plan, chapterNumber: 8, previousChapter: null });
     const judge = buildJudgeBrief({ premise, bible, cycle: plan, chapterNumber: 8, title: 'Một đơn hàng lớn', prose: 'Nội dung thử.' });
-    const planner = buildCyclePlannerBrief({ premise, bible, previousCycle: plan, cycleNumber: 3, volumeNumber: 1, startChapter: 17, steering: [] });
+    const planner = buildCyclePlannerBrief({ premise, bible, previousCycle: plan, cycleNumber: 3, volumeNumber: 1, startChapter: 17, editorialNotes: [] });
     expect(writer.truyen.readerFantasy).toBe(premise.readerFantasy);
     expect(judge.readerFantasy).toBe(premise.readerFantasy);
     expect(judge.kimThuChi).toEqual({ ten: premise.goldenFinger.name, luat: premise.goldenFinger.rule, phamVi: premise.goldenFinger.scope });
@@ -77,7 +77,7 @@ describe('reader-led editorial direction', () => {
     const planner = buildCyclePlannerBrief({
       premise, bible: baseBible(), previousCycle: null, activeCycle: active,
       cycleNumber: active.cycleNumber, volumeNumber: active.volumeNumber,
-      startChapter: active.startChapter + 2, steering: [],
+      startChapter: active.startChapter + 2, editorialNotes: [],
     });
     expect(planner.chuKyDangViet).toEqual(expect.objectContaining({
       dongLuc: active.pressure,

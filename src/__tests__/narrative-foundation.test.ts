@@ -713,7 +713,6 @@ describe('versioned narrative foundation', () => {
       volumeNumber: 1,
       startChapter: 3,
       fixedEndChapter: 5,
-      recentVerdicts: [],
     });
     expect(planned.cycle.beatSheets[0].sceneMode).toBe('discovery');
     expect(planned.usages).toHaveLength(1);

@@ -15,7 +15,6 @@ describe('serial contracts', () => {
     expect(Object.keys(premise.conflictLadder)).toEqual(['survival', 'rules', 'ideology', 'self']);
     expect(premise.hiddenThread.length).toBeGreaterThan(40);
     expect(() => PremiseSchema.parse({ ...premise, conflictLadder: undefined })).toThrow();
-    expect(CYCLE_PLANNER_SYSTEM_PROMPT).toMatch(/bốn hướng để chọn theo truyện/);
   });
 
   test('a premise must name six or more cast members with two antagonist classes', () => {

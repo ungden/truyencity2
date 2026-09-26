@@ -886,14 +886,27 @@ export const JudgeVerdictSchema = z.object({
       'report_prose', 'theme_spoken', 'crowd_chorus',
     ]),
   }).strict()).max(10),
-  /** Free-form direction for the next cycle plan. Never applied to this chapter. */
-  steering: z.array(line).max(5),
+  /**
+   * Retired 2026-09-26: the Judge used to steer the next cycle, and a third of its steering
+   * asked for clauses, witnesses and re-inspections, which turned every protagonist into a
+   * clerk. Direction now comes from the premise ladder. Kept readable for stored verdicts.
+   */
+  steering: z.array(line).max(5).default([]),
   /** Optional only so verdicts persisted before prompt v30 remain readable. New calls require it. */
   reviewBinding: JudgeReviewBindingSchema.optional(),
 }).strict();
-export const JudgeProviderVerdictSchema = JudgeVerdictSchema.extend({
-  reviewBinding: JudgeReviewBindingSchema,
-});
+/**
+ * What the Judge model is asked for: no steering field, a required review binding. A model
+ * that still volunteers steering out of habit has it dropped, not the whole verdict refused.
+ */
+export const JudgeProviderVerdictSchema = z.preprocess(
+  value => {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return value;
+    const { steering: _dropped, ...rest } = value as Record<string, unknown>;
+    return rest;
+  },
+  JudgeVerdictSchema.omit({ steering: true }).extend({ reviewBinding: JudgeReviewBindingSchema }),
+);
 export type JudgeVerdict = z.infer<typeof JudgeVerdictSchema>;
 
 // ---------------------------------------------------------- Opening audit

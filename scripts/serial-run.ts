@@ -213,7 +213,6 @@ async function main(): Promise<void> {
       provider, routes: DEFAULT_SERIAL_ROUTES, premise, bible,
       previousCycle: null, cycleNumber: 1, volumeNumber: 1, startChapter: 1,
       fixedEndChapter: chapters >= 5 && chapters <= 15 ? chapters : undefined,
-      recentVerdicts: [],
     });
     usages.push(...planned.usages);
     cycle = planned.cycle;
@@ -234,7 +233,6 @@ async function main(): Promise<void> {
       previousCycle: null, activeCycle: cycle,
       cycleNumber: cycle.cycleNumber, volumeNumber: cycle.volumeNumber,
       startChapter: replanFrom, fixedEndChapter: cycle.plannedEndChapter,
-      recentVerdicts: verdicts,
       editorialNotes: literaryFeedback,
     });
     usages.push(...replanned.usages);
@@ -281,7 +279,6 @@ async function main(): Promise<void> {
         previousCycle: null, activeCycle: cycle,
         cycleNumber: cycle.cycleNumber, volumeNumber: cycle.volumeNumber,
         startChapter: chapterNumber, fixedEndChapter: cycle.plannedEndChapter,
-        recentVerdicts: verdicts,
       });
       usages.push(...extended.usages);
       planHistory.push(extended.cycle);

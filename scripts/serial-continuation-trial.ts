@@ -156,7 +156,6 @@ async function main(): Promise<void> {
     volumeNumber: checkpointCycle.data.volume_number,
     startChapter: targetStart,
     fixedEndChapter: checkpointCycle.data.end_chapter,
-    recentVerdicts,
   });
   usages.push(...initial.usages);
   let cycle: CyclePlan = initial.cycle;
@@ -169,7 +168,6 @@ async function main(): Promise<void> {
         activeCycle: cycle,
         cycleNumber: cycle.cycleNumber, volumeNumber: cycle.volumeNumber,
         startChapter: chapterNumber, fixedEndChapter: checkpointCycle.data.end_chapter,
-        recentVerdicts: [...recentVerdicts, ...verdicts],
       });
       usages.push(...rolling.usages);
       cycle = mergeRollingCyclePlan({
@@ -194,7 +192,6 @@ async function main(): Promise<void> {
         activeCycle: cycle,
         cycleNumber: cycle.cycleNumber, volumeNumber: cycle.volumeNumber,
         startChapter: chapterNumber, fixedEndChapter: checkpointCycle.data.end_chapter,
-        recentVerdicts: [...recentVerdicts, ...verdicts, outcome.verdict],
         editorialNotes: [outcome.reason],
       });
       usages.push(...replanned.usages);

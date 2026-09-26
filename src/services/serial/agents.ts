@@ -1,6 +1,6 @@
 import type { StoryModelProvider, ProviderUsage } from '@/services/story-factory/provider';
 import {
-  ChapterDigestSchema, ChapterDraftSchema, LegacyChapterDigestSchema, CyclePlanShapeSchema, JudgeProviderVerdictSchema, OpeningAuditProviderSchema, ProposedPremiseSchema,
+  ChapterDigestSchema, ChapterDraftSchema, LegacyChapterDigestSchema, CyclePlanShapeSchema, JudgeProviderVerdictSchema, JudgeVerdictSchema, OpeningAuditProviderSchema, ProposedPremiseSchema,
   type ChapterDigest, type ChapterDraft, type CyclePlan, type JudgeVerdict, type OpeningAudit, type Premise,
   type SerialRoutes,
 } from './contracts';
@@ -189,9 +189,7 @@ export async function judgeChapter(input: {
     temperature: 0.2,
     timeoutMs: SUPPORT_TIMEOUT_MS,
   });
-  const deniedInput = (result.value.steering ?? []).some(line =>
-    /(?:không|chưa) (?:có|được (?:cấp|cung cấp|gửi)) (?:truyện|văn bản|nội dung|phần văn|bản thảo)/iu.test(line));
-  const mismatch = deniedInput ? 'steering says no text was supplied' : reviewBindingMismatch(result.value.reviewBinding, input.chapter);
+  const mismatch = reviewBindingMismatch(result.value.reviewBinding, input.chapter);
   if (mismatch) {
     throw new StoryFactoryError(
       'infra_blocked',
@@ -199,7 +197,7 @@ export async function judgeChapter(input: {
       { usage: result.usage },
     );
   }
-  return { value: result.value, usage: result.usage };
+  return { value: JudgeVerdictSchema.parse(result.value), usage: result.usage };
 }
 
 export async function extractDigest(input: {

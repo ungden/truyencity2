@@ -485,18 +485,19 @@ export function buildCyclePlannerBrief(input: {
   volumeNumber: number;
   startChapter: number;
   fixedEndChapter?: number;
-  steering: string[];
+  /** A person's or the opening audit's notes. The Judge no longer steers the story. */
+  editorialNotes: string[];
   previousChapter?: string | null;
 }) {
   const { premise, bible } = input;
   const used: PayoffKind[] = recentPayoffKinds(bible);
   return {
     truyen: {
-      tieuDe: premise.title,
       dauTruong: premise.arena,
       readerFantasy: premise.readerFantasy,
       huongKetThuc: premise.endingDirection,
     },
+    loiHuaCotLoi: coreLadder(premise, bible),
     kimThuChi: premise.goldenFinger,
     nguonDoiKhang: premise.oppositionEngine,
     worldKernel: premise.worldKernel,
@@ -537,6 +538,9 @@ export function buildCyclePlannerBrief(input: {
         ketQua: input.previousCycle.climax.result,
         hookDeLai: input.previousCycle.nextHook,
         vongKhachHang: input.previousCycle.customerLoop,
+        khuonCanh: input.previousCycle.beatSheets.map(sheet => ({
+          sceneMode: sheet.sceneMode, protagonistMove: sheet.protagonistMove, materialOutcome: sheet.materialOutcome,
+        })),
       }
       : null,
     chuKyDangViet: input.activeCycle
@@ -556,7 +560,7 @@ export function buildCyclePlannerBrief(input: {
     loaiSuongKhongDuocDung: input.previousCycle ? [input.previousCycle.climax.payoffKind] : [],
     loaiSuongDaDungGanDay: used,
     phucButQuaHan: overdueHooks(bible, input.startChapter),
-    chiDaoTuBienTap: input.steering,
+    chiDaoTuBienTap: input.editorialNotes,
     narrativeFoundation: premise.narrativeFoundation ?? null,
     narrativeEvidence: bible.symbolicCore.narrativeEvidence,
     durableNarrativeState: {
@@ -565,22 +569,6 @@ export function buildCyclePlannerBrief(input: {
       characterKnowledge: bible.symbolicCore.characterKnowledge,
     },
   };
-}
-
-/** Steering collected from recent judge verdicts. Never applied to the chapter it came from. */
-export function collectSteering(verdicts: JudgeVerdict[], limit = 8): string[] {
-  const seen = new Set<string>();
-  const out: string[] = [];
-  for (const verdict of [...verdicts].reverse()) {
-    for (const line of verdict.steering) {
-      const key = line.trim().toLowerCase();
-      if (seen.has(key)) continue;
-      seen.add(key);
-      out.push(line.trim());
-      if (out.length >= limit) return out;
-    }
-  }
-  return out;
 }
 
 /**
@@ -595,6 +583,40 @@ export function refreshStyleMemory(bible: Bible, verdicts: JudgeVerdict[], limit
   ]);
   const merged = [...quotes, ...bible.styleMemory].map(entry => entry.trim()).filter(Boolean);
   return [...new Set(merged)].slice(0, limit);
+}
+
+/**
+ * The promise the story is sold on, as the next rung it can climb: the title and hook, the
+ * golden finger's current and next rung, and each rank the protagonist or a story subject
+ * (shop, clan, companion) can reach next. The planner's cycle climbs one of these on the page.
+ */
+export function coreLadder(premise: Premise, bible: Bible) {
+  const rungs = premise.goldenFinger.evolution;
+  const rungIndex = rungs.findIndex(rung => rung.id === bible.symbolicCore.mc.goldenFingerRungId);
+  const subjects = new Set([bible.symbolicCore.mc.characterId, ...premise.worldKernel.progressionSubjects.map(subject => subject.id)]);
+  const subjectName = (id: string) => premise.worldKernel.progressionSubjects.find(subject => subject.id === id)?.name ?? nameOf(bible, id);
+  return {
+    tieuDe: premise.title,
+    hook: premise.hook,
+    blurb: premise.blurb,
+    kimThuChi: {
+      ten: premise.goldenFinger.name,
+      nacHienTai: rungs[rungIndex] ?? null,
+      nacKeTiep: rungs[rungIndex + 1] ?? null,
+    },
+    tienTrien: bible.symbolicCore.progressions
+      .filter(state => subjects.has(state.subjectId))
+      .map(state => {
+        const system = premise.worldKernel.progressionSystems.find(item => item.id === state.systemId);
+        const index = system?.ranks.findIndex(rank => rank.id === state.rankId) ?? -1;
+        return {
+          chuThe: subjectName(state.subjectId),
+          he: system?.name ?? state.systemId,
+          capHienTai: system?.ranks[index]?.name ?? state.rankId,
+          capKeTiep: index >= 0 ? system?.ranks[index + 1]?.name ?? null : null,
+        };
+      }),
+  };
 }
 
 /** Digest fields the planner needs to know a beat sheet was actually delivered. */

@@ -361,7 +361,7 @@ describe('serial runtime', () => {
               reviewBinding: { chapterNumber: 8, title: 'Ca kiểm hàng', excerpt: prose.slice(0, 40) },
               continuity: [{
                 kind: 'golden_finger_scope', quote: prose.slice(0, 40),
-                explain: 'Bảng đọc vượt nấc đã duyệt.', repair: 'Giữ bảng trong nấc hiện tại.',
+                explain: 'Bảng đọc vượt nấc đã duyệt.',
               }],
               scorecard: { opening: 4, anticipation: 4, payoff: 3, newness: 3, endHook: 3 },
               craft: { protagonistAgency: 4, sceneLife: 4, worldLogic: 4, dialogueNaturalness: 4, structuralFreshness: 3 },
@@ -628,7 +628,7 @@ describe('serial runtime', () => {
     expect(serialFailureDisposition(new Error('Connection timed out'), 3)).toBe('paused');
   });
 
-  test('planning receives failed verdicts with newest feedback first', async () => {
+  test('planning is driven by the premise ladder and never by the Judge', async () => {
     const verdict = (note: string) => ({
       continuity: [], scorecard: { opening: 4, anticipation: 4, payoff: 4, newness: 4, endHook: 4 },
       craft: { protagonistAgency: 4, sceneLife: 4, worldLogic: 4, dialogueNaturalness: 4, structuralFreshness: 4 },
@@ -637,10 +637,7 @@ describe('serial runtime', () => {
     const { db } = fakeDb({ rows: {
       serial_novels: novelRow(),
       serial_cycles: { id: 'cy1', cycle_number: 2, volume_number: 1, start_chapter: 8, end_chapter: 16, plan: cycle() },
-      serial_runs: [
-        { status: 'failed', verdict: verdict('Mới: sửa nguồn hàng đã bị chấm sai.') },
-        { status: 'committed', verdict: verdict('Cũ: mở cơ hội mua bán tiếp theo.') },
-      ],
+      serial_runs: [{ status: 'committed', verdict: verdict('Buộc đối phương ghi rõ điều khoản và đóng dấu biên bản.') }],
     }, rpc: { claim_serial_job: job({ stage: 'plan_cycle' }) } });
     const prompts: string[] = [];
     const provider = { async json(args: { prompt: string }) {
@@ -650,8 +647,8 @@ describe('serial runtime', () => {
     const result = await runSerialTick({ db, provider });
     expect(result.status).toBe('completed');
     expect(prompts).toHaveLength(1);
-    expect(prompts[0].indexOf('Mới:')).toBeLessThan(prompts[0].indexOf('Cũ:'));
-    expect(prompts[0]).toContain('Mới: sửa nguồn hàng đã bị chấm sai.');
+    expect(prompts[0]).not.toContain('điều khoản và đóng dấu biên bản');
+    expect(prompts[0]).toContain('loiHuaCotLoi');
   });
 
   test('draining stops at the first idle claim', async () => {

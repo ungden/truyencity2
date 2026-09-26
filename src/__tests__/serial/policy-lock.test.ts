@@ -2,7 +2,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import {
-  assertSerialLaunchable, HARD_CONTINUITY_KINDS, LegacyChapterDigestSchema, OpeningAuditProviderSchema, PremiseSchema,
+  assertSerialLaunchable, HARD_CONTINUITY_KINDS, JudgeProviderVerdictSchema, LegacyChapterDigestSchema, OpeningAuditProviderSchema, PremiseSchema,
   premiseLint, processDensity, ProposedPremiseSchema,
   processProseFindings, PROCESS_DENSITY_LIMIT, SOFT_CONTINUITY_KINDS,
 } from '@/services/serial/contracts';
@@ -59,6 +59,23 @@ describe('policy lock: payoffs are never forbidden', () => {
   });
 });
 
+describe('policy lock: the checker does not steer the story', () => {
+  // A third of the Judge's steering asked for clauses, witnesses and re-inspections, and it
+  // fed every plan: all five launch novels turned their protagonists into clerks (2026-09-26).
+  test('the Judge is not asked for steering and the planner takes no verdicts', () => {
+    const judgeSchema = JSON.stringify(zodToJsonSchema(JudgeProviderVerdictSchema, { target: 'jsonSchema7', $refStrategy: 'none' }));
+    expect(judgeSchema).not.toMatch(/steering/);
+    for (const archetype of archetypeIds()) expect(promptsFor(archetype).judge).not.toMatch(/steering/);
+    const engine = readFileSync('src/services/serial/engine.ts', 'utf8');
+    const planner = engine.slice(engine.indexOf('export async function planNextCycle'), engine.indexOf('}): Promise<{ cycle: CyclePlan', engine.indexOf('export async function planNextCycle')));
+    expect(planner).not.toMatch(/verdict/i);
+  });
+
+  test('the premise ladder is what the planner climbs', () => {
+    for (const archetype of archetypeIds()) expect(promptsFor(archetype).planner).toMatch(/loiHuaCotLoi/);
+  });
+});
+
 describe('policy lock: arithmetic never discards a chapter', () => {
   test('number and provenance slips are soft; plot holes are the only hard findings', () => {
     expect(SOFT_CONTINUITY_KINDS).toEqual(expect.arrayContaining(['transaction_contradiction', 'resource_provenance', 'process_prose', 'meta_leak']));
@@ -68,7 +85,7 @@ describe('policy lock: arithmetic never discards a chapter', () => {
 
   test('a panel describing what a pet, card or item can do is not a golden-finger overreach', () => {
     for (const archetype of archetypeIds()) {
-      expect(promptsFor(archetype).judge).toMatch(/là thông tin thế giới, không phải kim thủ chỉ có thêm tác dụng/);
+      expect(promptsFor(archetype).judge).toMatch(/làm được là thông tin thế giới/);
     }
   });
 

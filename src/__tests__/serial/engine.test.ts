@@ -7,7 +7,7 @@ import {
   type SerialDraftCheckpoint,
 } from '@/services/serial/engine';
 import { normalizeChapterDraft, reviewBindingMismatch, stripJsonResidue, stripMarkdown } from '@/services/serial/agents';
-import { assetLedgerSlice, splitLedgerLines, buildCyclePlannerBrief, buildExtractorBrief, buildJudgeBrief, buildWriterBrief, collectSteering, refreshStyleMemory, relevantCast } from '@/services/serial/context';
+import { assetLedgerSlice, splitLedgerLines, buildCyclePlannerBrief, buildExtractorBrief, buildJudgeBrief, buildWriterBrief, coreLadder, refreshStyleMemory, relevantCast } from '@/services/serial/context';
 import { seedBible } from '@/services/serial/state';
 import { premise, baseBible, cycle } from './fixtures';
 import {
@@ -363,7 +363,7 @@ describe('cycle lifecycle', () => {
     });
     const result = await planNextCycle({
       provider, routes: DEFAULT_SERIAL_ROUTES, premise, bible: baseBible(),
-      previousCycle: previous, cycleNumber: 2, volumeNumber: 1, startChapter: 8, recentVerdicts: [cleanVerdict()],
+      previousCycle: previous, cycleNumber: 2, volumeNumber: 1, startChapter: 8,
       editorialNotes: ['Nêu tên đội giao thịt và khoản đối giá ngay trên trang.'],
     });
     expect(result.cycle.climax.payoffKind).toBe('tri_thang');
@@ -375,7 +375,7 @@ describe('cycle lifecycle', () => {
     const provider = stubProvider({ planner: [{ ...cycle(), schemaVersion: 2 }] });
     const result = await planNextCycle({
       provider, routes: DEFAULT_SERIAL_ROUTES, premise, bible: baseBible(),
-      previousCycle: null, cycleNumber: 2, volumeNumber: 1, startChapter: 8, recentVerdicts: [cleanVerdict()],
+      previousCycle: null, cycleNumber: 2, volumeNumber: 1, startChapter: 8,
     });
     expect(result.cycle.schemaVersion).toBe(1);
     expect(result.usages).toHaveLength(1);
@@ -388,7 +388,7 @@ describe('cycle lifecycle', () => {
     });
     await expect(planNextCycle({
       provider, routes: DEFAULT_SERIAL_ROUTES, premise, bible: baseBible(),
-      previousCycle: previous, cycleNumber: 2, volumeNumber: 1, startChapter: 8, recentVerdicts: [],
+      previousCycle: previous, cycleNumber: 2, volumeNumber: 1, startChapter: 8,
     })).rejects.toThrow(/repeats the payoff kind/);
   });
 
@@ -401,7 +401,7 @@ describe('cycle lifecycle', () => {
     });
     const result = await planNextCycle({
       provider, routes: DEFAULT_SERIAL_ROUTES, premise, bible: baseBible(),
-      previousCycle: null, cycleNumber: 2, volumeNumber: 1, startChapter: 8, recentVerdicts: [],
+      previousCycle: null, cycleNumber: 2, volumeNumber: 1, startChapter: 8,
     });
     expect(result.cycle.beatSheets[0].chapterNumber).toBe(8);
     expect(result.usages).toHaveLength(2);
@@ -440,7 +440,7 @@ describe('cycle lifecycle', () => {
     const result = await planNextCycle({
       provider, routes: DEFAULT_SERIAL_ROUTES, premise, bible: baseBible(),
       previousCycle: null, activeCycle: active,
-      cycleNumber: 2, volumeNumber: 1, startChapter: 14, fixedEndChapter: 18, recentVerdicts: [],
+      cycleNumber: 2, volumeNumber: 1, startChapter: 14, fixedEndChapter: 18,
     });
     expect(result.cycle.beatSheets.map(sheet => sheet.sceneMode)).toEqual(['transaction', 'hunt', 'investigation']);
     expect(result.usages).toHaveLength(1);
@@ -477,7 +477,7 @@ describe('cycle lifecycle', () => {
     const result = await planNextCycle({
       provider, routes: DEFAULT_SERIAL_ROUTES, premise, bible: baseBible(),
       previousCycle: null, activeCycle: active,
-      cycleNumber: 1, volumeNumber: 1, startChapter: 10, fixedEndChapter: 10, recentVerdicts: [],
+      cycleNumber: 1, volumeNumber: 1, startChapter: 10, fixedEndChapter: 10,
     });
 
     expect(result.cycle.plannedEndChapter).toBe(10);
@@ -519,8 +519,7 @@ describe('context selection', () => {
     const last = buildWriterBrief({ premise, bible: baseBible(), cycle: withNext, chapterNumber: first.chapterNumber + 1, previousChapter: 'Câu cuối.' });
     expect(last.chuongKeTiep).toBeNull();
     for (const archetype of archetypeIds()) {
-      expect(promptsFor(archetype).writer).toMatch(/câu hook cuối chương dẫn thẳng vào việc chương sau làm/);
-      expect(promptsFor(archetype).writer).toMatch(/đoạn mở xử lý hoặc nối nó sang openingBridge/);
+      expect(promptsFor(archetype).writer).toMatch(/kết bằng hook dẫn vào chuongKeTiep/);
     }
   });
 
@@ -605,7 +604,7 @@ describe('context selection', () => {
   test('planner receives the open payoff registry as exact ids', () => {
     const brief = buildCyclePlannerBrief({
       premise, bible: baseBible(), previousCycle: null,
-      cycleNumber: 2, volumeNumber: 1, startChapter: 8, steering: [],
+      cycleNumber: 2, volumeNumber: 1, startChapter: 8, editorialNotes: [],
     });
     expect(brief.loaiSuongHopLe).toContain('tri_thang');
     expect(brief.loaiSuongHopLe).toContain('chan_dong');
@@ -615,12 +614,12 @@ describe('context selection', () => {
   test('the planner is shown the opening contract of the chapters it plans, and must deliver it', () => {
     const window = buildCyclePlannerBrief({
       premise, bible: baseBible(), previousCycle: null, activeCycle: cycle({ cycleNumber: 1, startChapter: 1, plannedEndChapter: 5 }),
-      cycleNumber: 1, volumeNumber: 1, startChapter: 4, fixedEndChapter: 5, steering: [],
+      cycleNumber: 1, volumeNumber: 1, startChapter: 4, fixedEndChapter: 5, editorialNotes: [],
     });
     expect(window.hopDongTrongCuaSo.map(row => row.chapterNumber)).toEqual([4]);
     const later = buildCyclePlannerBrief({
       premise, bible: baseBible(), previousCycle: null,
-      cycleNumber: 2, volumeNumber: 1, startChapter: 8, steering: [],
+      cycleNumber: 2, volumeNumber: 1, startChapter: 8, editorialNotes: [],
     });
     expect(later.hopDongTrongCuaSo).toEqual([]);
     for (const archetype of archetypeIds()) {
@@ -632,14 +631,14 @@ describe('context selection', () => {
     const ending = 'Lục Hàn dặn Phàn Mộc: “Ai hỏi lô sau thì ghi tên, không nhận tiền trước.”';
     const brief = buildCyclePlannerBrief({
       premise, bible: baseBible(), previousCycle: null, activeCycle: cycle({ cycleNumber: 1, startChapter: 1, plannedEndChapter: 5 }),
-      cycleNumber: 1, volumeNumber: 1, startChapter: 4, fixedEndChapter: 5, steering: [], previousChapter: `Mở đầu. ${ending}`,
+      cycleNumber: 1, volumeNumber: 1, startChapter: 4, fixedEndChapter: 5, editorialNotes: [], previousChapter: `Mở đầu. ${ending}`,
     });
     expect(brief.doanCuoiChuongTruoc).toContain(ending);
     for (const archetype of archetypeIds()) {
       const prompts = promptsFor(archetype);
-      expect(prompts.planner).toMatch(/beat ghi luôn lý do đổi ý hiện trên trang/);
-      expect(prompts.writer).toMatch(/cho thấy lý do đổi ý ngay trên trang/);
-      expect(prompts.judge).toMatch(/Nhân vật đổi ý với lý do hiện trên trang không phải lỗi/);
+      expect(prompts.planner).toMatch(/đi ngược điều vừa hẹn thì beat ghi lý do/);
+      expect(prompts.writer).toMatch(/nếu kế hoạch đi ngược điều vừa xảy ra hay vừa hẹn, cho thấy trên trang vì sao/);
+      expect(prompts.judge).toMatch(/mà trang không cho thấy vì sao/);
     }
   });
 
@@ -672,12 +671,21 @@ describe('context selection', () => {
     expect(ids).toContain('cao_nguyen');
   });
 
-  test('steering is deduplicated newest-first and style memory merges old and new', () => {
-    expect(collectSteering([
-      cleanVerdict({ steering: ['a', 'b'] }),
-      cleanVerdict({ steering: ['b', 'c'] }),
-    ])).toEqual(['b', 'c', 'a']);
+  test('the planner climbs the premise ladder: next golden-finger rung and next rank, as data', () => {
+    const ladder = coreLadder(premise, baseBible());
+    expect(ladder.tieuDe).toBe(premise.title);
+    expect(ladder.hook).toBe(premise.hook);
+    expect(ladder.kimThuChi.nacKeTiep?.id).toBe(premise.goldenFinger.evolution[1].id);
+    expect(ladder.tienTrien.length).toBeGreaterThan(0);
+    const brief = buildCyclePlannerBrief({
+      premise, bible: baseBible(), previousCycle: cycle({ cycleNumber: 1, startChapter: 1, plannedEndChapter: 7 }),
+      cycleNumber: 2, volumeNumber: 1, startChapter: 8, editorialNotes: [],
+    });
+    expect(brief.loiHuaCotLoi).toEqual(ladder);
+    expect(brief.chuKyTruoc?.khuonCanh.length).toBeGreaterThan(0);
+  });
 
+  test('style memory merges old and new', () => {
     expect(refreshStyleMemory(baseBible(), [
       cleanVerdict({ repetition: [{ quote: 'lại mở sổ ra', repeatsChapter: 6, note: 'lặp' }] }),
     ])).toEqual(['lại mở sổ ra', 'ánh mắt sắc như dao']);
@@ -798,7 +806,7 @@ describe('code-owned ledger and reader-facing gates', () => {
     const provider = stubProvider({ planner: [bad, ledgerCycle()] });
     const result = await planNextCycle({
       provider, routes: DEFAULT_SERIAL_ROUTES, premise, bible: baseBible(),
-      previousCycle: null, cycleNumber: 2, volumeNumber: 1, startChapter: 8, recentVerdicts: [],
+      previousCycle: null, cycleNumber: 2, volumeNumber: 1, startChapter: 8,
     });
     expect(provider.calls).toEqual(['planner', 'planner']);
     expect(result.cycle.beatSheets[0].ledger?.[1].quantity).toBe(1);
@@ -819,7 +827,7 @@ describe('code-owned ledger and reader-facing gates', () => {
     const provider = stubProvider({ planner: [plan] });
     const result = await planNextCycle({
       provider, routes: DEFAULT_SERIAL_ROUTES, premise, bible: baseBible(),
-      previousCycle: null, cycleNumber: 2, volumeNumber: 1, startChapter: 8, recentVerdicts: [],
+      previousCycle: null, cycleNumber: 2, volumeNumber: 1, startChapter: 8,
     });
     expect(provider.calls).toEqual(['planner']);
     expect(result.cycle.beatSheets[0].ledger?.map(event => [event.eventId, event.sourceLotId])).toEqual([
@@ -897,7 +905,7 @@ describe('never start a paid call without time to finish it', () => {
     const clock = { deadline: Date.now() + 10 * 60_000 };
     const planInput = Object.defineProperty({
       provider: exhaustAfterFirstCall(provider, clock), routes: DEFAULT_SERIAL_ROUTES, premise, bible: baseBible(),
-      previousCycle: previous, cycleNumber: 2, volumeNumber: 1, startChapter: 8, recentVerdicts: [] as JudgeVerdict[],
+      previousCycle: previous, cycleNumber: 2, volumeNumber: 1, startChapter: 8,
     }, 'deadline', { get: () => clock.deadline }) as Parameters<typeof planNextCycle>[0];
     const error = await planNextCycle(planInput).catch(caught => caught);
     expect(error).toBeInstanceOf(SerialDeadlineError);
@@ -917,7 +925,7 @@ describe('never start a paid call without time to finish it', () => {
     const provider = stubProvider({ planner: [plan] });
     const result = await planNextCycle({
       provider, routes: DEFAULT_SERIAL_ROUTES, premise, bible: baseBible(),
-      previousCycle: null, cycleNumber: 2, volumeNumber: 1, startChapter: 8, recentVerdicts: [],
+      previousCycle: null, cycleNumber: 2, volumeNumber: 1, startChapter: 8,
     });
     expect(provider.calls).toEqual(['planner']);
     expect(result.cycle.plannedEndChapter).toBe(12);
@@ -1034,7 +1042,7 @@ describe('the customer loop belongs to commerce archetypes', () => {
     const commerce = stubProvider({ planner: [withoutLoop, cycle()] });
     await planNextCycle({
       provider: commerce, routes: DEFAULT_SERIAL_ROUTES, premise, bible: baseBible(),
-      previousCycle: null, cycleNumber: 2, volumeNumber: 1, startChapter: 8, recentVerdicts: [],
+      previousCycle: null, cycleNumber: 2, volumeNumber: 1, startChapter: 8,
     });
     expect(commerce.calls).toEqual(['planner', 'planner']);
 
@@ -1050,7 +1058,7 @@ describe('the customer loop belongs to commerce archetypes', () => {
     } as StoryModelProvider;
     const result = await planNextCycle({
       provider: beastProvider, routes: DEFAULT_SERIAL_ROUTES, premise: beastPremise, bible: baseBible(),
-      previousCycle: null, cycleNumber: 2, volumeNumber: 1, startChapter: 8, recentVerdicts: [],
+      previousCycle: null, cycleNumber: 2, volumeNumber: 1, startChapter: 8,
     });
     expect(calls).toEqual(['beast-planner']);
     expect(result.cycle.customerLoop).toBeNull();

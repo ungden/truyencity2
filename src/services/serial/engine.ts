@@ -14,7 +14,7 @@ import {
 } from './agents';
 import {
   buildCyclePlannerBrief, buildExtractorBrief, buildJudgeBrief, buildWriterBrief,
-  buildOpeningAuditBrief, collectSteering, refreshStyleMemory,
+  buildOpeningAuditBrief, refreshStyleMemory,
 } from './context';
 import {
   applyDigest, assertBibleCoherence, assertCycleAssetCoherence, assertCycleLedger, assertPayoffRotation,
@@ -656,7 +656,6 @@ export async function planNextCycle(input: {
   volumeNumber: number;
   startChapter: number;
   fixedEndChapter?: number;
-  recentVerdicts: JudgeVerdict[];
   editorialNotes?: string[];
   /** A validation error from the previous tick's plan, fixed on this first attempt. */
   correction?: string | null;
@@ -675,7 +674,7 @@ export async function planNextCycle(input: {
     volumeNumber: input.volumeNumber,
     startChapter: input.startChapter,
     fixedEndChapter: input.fixedEndChapter,
-    steering: [...new Set([...(input.editorialNotes ?? []), ...collectSteering(input.recentVerdicts)])].slice(0, 8),
+    editorialNotes: [...new Set(input.editorialNotes ?? [])].slice(0, 8),
     previousChapter: input.previousChapter ?? null,
   });
 
