@@ -15,7 +15,6 @@ import { overdueHooks, recentPayoffKinds } from './state';
 const RELEVANT_CAST_LIMIT = 10;
 const PREVIOUS_TAIL_WORDS = 800;
 const ASSET_LOT_SLICE_LIMIT = 40;
-const ASSET_EVENT_SLICE_LIMIT = 50;
 
 export function previousTail(previousChapter: string | null, words = PREVIOUS_TAIL_WORDS): string {
   if (!previousChapter) return '';
@@ -49,24 +48,30 @@ function customerLoopMilestone(cycle: CyclePlan, chapterNumber: number) {
 }
 
 /** Positive, bounded ownership state: what can still be used and what recently left the account. */
+/**
+ * What is in hand, not how it got there. Until 2026-09-26 every brief also carried the last
+ * fifty asset events with provenance: a third of what the Writer and Judge read before each
+ * chapter was a stock ledger, and the prose read like one. The planner still gets lot ids
+ * (it plans transfers from them); the Writer and Judge get one line per holding.
+ */
 export function assetLedgerSlice(bible: Bible, castIds: string[], semanticText = '', includeAll = false) {
   const focusedOwners = new Set(castIds);
   const haystack = semanticText.toLowerCase();
-  const relevantAssetIds = new Set(bible.symbolicCore.activeAssetLots
-    .filter(lot => focusedOwners.has(lot.ownerId)
-      || haystack.includes(lot.assetName.toLowerCase())
-      || haystack.includes(lot.ownerName.toLowerCase())
-      || includeAll)
-    .map(lot => lot.assetId));
   const activeLots = bible.symbolicCore.activeAssetLots
-    .filter(lot => focusedOwners.has(lot.ownerId) || relevantAssetIds.has(lot.assetId))
-    .slice(-ASSET_LOT_SLICE_LIMIT);
-  const recentEvents = bible.symbolicCore.recentAssetEvents
-    .filter(event => includeAll || relevantAssetIds.has(event.assetId)
-      || (event.fromOwnerId ? focusedOwners.has(event.fromOwnerId) : false)
-      || (event.toOwnerId ? focusedOwners.has(event.toOwnerId) : false))
-    .slice(-ASSET_EVENT_SLICE_LIMIT);
-  return { activeLots, recentEvents };
+    .filter(lot => includeAll || focusedOwners.has(lot.ownerId)
+      || haystack.includes(lot.assetName.toLowerCase()) || haystack.includes(lot.ownerName.toLowerCase()))
+    .slice(-ASSET_LOT_SLICE_LIMIT)
+    .map(lot => ({
+      lotId: lot.lotId, assetId: lot.assetId, assetName: lot.assetName,
+      ownerId: lot.ownerId, ownerName: lot.ownerName, quantity: lot.quantity, unit: lot.unit,
+    }));
+  return { activeLots };
+}
+
+/** One line per holding, for the roles that only need to know what someone has. */
+export function holdingLines(bible: Bible, castIds: string[], semanticText = ''): string[] {
+  return assetLedgerSlice(bible, castIds, semanticText).activeLots
+    .map(lot => `${lot.ownerName}: ${formatQuantity(lot.quantity)} ${measureWord(lot.unit, lot.assetName)}${lot.assetName}`);
 }
 
 const formatQuantity = (value: number): string =>
@@ -256,7 +261,7 @@ export function buildWriterBrief(input: {
   const castIds = relevantCast(bible, premise, beatText);
   const rung = premise.goldenFinger.evolution.find(item => item.id === bible.symbolicCore.mc.goldenFingerRungId);
   const worldSlice = relevantWorldSlice({ premise, bible, castIds, chapterNumber, beatText });
-  const assetLedger = assetLedgerSlice(bible, castIds, beatText);
+  const assetLedger = holdingLines(bible, castIds, beatText);
   const openingContract = premise.worldKernel.openingContract.find(item => item.chapterNumber === chapterNumber) ?? null;
 
   return {
@@ -347,7 +352,7 @@ export function buildJudgeBrief(input: {
   const sheet = cycle.beatSheets.find(item => item.chapterNumber === chapterNumber);
   const beatText = sheet ? [sheet.newNamedThing ?? '', sheet.emotionalTarget, ...sheet.beats].join(' ') : '';
   const castIds = relevantCast(bible, premise, `${beatText} ${input.prose}`);
-  const assetLedger = assetLedgerSlice(bible, castIds, `${beatText} ${input.prose}`);
+  const assetLedger = holdingLines(bible, castIds, `${beatText} ${input.prose}`);
   return {
     readerFantasy: premise.readerFantasy,
     kimThuChi: { ten: premise.goldenFinger.name, luat: premise.goldenFinger.rule, phamVi: premise.goldenFinger.scope },

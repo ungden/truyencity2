@@ -16,7 +16,7 @@ import {
   BibleSchema, ChapterDigestSchema, CyclePlanSchema, JudgeVerdictSchema, PremiseSchema, SerialRoutesSchema,
   type Bible, type CyclePlan, type JudgeVerdict,
 } from '@/services/serial/contracts';
-import { planNextCycle, readingHealth, writeOneChapter } from '@/services/serial/engine';
+import { planNextCycle, writeOneChapter } from '@/services/serial/engine';
 import { mergeRollingCyclePlan } from '@/services/serial/runtime';
 import { SERIAL_PROMPT_VERSION } from '@/services/serial/prompts';
 import { rebuildBibleFromDigests } from '@/services/serial/state';
@@ -249,7 +249,6 @@ async function main(): Promise<void> {
     replans,
     totalModelCalls: usages.length,
     totalUsd: totalCost(usages),
-    readingHealth: readingHealth(verdicts),
     audit: audited.value,
     usage: usages,
   };

@@ -14,7 +14,6 @@ const actionSchema = z.object({
 }).strict();
 
 interface RunRow {
-  scorecard_avg: number | null;
   cost_usd: number | null;
   serial_novel_id: string;
   chapter_number: number | null;
@@ -33,8 +32,8 @@ export async function GET(request: NextRequest) {
       novels!serial_jobs_novel_id_fkey(title, slug, hidden, chapter_count)
     `).order('updated_at', { ascending: false }),
     db.from('serial_runs')
-      .select('serial_novel_id,chapter_number,scorecard_avg,cost_usd,opening_audit')
-      .eq('kind', 'chapter').not('scorecard_avg', 'is', null)
+      .select('serial_novel_id,chapter_number,cost_usd,opening_audit')
+      .eq('kind', 'chapter').in('status', ['committed', 'published'])
       .order('started_at', { ascending: false }).limit(200),
   ]);
   if (jobsResult.error || runsResult.error) {
@@ -56,8 +55,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: openingResult.error.message }, { status: 500 });
   }
 
-  // Reading score over the last ten chapters per story: the number that replaces a
-  // block count as the health signal.
+  // Spend over the last ten kept chapters per story.
   const byNovel = new Map<string, RunRow[]>();
   for (const run of (runsResult.data ?? []) as RunRow[]) {
     const bucket = byNovel.get(run.serial_novel_id) ?? [];
@@ -67,12 +65,10 @@ export async function GET(request: NextRequest) {
 
   const jobs = (jobsResult.data ?? []).map(job => {
     const runs = byNovel.get(job.serial_novel_id as string) ?? [];
-    const scores = runs.map(run => Number(run.scorecard_avg)).filter(Number.isFinite);
     return {
       ...job,
       openingChapters: (openingResult.data ?? []).filter(chapter => chapter.novel_id === job.novel_id),
       openingAudit: runs.find(run => run.chapter_number === 4 && run.opening_audit)?.opening_audit ?? null,
-      readingScore: scores.length ? Number((scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(2)) : null,
       last10Usd: Number(runs.reduce((sum, run) => sum + Number(run.cost_usd ?? 0), 0).toFixed(3)),
     };
   });

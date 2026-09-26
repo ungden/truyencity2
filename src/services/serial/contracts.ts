@@ -864,7 +864,7 @@ export const JudgeVerdictSchema = z.object({
     newness: score,
     /** Is there something specific worth reading next? */
     endHook: score,
-  }).strict(),
+  }).strict().optional(),
   craft: z.object({
     /** Does the protagonist choose, act, work or gain something only they can carry forward? */
     protagonistAgency: score,
@@ -876,7 +876,7 @@ export const JudgeVerdictSchema = z.object({
     dialogueNaturalness: score,
     /** Is the reward structure materially different from the recent chapters? */
     structuralFreshness: score,
-  }).strict(),
+  }).strict().optional(),
   repetition: z.array(z.object({ quote: z.string().trim().min(4).max(400), repeatsChapter: z.number().int().min(1), note: line }).strict()).max(6),
   /** 排比三连 · 空洞抒情 · 万能过渡 · 万能形容词 · 情感标签 */
   aiFlavor: z.array(z.object({
@@ -902,10 +902,10 @@ export const JudgeVerdictSchema = z.object({
 export const JudgeProviderVerdictSchema = z.preprocess(
   value => {
     if (!value || typeof value !== 'object' || Array.isArray(value)) return value;
-    const { steering: _dropped, ...rest } = value as Record<string, unknown>;
+    const { steering: _s, scorecard: _p, craft: _c, ...rest } = value as Record<string, unknown>;
     return rest;
   },
-  JudgeVerdictSchema.omit({ steering: true }).extend({ reviewBinding: JudgeReviewBindingSchema }),
+  JudgeVerdictSchema.omit({ steering: true, scorecard: true, craft: true }).extend({ reviewBinding: JudgeReviewBindingSchema }),
 );
 export type JudgeVerdict = z.infer<typeof JudgeVerdictSchema>;
 
@@ -973,15 +973,20 @@ export type OpeningAudit = z.infer<typeof OpeningAuditSchema>;
 
 export const CHAPTER_WORD_RANGE = { min: 1_600, max: 2_600 } as const;
 
-/** The five reader-pull dimensions only: did this chapter make anyone want the next one. */
-export function pullAverage(verdict: JudgeVerdict): number {
+/**
+ * The Judge's self-scores, kept readable for verdicts stored before 2026-09-26. They are no
+ * longer requested: across 55 launch chapters they averaged 4.1/5 while editors reading the
+ * same chapters scored 3–5/10, so they measured nothing and a hold built on them never fired.
+ */
+export function pullAverage(verdict: JudgeVerdict): number | null {
   const s = verdict.scorecard;
-  return (s.opening + s.anticipation + s.payoff + s.newness + s.endHook) / 5;
+  return s ? (s.opening + s.anticipation + s.payoff + s.newness + s.endHook) / 5 : null;
 }
 
-export function scorecardAverage(verdict: JudgeVerdict): number {
+export function scorecardAverage(verdict: JudgeVerdict): number | null {
   const s = verdict.scorecard;
   const c = verdict.craft;
+  if (!s || !c) return null;
   return (
     s.opening + s.anticipation + s.payoff + s.newness + s.endHook
     + c.protagonistAgency + c.sceneLife + c.worldLogic + c.dialogueNaturalness + c.structuralFreshness

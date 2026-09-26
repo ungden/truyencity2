@@ -11,7 +11,7 @@ import {
 } from './contracts';
 import { SERIAL_PROMPT_VERSION } from './prompts';
 import {
-  assertTimeFor, auditFourChapterOpening, cyclePull, foldVolume, lowPullStreak, LOW_PULL_THRESHOLD, planNextCycle,
+  assertTimeFor, auditFourChapterOpening, foldVolume, planNextCycle,
   SerialCheckpointError, SerialDeadlineError, splitOpeningFindings, writeOneChapter,
   type ChapterOutcome, type SerialDraftCheckpoint,
 } from './engine';
@@ -800,15 +800,6 @@ async function stagePublishCycle(
     }
   }
 
-  if (parsedPlan.success && parsedPlan.data.schemaVersion === 1) {
-    const held = await holdLowPullCycle(db, job, {
-      cycleNumber,
-      startChapter: persistedCycle.start_chapter ?? parsedPlan.data.startChapter,
-      endChapter: persistedCycle.end_chapter ?? parsedPlan.data.plannedEndChapter,
-    });
-    if (held) return held;
-  }
-
   const { data, error } = await db.rpc('publish_serial_cycle', {
     p_job_id: job.id, p_lease_token: job.lease_token,
     p_cycle_id: job.current_cycle_id, p_next_stage: nextStage,
@@ -819,62 +810,6 @@ async function stagePublishCycle(
     status: 'completed', jobId: job.id, stage: 'publish_cycle',
     detail: `Published chapters ${published.startChapter}-${published.endChapter}.`,
   };
-}
-
-async function chapterVerdicts(db: SupabaseClient, serialNovelId: string, from: number, to: number) {
-  const { data, error } = await db.from('serial_runs')
-    .select('chapter_number,verdict,finished_at')
-    .eq('serial_novel_id', serialNovelId)
-    .eq('kind', 'chapter')
-    .in('status', ['committed', 'published'])
-    .gte('chapter_number', from).lte('chapter_number', to)
-    .not('verdict', 'is', null)
-    .order('finished_at', { ascending: true });
-  if (error) throw error;
-  // The newest committed verdict per chapter is the one that describes the private draft.
-  const byChapter = new Map<number, unknown>();
-  for (const row of (data ?? []) as Array<{ chapter_number: number; verdict: unknown }>) byChapter.set(row.chapter_number, row.verdict);
-  return [...byChapter.values()].flatMap(value => {
-    const parsed = JudgeVerdictSchema.safeParse(value);
-    return parsed.success ? [parsed.data] : [];
-  });
-}
-
-/**
- * Two consecutive cycles that nobody would come back for stop here, private, for a
- * person to read. It is the only quality hold in the engine and it is about pull, not
- * arithmetic: a low score never blocks one chapter, only a pattern.
- */
-async function holdLowPullCycle(db: SupabaseClient, job: SerialJobRow, cycle: {
-  cycleNumber: number; startChapter: number; endChapter: number;
-}): Promise<SerialTickResult | null> {
-  if (cycle.cycleNumber < 2 || !job.current_cycle_id) return null;
-  // Resuming a held job is the reader's decision to publish; hold each cycle once.
-  // Cycle v1 has no narrative review, so its review column carries the marker.
-  const { data: currentRow, error: currentError } = await db.from('serial_cycles')
-    .select('narrative_review').eq('id', job.current_cycle_id).single();
-  if (currentError) throw currentError;
-  const marker = (currentRow as { narrative_review?: { lowPullHold?: unknown } | null }).narrative_review;
-  if (marker?.lowPullHold) return null;
-  const { data: previousRow, error } = await db.from('serial_cycles')
-    .select('start_chapter,end_chapter')
-    .eq('serial_novel_id', job.serial_novel_id)
-    .eq('cycle_number', cycle.cycleNumber - 1)
-    .maybeSingle();
-  if (error) throw error;
-  if (!previousRow) return null;
-  const previous = previousRow as { start_chapter: number; end_chapter: number };
-  const current = cyclePull(await chapterVerdicts(db, job.serial_novel_id, cycle.startChapter, cycle.endChapter));
-  const before = cyclePull(await chapterVerdicts(db, job.serial_novel_id, previous.start_chapter, previous.end_chapter));
-  if (!lowPullStreak(current, before)) return null;
-  const reason = `Hai chu kỳ liền có điểm kéo đọc dưới ${LOW_PULL_THRESHOLD} (chu kỳ trước ${before}, chu kỳ này ${current}). Chu kỳ được giữ riêng tư để người đọc trước khi xuất bản; resume để xuất bản.`;
-  const marked = await db.from('serial_cycles').update({
-    narrative_review: { lowPullHold: { at: new Date().toISOString(), current, previous: before, threshold: LOW_PULL_THRESHOLD } },
-    updated_at: new Date().toISOString(),
-  }).eq('id', job.current_cycle_id);
-  if (marked.error) throw marked.error;
-  await releaseLease(db, job, { status: 'paused', last_error: reason });
-  return { status: 'completed', jobId: job.id, stage: 'publish_cycle', detail: reason };
 }
 
 async function stageFoldVolume(db: SupabaseClient, job: SerialJobRow): Promise<SerialTickResult> {

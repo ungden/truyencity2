@@ -38,7 +38,6 @@ describe('reader-led editorial direction', () => {
       'TUYỆT ĐỐI KHÔNG thiết kế kim thủ chỉ quay lại cắn chủ nhân',
     ]) expect(prompts).not.toContain(oldDirection);
     expect(CYCLE_PLANNER_SYSTEM_PROMPT).toContain('khám phá → thử thành công');
-    expect(JUDGE_SYSTEM_PROMPT).toContain('công dụng mới, phần thưởng, phản ứng, cơ hội');
   });
 
   test('positive and adversarial hooks both survive the model output contract', () => {

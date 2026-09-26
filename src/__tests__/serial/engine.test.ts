@@ -2,8 +2,8 @@ import type { ProviderUsage, StoryModelProvider } from '@/services/story-factory
 import { metaLeakFindings, type ChapterDigest, type ChapterDraft, type CyclePlan, type JudgeVerdict, type OpeningAudit, type SceneMode } from '@/services/serial/contracts';
 import { DEFAULT_SERIAL_ROUTES } from '@/services/serial/routes';
 import {
-  auditFourChapterOpening, cyclePull, cycleReadyToClose, foldVolume, LOW_PULL_THRESHOLD, lowPullStreak,
-  planNextCycle, readingHealth, repairOpeningChapters, repairOpeningUntilClean, SerialCheckpointError, SerialDeadlineError, splitOpeningFindings, writeOneChapter,
+  auditFourChapterOpening, cycleReadyToClose, foldVolume,
+  planNextCycle, repairOpeningChapters, repairOpeningUntilClean, SerialCheckpointError, SerialDeadlineError, splitOpeningFindings, writeOneChapter,
   type SerialDraftCheckpoint,
 } from '@/services/serial/engine';
 import { normalizeChapterDraft, reviewBindingMismatch, stripJsonResidue, stripMarkdown } from '@/services/serial/agents';
@@ -642,7 +642,7 @@ describe('context selection', () => {
     }
   });
 
-  test('chapter roles receive only the relevant active and recently consumed asset lots', () => {
+  test('chapter roles see what is in hand, never the transaction history', () => {
     const bible = baseBible();
     bible.symbolicCore.activeAssetLots = [{
       lotId: 'c7_ho_than_01', assetId: 'ho_than_phu', assetName: 'Hộ Thân Phù số 01',
@@ -657,7 +657,11 @@ describe('context selection', () => {
     }];
     const slice = assetLedgerSlice(bible, ['lam_viet'], 'Hộ Thân Phù');
     expect(slice.activeLots.map(lot => lot.lotId)).toEqual(['c7_ho_than_01']);
-    expect(slice.recentEvents.map(event => event.eventId)).toEqual(['c7_dung_ho_than_00']);
+    expect(slice).not.toHaveProperty('recentEvents');
+    expect(slice.activeLots[0]).not.toHaveProperty('provenance');
+    const writer = buildWriterBrief({ premise, bible, cycle: cycle(), chapterNumber: 8, previousChapter: null });
+    expect(writer.soTaiSanDauChuong).toEqual(['Lâm Việt: 1 lá Hộ Thân Phù số 01']);
+    expect(JSON.stringify(writer)).not.toContain('Lá phù đã kích phát rồi vỡ.');
     const extractor = buildExtractorBrief({
       premise, bible, chapterNumber: 8, title: 'Dùng phù', prose: 'Lâm Việt giao Hộ Thân Phù số 01.',
     });
@@ -689,14 +693,6 @@ describe('context selection', () => {
     expect(refreshStyleMemory(baseBible(), [
       cleanVerdict({ repetition: [{ quote: 'lại mở sổ ra', repeatsChapter: 6, note: 'lặp' }] }),
     ])).toEqual(['lại mở sổ ra', 'ánh mắt sắc như dao']);
-  });
-
-  test('reading health reports the weakest dimension for the operator dashboard', () => {
-    expect(readingHealth([])).toEqual({ chapters: 0, average: 0, weakest: null });
-    expect(readingHealth([
-      cleanVerdict({ scorecard: { opening: 5, anticipation: 2, payoff: 4, newness: 4, endHook: 5 } }),
-      cleanVerdict({ scorecard: { opening: 4, anticipation: 1, payoff: 4, newness: 5, endHook: 5 } }),
-    ])).toEqual({ chapters: 2, average: 3.95, weakest: 'anticipation' });
   });
 });
 
@@ -849,17 +845,6 @@ describe('code-owned ledger and reader-facing gates', () => {
     expect(metaLeakFindings('Hoàn tất đơn đã trả trước ở chương 2.')).toHaveLength(1);
     expect(metaLeakFindings('Chương mới của đời hắn bắt đầu.')).toHaveLength(0);
     expect(metaLeakFindings('【1. Giao dịch: Lâm Việt → Bảy Thạch: 1 lá Hộ Thân Phù】')).toHaveLength(1);
-  });
-
-  test('two low-pull cycles in a row are a pattern; one is steering', () => {
-    const low = cleanVerdict({ scorecard: { opening: 2, anticipation: 2, payoff: 1, newness: 2, endHook: 2 } });
-    const high = cleanVerdict();
-    expect(cyclePull([low, low])).toBe(1.8);
-    expect(cyclePull([])).toBeNull();
-    expect(lowPullStreak(cyclePull([low]), cyclePull([low]))).toBe(true);
-    expect(lowPullStreak(cyclePull([low]), cyclePull([high]))).toBe(false);
-    expect(lowPullStreak(cyclePull([low]), null)).toBe(false);
-    expect(LOW_PULL_THRESHOLD).toBe(2.5);
   });
 });
 

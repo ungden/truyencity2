@@ -14,7 +14,6 @@ type Job = {
   chapters_today: number;
   consecutive_replans: number;
   last_error: string | null;
-  readingScore: number | null;
   last10Usd: number;
   openingChapters: Array<{ chapter_number: number; title: string; content: string; publication_state: string }>;
   openingAudit: { passed?: boolean; summary?: string; findings?: unknown[] } | null;
@@ -281,7 +280,6 @@ export default function SerialPage() {
               <p>Giai đoạn: {job.stage}</p>
               <p>Chương: {job.current_chapter} (công khai {novel?.chapter_count ?? 0})</p>
               <p>Hôm nay: {job.chapters_today}/{job.daily_target}</p>
-              <p>Điểm đọc 10 chương gần nhất: <strong>{job.readingScore ?? '—'}</strong>/5</p>
               <p>Chi phí 10 chương: ${job.last10Usd}</p>
               <p>Lần lập lại kế hoạch liên tiếp: {job.consecutive_replans}</p>
               <p>Premise: {premiseApproved ? 'đã duyệt' : 'chưa duyệt'}</p>

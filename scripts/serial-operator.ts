@@ -63,12 +63,10 @@ async function status(): Promise<void> {
   for (const job of rows) {
     const novel = Array.isArray(job.novels) ? job.novels[0] : job.novels;
     const { data: health } = await db.from('serial_runs')
-      .select('scorecard_avg,cost_usd')
+      .select('cost_usd')
       .eq('serial_novel_id', job.serial_novel_id).eq('kind', 'chapter')
-      .not('scorecard_avg', 'is', null)
+      .in('status', ['committed', 'published'])
       .order('started_at', { ascending: false }).limit(10);
-    const scores = (health ?? []).map(run => Number(run.scorecard_avg));
-    const average = scores.length ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(2) : '—';
     const spend = (health ?? []).reduce((sum, run) => sum + Number(run.cost_usd ?? 0), 0);
     console.log(JSON.stringify({
       jobId: job.id,
@@ -79,8 +77,6 @@ async function status(): Promise<void> {
       chapter: job.current_chapter,
       today: `${job.chapters_today}/${job.daily_target}`,
       replans: job.consecutive_replans,
-      // The dashboard number: how the last ten chapters read, not how many are blocked.
-      readingScore: average,
       last10Usd: Number(spend.toFixed(3)),
       lastError: job.last_error,
     }, null, 1));

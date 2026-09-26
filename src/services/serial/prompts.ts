@@ -45,27 +45,13 @@ golden_finger_scope chỉ dành cho lợi thế của main tự làm được vi
 Main bị đồng minh thay toàn bộ quyết định, trái protagonistMove trong leRaPhaiLam, dùng contradicts_bible.
 LỖI SỐ LIỆU (được sửa một lần, không bao giờ vứt chương): bangSoLieu và soLieuNgoaiQuay là con số đúng của chương do hệ thống tính. Lượng, giá hay người nhận khác hai bảng này dùng transaction_contradiction; một lần trao tay không có dòng tương ứng dùng resource_provenance. Trích đúng câu sai. Không tự làm lại phép tính tồn kho.
 
-ĐIỂM ĐỌC 0–5, không bao giờ chặn chương. Chấm thật, không nể: 5 là chương khiến độc giả bấm chương sau ngay; 3 là đọc được nhưng không có cú; 2 trở xuống là chương thủ tục, kiểm kê, chuẩn bị hoặc hẹn lần sau mà không trả gì.
-- opening: vào thẳng việc độc giả quan tâm, tình huống tiến lên.
-- anticipation: khiến độc giả mong công dụng mới, phần thưởng, phản ứng, cơ hội hoặc thắng đối thủ đến đâu.
-- payoff: kết quả và phản ứng thực hiện lời hứa của nhịp này đến đâu.
-- newness: thứ mới có tên và còn dùng được.
-- endHook: điều cụ thể đáng đọc tiếp.
-
-ĐIỂM NGHỀ 0–5, chấm thẳng chất lượng văn:
-- protagonistAgency: nhân vật chính có lựa chọn, công sức hoặc thành quả chỉ họ mang được sang vòng sau.
-- sceneLife: chương là một cảnh đang sống, không phải biên bản, dashboard, bài thuyết trình hay danh sách thao tác.
-- worldLogic: đi lại, công nghệ, quyền hạn, nhân quả và thể chế khớp luật thế giới.
-- dialogueNaturalness: người nói theo lợi ích trước mắt và có giọng riêng, không đọc hộ thông điệp tác giả.
-- structuralFreshness: cách tạo và trả thưởng khác thật so với các chương gần đây.
-
-Kèm trích dẫn cho repetition (cảnh/thủ pháp lặp so với tóm tắt được cấp) và aiFlavor: ba vế song song, trữ tình rỗng, chuyển cảnh/tính từ vạn năng, gán nhãn cảm xúc, văn như báo cáo, nhân vật nói thẳng chủ đề, hoặc đám đông đồng thanh cùng một phản ứng.
+Ngoài lỗi logic, trích dẫn repetition (cảnh/thủ pháp lặp so với tóm tắt được cấp) và aiFlavor — những thứ này không bao giờ chặn chương, chỉ để tác giả tránh ở chương sau: ba vế song song, trữ tình rỗng, chuyển cảnh/tính từ vạn năng, gán nhãn cảm xúc, văn như báo cáo, nhân vật nói thẳng chủ đề, hoặc đám đông đồng thanh cùng một phản ứng.
 
 reviewBinding là bằng chứng bạn đã đọc đúng bản thảo: chép lại đúng chuongSo, tieuDe và một excerpt liên tiếp 24–400 ký tự có nguyên văn trong trường chuong. Không được nói thiếu văn bản nếu trường chuong có nội dung.
 
 ${craftBlock('judge', archetype)}
 
-Bạn chỉ soát và chấm. Hướng đi của truyện do kế hoạch và premise quyết định, không phải bạn.`;
+Bạn chỉ soát. Hướng đi của truyện do kế hoạch và premise quyết định, không phải bạn.`;
 export const JUDGE_SYSTEM_PROMPT = judgePrompt(DEFAULT_ARCHETYPE);
 
 export const EXTRACTOR_SYSTEM_PROMPT = `Bạn đọc một chương vừa viết xong và rút ra dữ liệu để cập nhật trí nhớ của truyện.
@@ -111,7 +97,7 @@ ${craftBlock('planner', archetype)}
 
 ${loopRules(archetype)}
 LỜI HỨA CỐT LÕI: climax của mỗi chu kỳ đưa loiHuaCotLoi lên một nấc thấy được trên trang — kim thủ chỉ lên nacKeTiep, một chủ thể đạt capKeTiep, hoặc lời hứa của tiêu đề và hook được trả ở quy mô lớn hơn lần trước — và main giành nó bằng lợi thế, sức mạnh hay mưu trí của chính mình trong hành động. chuKyTruoc.khuonCanh và chuKyDangViet.nhipDaLap là cách truyện đã thắng: chu kỳ này đổi sân chơi và cách thắng.
-SỔ GIAO DỊCH: mỗi beatSheet khai ledger — mọi món có số lượng đổi chủ trong chương đó, theo thứ tự diễn ra. acquire tạo lô mới cho người nhận (nhập hàng, săn được, luyện ra); transfer chuyển một phần hoặc toàn bộ lô sourceLotId từ fromOwnerId sang toOwnerId (bán hàng là một transfer hàng sang khách và một transfer tiền/tinh hạch sang người bán); consume chỉ khi đan, phù, nguyên liệu bị dùng hết cho chính người giữ nó; trả tiền, trả tinh hạch hay đổi hàng cho người khác luôn là transfer tới người nhận, không phải consume. eventId bắt đầu bằng c<chuongSo>_ và trở thành lotId của lô mới; sourceLotId trỏ lô trong soTaiSanHienTai hoặc eventId đứng trước trong cửa sổ. Hệ thống cộng trừ sổ này trước khi viết; bán món chưa có là bị trả lại. Writer chỉ chép con số từ đây. Trong bốn chương đầu, chép đúng các mục openingLedger của chương vào ledger, và với mỗi chương trong hopDongTrongCuaSo, materialOutcome chính là visibleResult của chương đó, trọn vẹn và đúng mức cụ thể.
+SỔ GIAO DỊCH: mỗi beatSheet khai ledger — mọi vật phẩm, nguyên liệu và tiền đổi chủ trong chương đó, theo thứ tự diễn ra; quyền, giấy phép, chứng nhận, suất dự thi hay hợp đồng là tình tiết của truyện, không phải tài sản. acquire tạo lô mới cho người nhận (nhập hàng, săn được, luyện ra); transfer chuyển một phần hoặc toàn bộ lô sourceLotId từ fromOwnerId sang toOwnerId (bán hàng là một transfer hàng sang khách và một transfer tiền/tinh hạch sang người bán); consume chỉ khi đan, phù, nguyên liệu bị dùng hết cho chính người giữ nó; trả tiền, trả tinh hạch hay đổi hàng cho người khác luôn là transfer tới người nhận, không phải consume. eventId bắt đầu bằng c<chuongSo>_ và trở thành lotId của lô mới; sourceLotId trỏ lô trong soTaiSanHienTai hoặc eventId đứng trước trong cửa sổ. Hệ thống cộng trừ sổ này trước khi viết; bán món chưa có là bị trả lại. Writer chỉ chép con số từ đây. Trong bốn chương đầu, chép đúng các mục openingLedger của chương vào ledger, và với mỗi chương trong hopDongTrongCuaSo, materialOutcome chính là visibleResult của chương đó, trọn vẹn và đúng mức cụ thể.
 
 beatSheets lập cho tối đa ba chương kế tiếp, bắt đầu đúng chuongBatDau, liên tiếp và không vượt qua chuongKetThucCoDinh nếu trường này có giá trị. Mỗi chương ghi hai đến bốn nhịp bằng lời kể, một mục tiêu cảm xúc, một thứ mới sẽ được đặt tên, và kiểu hook kết chương. Chương cuối của chu kỳ phải trả climax bằng kết quả nhìn thấy trước khi mở nextHook. Tuyệt đối không ghi con số trạng thái, không ghi delta tài nguyên, không ghi lịch trình phút.
 openingBridge của chương đầu cửa sổ nối tiếp đúng doanCuoiChuongTruoc (đi ngược điều vừa hẹn thì beat ghi lý do). Mỗi beatSheet chọn một sceneMode khác nhau trong cửa sổ; protagonistMove giữ quyền chủ động cho main; materialOutcome là thành quả có trước câu cuối.

@@ -23,7 +23,7 @@ import {
 import { DEFAULT_SERIAL_ROUTES } from '@/services/serial/routes';
 import { applyDigest, seedBible } from '@/services/serial/state';
 import {
-  auditFourChapterOpening, planNextCycle, readingHealth, repairOpeningUntilClean, SerialCheckpointError,
+  auditFourChapterOpening, planNextCycle, repairOpeningUntilClean, SerialCheckpointError,
   writeOneChapter,
   serialChapterInputFingerprint,
   type ChapterOutcome, type SerialDraftCheckpoint,
@@ -446,7 +446,6 @@ async function main(): Promise<void> {
     chapters: verdicts.length,
     totalUsd: Number(spend.toFixed(3)),
     perChapterUsd: verdicts.length ? Number((spend / verdicts.length).toFixed(3)) : 0,
-    reading: readingHealth(verdicts),
     // Bookkeeping words per 1,000; above PROCESS_DENSITY_LIMIT a chapter is drifting into ledger prose.
     processDensity: writtenChapters.map(chapter => processDensity(chapter.content)),
     openingAudit: openingAudit ? { passed: openingAudit.passed, findings: openingAudit.findings.map(item => `Ch.${item.chapterNumber} ${item.kind}`) } : null,

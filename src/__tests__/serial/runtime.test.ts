@@ -501,40 +501,13 @@ describe('serial runtime', () => {
     }] }),
   });
 
-  test('a second low-pull cycle in a row stays private for a person to read', async () => {
-    const { db, writes, rpcCalls } = fakeDb({
-      rows: {
-        serial_cycles: heldCycle(null),
-        serial_runs: [{ chapter_number: 21, verdict: pullVerdict(2) }, { chapter_number: 22, verdict: pullVerdict(1) }],
-      },
-      rpc: { claim_serial_job: job({ stage: 'publish_cycle' }), publish_serial_cycle: { startChapter: 21, endChapter: 30 } },
-    });
-    const result = await runSerialTick({ db, provider: unusedProvider });
-    expect(result.detail).toMatch(/Hai chu kỳ liền có điểm kéo đọc dưới 2.5/);
-    expect(rpcCalls.map(call => call.fn)).not.toContain('publish_serial_cycle');
-    expect(writes.find(write => write.table === 'serial_cycles')?.value).toMatchObject({ narrative_review: { lowPullHold: { current: 1.5 } } });
-    expect(writes.filter(write => write.table === 'serial_jobs').at(-1)?.value).toMatchObject({ status: 'paused' });
-  });
-
-  test('resuming a held cycle is the decision to publish it', async () => {
+  test('a finished cycle publishes; the Judge self-scores never hold it', async () => {
     const { db, rpcCalls } = fakeDb({
-      rows: {
-        serial_cycles: heldCycle({ lowPullHold: { at: '2026-09-23T00:00:00.000Z', current: 1.5, previous: 1.5 } }),
-        serial_runs: [{ chapter_number: 21, verdict: pullVerdict(1) }],
-      },
+      rows: { serial_cycles: heldCycle(null), serial_runs: [{ chapter_number: 21, verdict: pullVerdict(1) }] },
       rpc: { claim_serial_job: job({ stage: 'publish_cycle' }), publish_serial_cycle: { startChapter: 21, endChapter: 30 } },
     });
     const result = await runSerialTick({ db, provider: unusedProvider });
     expect(result.detail).toBe('Published chapters 21-30.');
-    expect(rpcCalls.map(call => call.fn)).toContain('publish_serial_cycle');
-  });
-
-  test('a strong cycle publishes without a hold', async () => {
-    const { db, rpcCalls } = fakeDb({
-      rows: { serial_cycles: heldCycle(null), serial_runs: [{ chapter_number: 21, verdict: pullVerdict(4) }] },
-      rpc: { claim_serial_job: job({ stage: 'publish_cycle' }), publish_serial_cycle: { startChapter: 21, endChapter: 30 } },
-    });
-    await runSerialTick({ db, provider: unusedProvider });
     expect(rpcCalls.map(call => call.fn)).toContain('publish_serial_cycle');
   });
 

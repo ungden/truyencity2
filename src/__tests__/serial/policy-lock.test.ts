@@ -65,6 +65,8 @@ describe('policy lock: the checker does not steer the story', () => {
   test('the Judge is not asked for steering and the planner takes no verdicts', () => {
     const judgeSchema = JSON.stringify(zodToJsonSchema(JudgeProviderVerdictSchema, { target: 'jsonSchema7', $refStrategy: 'none' }));
     expect(judgeSchema).not.toMatch(/steering/);
+    // Nor for self-scores: 4.1/5 on chapters editors scored 3–5/10 measured nothing.
+    expect(judgeSchema).not.toMatch(/scorecard|protagonistAgency/);
     for (const archetype of archetypeIds()) expect(promptsFor(archetype).judge).not.toMatch(/steering/);
     const engine = readFileSync('src/services/serial/engine.ts', 'utf8');
     const planner = engine.slice(engine.indexOf('export async function planNextCycle'), engine.indexOf('}): Promise<{ cycle: CyclePlan', engine.indexOf('export async function planNextCycle')));
