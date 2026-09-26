@@ -2,7 +2,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import {
-  assertSerialLaunchable, HARD_CONTINUITY_KINDS, JudgeProviderVerdictSchema, LegacyChapterDigestSchema, OpeningAuditProviderSchema, PremiseSchema,
+  assertSerialLaunchable, CyclePlanOutputSchema, HARD_CONTINUITY_KINDS, JudgeProviderVerdictSchema, LegacyChapterDigestSchema, OpeningAuditProviderSchema, PremiseSchema,
   premiseLint, processDensity, ProposedPremiseSchema,
   processProseFindings, PROCESS_DENSITY_LIMIT, SOFT_CONTINUITY_KINDS,
 } from '@/services/serial/contracts';
@@ -75,6 +75,29 @@ describe('policy lock: the checker does not steer the story', () => {
 
   test('the premise ladder is what the planner climbs', () => {
     for (const archetype of archetypeIds()) expect(promptsFor(archetype).planner).toMatch(/loiHuaCotLoi/);
+  });
+});
+
+describe('policy lock: models are not asked for what code owns or what is retired', () => {
+  const schemaText = (schema: Parameters<typeof zodToJsonSchema>[0]) =>
+    JSON.stringify(zodToJsonSchema(schema, { target: 'jsonSchema7', $refStrategy: 'none' }));
+
+  test('the planner does not write plan versions, notes or lived-causality links', () => {
+    const planner = schemaText(CyclePlanOutputSchema);
+    for (const field of ['schemaVersion', 'editorialNotes', 'prerequisiteIds', 'revealsFactIds', 'advancesMilestoneIds', 'valueContrastId']) {
+      expect({ field, present: planner.includes(`"${field}"`) }).toEqual({ field, present: false });
+    }
+  });
+
+  test('the extractor does not count assets the planned ledger already owns', () => {
+    expect(schemaText(LegacyChapterDigestSchema)).not.toMatch(/"assetEvents"/);
+  });
+
+  test('a v2 brief carries no empty lived-causality fields', () => {
+    const [{ premise }] = SERIAL_PREMISE_CATALOG;
+    expect(premise.narrativeFoundation).toBeUndefined();
+    const context = readFileSync('src/services/serial/context.ts', 'utf8');
+    expect(context.match(/\n    narrativeFoundation: /g) ?? []).toEqual([]);
   });
 });
 

@@ -684,6 +684,21 @@ function validateCyclePlan(cycle: z.infer<typeof CyclePlanObjectSchema>, ctx: z.
 export const CyclePlanShapeSchema = CyclePlanObjectSchema;
 type CyclePlanShape = z.infer<typeof CyclePlanShapeSchema>;
 
+/**
+ * What the planner model is sent. Strict structured output makes every field required, so
+ * a field the model should not decide costs output tokens on every beat and invites
+ * invented ids: the retired lived-causality links, the plan version (code owns it) and the
+ * editorial notes (code carries them). `toPlan` restores them before validation.
+ */
+export const CyclePlanOutputSchema = CyclePlanObjectSchema
+  .omit({ schemaVersion: true, editorialNotes: true })
+  .extend({
+    beatSheets: z.array(CyclePlanObjectSchema.shape.beatSheets.element.omit({
+      prerequisiteIds: true, revealsFactIds: true, advancesMilestoneIds: true,
+      valueContrastId: true, valueExperience: true,
+    })).min(1).max(3),
+  });
+
 export function normalizeCyclePlanShape(plan: CyclePlanShape, options: { rolling: boolean }): CyclePlanShape {
   const start = plan.startChapter;
   let end = plan.plannedEndChapter;
@@ -762,7 +777,14 @@ export const ChapterDigestSchema = z.object({
 export type ChapterDigest = z.infer<typeof ChapterDigestSchema>;
 /** What a v2 extractor is asked for: the digest without lived-causality evidence. */
 export const LegacyChapterDigestSchema = ChapterDigestSchema.omit({ narrativeEvidence: true })
-  .transform(digest => ({ ...digest, narrativeEvidence: [] as ChapterDigest['narrativeEvidence'] }));
+  // assetEvents come from the planned ledger at commit; asking the extractor for them was
+  // paid output that was always overwritten.
+  .extend({ coreChanges: ChapterDigestSchema.shape.coreChanges.omit({ assetEvents: true }) })
+  .transform(digest => ({
+    ...digest,
+    coreChanges: { ...digest.coreChanges, assetEvents: [] as ChapterDigest['coreChanges']['assetEvents'] },
+    narrativeEvidence: [] as ChapterDigest['narrativeEvidence'],
+  }));
 
 // ---------------------------------------------------------------- Verdict
 

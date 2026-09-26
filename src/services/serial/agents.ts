@@ -1,6 +1,7 @@
+import { z } from 'zod';
 import type { StoryModelProvider, ProviderUsage } from '@/services/story-factory/provider';
 import {
-  ChapterDigestSchema, ChapterDraftSchema, LegacyChapterDigestSchema, CyclePlanShapeSchema, JudgeProviderVerdictSchema, JudgeVerdictSchema, OpeningAuditProviderSchema, ProposedPremiseSchema,
+  ChapterDigestSchema, ChapterDraftSchema, LegacyChapterDigestSchema, CyclePlanOutputSchema, JudgeProviderVerdictSchema, JudgeVerdictSchema, OpeningAuditProviderSchema, ProposedPremiseSchema,
   type ChapterDigest, type ChapterDraft, type CyclePlan, type JudgeVerdict, type OpeningAudit, type Premise,
   type SerialRoutes,
 } from './contracts';
@@ -225,12 +226,13 @@ export async function planCycle(input: {
   premise: Premise;
   plannerBrief: unknown;
   rolling?: boolean;
-}): Promise<AgentResult<CyclePlan>> {
+}): Promise<AgentResult<z.infer<typeof CyclePlanOutputSchema>>> {
+  // Raw planner output: the engine's toPlan restores code-owned fields and validates.
   const result = await input.provider.json({
     model: input.routes.planner,
     system: serialSystemPrompt('planner', input.premise),
     prompt: brief(input.plannerBrief),
-    schema: CyclePlanShapeSchema,
+    schema: CyclePlanOutputSchema,
     temperature: 0.8,
     timeoutMs: PLANNER_TIMEOUT_MS,
   });

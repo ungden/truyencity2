@@ -692,12 +692,15 @@ export async function planNextCycle(input: {
   // the planner gets one chance to fix, like any other validation failure.
   const commerceShape = archetypeOf(input.premise.archetype)?.commerce ?? true;
   const toPlan = (value: unknown): CyclePlan => {
-    const shaped = normalizeCyclePlanShape(CyclePlanShapeSchema.parse(value), { rolling });
+    const version = input.premise.narrativeFoundation ? 2 : 1;
+    const shaped = normalizeCyclePlanShape(CyclePlanShapeSchema.parse({
+      ...(value as Record<string, unknown>), schemaVersion: version,
+    }), { rolling });
     // The plan version follows the premise; it is code's to set, not the model's to choose.
     // A planner that wrote schemaVersion 2 for a v2 premise cost a paid retry on 2026-09-26.
     const parsed = planSchema.safeParse({
       ...shaped,
-      schemaVersion: input.premise.narrativeFoundation ? 2 : 1,
+      schemaVersion: version,
       editorialNotes: input.editorialNotes ?? [],
     });
     if (!parsed.success) {

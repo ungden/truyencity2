@@ -301,18 +301,21 @@ export function buildWriterBrief(input: {
     // chapter 2 on "the land check is in three days", which chapter 3 never held.
     chuongKeTiep: nextChapterLead(cycle, chapterNumber),
     ghiChuBienTap: cycle.editorialNotes,
-    narrativeFoundation: premise.narrativeFoundation ?? null,
-    narrativeEvidence: bible.symbolicCore.narrativeEvidence,
-    durableNarrativeState: {
-      revealedNarrativeIds: bible.symbolicCore.revealedNarrativeIds,
-      achievedNarrativeMilestoneIds: bible.symbolicCore.achievedNarrativeMilestoneIds,
-      characterKnowledge: bible.symbolicCore.characterKnowledge,
-    },
-    dieuKienNhip: {
-      prerequisiteIds: sheet.prerequisiteIds,
-      revealsFactIds: sheet.revealsFactIds,
-      advancesMilestoneIds: sheet.advancesMilestoneIds,
-    },
+    // Lived-causality (v3, retired) only; a v2 brief no longer carries these empty fields.
+    ...(premise.narrativeFoundation ? {
+      narrativeFoundation: premise.narrativeFoundation ?? null,
+      narrativeEvidence: bible.symbolicCore.narrativeEvidence,
+      durableNarrativeState: {
+        revealedNarrativeIds: bible.symbolicCore.revealedNarrativeIds,
+        achievedNarrativeMilestoneIds: bible.symbolicCore.achievedNarrativeMilestoneIds,
+        characterKnowledge: bible.symbolicCore.characterKnowledge,
+      },
+      dieuKienNhip: {
+        prerequisiteIds: sheet.prerequisiteIds,
+        revealsFactIds: sheet.revealsFactIds,
+        advancesMilestoneIds: sheet.advancesMilestoneIds,
+      },
+    } : {}),
     soGiaoDichMoDau: chapterNumber <= 4
       ? premise.worldKernel.openingLedger.filter(entry => entry.chapterNumber <= chapterNumber)
       : [],
@@ -377,13 +380,16 @@ export function buildJudgeBrief(input: {
       const lines = splitLedgerLines(sheet?.ledger ?? [], premise.castSeed.find(member => member.role === 'protagonist')?.id);
       return { bangSoLieu: lines.panel, soLieuNgoaiQuay: lines.background };
     })(),
-    narrativeFoundation: premise.narrativeFoundation ?? null,
-    narrativeEvidence: bible.symbolicCore.narrativeEvidence,
-    durableNarrativeState: {
-      revealedNarrativeIds: bible.symbolicCore.revealedNarrativeIds,
-      achievedNarrativeMilestoneIds: bible.symbolicCore.achievedNarrativeMilestoneIds,
-      characterKnowledge: bible.symbolicCore.characterKnowledge,
-    },
+    // Lived-causality (v3, retired) only; a v2 brief no longer carries these empty fields.
+    ...(premise.narrativeFoundation ? {
+      narrativeFoundation: premise.narrativeFoundation ?? null,
+      narrativeEvidence: bible.symbolicCore.narrativeEvidence,
+      durableNarrativeState: {
+        revealedNarrativeIds: bible.symbolicCore.revealedNarrativeIds,
+        achievedNarrativeMilestoneIds: bible.symbolicCore.achievedNarrativeMilestoneIds,
+        characterKnowledge: bible.symbolicCore.characterKnowledge,
+      },
+    } : {}),
     luatPhanUng: premise.voiceSheet.reactionRule,
     worldSlice: relevantWorldSlice({ premise, bible, castIds, chapterNumber, beatText }),
     soTaiSanDauChuong: assetLedger,
@@ -447,17 +453,20 @@ export function buildExtractorBrief(input: {
     phucButDangMo: input.bible.symbolicCore.openHooks
       .filter(hook => hook.status !== 'paid' && hook.status !== 'dropped')
       .map(hook => ({ id: hook.id, noiDung: hook.what })),
-    narrativeFoundation: input.premise.narrativeFoundation ?? null,
-    bangChungNarrativeTheoBeat: plannedNarrative ? {
-      factIds: plannedNarrative.revealsFactIds,
-      milestoneIds: plannedNarrative.advancesMilestoneIds,
-    } : null,
-    narrativeEvidenceDaCo: input.bible.symbolicCore.narrativeEvidence,
-    narrativeStateBenVung: {
-      revealedNarrativeIds: input.bible.symbolicCore.revealedNarrativeIds,
-      achievedNarrativeMilestoneIds: input.bible.symbolicCore.achievedNarrativeMilestoneIds,
-      characterKnowledge: input.bible.symbolicCore.characterKnowledge,
-    },
+    // Lived-causality (v3, retired) only; a v2 brief no longer carries these empty fields.
+    ...(input.premise.narrativeFoundation ? {
+      narrativeFoundation: input.premise.narrativeFoundation ?? null,
+      bangChungNarrativeTheoBeat: plannedNarrative ? {
+        factIds: plannedNarrative.revealsFactIds,
+        milestoneIds: plannedNarrative.advancesMilestoneIds,
+      } : null,
+      narrativeEvidenceDaCo: input.bible.symbolicCore.narrativeEvidence,
+      narrativeStateBenVung: {
+        revealedNarrativeIds: input.bible.symbolicCore.revealedNarrativeIds,
+        achievedNarrativeMilestoneIds: input.bible.symbolicCore.achievedNarrativeMilestoneIds,
+        characterKnowledge: input.bible.symbolicCore.characterKnowledge,
+      },
+    } : {}),
   };
 }
 
@@ -475,8 +484,8 @@ export function buildOpeningAuditBrief(input: {
     vongKinhTe: input.premise.worldKernel.economyLoops,
     hangMoMan: input.premise.worldKernel.launchProducts,
     hopDongBonChuong: input.premise.worldKernel.openingContract,
-    soGiaoDichChuan: input.premise.worldKernel.openingLedger,
-    narrativeFoundation: input.premise.narrativeFoundation ?? null,
+    // The auditor reads for pull, not stock: no opening ledger.
+    ...(input.premise.narrativeFoundation ? { narrativeFoundation: input.premise.narrativeFoundation } : {}),
     chuong: input.chapters,
   };
 }
@@ -503,10 +512,13 @@ export function buildCyclePlannerBrief(input: {
       huongKetThuc: premise.endingDirection,
     },
     loiHuaCotLoi: coreLadder(premise, bible),
-    kimThuChi: premise.goldenFinger,
     nguonDoiKhang: premise.oppositionEngine,
-    worldKernel: premise.worldKernel,
-    commerceFantasy: premise.narrativeFoundation?.commerceFantasy ?? null,
+    // The opening contract and ledger drive chapters 1–4 only; hopDongTrongCuaSo carries
+    // the rows for a planning window that still reaches them.
+    worldKernel: input.startChapter > 4
+      ? { ...premise.worldKernel, openingContract: [], openingLedger: [] }
+      : premise.worldKernel,
+    ...(premise.narrativeFoundation ? { commerceFantasy: premise.narrativeFoundation.commerceFantasy ?? null } : {}),
     luatPhanUng: premise.voiceSheet.reactionRule,
     chuKySo: input.cycleNumber,
     quyenSo: input.volumeNumber,
@@ -556,7 +568,11 @@ export function buildCyclePlannerBrief(input: {
         vongKhachHang: input.activeCycle.customerLoop,
         aftermath: input.activeCycle.aftermath,
         nextHook: input.activeCycle.nextHook,
-        nhipDaLap: input.activeCycle.beatSheets,
+        // Shapes, not the full beats with their ledgers: how these chapters won.
+        nhipDaLap: input.activeCycle.beatSheets.map(sheet => ({
+          chapterNumber: sheet.chapterNumber, sceneMode: sheet.sceneMode,
+          protagonistMove: sheet.protagonistMove, materialOutcome: sheet.materialOutcome,
+        })),
         chuongKetThuc: input.activeCycle.plannedEndChapter,
       }
       : null,
@@ -566,13 +582,16 @@ export function buildCyclePlannerBrief(input: {
     loaiSuongDaDungGanDay: used,
     phucButQuaHan: overdueHooks(bible, input.startChapter),
     chiDaoTuBienTap: input.editorialNotes,
-    narrativeFoundation: premise.narrativeFoundation ?? null,
-    narrativeEvidence: bible.symbolicCore.narrativeEvidence,
-    durableNarrativeState: {
-      revealedNarrativeIds: bible.symbolicCore.revealedNarrativeIds,
-      achievedNarrativeMilestoneIds: bible.symbolicCore.achievedNarrativeMilestoneIds,
-      characterKnowledge: bible.symbolicCore.characterKnowledge,
-    },
+    // Lived-causality (v3, retired) only; a v2 brief no longer carries these empty fields.
+    ...(premise.narrativeFoundation ? {
+      narrativeFoundation: premise.narrativeFoundation ?? null,
+      narrativeEvidence: bible.symbolicCore.narrativeEvidence,
+      durableNarrativeState: {
+        revealedNarrativeIds: bible.symbolicCore.revealedNarrativeIds,
+        achievedNarrativeMilestoneIds: bible.symbolicCore.achievedNarrativeMilestoneIds,
+        characterKnowledge: bible.symbolicCore.characterKnowledge,
+      },
+    } : {}),
   };
 }
 
@@ -606,6 +625,8 @@ export function coreLadder(premise: Premise, bible: Bible) {
     blurb: premise.blurb,
     kimThuChi: {
       ten: premise.goldenFinger.name,
+      luat: premise.goldenFinger.rule,
+      phamVi: premise.goldenFinger.scope,
       nacHienTai: rungs[rungIndex] ?? null,
       nacKeTiep: rungs[rungIndex + 1] ?? null,
     },
