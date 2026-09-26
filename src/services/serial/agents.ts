@@ -77,6 +77,19 @@ export function stripMarkdown(content: string): string {
     .replace(/^#{1,6}\s+/gm, '');
 }
 
+/**
+ * The JSON envelope around a chapter can bleed into its text: beast-taming chapter 8 went
+ * public ending in `Tạ Hành.”}`. Braces and brackets at either end are never prose, and a
+ * closing quote left without an opening one is the envelope's, not a line of dialogue's.
+ */
+export function stripJsonResidue(content: string): string {
+  let text = content.replace(/^\s*[{[]+\s*/, '').replace(/\s*"?\s*[}\]]+\s*$/, '');
+  const count = (mark: string) => text.split(mark).length - 1;
+  if (text.endsWith('”') && count('”') > count('“')) text = text.slice(0, -1);
+  if (text.endsWith('"') && count('"') % 2 === 1) text = text.slice(0, -1);
+  return text.trimEnd();
+}
+
 /** Remove a model-emitted Markdown heading that merely repeats the structured title. */
 export function normalizeChapterDraft(draft: ChapterDraft): ChapterDraft {
   const title = draft.title.replace(/^chương\s+\d+\s*:\s*/iu, '').trim();
@@ -87,7 +100,7 @@ export function normalizeChapterDraft(draft: ChapterDraft): ChapterDraft {
     while (lines.length > 1 && lines[1].trim() === '') lines.splice(1, 1);
     lines.shift();
   }
-  return ChapterDraftSchema.parse({ ...draft, title, content: stripMarkdown(lines.join('\n')).trim() });
+  return ChapterDraftSchema.parse({ ...draft, title, content: stripJsonResidue(stripMarkdown(lines.join('\n'))).trim() });
 }
 
 export async function writeChapter(input: {

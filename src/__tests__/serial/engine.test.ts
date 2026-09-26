@@ -6,7 +6,7 @@ import {
   planNextCycle, readingHealth, repairOpeningChapters, repairOpeningUntilClean, SerialCheckpointError, SerialDeadlineError, splitOpeningFindings, writeOneChapter,
   type SerialDraftCheckpoint,
 } from '@/services/serial/engine';
-import { normalizeChapterDraft, reviewBindingMismatch, stripMarkdown } from '@/services/serial/agents';
+import { normalizeChapterDraft, reviewBindingMismatch, stripJsonResidue, stripMarkdown } from '@/services/serial/agents';
 import { assetLedgerSlice, splitLedgerLines, buildCyclePlannerBrief, buildExtractorBrief, buildJudgeBrief, buildWriterBrief, collectSteering, refreshStyleMemory, relevantCast } from '@/services/serial/context';
 import { seedBible } from '@/services/serial/state';
 import { premise, baseBible, cycle } from './fixtures';
@@ -119,6 +119,12 @@ describe('chapter loop', () => {
     expect(stripMarkdown('Trên đó chỉ có một dòng.\n\n**Tịnh Mạch Đan — ba tinh hạch.**\n\n*Thôi xong.*\n\n# Hết'))
       .toBe('Trên đó chỉ có một dòng.\n\nTịnh Mạch Đan — ba tinh hạch.\n\nThôi xong.\n\nHết');
     expect(stripMarkdown('【Giao dịch: 3 × 2 viên】 và 5*3 = 15')).toBe('【Giao dịch: 3 × 2 viên】 và 5*3 = 15');
+    // The JSON envelope that went public at the end of beast-taming chapter 8.
+    expect(stripJsonResidue('“Tên thách đấu ưu tiên.”\n\nBên dưới là một cái tên.\n\nTạ Hành.”}')).toBe('“Tên thách đấu ưu tiên.”\n\nBên dưới là một cái tên.\n\nTạ Hành.');
+    // A chapter that really ends on dialogue keeps its closing quote.
+    expect(stripJsonResidue('Hắn nói:\n\n“Vậy gọi hắn tới.”')).toBe('Hắn nói:\n\n“Vậy gọi hắn tới.”');
+    expect(stripJsonResidue('Hắn nói:\n\n“Vậy gọi hắn tới.”\"}')).toBe('Hắn nói:\n\n“Vậy gọi hắn tới.”');
+    expect(stripJsonResidue('{Mở đầu. 【Bảng】')).toBe('Mở đầu. 【Bảng】');
   });
 
   test('structured title owns the heading and duplicate Markdown is stripped', () => {
