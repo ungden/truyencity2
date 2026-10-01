@@ -446,6 +446,54 @@ describe('cycle lifecycle', () => {
     expect(result.usages).toHaveLength(1);
   });
 
+  test('a rolling window may repeat a scene mode, and a merge the cycle rejects gets the retry', async () => {
+    const makeBeat = (chapterNumber: number, sceneMode: SceneMode) => ({
+      chapterNumber,
+      sceneMode,
+      openingBridge: `Trả ngay câu cuối chương ${chapterNumber - 1}.`,
+      protagonistMove: `Lâm Việt tự chọn cách xử lý chương ${chapterNumber}.`,
+      beats: ['Mở cảnh bằng hệ quả trực tiếp', 'Chốt một thành quả nhìn thấy'],
+      materialOutcome: `Một kết quả vật chất của chương ${chapterNumber} được xác lập.`,
+      emotionalTarget: 'Thỏa mãn vì tình thế đổi thật.',
+      newNamedThing: `Mốc ${chapterNumber}`,
+      endHookKind: 'opportunity' as const,
+      prerequisiteIds: [],
+      revealsFactIds: [],
+      advancesMilestoneIds: [],
+    });
+    const active = cycle({
+      startChapter: 11,
+      plannedEndChapter: 18,
+      beatSheets: [makeBeat(11, 'transaction'), makeBeat(12, 'hunt'), makeBeat(13, 'public_showcase')],
+    });
+    const plan = (beats: ReturnType<typeof makeBeat>[]) => cycle({ startChapter: 14, plannedEndChapter: 18, beatSheets: beats });
+    const input = {
+      routes: DEFAULT_SERIAL_ROUTES, premise, bible: baseBible(),
+      previousCycle: null, activeCycle: active,
+      cycleNumber: 2, volumeNumber: 1, startChapter: 14, fixedEndChapter: 18,
+    };
+    // The production story paused on 2026-09-26 on exactly this window.
+    const repeated = await planNextCycle({
+      ...input,
+      provider: stubProvider({ planner: [plan([makeBeat(14, 'hunt'), makeBeat(15, 'hunt'), makeBeat(16, 'transaction')])] }),
+    });
+    expect(repeated.cycle.beatSheets.map(sheet => sheet.sceneMode)).toEqual(['hunt', 'hunt', 'transaction']);
+    expect(repeated.usages).toHaveLength(1);
+
+    const retried = await planNextCycle({
+      ...input,
+      provider: stubProvider({ planner: [
+        (() => {
+          const broken = plan([makeBeat(14, 'hunt'), makeBeat(15, 'investigation'), makeBeat(16, 'crafting')]);
+          return { ...broken, beatSheets: broken.beatSheets.map((sheet, index) => index === 0 ? { ...sheet, newNamedThing: null } : sheet) };
+        })(),
+        plan([makeBeat(14, 'hunt'), makeBeat(15, 'investigation'), makeBeat(16, 'crafting')]),
+      ] }),
+    });
+    expect(retried.cycle.beatSheets[0].newNamedThing).toBe('Mốc 14');
+    expect(retried.usages).toHaveLength(2);
+  });
+
   test('a final rolling window plans only the exact remaining chapter', async () => {
     const makeBeat = (chapterNumber: number, sceneMode: SceneMode) => ({
       chapterNumber,
@@ -529,6 +577,8 @@ describe('context selection', () => {
     });
     expect(brief.nhipChuong).toHaveLength(2);
     expect(brief.khongDuocTrai.daChet).toEqual([]);
+    // The Bible's address for a character goes stale; the previous chapter says where a scene is.
+    expect(JSON.stringify(brief.khongDuocTrai)).not.toMatch(/dangO|locationId/);
     expect(brief.khongDuocTrai.nhanVatChinh.tienTrien).toEqual(expect.arrayContaining([
       expect.objectContaining({ he: 'Cảnh giới Tu Tiên', cap: 'Luyện Khí tầng bốn' }),
     ]));

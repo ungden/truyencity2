@@ -11,7 +11,7 @@ import playbookData from './playbook.json';
  * composed in at the marked point. Changing craft is a data edit; changing the
  * contract is a code change. They rot at different speeds.
  */
-export const SERIAL_PROMPT_VERSION = `serial-prompts-41-ladder + playbook-${playbookData.version}`;
+export const SERIAL_PROMPT_VERSION = `serial-prompts-42-no-stale-place + playbook-${playbookData.version}`;
 
 const writerPrompt = (archetype: string) => `Bạn là tác giả truyện mạng tiếng Việt, viết truyện dài nhiều chương ra hằng ngày.
 
@@ -21,7 +21,7 @@ ${craftBlock('writer', archetype)}
 
 RÀNG BUỘC
 Bạn được tự do bịa thêm người, nơi, chi tiết, lời thoại và diễn biến nhỏ để chương hay hơn.
-khongDuocTrai là trạng thái ở đầu chương, không phải trần tiến triển: ai đã chết, ai ở đâu, cấp nào, ngày thứ mấy, ai biết gì. Cấp độc giả đã thấy thì không công bố lại như cú thăng cấp mới; cấp mới thì cho thấy căn cứ rồi kết thúc đúng cấp mới. Dùng đúng tên hệ, cấp và phẩm trong worldSlice. hopDongMoDau, nếu có, là kết quả phải xảy ra trọn và đúng mức cụ thể trên trang.
+khongDuocTrai là trạng thái ở đầu chương, không phải trần tiến triển: ai đã chết, cấp nào, ngày thứ mấy, ai biết gì. Cấp độc giả đã thấy thì không công bố lại như cú thăng cấp mới; cấp mới thì cho thấy căn cứ rồi kết thúc đúng cấp mới. Dùng đúng tên hệ, cấp và phẩm trong worldSlice. hopDongMoDau, nếu có, là kết quả phải xảy ra trọn và đúng mức cụ thể trên trang.
 SỐ LIỆU DO HỆ THỐNG GIỮ: bangSoLieu và soLieuNgoaiQuay là mọi món đổi chủ trong chương, đã tính sẵn, xếp theo thứ tự diễn ra. Kể từng lần trao tay bằng lời trong cảnh, đúng con số, đúng thứ tự (hàng phải về tay trước khi được bán). Không tự thêm con số hàng, giá hay tồn kho; việc trao tay nào không có trong hai bảng này thuộc chương khác.
 mocVongKhachHangChuongNay, nếu có, là payoff thương mại phải hoàn tất trong chương; người chứng kiến chuyển ngay thành hỏi giá, đặt hàng, mời hợp tác hoặc đổi địa vị.
 hinhDangChuong là xương cảnh đã duyệt. Chương nối liền: mở bằng openingBridge tiếp đúng doanCuoiChuongTruoc, kết bằng hook dẫn vào chuongKeTiep nếu có; nếu kế hoạch đi ngược điều vừa xảy ra hay vừa hẹn, cho thấy trên trang vì sao. protagonistMove là lựa chọn của main; materialOutcome có trước câu hook; sceneMode là loại cảnh, không phải nhãn để đọc lên.

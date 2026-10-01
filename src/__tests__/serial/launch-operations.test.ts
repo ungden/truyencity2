@@ -41,6 +41,17 @@ describe('serial launch operations', () => {
     expect(keep).toMatch(/current_chapter = v_from - 1/);
   });
 
+  test('a story pauses when a replan does not help, not after two unrelated replans in a cycle', () => {
+    const pause = readFileSync('supabase/migrations/20261002090000_serial_replan_pauses_on_consecutive_failure.sql', 'utf8');
+    expect(pause).toMatch(/v_pause := v_job\.consecutive_replans \+ 1 >= 2\s+OR \(v_discarded > 0 AND v_cycle\.replan_count \+ 1 >= 2\)/);
+    expect(pause).toMatch(/status = CASE WHEN v_pause THEN 'paused' ELSE 'ready' END/);
+    expect(pause).not.toMatch(/CASE WHEN v_cycle\.replan_count \+ 1 >= 2/);
+    // Everything the previous version guaranteed still holds.
+    expect(pause).toMatch(/v_bible_chapter = p_from_chapter - 1/);
+    expect(pause).toMatch(/current_chapter = v_from - 1/);
+    expect(pause).toMatch(/greatest\(0, v_job\.chapters_today - v_refund\)/);
+  });
+
   test('automatic replans refund only same-day draft chapters from quota', () => {
     expect(quotaRefundMigration).toMatch(/timezone\('Asia\/Ho_Chi_Minh', created_at\)::date = v_local_date/);
     expect(quotaRefundMigration).toMatch(/greatest\(0, v_job\.chapters_today - v_refund\)/);

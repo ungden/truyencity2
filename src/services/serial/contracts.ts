@@ -630,14 +630,9 @@ function validateCyclePlan(cycle: z.infer<typeof CyclePlanObjectSchema>, ctx: z.
       });
     }
   });
-  const plannedModes = cycle.beatSheets.map(sheet => sheet.sceneMode);
-  if (minimumSpan === 5 && cycle.schemaVersion === 1 && new Set(plannedModes).size !== plannedModes.length) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ['beatSheets'],
-      message: 'A rolling beat window must use a different dominant scene mode for each chapter.',
-    });
-  }
+  // Scene-mode variety is taste, asked for in the planner prompt. 93c7dac removed its
+  // rejection from the engine but left this copy, which every v2 story's plans reach
+  // (their plan version is 1); it paused the first production story on 2026-09-26.
   // The customer loop is a commerce-archetype requirement, checked where the premise is known.
   if (minimumSpan === 5 && cycle.schemaVersion === 1 && (cycle.climax.witnesses.length === 0
     || cycle.beatSheets.some(sheet => !sheet.newNamedThing))) {
@@ -716,8 +711,10 @@ export function normalizeCyclePlanShape(plan: CyclePlanShape, options: { rolling
     })
     .filter((beat, index) => index === 0 || beat.chapterNumber <= end);
   end = Math.max(end, beatSheets[0]?.chapterNumber ?? end);
-  let customerLoop = plan.customerLoop;
-  if (customerLoop && !options.rolling) {
+  // A rolling window keeps the cycle's approved loop (`mergeRollingCyclePlan`); one the
+  // planner returns is discarded, so it must not cost a retry by failing validation.
+  let customerLoop = options.rolling ? null : plan.customerLoop;
+  if (customerLoop) {
     const { purchaseChapter, useToEarnChapter, publicProofChapter, returnUpgradeChapter } = customerLoop.schedule;
     const ordered = [purchaseChapter, useToEarnChapter, publicProofChapter, returnUpgradeChapter];
     const valid = ordered.every((chapter, index) => index === 0 || chapter > ordered[index - 1])

@@ -215,7 +215,7 @@ Nothing parks waiting for a repair.
 | Judge cites a contradiction | One targeted repair against the quoted passages |
 | It survives the repair | One clean rewrite with the findings in front of it |
 | It survives that too | `replan_serial_cycle` from that chapter: its drafts and later ones are deleted, the chapters before it (which passed their judge, and in cycle 1 the opening review) stay with the Bible they built, and the rest of the cycle is planned again. Only a failed opening audit rewinds the whole cycle to its checkpoint. Until 2026-09-24 every replan rewound the whole cycle, which cost the beast-taming launch its approved opening |
-| A cycle replans twice | Job `paused` — the one place a person is needed, and the job is to **read**, not to repair |
+| The replanned chapter fails again before anything commits, or a rewind that discards drafts happens twice in a cycle | Job `paused` — the one place a person is needed, and the job is to **read**, not to repair. Until 2026-10-02 any two replans in a cycle paused it, even seven good chapters apart |
 | Lease expires mid-stage | `reconcile_serial_jobs` returns it with exponential backoff |
 
 A low reading score never blocks anything.
@@ -255,6 +255,27 @@ The same day the pipeline was trimmed to what each model decides:
 `policy-lock.test.ts` fails if the Judge schema or prompt regains steering or the planner
 takes verdicts. The fix removed prompt text rather than adding it: writer 1,586 → ~1,235
 words, judge 1,070 → ~780, and five overlapping planner rules became three.
+
+## Where a scene stands comes from the previous chapter (2026-10-02)
+
+All five stories paused in cycle 3 between 2026-09-26 and 09-28. Three causes, none of them
+a model failure:
+
+- **Stale addresses.** `khongDuocTrai` gave the Writer and Judge each character's Bible
+  location as canon. The Bible can only hold the kernel's 5–7 locations and the extractor
+  rarely reports a move (rule-horror: 0 moves in 12 chapters), so cast stayed at their
+  starting addresses while the story moved to a hospital instance or a rift. The Judge
+  cited the stale address against correct prose (`location_impossible`, 8 failures, the
+  most common kind); a repair cannot fix a wrong canon and a replan reproduces it. The
+  locations are no longer in `khongDuocTrai`; the previous chapter's ending decides.
+- **Cumulative pause count.** `replan_serial_cycle` paused on the cycle's second replan
+  ever, not the second in a row. It now pauses on `consecutive_replans` (reset by every
+  commit), keeping the cycle count only for rewinds that discard committed drafts.
+- **A scene-mode rule that was never removed.** `93c7dac` deleted the engine's check but
+  not the copy in `validateCyclePlan`, which every v2 story's plans reach (their plan
+  version is 1). It surfaced as a raw ZodError from the rolling merge, which skipped the
+  planner retry and paused the story. The rule is gone, a rejected merge now gets the
+  retry, and a rolling plan's customer loop (which the merge discards) is not validated.
 
 ## Two launch gates
 

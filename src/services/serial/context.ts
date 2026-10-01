@@ -148,7 +148,16 @@ export function relevantCast(bible: Bible, premise: Premise, beatText: string): 
   return scored.sort((a, b) => b.score - a.score).slice(0, RELEVANT_CAST_LIMIT).map(item => item.id);
 }
 
-/** The small, hard surface. Short on purpose: a Writer that reads it will obey it. */
+/**
+ * The small, hard surface. Short on purpose: a Writer that reads it will obey it.
+ *
+ * Where people are is not on it. The Bible can only place someone in one of the
+ * kernel's five-to-seven locations, and the extractor rarely reports a move, so by
+ * cycle three every story still had its cast at their starting addresses. The Judge
+ * then cited that stale address against prose that followed the previous chapter
+ * correctly, and four stories paused on `location_impossible` (2026-09-26..28). The
+ * previous chapter's ending, which every role receives, says where a scene stands.
+ */
 export function mustNotContradict(bible: Bible, premise: Premise, castIds: string[]) {
   const core = bible.symbolicCore;
   const progressionName = (subjectId: string) => core.progressions
@@ -166,13 +175,12 @@ export function mustNotContradict(bible: Bible, premise: Premise, castIds: strin
     ngayTruyen: core.storyDay,
     nhanVatChinh: {
       tienTrien: progressionName(core.mc.characterId),
-      dangO: core.mc.locationId,
       nacKimThuChi: core.mc.goldenFingerRungId,
     },
     daChet: core.cast.filter(member => !member.alive).map(member => nameOf(bible, member.id)),
-    viTri: core.cast
+    tienTrienNhanVat: core.cast
       .filter(member => member.alive && castIds.includes(member.id))
-      .map(member => ({ ten: nameOf(bible, member.id), tienTrien: progressionName(member.id), dangO: member.locationId })),
+      .map(member => ({ ten: nameOf(bible, member.id), tienTrien: progressionName(member.id) })),
     bietBiMat: core.cast
       .filter(member => member.knowsFinger)
       .map(member => nameOf(bible, member.id)),

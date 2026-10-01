@@ -753,11 +753,18 @@ export async function planNextCycle(input: {
       assertCycleLedger(input.bible, candidate, input.startChapter);
       assertNarrativePlan(input.premise, input.bible, candidate);
     } else {
-      const merged = CyclePlanSchema.parse({
+      // A merge the cycle contract rejects is the planner's to fix on its retry. As a raw
+      // ZodError it skipped the retry and paused the story outright.
+      const mergedResult = CyclePlanSchema.safeParse({
         ...input.activeCycle,
         beatSheets: candidate.beatSheets,
         editorialNotes: input.editorialNotes ?? [],
       });
+      if (!mergedResult.success) {
+        throw new SerialStateError('plan_shape', mergedResult.error.issues
+          .map(issue => `${issue.path.join('.')}: ${issue.message}`).join(' | ').slice(0, 1_500));
+      }
+      const merged = mergedResult.data;
       assertCycleAssetCoherence(input.bible, merged, input.startChapter);
       assertCycleLedger(input.bible, merged, input.startChapter);
       assertNarrativePlan(input.premise, input.bible, merged);
