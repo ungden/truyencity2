@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import {
-  assertSerialLaunchable, PremiseSchema, CyclePlanSchema, scorecardAverage, type ChapterDigest,
+  assertSerialLaunchable, ChapterDigestSchema, PremiseSchema, CyclePlanSchema, scorecardAverage, type ChapterDigest,
 } from '@/services/serial/contracts';
 import {
   applyDigest, assertBibleCoherence, assertCycleAssetCoherence, assertPayoffRotation, assertStanceHeld, overdueHooks, progressionRankIndex,
@@ -9,6 +9,7 @@ import {
 import { WRITER_SYSTEM_PROMPT, CYCLE_PLANNER_SYSTEM_PROMPT, JUDGE_SYSTEM_PROMPT, PREMISE_SYSTEM_PROMPT } from '@/services/serial/prompts';
 import { payoffKindIds, activeRules, staleRules } from '@/services/serial/playbook';
 import { premise, baseBible, digest, cycle } from './fixtures';
+import { SERIAL_PREMISE_CATALOG } from '@/services/serial/catalog';
 
 describe('serial contracts', () => {
   test('a premise offers four directions for expansion', () => {
@@ -360,7 +361,7 @@ describe('writer prompt encodes the measured Faloo rules', () => {
     expect(JUDGE_SYSTEM_PROMPT).toMatch(/chỉ báo lỗi có bằng chứng nguyên văn/);
     expect(JUDGE_SYSTEM_PROMPT).toMatch(/golden_finger_scope/);
     expect(JUDGE_SYSTEM_PROMPT).toMatch(/transaction_contradiction/);
-    expect(JUDGE_SYSTEM_PROMPT).toMatch(/bangSoLieu và soLieuNgoaiQuay là con số đúng của chương/);
+    expect(JUDGE_SYSTEM_PROMPT).toMatch(/traoTayCuaMain và traoTayNgoaiQuay là con số đúng của chương/);
     expect(JUDGE_SYSTEM_PROMPT).toMatch(/không bao giờ vứt chương/);
     expect(JUDGE_SYSTEM_PROMPT).toMatch(/không bao giờ chặn chương/);
   });
@@ -531,6 +532,36 @@ describe('sanitizing an extractor digest', () => {
     const { digest: clean, dropped } = sanitizeDigest({ premise, bible: baseBible(), digest: volunteered });
     expect(clean.narrativeEvidence).toEqual([]);
     expect(dropped.join(' ')).toMatch(/narrativeEvidence/);
+  });
+
+  test('a rank-up that names no track lands on the only track the subject is on', () => {
+    // Rule-horror, chapter 10: 【Thăng cấp: Lâm Khải đạt Thử Luật Sơ Kỳ.】 The extractor left
+    // trackId empty, the merge saw a stranger to the system, and the Bible kept the old rank.
+    const horror = SERIAL_PREMISE_CATALOG.find(entry => entry.id === 'rule-horror')!.premise;
+    const seeded = seedBible({ premise: horror });
+    const held = seeded.symbolicCore.progressions.find(state => state.subjectId === 'lam_khai' && state.systemId === 'nguoi_tham_gia')!;
+    expect(held.trackId).toBe('quan_sat');
+    const bible = {
+      ...seeded,
+      symbolicCore: {
+        ...seeded.symbolicCore,
+        chapterNumber: 9,
+        progressions: seeded.symbolicCore.progressions.map(state => state === held ? { ...state, minorStageId: 'hau_ky' } : state),
+      },
+    };
+    const rankUp = ChapterDigestSchema.parse({
+      ...digest(), chapterNumber: 10, payoffKind: null,
+      coreChanges: { ...digest().coreChanges, progressionChanges: [{
+        subjectId: 'lam_khai', systemId: 'nguoi_tham_gia', trackId: null, toRankId: 'thu_luat',
+        toMinorStageId: 'so_ky', why: 'Bảng xếp hạng thông quan xác nhận.',
+      }] },
+    });
+    const { digest: clean, dropped } = sanitizeDigest({ premise: horror, bible, digest: rankUp });
+    expect(dropped).toEqual([]);
+    expect(clean.coreChanges.progressionChanges[0].trackId).toBe('quan_sat');
+    const next = applyDigest({ premise: horror, bible, digest: clean });
+    expect(next.symbolicCore.progressions.find(state => state.subjectId === 'lam_khai' && state.systemId === 'nguoi_tham_gia'))
+      .toMatchObject({ trackId: 'quan_sat', rankId: 'thu_luat', minorStageId: 'so_ky' });
   });
 
   test('a rank the subject already holds is not recorded as a new breakthrough', () => {

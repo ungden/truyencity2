@@ -45,8 +45,11 @@ cron */5  →  /api/cron/serial  →  reconcile_serial_jobs  →  runSerialTicks
 Every quantity that changes hands — goods, price, crystals, stock — is declared by the
 planner in `beatSheets[].ledger` (acquire / transfer / consume). Code prefixes the ids,
 replays the ledger over the current lots and rejects an impossible sale **before any prose
-exists**, costing one planner retry. The Writer receives `bangSoLieu`, lines rendered by
-code, and copies the numbers (inside 【】 in a system lane). At commit the digest's
+exists**, costing one planner retry. The Writer receives `traoTayCuaMain` and
+`traoTayNgoaiQuay`, plain clauses rendered by code ("Cao Nguyên trao cho Lâm Việt 8 viên
+tinh hạch"), and tells each hand-over in prose with those numbers. Until 2026-10-02 they
+were receipts (`bangSoLieu`: "2. Giao dịch: A → B: 1 X") and the Writer printed them as
+system panels. At commit the digest's
 `assetEvents` are replaced by the planned ledger; the Extractor no longer counts anything.
 
 This replaced an opening audit that did inventory arithmetic over prose and an extractor
@@ -276,6 +279,25 @@ a model failure:
   version is 1). It surfaced as a raw ZodError from the rolling merge, which skipped the
   planner retry and paused the story. The rule is gone, a rejected merge now gets the
   retry, and a rolling plan's customer loop (which the merge discards) is not validated.
+
+## The Bible follows the page (2026-10-02)
+
+A read of all five stories (chapters 1–3 and 11+, scored 4–5/10 against 6–7 for the
+openings) found two more places where code, not the models, broke the page:
+
+- **A rank-up the merge dropped.** A panel names the rank, not the track ("đạt Thử Luật Sơ
+  Kỳ"), so the extractor left `trackId` empty; `sanitizeDigest` keyed the change without it,
+  saw a subject new to the system and dropped it as "must enter at the first rank". The
+  rule-horror Bible kept its protagonist at Tàn Dư Hậu Kỳ, the Writer called him that for
+  three chapters, and chapter 15 announced the same promotion again. A subject on exactly
+  one track of a system is now on that track. What the merge sets aside is stored in
+  `serial_runs.merge_notes`; it used to exist only in the tick's HTTP response.
+- **Receipts in panels.** See *Numbers belong to the plan*: the ledger reached the Writer
+  in receipt form and came back as 【Giao dịch: …】.
+
+The rest of that read is premise and plan, not code: cycles stretch one arena over five to
+eight chapters, beats resolve on a document or a stamp, and the golden finger and the
+protagonist's rank barely climb. Those are fixed in the premise and the plan.
 
 ## Two launch gates
 

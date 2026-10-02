@@ -290,7 +290,19 @@ export function sanitizeDigest(input: { premise: Premise; bible: Bible; digest: 
       progressions.set(`${arrival.id}:${state.systemId}:${state.trackId ?? ''}`, { subjectId: arrival.id, ...state });
     }
   }
-  const progressionChanges = changes.progressionChanges.filter(change => {
+  // A rank-up panel names the rank, not the track ("đạt Thử Luật Sơ Kỳ"), so the extractor
+  // often leaves trackId empty. Keyed without it, the subject looked new to the system and
+  // the promotion was dropped as "must enter at the first rank": the rule-horror Bible kept
+  // its protagonist two chapters behind his published rank, and the Writer re-announced it.
+  // A subject on exactly one track of the system is on that track.
+  const tracksOf = (subjectId: string, systemId: string) => [...progressions.values()]
+    .filter(state => state.subjectId === subjectId && state.systemId === systemId)
+    .map(state => state.trackId ?? null);
+  const progressionChanges = changes.progressionChanges.map(change => {
+    if (change.trackId) return change;
+    const tracks = tracksOf(change.subjectId, change.systemId);
+    return tracks.length === 1 ? { ...change, trackId: tracks[0] } : change;
+  }).filter(change => {
     const label = `progression ${change.subjectId}/${change.systemId}→${change.toRankId}`;
     if (!knownSubjects.has(change.subjectId)) return drop(`${label}: chủ thể không tồn tại`);
     if (alive.get(change.subjectId) === false) return drop(`${label}: nhân vật đã chết`);

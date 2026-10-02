@@ -766,11 +766,22 @@ describe('code-owned ledger and reader-facing gates', () => {
 
   test('the writer copies numbers rendered by code from the planned ledger', () => {
     const writerBrief = buildWriterBrief({ premise, bible: baseBible(), cycle: ledgerCycle(), chapterNumber: 8, previousChapter: null });
-    expect(writerBrief.bangSoLieu).toEqual([
-      '1. Nhập kho: Lâm Việt nhận 3 lá Hộ Thân Phù',
-      '2. Giao dịch: Lâm Việt → Bảy Thạch: 1 lá Hộ Thân Phù',
+    expect(writerBrief.traoTayCuaMain).toEqual([
+      'Lâm Việt nhận 3 lá Hộ Thân Phù',
+      'Lâm Việt trao cho Bảy Thạch 1 lá Hộ Thân Phù',
     ]);
-    expect(WRITER_SYSTEM_PROMPT).toMatch(/bangSoLieu/);
+    expect(WRITER_SYSTEM_PROMPT).toMatch(/traoTayCuaMain/);
+  });
+
+  test('hand-overs reach the Writer as clauses, never as receipts it can print in a panel', () => {
+    // 【Giao dịch: Trần Kính → Liên Minh Ngự Thú: 1 …】 was printed in two stories (2026-10-01).
+    const writerBrief = buildWriterBrief({ premise, bible: baseBible(), cycle: ledgerCycle(), chapterNumber: 8, previousChapter: null });
+    const judgeBrief = buildJudgeBrief({ premise, bible: baseBible(), cycle: ledgerCycle(), chapterNumber: 8, title: 't', prose: 'p' });
+    for (const brief of [writerBrief, judgeBrief]) {
+      expect(Object.keys(brief).filter(key => /^bang/i.test(key))).toEqual([]);
+      expect([...brief.traoTayCuaMain, ...brief.traoTayNgoaiQuay].join('\n'))
+        .not.toMatch(/→|^\d+\.|Giao dịch:|Nhập kho:|Tiêu hao:/m);
+    }
   });
 
   test("a customer's own purse never shows up as a shop notice", () => {
@@ -786,8 +797,8 @@ describe('code-owned ledger and reader-facing gates', () => {
     const gift = { ...pay, eventId: 'c8_tang', toOwnerId: 'to_van', toOwnerName: 'Tô Vãn', quantity: 1 };
     const lines = splitLedgerLines([...ledger, purse, pay, gift], 'lam_viet');
     expect(lines.panel.join('\n')).not.toMatch(/Bảy Thạch nhận/);
-    expect(lines.panel.join('\n')).toMatch(/Bảy Thạch → Lâm Việt: 3 viên/);
-    expect(lines.background).toEqual(['1. Giao dịch: Bảy Thạch → Tô Vãn: 1 viên Tinh hạch Nhất giai']);
+    expect(lines.panel.join('\n')).toMatch(/Bảy Thạch trao cho Lâm Việt 3 viên/);
+    expect(lines.background).toEqual(['Bảy Thạch trao cho Tô Vãn 1 viên Tinh hạch Nhất giai']);
   });
 
   test('a unit the item name already starts with is not printed twice', () => {
@@ -826,7 +837,7 @@ describe('code-owned ledger and reader-facing gates', () => {
     const priceSlip: JudgeVerdict['continuity'] = [{
       kind: 'transaction_contradiction',
       quote: 'Bảy Thạch đặt bốn tinh hạch lên quầy.',
-      explain: 'bangSoLieu ghi ba tinh hạch.',
+      explain: 'traoTayCuaMain ghi ba tinh hạch.',
     }];
     const provider = stubProvider({
       writer: [draft(), draft()],

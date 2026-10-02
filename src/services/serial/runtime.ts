@@ -661,6 +661,12 @@ async function stageWrite(
   });
   if (error) throw error;
   const needsOpeningReview = Boolean((commit as { needsOpeningReview?: boolean } | null)?.needsOpeningReview);
+  // What the merge set aside used to live only in this tick's HTTP response, so a dropped
+  // rank-up left no trace (rule-horror chapter 10, 2026-09-25). Keep it on the run.
+  if (outcome.mergeNotes.length) {
+    const kept = await db.from('serial_runs').update({ merge_notes: outcome.mergeNotes }).eq('id', runId);
+    if (kept.error) throw kept.error;
+  }
   if (localOpeningNotes) {
     const noted = await db.from('serial_jobs')
       .update({ last_error: `Biên tập mở đầu đề nghị sửa cục bộ: ${localOpeningNotes}`.slice(0, 2_000) })

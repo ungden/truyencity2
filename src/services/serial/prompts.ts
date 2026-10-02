@@ -11,7 +11,7 @@ import playbookData from './playbook.json';
  * composed in at the marked point. Changing craft is a data edit; changing the
  * contract is a code change. They rot at different speeds.
  */
-export const SERIAL_PROMPT_VERSION = `serial-prompts-42-no-stale-place + playbook-${playbookData.version}`;
+export const SERIAL_PROMPT_VERSION = `serial-prompts-43-handovers-not-receipts + playbook-${playbookData.version}`;
 
 const writerPrompt = (archetype: string) => `Bạn là tác giả truyện mạng tiếng Việt, viết truyện dài nhiều chương ra hằng ngày.
 
@@ -22,7 +22,7 @@ ${craftBlock('writer', archetype)}
 RÀNG BUỘC
 Bạn được tự do bịa thêm người, nơi, chi tiết, lời thoại và diễn biến nhỏ để chương hay hơn.
 khongDuocTrai là trạng thái ở đầu chương, không phải trần tiến triển: ai đã chết, cấp nào, ngày thứ mấy, ai biết gì. Cấp độc giả đã thấy thì không công bố lại như cú thăng cấp mới; cấp mới thì cho thấy căn cứ rồi kết thúc đúng cấp mới. Dùng đúng tên hệ, cấp và phẩm trong worldSlice. hopDongMoDau, nếu có, là kết quả phải xảy ra trọn và đúng mức cụ thể trên trang.
-SỐ LIỆU DO HỆ THỐNG GIỮ: bangSoLieu và soLieuNgoaiQuay là mọi món đổi chủ trong chương, đã tính sẵn, xếp theo thứ tự diễn ra. Kể từng lần trao tay bằng lời trong cảnh, đúng con số, đúng thứ tự (hàng phải về tay trước khi được bán). Không tự thêm con số hàng, giá hay tồn kho; việc trao tay nào không có trong hai bảng này thuộc chương khác.
+SỐ LIỆU DO HỆ THỐNG GIỮ: traoTayCuaMain và traoTayNgoaiQuay là mọi món đổi chủ trong chương, đã tính sẵn, xếp theo thứ tự diễn ra. Kể từng lần trao tay bằng lời trong cảnh, đúng con số, đúng thứ tự (hàng phải về tay trước khi được bán). Không tự thêm con số hàng, giá hay tồn kho; việc trao tay nào không có trong hai danh sách này thuộc chương khác.
 mocVongKhachHangChuongNay, nếu có, là payoff thương mại phải hoàn tất trong chương; người chứng kiến chuyển ngay thành hỏi giá, đặt hàng, mời hợp tác hoặc đổi địa vị.
 hinhDangChuong là xương cảnh đã duyệt. Chương nối liền: mở bằng openingBridge tiếp đúng doanCuoiChuongTruoc, kết bằng hook dẫn vào chuongKeTiep nếu có; nếu kế hoạch đi ngược điều vừa xảy ra hay vừa hẹn, cho thấy trên trang vì sao. protagonistMove là lựa chọn của main; materialOutcome có trước câu hook; sceneMode là loại cảnh, không phải nhãn để đọc lên.
 Viết văn bản thuần, không dùng markdown (không **, *, #, _). Viết tiếng Việt có đủ dấu. Không lẫn tiếng Anh ngoài tên riêng đã có trong truyện. Không bao giờ nhắc tới brief, prompt, hệ thống sinh văn bản hay bất cứ thứ gì ngoài truyện: không viết tên luật ("thứ mới có tên"), không viết số chương ("ở chương 2"), không bình chú rằng một thứ là mới — cứ để nó xuất hiện.
@@ -43,7 +43,7 @@ khongDuocTrai là trạng thái ở đầu chương, không phải trần của 
 doanCuoiChuongTruoc là đoạn cuối chương liền trước. Chương này mở ra hay diễn tiếp trái với điều vừa hẹn hoặc vừa xảy ra ở đó mà trang không cho thấy vì sao — dùng timeline và trích câu trái ngược.
 golden_finger_scope chỉ dành cho lợi thế của main tự làm được việc ngoài rule, scope và nấc hiện tại (lực đẩy, cưỡng chế, liên lạc xuyên giới, sản xuất, quyền quản lý). Điều sủng thú, thẻ, vật phẩm hay người trên trang làm được là thông tin thế giới.
 Main bị đồng minh thay toàn bộ quyết định, trái protagonistMove trong leRaPhaiLam, dùng contradicts_bible.
-LỖI SỐ LIỆU (được sửa một lần, không bao giờ vứt chương): bangSoLieu và soLieuNgoaiQuay là con số đúng của chương do hệ thống tính. Lượng, giá hay người nhận khác hai bảng này dùng transaction_contradiction; một lần trao tay không có dòng tương ứng dùng resource_provenance. Trích đúng câu sai. Không tự làm lại phép tính tồn kho.
+LỖI SỐ LIỆU (được sửa một lần, không bao giờ vứt chương): traoTayCuaMain và traoTayNgoaiQuay là con số đúng của chương do hệ thống tính. Lượng, giá hay người nhận khác hai danh sách này dùng transaction_contradiction; một lần trao tay không có dòng tương ứng dùng resource_provenance. Trích đúng câu sai. Không tự làm lại phép tính tồn kho.
 
 Ngoài lỗi logic, trích dẫn repetition (cảnh/thủ pháp lặp so với tóm tắt được cấp) và aiFlavor — những thứ này không bao giờ chặn chương, chỉ để tác giả tránh ở chương sau: ba vế song song, trữ tình rỗng, chuyển cảnh/tính từ vạn năng, gán nhãn cảm xúc, văn như báo cáo, nhân vật nói thẳng chủ đề, hoặc đám đông đồng thanh cùng một phản ứng.
 

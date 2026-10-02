@@ -97,12 +97,14 @@ function measureWord(unit: string, assetName: string): string {
 export function renderLedgerLines(events: AssetEvent[]): string[] {
   // The planner's note is bookkeeping ("paid in chapter 2", "credited to…"). It stays in
   // the plan; the reader only ever sees who handed what to whom.
-  return events.map((event, index) => {
-    const step = `${index + 1}. `;
+  // Each line is a plain clause, in order. Until 2026-10-02 they were receipts
+  // ("2. Giao dịch: A → B: 1 X", "Nhập kho: …") handed over as `bangSoLieu`, and the Writer
+  // printed them as system panels: 【Giao dịch: Trần Kính → Liên Minh Ngự Thú: 1 …】.
+  return events.map(event => {
     const amount = `${formatQuantity(event.quantity)} ${measureWord(event.unit, event.assetName)}${event.assetName}`;
-    if (event.kind === 'acquire') return `${step}Nhập kho: ${event.toOwnerName} nhận ${amount}`;
-    if (event.kind === 'transfer') return `${step}Giao dịch: ${event.fromOwnerName ?? event.fromOwnerId} → ${event.toOwnerName}: ${amount}`;
-    return `${step}Tiêu hao: ${event.fromOwnerName ?? event.fromOwnerId} dùng ${amount}`;
+    if (event.kind === 'acquire') return `${event.toOwnerName} nhận ${amount}`;
+    if (event.kind === 'transfer') return `${event.fromOwnerName ?? event.fromOwnerId} trao cho ${event.toOwnerName} ${amount}`;
+    return `${event.fromOwnerName ?? event.fromOwnerId} dùng ${amount}`;
   });
 }
 
@@ -329,7 +331,7 @@ export function buildWriterBrief(input: {
       : [],
     ...(() => {
       const lines = splitLedgerLines(sheet.ledger ?? [], premise.castSeed.find(member => member.role === 'protagonist')?.id);
-      return { bangSoLieu: lines.panel, soLieuNgoaiQuay: lines.background };
+      return { traoTayCuaMain: lines.panel, traoTayNgoaiQuay: lines.background };
     })(),
     nhanVatLienQuan: castIds.map(id => ({
       ten: nameOf(bible, id),
@@ -386,7 +388,7 @@ export function buildJudgeBrief(input: {
     mocVongKhachHangChuongNay: customerLoopMilestone(cycle, chapterNumber),
     ...(() => {
       const lines = splitLedgerLines(sheet?.ledger ?? [], premise.castSeed.find(member => member.role === 'protagonist')?.id);
-      return { bangSoLieu: lines.panel, soLieuNgoaiQuay: lines.background };
+      return { traoTayCuaMain: lines.panel, traoTayNgoaiQuay: lines.background };
     })(),
     // Lived-causality (v3, retired) only; a v2 brief no longer carries these empty fields.
     ...(premise.narrativeFoundation ? {
