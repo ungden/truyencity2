@@ -89,7 +89,7 @@ next one fail CI:
 | `ANTI_PAYOFF_PATTERNS` (playbook load + prompt test) | A rule forbidding transactions, ranks, new names, crowds or payoffs |
 | Soft/hard continuity kinds, auditor schema | Arithmetic or provenance becoming a reason to discard a chapter |
 | `RULE_BUDGET` (57, counted across line breaks) | Adding a rejection rule without removing one |
-| `premiseLint` in `assertSerialLaunchable` | An opening ledger written as accounting, a hook that postpones the promise, fewer than 6 rungs |
+| `premiseLint` in `assertSerialLaunchable` | An opening ledger written as accounting, a hook that postpones the promise, fewer than 6 rungs, paperwork as the way to win (non-commerce lanes) |
 | `processProseFindings` (code, per chapter) | Bookkeeping/inspection prose above 14 words per 1,000 — sent to the one repair |
 | `metaLeakFindings` (code, per chapter) | Brief vocabulary ("thứ mới có tên", "ở chương 2") in the story |
 | `normalizeCyclePlanShape` | A whole plan rejected for a mechanical field (span, loop schedule, unpaired ids) — repaired in code |
@@ -297,7 +297,17 @@ openings) found two more places where code, not the models, broke the page:
 
 The rest of that read is premise and plan, not code: cycles stretch one arena over five to
 eight chapters, beats resolve on a document or a stamp, and the golden finger and the
-protagonist's rank barely climb. Those are fixed in the premise and the plan.
+protagonist's rank barely climb.
+
+The four non-commerce premises said so themselves. Their motor fields — the protagonist's
+agenda, `conflictLadder.rules`, `oppositionEngine`, `voiceSheet.register` and
+`reactionRule`, the text planners turn into beats — read "chốt giá bằng giấy trắng mực
+đen", "thắng một điều khoản", "thắng trong luật trước khi có sức phá luật", "cướp chiến lợi
+phẩm bằng hợp đồng". Those lines were rewritten so wins come from fights, evolutions,
+talent and people (ids and structure untouched, so the running Bibles still bind), and the
+four live stories carry the revision from 2026-10-02. `premiseLint` now refuses a
+non-commerce premise whose motor fields hold three or more paperwork terms; commerce lanes
+are exempt because an order or a contract is their payoff.
 
 ## Two launch gates
 

@@ -69,13 +69,13 @@
   },
   "conflictLadder": {
     "survival": "Trần Kính phải chuộc lồng thú, giữ Sửu Khuyển khỏi bị Phòng Thí Nghiệm Hắc Tảo thu mua và sống qua những lần tiến hóa có tỷ lệ chết thật.",
-    "rules": "Các trường, gia tộc và Liên Minh dùng hạn ngạch kiểm định, quyền khai thác bí cảnh và quy tắc giải đấu để khóa vật liệu; hắn phải thắng trong luật trước khi có sức phá luật.",
+    "rules": "Các trường, gia tộc và Liên Minh khóa vật liệu bằng hạn ngạch, giấy phép bí cảnh và luật giải đấu; Trần Kính phá khóa bằng những trận thắng công khai và những lần tiến hóa không ai đoán trước.",
     "ideology": "Học viện xem tiến hóa là tài sản cần độc quyền, còn Trần Kính tin rằng đường đi của sủng thú thuộc về sự lựa chọn của cả người lẫn thú, không phải bảng giá của kẻ có quyền.",
     "self": "Khi đã có danh tiếng và đội thú mạnh, Trần Kính phải chọn làm người bán bí mật cho thế lực lớn để sống yên, hay dựng một Đấu Trường Mở nơi phế thú và chủ nghèo cũng được chứng minh giá trị."
   },
   "hiddenThread": "Nhãn Đồ Tiến Hóa không phải năng lực vô chủ: nó là một mảnh giao diện còn sót lại từ Kỷ Nguyên Khai Phổ, khi các Vương Thú từng tự chọn huyết mạch thay vì bị con người phân hạng. Mọi nhánh ẩn mà Trần Kính mở đều đang đánh thức các Mẫu Ấn trong bí cảnh. Liên Minh Ngự Thú muốn thu hồi Mẫu Ấn để tái lập hệ thống kiểm soát giống loài; còn một số Vương Thú ngủ sâu muốn phá toàn bộ khế ước. Trần Kính sẽ phát hiện con đường của Sửu Khuyển không dẫn đến thú mạnh nhất, mà dẫn đến kẻ có quyền quyết định các đường tiến hóa còn lại.",
   "payoffStance": "mixed",
-  "oppositionEngine": "Trường Huấn Thú Hạ Thành giữ quyền kiểm định và kho Tủy Thạch mà Trần Kính cần; giáo quan Tạ Hành mất uy tín nếu một nhân viên quét chuồng chứng minh máy của ông bỏ sót nhánh tiến hóa. Gia tộc Lục giữ giấy phép vào Bí cảnh Mẫu Sào và sẽ mất độc quyền vật liệu nếu phế thú của Trần Kính thắng giải. Phòng Thí Nghiệm Hắc Tảo cần mua Sửu Khuyển trước khi nó lột xác để giải phẫu huyết mạch. Họ có thể ép nợ, sửa điểm kiểm định, giăng đối thủ khắc chế, mua chuộc đồng đội hoặc chiếm điểm khai thác hợp pháp. Mỗi lần Trần Kính thắng một cửa, hắn không xóa đối thủ mà lấy được ghế dự bị, quyền đề cử, đồng minh hoặc giấy phép để bước vào bàn chơi lớn hơn.",
+  "oppositionEngine": "Trường Huấn Thú Hạ Thành giữ quyền kiểm định và kho Tủy Thạch mà Trần Kính cần; giáo quan Tạ Hành mất uy tín nếu một nhân viên quét chuồng chứng minh máy của ông bỏ sót nhánh tiến hóa. Gia tộc Lục giữ lối vào Bí cảnh Mẫu Sào và sẽ mất độc quyền vật liệu nếu phế thú của Trần Kính thắng giải. Phòng Thí Nghiệm Hắc Tảo cần mua Sửu Khuyển trước khi nó lột xác để giải phẫu huyết mạch. Họ có thể ép nợ, sửa điểm kiểm định, giăng đối thủ khắc chế, mua chuộc đồng đội hoặc chiếm điểm khai thác. Mỗi lần Trần Kính thắng một cửa, hắn không xóa đối thủ mà lấy được vật liệu tiến hóa, một trận đấu lớn hơn, đồng minh hoặc lối vào bí cảnh mới.",
   "castSeed": [
     {
       "id": "tran_kinh",
@@ -193,7 +193,7 @@
       "id": "luu_mien",
       "name": "Lưu Miên",
       "role": "ally",
-      "agenda": "Cô muốn đỗ vào đội nghiên cứu bí cảnh bằng năng lực thật, không bằng họ hàng trong học viện, nên cần chứng cứ về các nhánh tiến hóa bị che giấu.",
+      "agenda": "Cô muốn đỗ vào đội nghiên cứu bí cảnh bằng năng lực thật, không bằng họ hàng trong học viện, nên muốn tận mắt cùng Trần Kính mở các nhánh tiến hóa bị che giấu.",
       "antagonistClass": null,
       "startLocationId": "inspection_yard",
       "startingProgressions": [
@@ -802,10 +802,10 @@
   "endingDirection": "Ở hồi cuối, Trần Kính dẫn Khuyển Ảnh Nhai Cốt tiến đến Tổ Thú, mở Mẫu Ấn trung tâm và buộc Liên Minh công khai toàn bộ đường tiến hóa bị độc quyền. Hắn không phá hủy khế ước; hắn lập luật mới để sủng thú có quyền từ chối, còn ngự thú sư bình dân có thể dùng thành tích đấu trường đổi lấy cơ hội tiến hóa hợp pháp.",
   "voiceSheet": {
     "pov": "third_limited",
-    "register": "Nhịp nhanh, câu gọn, ưu tiên hành động nhìn thấy được. Trần Kính nói ít nhưng luôn chốt bằng giá, điều kiện hoặc kết quả; Sửu Khuyển có độc thoại ngắn, ngang bướng và thực dụng trong các đoạn khế ước.",
+    "register": "Nhịp nhanh, câu gọn, ưu tiên hành động nhìn thấy được. Trần Kính nói ít nhưng luôn chốt bằng kết quả trận đấu hoặc một lần tiến hóa; Sửu Khuyển có độc thoại ngắn, ngang bướng và thực dụng qua liên kết tâm ý.",
     "chapterTitleRule": "Mỗi tiêu đề phải gọi thẳng đấu trường hoặc mục tiêu, lợi thế tiến hóa và phần thưởng: “Kiểm Định: Sửu Khuyển thức tỉnh Ảnh Nhai, lấy suất dự giải”",
     "showsSystemPanel": true,
-    "reactionRule": "Khi bảng gọi đúng cấp, phẩm hoặc kỹ năng mới, phản ứng không dừng ở kinh ngạc: người chứng kiến phải tranh suất hợp tác, đưa giá chiêu mộ, gửi thư thách đấu, sửa thái độ hoặc dùng quyền hạn để ngăn Trần Kính. Mỗi trận thắng công khai phải tạo ít nhất một cơ hội tài nguyên và một hành động đối kháng mới.",
+    "reactionRule": "Khi bảng gọi đúng cấp, phẩm hoặc kỹ năng mới, phản ứng không dừng ở kinh ngạc: người chứng kiến phải tranh suất hợp tác, đưa giá chiêu mộ, gửi thư thách đấu, sửa thái độ hoặc giăng đối thủ khắc chế để chặn Trần Kính. Mỗi trận thắng công khai phải tạo ít nhất một cơ hội tài nguyên và một hành động đối kháng mới.",
     "taboos": [
       "Không dùng tên quốc gia, thành phố, thương hiệu hay nhân vật có thật.",
       "Không để tiến hóa tự thành công nếu chưa trả giá bằng điều kiện cụ thể.",

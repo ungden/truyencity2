@@ -70,19 +70,19 @@
   },
   "conflictLadder": {
     "survival": "Giữ tiểu linh mạch và tổ trạch trước hạn ba mươi ngày, nuôi nổi năm tộc nhân còn lại.",
-    "rules": "Dùng khế đất, tỷ thí phường thị, luật đại hội gia tộc và danh ngạch tông môn để chống thế lực có quyền viết luật.",
+    "rules": "Thắng tỷ thí phường thị, đại hội gia tộc và cuộc tranh danh ngạch tông môn bằng chính những thiên tài Lục gia nuôi ra, buộc các thế lực có quyền viết luật phải nhường chỗ.",
     "ideology": "Lục Hàn phản đối việc xem người có tư chất thấp là vật hy sinh; hắn xây gia tộc bằng cơ hội có điều kiện thay vì lấy thiên tài làm tài sản độc quyền.",
     "self": "Khi đã có quyền lực, Lục Hàn phải chọn làm một gia chủ luôn đổi mọi quan hệ thành phúc báo hay dựng một Lục gia đủ mạnh để hậu bối được tự chọn con đường."
   },
   "hiddenThread": "Linh mạch tổ truyền của Lục gia không suy kiệt tự nhiên. Nó là một mắt trận cổ bị người đời trước cố ý khóa để che giấu quyền quản lý mạch nguồn Vân Lĩnh. Hệ thống không ban sức mạnh vô cớ: nó đang chọn một gia chủ có thể tập hợp đủ các nhánh huyết mạch, nghề nghiệp và đồng minh để mở lại mắt trận. Mỗi lãnh địa Lục Hàn giành được vừa là tài sản thật, vừa là một mảnh bản đồ dẫn đến kẻ đã khiến Lục gia sa sút.",
   "payoffStance": "front",
-  "oppositionEngine": "Tạ gia đang giữ giấy thế chấp linh mạch và muốn nuốt tổ địa để mở rộng linh điền; nếu Lục Hàn thành công, họ mất nguồn dược liệu và uy danh gia tộc lớn. Chấp sự Nghiêm của Thanh Mộc tông giữ danh ngạch đệ tử cùng quyền khai thác dược cốc, nên muốn cướp thiên tài Lục gia bằng hợp đồng bất bình đẳng. Phường chủ Bùi giữ đường thương mại, thuế bến bãi và muốn Lục gia mãi nghèo để mua rẻ đất đai. Họ có thể ép nợ, phá liên hôn, mua chuộc tộc nhân, dựng tỷ thí và viện luật đại hội. Mỗi lần Lục Hàn thắng một điều khoản hoặc một trận chiến, hắn lấy lại một chỗ đứng cụ thể: linh điền, danh ngạch, quyền khai thác hay phiếu biểu quyết.",
+  "oppositionEngine": "Tạ gia đang giữ giấy thế chấp linh mạch và muốn nuốt tổ địa để mở rộng linh điền; nếu Lục Hàn thành công, họ mất nguồn dược liệu và uy danh gia tộc lớn. Chấp sự Nghiêm của Thanh Mộc tông giữ danh ngạch đệ tử cùng quyền khai thác dược cốc, nên muốn cướp thiên tài Lục gia bằng danh ngạch và đan dược mồi chài. Phường chủ Bùi giữ đường thương mại, thuế bến bãi và muốn Lục gia mãi nghèo để mua rẻ đất đai. Họ có thể ép nợ, phá liên hôn, mua chuộc tộc nhân, dựng tỷ thí và viện luật đại hội. Mỗi lần Lục Hàn đánh thắng một trận, đưa một thiên tài nhập phả hay đoạt một mỏ tài nguyên, hắn lấy lại một chỗ đứng cụ thể: linh điền, linh mạch, danh ngạch hay phiếu biểu quyết.",
   "castSeed": [
     {
       "id": "luc_han",
       "name": "Lục Hàn",
       "role": "protagonist",
-      "agenda": "Gia chủ trẻ nhịn nhục đúng lúc nhưng luôn chốt giá bằng giấy trắng mực đen; mục tiêu trước mắt là trong ba mươi ngày kiếm đủ ba trăm linh thạch hạ phẩm để chuộc tiểu linh mạch.",
+      "agenda": "Gia chủ trẻ nhịn nhục đúng lúc nhưng đã ra tay là lấy lại gấp bội; mục tiêu trước mắt là trong ba mươi ngày kiếm đủ ba trăm linh thạch hạ phẩm để chuộc tiểu linh mạch, và không để tháng nào trôi qua mà gia phả không có thêm một thiên tài.",
       "antagonistClass": null,
       "startLocationId": "luc_gia_to_trach",
       "startingProgressions": [
@@ -985,15 +985,15 @@
   "endingDirection": "Sau khi tập hợp đủ các nhánh hậu bối và phá khóa mạch nguồn, Lục Hàn phát hiện quyền lực lớn nhất không phải độc chiếm linh khí mà là thiết lập quy tắc phân phối mới. Kết thúc hướng đến Lục gia trở thành thế gia giữ mạch nguồn Vân Lĩnh, đánh bại kẻ thao túng sự sa sút của các tiểu tộc, đồng thời Lục Hàn trao quyền lựa chọn đường tu cho thế hệ sau thay vì biến họ thành công cụ của hệ thống.",
   "voiceSheet": {
     "pov": "third_limited",
-    "register": "Nhịp nhanh, lời thoại thẳng, ưu tiên giá cả, cảnh giới, điều khoản và kết quả nhìn thấy. Lục Hàn nói ít nhưng luôn gọi đúng món nợ, đúng cấp bậc và đúng lợi ích; gia tộc có tình nhưng mọi lời hứa phải được chứng minh bằng hành động.",
+    "register": "Nhịp nhanh, lời thoại thẳng, ưu tiên giá cả, cảnh giới, phần thưởng và kết quả nhìn thấy. Lục Hàn nói ít nhưng luôn gọi đúng món nợ, đúng cấp bậc và đúng lợi ích; gia tộc có tình nhưng mọi lời hứa phải được chứng minh bằng hành động.",
     "chapterTitleRule": "Tiêu đề chương luôn nêu một xung đột cụ thể và một kết quả hoặc phần thưởng, ví dụ: Chương 12: Băng linh căn nhập phả, nhận trận bàn Nhất phẩm.",
     "showsSystemPanel": true,
-    "reactionRule": "Mỗi khi bảng gọi đúng linh căn, cảnh giới, phẩm giai hay cấp gia tộc, ít nhất một người chứng kiến phải chuyển sự kinh ngạc thành hành động lợi ích cụ thể: tranh mua, mời chào, ép ký khế, thách đấu, xin liên hôn, chiêu mộ hoặc đổi phe. Không được chỉ có lời khen suông; phản ứng phải tạo ra giao dịch, đối thủ hoặc cơ hội kế tiếp.",
+    "reactionRule": "Mỗi khi bảng gọi đúng linh căn, cảnh giới, phẩm giai hay cấp gia tộc, ít nhất một người chứng kiến phải chuyển sự kinh ngạc thành hành động lợi ích cụ thể: tranh mua, mời chào, ra giá cướp người, thách đấu, xin liên hôn, chiêu mộ hoặc đổi phe. Không được chỉ có lời khen suông; phản ứng phải tạo ra giao dịch, đối thủ hoặc cơ hội kế tiếp.",
     "taboos": [
       "Không có cảnh tình dục hay miêu tả thân mật trực diện.",
       "Không dùng tên quốc gia, triều đại, thành phố hoặc nhân vật có thật.",
       "Không cho phần thưởng giải quyết vô điều kiện mọi vấn đề.",
-      "Không bỏ qua giá linh thạch, khế ước và hậu quả khi gia tộc mở rộng.",
+      "Không bỏ qua giá linh thạch và hậu quả khi gia tộc mở rộng.",
       "Không để đối thủ ngu ngốc đứng nhìn khi Lục gia đoạt tài nguyên."
     ]
   }

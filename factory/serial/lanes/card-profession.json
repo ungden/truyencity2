@@ -74,13 +74,13 @@
   },
   "conflictLadder": {
     "survival": "Giữ mạng trong hầm ngục, kiếm tiền chuộc quầy và không để đội săn bị bỏ rơi giữa dị biến.",
-    "rules": "Giành chứng nhận, chỉ tiêu hầm ngục và quyền sở hữu công thức trước khi gia tộc dùng quy tắc bóp chết người nghèo.",
+    "rules": "Giành chỉ tiêu hầm ngục, suất giải liên viện và nguyên liệu phẩm cao bằng thẻ mạnh hơn và những trận thắng công khai, trước khi gia tộc dùng tiền và người bóp chết dân khu trọ.",
     "ideology": "Lâm Kha chống việc biến thẻ mạnh thành tài sản cha truyền con nối, còn các thế lực tin tài nguyên phải thuộc về kẻ đủ tiền giữ nó.",
     "self": "Khi đã có thể tạo thẻ Đỏ và điều khiển lợi ích cả Vân Cảng, Lâm Kha chọn dựng luật chia cơ hội hay tự trở thành người độc quyền mới."
   },
   "hiddenThread": "Bảng Luyện Thẻ không phải phần thưởng vô chủ mà là chìa khóa đóng mở một Thẻ Môn từng phong ấn nguồn dị biến của Hầm Mưa Đen. Sáu phẩm màu không chỉ là thang sức mạnh: mỗi màu là một mảnh quyền hạn. Tạ Mặc muốn người mở cửa để cứu thành, Phan gia muốn biến cửa thành độc quyền nguyên liệu, còn Lâm Kha dần hiểu việc mở cửa sai cách sẽ khiến mọi chức nghiệp bị thẻ hóa thành tài sản có thể tước đoạt.",
   "payoffStance": "front",
-  "oppositionEngine": "Phan gia giữ mực thẻ, kho vật liệu và người trong Tháp Giám Định; họ mất độc quyền ngay khi Lâm Kha chứng minh phế liệu cũng có thể luyện thẻ phẩm cao. Nhà Đoàn giữ đội săn cùng quyền khai thác và sẽ mất vị trí nếu đội của Lâm Kha vượt họ. Tạ Mặc giữ chỉ tiêu bí cảnh, cần Lâm Kha nhưng sẵn sàng dùng quy định để thử lòng cậu. Họ có thể khóa hàng, mua chuộc đồng đội, dựng cuộc kiểm định, thách đấu công khai hoặc chiếm cổng hầm ngục. Mỗi lần Lâm Kha phá một vòng kiểm soát, cậu không chỉ thắng trận mà có thêm khách hàng, đồng đội, giấy phép hoặc quyền nói trong luật chơi.",
+  "oppositionEngine": "Phan gia giữ mực thẻ, kho vật liệu và người trong Tháp Giám Định; họ mất độc quyền ngay khi Lâm Kha chứng minh phế liệu cũng có thể luyện thẻ phẩm cao. Nhà Đoàn giữ đội săn cùng quyền khai thác và sẽ mất vị trí nếu đội của Lâm Kha vượt họ. Tạ Mặc giữ chỉ tiêu bí cảnh, cần Lâm Kha nhưng sẵn sàng đẩy cậu vào tầng nguy hiểm để thử thực lực. Họ có thể khóa hàng, mua chuộc đồng đội, dựng cuộc kiểm định, thách đấu công khai hoặc chiếm cổng hầm ngục. Mỗi lần Lâm Kha phá một vòng vây, cậu không chỉ thắng trận mà có thêm thẻ, nguyên liệu, đồng đội hoặc một tầng hầm ngục mới.",
   "castSeed": [
     {
       "id": "lam_kha",
@@ -294,7 +294,7 @@
       "id": "bang_khiem",
       "name": "Bàng Khiêm",
       "role": "antagonist",
-      "agenda": "Lấy báo cáo lớn để vào bộ phận công thức của Tháp Giám Định.",
+      "agenda": "Cướp công thức thẻ phẩm cao của Lâm Kha để leo vào bộ phận công thức của Tháp Giám Định.",
       "antagonistClass": "quan_lieu_kiem_dinh",
       "startLocationId": "thap_giam_dinh",
       "startingProgressions": [
@@ -826,10 +826,10 @@
   "endingDirection": "Khoảng chương 800 đến 1.200, Lâm Kha hoàn thành bộ sáu màu, mở Thẻ Môn ở lõi Hầm Mưa Đen và phát hiện các gia tộc đã dùng chuẩn phẩm màu để khóa đường tiến của người nghèo. Cậu không xóa hệ thống thẻ bằng một trận thắng, mà dùng quyền Thẻ Hoàng lập chuẩn công thức công khai, phá độc quyền nguyên liệu và dựng liên minh đội săn có thể tự luyện, tự kiểm định, tự khai hoang. Trận cuối là lựa chọn giữa giữ Thẻ Môn cho riêng mình thành quyền lực tuyệt đối, hoặc mở đường nhưng chấp nhận thế giới sẽ xuất hiện thêm đối thủ ngang tầm.",
   "voiceSheet": {
     "pov": "third_limited",
-    "register": "Nhịp nhanh, câu gọn, ưu tiên công dụng thẻ, giá nguyên liệu, điều kiện thắng và phản ứng ngay tại hiện trường. Lâm Kha nói ít nhưng luôn chốt bằng giá, điều kiện hoặc câu hỏi lật lợi ích đối phương.",
+    "register": "Nhịp nhanh, câu gọn, ưu tiên công dụng thẻ, giá nguyên liệu, điều kiện thắng và phản ứng ngay tại hiện trường. Lâm Kha nói ít nhưng luôn chốt bằng một lá thẻ, một cú ra tay hoặc một câu lật lợi ích đối phương.",
     "chapterTitleRule": "Tiêu đề chương nêu thẳng đấu trường, thẻ hoặc phần thưởng: ví dụ Kiểm Định: Khiên Tro Lục Phẩm, Cả Lớp Im Lặng.",
     "showsSystemPanel": true,
-    "reactionRule": "Mỗi khi cấp cảnh giới hoặc phẩm màu được gọi đúng, phản ứng phải chuyển thành hành động có lợi ích: người chứng kiến tranh mua nguyên liệu, chiêu mộ vào đội, gửi thách đấu, sửa giá hợp đồng, rút thái độ khinh thường hoặc dùng quy tắc để ngăn cản. Không có kinh ngạc đứng yên chỉ để khen.",
+    "reactionRule": "Mỗi khi cấp cảnh giới hoặc phẩm màu được gọi đúng, phản ứng phải chuyển thành hành động có lợi ích: người chứng kiến tranh mua nguyên liệu, chiêu mộ vào đội, gửi thách đấu, ra giá cao hơn, rút thái độ khinh thường hoặc chặn đường bằng thực lực. Không có kinh ngạc đứng yên chỉ để khen.",
     "taboos": [
       "Không trì hoãn thẻ Lục sau chương hai.",
       "Không dùng nhân vật, quái vật hay địa danh từ tác phẩm có thật.",

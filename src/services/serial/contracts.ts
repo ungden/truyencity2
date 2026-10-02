@@ -1058,6 +1058,14 @@ export function assertSerialLaunchable(premise: Premise): void {
  */
 const BOOKKEEPING = /tín dụng|ghi có|số dư|quyết toán|phát sinh|khấu trừ|người thanh toán|nghĩa vụ|(?:^|\s)chương (?:một|hai|ba|bốn|\d+)/iu;
 const POSTPONED_PROMISE = /trước khi (?:bán|mở|kiếm|lên cấp|thành)|rồi mới (?:bán|mở|hình thành)|từng bước[^.]{0,40}rồi mới/iu;
+/**
+ * Paperwork as the way to win. The fields below are what planners turn into beats; when
+ * they say the hero "chốt giá bằng giấy trắng mực đen", "thắng một điều khoản" or "thắng
+ * trong luật", every cycle resolves on a stamp. A read of chapters 11+ on 2026-10-02 scored
+ * four such stories 4–5/10. Commerce lanes are exempt: an order or a contract is their payoff.
+ */
+const PROCEDURE_MOTOR = /hợp đồng|điều khoản|khế ước|ký khế|giấy phép|giấy trắng mực đen|biên bản|hồ sơ|chứng nhận|con dấu|niêm phong|công chứng|báo cáo|trong luật|quyền đề cử/giu;
+const PROCEDURE_MOTOR_LIMIT = 3;
 
 export function premiseLint(premise: Premise): string[] {
   const problems: string[] = [];
@@ -1068,6 +1076,17 @@ export function premiseLint(premise: Premise): string[] {
   }
   for (const [field, value] of [['hook', premise.hook], ['readerFantasy', premise.readerFantasy]] as const) {
     if (POSTPONED_PROMISE.test(value)) problems.push(`${field} trì hoãn lời hứa thay vì hứa nó`);
+  }
+  if (!(archetypeOf(premise.archetype)?.commerce ?? true)) {
+    const protagonist = premise.castSeed.find(member => member.role === 'protagonist');
+    const motor = [
+      protagonist?.agenda ?? '', premise.conflictLadder.rules, premise.oppositionEngine,
+      premise.voiceSheet.register, premise.voiceSheet.reactionRule,
+    ].join(' ');
+    const found = motor.match(PROCEDURE_MOTOR) ?? [];
+    if (found.length >= PROCEDURE_MOTOR_LIMIT) {
+      problems.push(`động cơ truyện là thủ tục (${[...new Set(found.map(word => word.toLowerCase()))].join(', ')}): main phải thắng bằng sức mạnh, tiến hóa hay người, không bằng giấy tờ`);
+    }
   }
   if (!premise.title.includes(':') || /^\s*(đấu trường|đấu truong|arena)\s*:/iu.test(premise.title)) {
     problems.push('title phải có dạng "Thể loại: lợi thế + phần thưởng", không chép nhãn công thức');

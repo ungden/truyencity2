@@ -165,6 +165,29 @@ describe('policy lock: the premise cannot smuggle process in', () => {
   });
 });
 
+describe('policy lock: a premise cannot make paperwork the way to win', () => {
+  const lane = (id: string) => SERIAL_PREMISE_CATALOG.find(entry => entry.id === id)!.premise;
+
+  test('the motor lines four lanes shipped with until 2026-10-02 are caught', () => {
+    // Clan-legacy, verbatim before the rewrite: chapters 11-19 became eight hearings over one deed.
+    const clan = lane('clan-legacy');
+    const shipped = {
+      ...clan,
+      castSeed: clan.castSeed.map(member => member.role === 'protagonist'
+        ? { ...member, agenda: 'Gia chủ trẻ nhịn nhục đúng lúc nhưng luôn chốt giá bằng giấy trắng mực đen.' }
+        : member),
+      oppositionEngine: `${clan.oppositionEngine} Chấp sự muốn cướp thiên tài bằng hợp đồng bất bình đẳng. Mỗi lần Lục Hàn thắng một điều khoản, hắn lấy lại một chỗ đứng.`,
+    };
+    expect(premiseLint(shipped).join(' ')).toMatch(/động cơ truyện là thủ tục/);
+  });
+
+  test('a commerce lane may win orders and contracts', () => {
+    const shop = lane('cua-hang-cong-phap-tu-tien');
+    const orders = { ...shop, oppositionEngine: `${shop.oppositionEngine} Mỗi vòng thắng mang về hợp đồng, hợp đồng lớn hơn và một hợp đồng độc quyền.` };
+    expect(premiseLint(orders).join(' ')).not.toMatch(/động cơ truyện là thủ tục/);
+  });
+});
+
 describe('policy lock: ledger prose is measured, not debated', () => {
   const pilot = (name: string) => readFileSync(`factory/serial/song-xuyen/private/runs/${name}`, 'utf8');
 
